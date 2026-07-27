@@ -88,9 +88,9 @@
 
       var config = {
         arguments: [],
-        dataUrl: "Build/6cd0d03c140b38df116217ef412de022.data.unityweb",
+        dataUrl: "Build/46eef4c7ba9430eaf94740c93d517f7e.data.unityweb",
         frameworkUrl: "Build/00424fe2ea5640673e2c8862c0cca28e.framework.js.unityweb",
-        codeUrl: "Build/6b3071039ac238a7bac2d1c430852e0e.wasm.unityweb",
+        codeUrl: "Build/ce85f9b2e9b4a5151192c8cfc462bad4.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "UNAD",
         productName: "TwinSight X500",
@@ -110,7 +110,7 @@
       document.querySelector("#unity-loading-bar").style.display = "block";
 
       var script = document.createElement("script");
-      script.src = "Build/c02a0bc936202d8ae347ae331e242c98.loader.js";
+      script.src = "Build/73b8da6598ce620ae2576cfaf2a4aa35.loader.js";
       script.onload = function () {
         createUnityInstance(canvas, config, function (progress) {
           document.querySelector("#unity-progress-bar-full").style.width =
