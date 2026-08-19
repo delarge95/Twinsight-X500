@@ -214,8 +214,15 @@
 \DeclareCaptionLabelFormat{table_num_bold_left}{\textbf{#1~#2}}
 \DeclareCaptionLabelSeparator{mediumspace}{\par}
 
-\AtBeginEnvironment{table}{\ifdim\pagetotal>0pt \vspace{18.5pt}\fi}
-\AtBeginEnvironment{figure}{\ifdim\pagetotal>0pt \vspace{18.5pt}\fi}
+\setlength{\intextsep}{18.5pt}
+\setlength{\textfloatsep}{0pt}
+\setlength{\floatsep}{14.5pt}
+
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{14.5pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
 
 \captionsetup[table]{
     labelformat=table_num_bold_left,
@@ -250,7 +257,7 @@
     \RaggedRight%
     \noindent\textit{Nota}. #2\par%
     \endgroup%
-    \ifdim#1>0pt\vspace*{#1}\fi%
+    \ifdim#1=0pt\else\vspace*{#1}\fi%
 }
 
 

@@ -27,7 +27,7 @@ La interoperabilidad aparece como una barrera transversal. NIST identifica retos
 \label{fig:madurez_digital_model_shadow_twin}
 \centering
 \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_madurez_digital_model_shadow_twin_trimmed.pdf}
-\apanote[14.4pt]{La build actual se ubica antes de las capas con telemetría histórica, datos en vivo y sincronización operacional. Elaboración propia.}
+\apanote[+6.2pt]{La build actual se ubica antes de las capas con telemetría histórica, datos en vivo y sincronización operacional. Elaboración propia.}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -127,7 +127,7 @@ En el contexto del prototipo, la interfaz 3D orbital, la selección directa sobr
 \label{fig:carga_cognitiva_2d_3d}
 \centering
 \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_carga_cognitiva_2d_3d_trimmed.pdf}
-\apanote[14.5pt]{La figura no afirma que el visor elimine la complejidad intrínseca del dron; muestra cómo puede reducir carga extrínseca asociada a búsqueda, rotación mental e integración manual de información. Elaboración propia.}
+\apanote[+6.2pt]{La figura no afirma que el visor elimine la complejidad intrínseca del dron; muestra cómo puede reducir carga extrínseca asociada a búsqueda, rotación mental e integración manual de información. Elaboración propia.}
 \end{figure}
 
 \FloatBarrier
@@ -168,7 +168,7 @@ El rendimiento de una aplicación WebGL no depende de una sola variable, sino de
 \label{fig:balance_fidelidad_legibilidad_rendimiento}
 \centering
 \includegraphics[width=0.92\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_balance_fidelidad_legibilidad_rendimiento.pdf}
-\apanote{La figura resume el criterio de \textit{Technical Art} del proyecto: preservar reconocimiento visual y lectura técnica sin romper el presupuesto de ejecución en navegador. Elaboración propia.}
+\apanote[+14.5pt]{La figura resume el criterio de \textit{Technical Art} del proyecto: preservar reconocimiento visual y lectura técnica sin romper el presupuesto de ejecución en navegador. Elaboración propia.}
 \end{figure}
 
 \paragraph{Presupuesto Poligonal}
@@ -212,7 +212,7 @@ Esto traduce el rendimiento a una restricción directamente medible en navegador
 \label{fig:modelo_rendimiento_webgl}
 \centering
 \includegraphics[width=0.96\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_modelo_operativo_rendimiento_webgl.pdf}
-\apanote[14.4pt]{El tiempo de cuadro efectivo se interpreta como resultado del cuello dominante entre CPU, GPU, memoria/carga y sincronización, no como efecto de una sola técnica de optimización. Elaboración propia.}
+\apanote[-18.3pt]{El tiempo de cuadro efectivo se interpreta como resultado del cuello dominante entre CPU, GPU, memoria/carga y sincronización, no como efecto de una sola técnica de optimización. Elaboración propia.}
 \end{figure}
 
 \FloatBarrier
@@ -259,7 +259,7 @@ La iluminación ambiental en PBR se apoya en mapas de entorno precalculados (irr
 \label{fig:flujo_pbr_urp}
 \centering
 \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_flujo_pbr_urp_app.pdf}
-\apanote{El diagrama distingue la base PBR delegada a URP de las extensiones propias de inspección técnica, como corte, X-Ray y lectura térmica heurística. Elaboración propia.}
+\apanote[14.5pt]{El diagrama distingue la base PBR delegada a URP de las extensiones propias de inspección técnica, como corte, X-Ray y lectura térmica heurística. Elaboración propia.}
 \end{figure}
 
 \subsubsection{Matemática Aplicada a Shaders de Inspección y Análisis}
@@ -272,7 +272,7 @@ El corte transversal de la app se expresa mediante la distancia al plano $\Pi = 
 \label{fig:plano_corte_shader}
 \centering
 \includegraphics[width=0.74\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_plano_corte_shader.pdf}
-\apanote[14.5pt]{El esquema resume el paso desde el movimiento del plano hasta la evaluación fragmento a fragmento; no representa una operación destructiva sobre la malla. Elaboración propia.}
+\apanote[-18.4pt]{El esquema resume el paso desde el movimiento del plano hasta la evaluación fragmento a fragmento; no representa una operación destructiva sobre la malla. Elaboración propia.}
 \end{figure}
 
 \paragraph{Fresnel de Borde para Modos Analíticos}
@@ -283,7 +283,7 @@ Modos como \textit{X-Ray} o \textit{Blueprint} usan intensidad de borde: $F_{\te
 \label{fig:fresnel_contornos_tecnicos}
 \centering
 \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_fresnel_contornos_tecnicos.pdf}
-\apanote[14.5pt]{Representación del cálculo de Fresnel de borde basado en el ángulo entre la normal de superficie y la vista para resaltar siluetas. Elaboración propia.}
+\apanote[+3.7pt]{Representación del cálculo de Fresnel de borde basado en el ángulo entre la normal de superficie y la vista para resaltar siluetas. Elaboración propia.}
 \end{figure}
 
 \paragraph{Mapeo Visual del Modo Térmico}
@@ -298,7 +298,7 @@ Esta ecuación describe una capa de visualización heurística inspirada en disi
 \label{fig:jerarquia_termica_heuristica}
 \centering
 \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_jerarquia_termica_heuristica.pdf}
-\apanote{Clasificación de disipación térmica heurística entre componentes activos (fuentes de calor primarias) y pasivos del dron Holybro X500 V2. Elaboración propia.}
+\apanote[+6.2pt]{Clasificación de disipación térmica heurística entre componentes activos (fuentes de calor primarias) y pasivos del dron Holybro X500 V2. Elaboración propia.}
 \end{figure}
 
 \FloatBarrier
