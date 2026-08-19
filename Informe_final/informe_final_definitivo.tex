@@ -2,7 +2,14 @@
 
 % ============================================================
 % TwinSight X500 - Informe Final
-% Archivo maestro DEFINITIVO - APA 7 UNAD (Instructivo marzo 2023)
+% BUILD DEFINITIVA v6 - APA 7 UNAD (Instructivo 2023) - Control Estructural de Flotantes
+% TOC corto (inicia en Objetivos).
+% ESTRATEGIA DE FLOTANTES: todos van [tp] (tope de pagina o pagina
+% de flotantes), NUNCA a mitad de texto. El hueco posterior a la
+% nota queda en el interlineal puro (18.5pt, el ritmo 2.0) con
+% \textfloatsep=0pt, y al no haber flotantes a mitad de texto se
+% elimina el caso del hueco previo colapsado. Reemplazar el archivo
+% COMPLETO, sin merge manual.
 % ============================================================
 
 % --- PAQUETES ---
@@ -17,7 +24,7 @@
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{float}
-\usepackage{placeins}                  % \FloatBarrier SOLO para casos puntuales
+\usepackage{placeins}
 \usepackage{caption}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -30,7 +37,8 @@
 \usepackage{enumitem}
 \usepackage{etoolbox}
 
-% Interlineado reducido permitido dentro de tablas (p. 23)
+% Interlineado reducido permitido DENTRO de tablas extensas (p. 23).
+% OJO: la excepcion aplica al cuerpo de la tabla, NO a la nota.
 \AtBeginEnvironment{table}{\setstretch{1.15}}
 \AtBeginEnvironment{longtable}{\setstretch{1.15}}
 
@@ -52,7 +60,7 @@
 \setlength{\emergencystretch}{3em}
 
 \setcounter{secnumdepth}{0}             % Titulos sin numeracion visible (p. 8)
-\setcounter{tocdepth}{3}                % TOC hasta Nivel 3 (como el TOC del propio Instructivo)
+\setcounter{tocdepth}{3}                % TOC hasta Nivel 3
 
 \hypersetup{bookmarksopen=true, bookmarksopenlevel=1, bookmarksdepth=3}
 
@@ -79,6 +87,26 @@
   \renewcommand{\headrulewidth}{0pt}%
   \fancyhead[R]{\thepage}%
 }
+
+% --- FLOTANTES ---
+% Estrategia [tp] (ver nota de cabecera): los flotantes van al tope de
+% una pagina o a una pagina de flotantes; nunca a mitad de texto.
+% \@fptop en 0pt alinea al TOPE el contenido de toda pagina de flotantes
+% (por defecto LaTeX la centra verticalmente con pegamento 1fil).
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
+% Flexibilizacion de parametros de asignacion de flotantes
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.70}
+\renewcommand{\textfraction}{0.10}
+\renewcommand{\floatpagefraction}{0.80}
+\setcounter{topnumber}{2}
+\setcounter{totalnumber}{4}
+
+\setlength{\textfloatsep}{0pt}
+\setlength{\intextsep}{0pt}
+\setlength{\floatsep}{0pt}
 
 % --- FORMATO TOC / LISTA DE TABLAS / LISTA DE FIGURAS ---
 \renewcommand{\cftsecpresnum}{\relax}
@@ -125,31 +153,37 @@
 \setlength{\cftbeforesubsecskip}{\mytocskip}
 \setlength{\cftbeforesubsubsecskip}{\mytocskip}
 
-% Ancho compacto del rotulo: cabe "Figura 10" / "Tabla 10" (3.9em aprox.)
-% sin dejar el hueco que marco el revisor. NO bajar de 4.5em.
-\renewcommand{\cfttabpresnum}{\tablename~}
-\renewcommand{\cfttabfont}{\normalfont}
+% Listas de Tablas y Figuras segun el ejemplo del Instructivo:
+% rotulo ("Tabla 1" / "Figura 1") en NEGRILLA redonda, titulo en CURSIVA,
+% sin espacio extra entre entradas.
+\renewcommand{\cfttabpresnum}{\normalfont\bfseries\tablename~}
+\renewcommand{\cfttabfont}{\normalfont\itshape}
 \renewcommand{\cfttabpagefont}{\normalfont}
 \renewcommand{\cfttableader}{\cftdotfill{\cftdotsep}}
-\setlength{\cfttabnumwidth}{4.5em}
-\setlength{\cftbeforetabskip}{0.15\baselineskip}
+\setlength{\cfttabnumwidth}{4.0em}
+\setlength{\cftbeforetabskip}{0pt}
 
-\renewcommand{\cftfigpresnum}{\figurename~}
-\renewcommand{\cftfigfont}{\normalfont}
+\renewcommand{\cftfigpresnum}{\normalfont\bfseries\figurename~}
+\renewcommand{\cftfigfont}{\normalfont\itshape}
 \renewcommand{\cftfigpagefont}{\normalfont}
 \renewcommand{\cftfigleader}{\cftdotfill{\cftdotsep}}
-\setlength{\cftfignumwidth}{4.5em}
-\setlength{\cftbeforefigskip}{0.15\baselineskip}
+\setlength{\cftfignumwidth}{4.0em}
+\setlength{\cftbeforefigskip}{0pt}
+
+% Entradas de lista como texto corrido: "Figura 1 Titulo" con un solo
+% espacio. Se elimina la caja de ancho fijo del rotulo (esa caja era la
+% causa del hueco persistente entre rotulo y titulo).
+\cftsetindents{figure}{0pt}{0pt}
+\cftsetindents{table}{0pt}{0pt}
+\makeatletter
+\def\cftnumberline#1{{\@cftbsnum #1\@cftasnum}\ \@cftasnumb}
+\makeatother
+\renewcommand{\numberline}[1]{\cftnumberline{#1}}
 
 % --- TITULOS APA 7 UNAD (p. 21) ---
-% REGLA DE ORO: sin espacio vertical extra alrededor de titulos.
-% El titulo ya ocupa una linea a interlineado 2.0; cualquier valor
-% adicional aqui es un "espacio libre" prohibido (p. 7) y es lo que
-% el revisor ordeno eliminar.
-% La forma ESTRELLADA de \titlespacing suprime automaticamente la
-% sangria del primer parrafo tras el titulo (regla "sangria a partir
-% del segundo parrafo", pp. 7, 18, 19, 25, 26). NO usar \noindent
-% manuales en los capitulos.
+% Sin espacio vertical extra alrededor de titulos (p. 7).
+% La forma ESTRELLADA de \titlespacing suprime la sangria del primer
+% parrafo tras el titulo (pp. 7, 18, 19, 25, 26). NO usar \noindent.
 
 % Nivel 1: centrado, negrita, mayusculas capitalizadas, pagina nueva
 \titleformat{\section}{\normalfont\bfseries\centering}{}{0em}{}
@@ -164,19 +198,24 @@
 \titlespacing*{\subsubsection}{0pt}{0pt}{0pt}
 
 % Nivel 4: sangria 1.27 cm, negrita, punto final, texto en la misma linea.
-% Separacion tras el punto = un espacio normal (0.5em), NO un cuadratin (1em).
+% Separacion tras el punto = 0.25em = exactamente UN espacio interpalabra
+% de Times 12pt. OJO: titlesec en modo runin ABSORBE el espacio fuente
+% tras la llave de cierre; la separacion debe venir del macro.
 \titleformat{\paragraph}[runin]{\normalfont\bfseries}{}{0em}{}[.]
-\titlespacing*{\paragraph}{1.27cm}{0pt}{0.5em}
+\titlespacing*{\paragraph}{1.27cm}{0pt}{0.25em}
 
 % Nivel 5: igual que Nivel 4, con cursiva
 \titleformat{\subparagraph}[runin]{\normalfont\bfseries\itshape}{}{0em}{}[.]
-\titlespacing*{\subparagraph}{1.27cm}{0pt}{0.5em}
+\titlespacing*{\subparagraph}{1.27cm}{0pt}{0.25em}
 
 % --- CAPTIONS Y NOTAS (pp. 22-24) ---
 % Linea 1: "Tabla 1" / "Figura 1" en negrita, alineado a la izquierda.
 % Linea 2: titulo en cursiva, mayusculas capitalizadas, SIN punto final.
 \DeclareCaptionLabelFormat{table_num_bold_left}{\textbf{#1~#2}}
-\DeclareCaptionLabelSeparator{mediumspace}{\par\vspace{0.25\baselineskip}}
+\DeclareCaptionLabelSeparator{mediumspace}{\par}
+
+\AtBeginEnvironment{table}{\ifdim\pagetotal>0pt \vspace{18.5pt}\fi}
+\AtBeginEnvironment{figure}{\ifdim\pagetotal>0pt \vspace{18.5pt}\fi}
 
 \captionsetup[table]{
     labelformat=table_num_bold_left,
@@ -197,26 +236,33 @@
     position=top
 }
 
-% Nota de tabla/figura: pegada al objeto, interlineado reducido (permitido, p. 23).
-% NUNCA anteponer \vspace manual en los capitulos: este macro ya trae el suyo.
-\newcommand{\apanote}[1]{%
-    \par\vspace{0.3\baselineskip}%
+% Macros para compensación de títulos inmediatamente bajo flotantes al tope:
+\newcommand{\espaciotituloniveldos}{\mbox{}\vspace*{6.2pt}}
+\newcommand{\espaciotitulonivelcuatro}{\mbox{}\vspace*{14.5pt}}
+
+% Nota de tabla/figura a interlineado 2.0.
+% Argumento opcional [#1]: espacio extra al final del flotante para compensación
+% cuando el flotante en el tope está seguido inmediatamente por un título.
+\newcommand{\apanote}[2][0pt]{%
+    \par%
     \begingroup%
-    \setstretch{1.15}%
+    \setstretch{2}%
     \RaggedRight%
-    \noindent\textit{Nota}. #1\par%
+    \noindent\textit{Nota}. #2\par%
     \endgroup%
+    \ifdim#1>0pt\vspace*{#1}\fi%
 }
+
+
 
 \begin{document}
 
 % --- PORTADA (p. 9) ---
 % Sin entorno titlepage: la portada se numera como pagina 1 (p. 7).
-% Titulo en minusculas y negrita; mayuscula solo en siglas y nombres propios.
+% Sin \vspace inicial: el titulo inicia en el margen superior.
 \thispagestyle{fancy}
 \begin{center}
     \setstretch{2}
-    \vspace*{2\baselineskip}
     {\normalfont\bfseries TwinSight X500: prototipo web 3D para visualización técnica de hardware complejo\par}
     \vfill
     {\normalfont Alexander Woodcock Salomón\par}
@@ -231,15 +277,16 @@
 \end{center}
 
 % --- RESUMEN (p. 12): un solo parrafo, sin sangria de primera linea ---
-\section{Resumen}
+% Con asterisco: NO aparece en la Tabla de Contenido (build de TOC corto)
+\section*{Resumen}
 \setlength{\parindent}{0pt}
 La documentación de hardware técnico complejo, como drones y sistemas electromecánicos multicomponente, presenta limitaciones de comunicación espacial cuando depende de imágenes 2D, manuales PDF y fuentes técnicas fragmentadas. Este informe desarrolla TwinSight X500, un prototipo web 3D interactivo orientado a la visualización técnica, inspección y análisis visual del dron Holybro X500~V2. El trabajo se enmarca en Design Science Research, prototipado iterativo, Teoría de la Carga Cognitiva, interacción 3D y renderizado físicamente basado. La build integra selección jerárquica de piezas, ficha técnica inferior, modos \textit{Inspect}, \textit{Analyze} y \textit{Studio}, corte transversal, vista explosionada, filtros y visualización térmica heurística. El pipeline redujo el modelo desde rutas CAD superiores a 6,5 millones de triángulos hasta 95\,617 triángulos optimizados. La validación combinó profiler WebGL, desempeño en tareas cronometradas, SUS, NASA-TLX Raw y \textit{Think-Aloud} con 12 participantes: SUS promedio de 91,88, NASA-TLX Raw de 8,69 para el visor 3D frente a 19,89 para el soporte 2D, menor tiempo medio en las tres tareas cronometradas y 96 registros tarea-condición completados. El prototipo alcanzó rendimiento estable en escritorio, comportamiento funcional en móviles reales y alcance defendible como \textit{visual product twin}, no como gemelo digital operacional.
 
-% "Palabras clave" con sangria, cursiva y negrita (p. 12). La lista NO lleva punto final.
+% "Palabras clave" con sangria, cursiva y negrita (p. 12). Sin punto final.
 \hspace{1.27cm}\textit{\textbf{Palabras clave:}} WebGL, Unity, WebAssembly, visualización, usabilidad
 
 % --- ABSTRACT (p. 13) ---
-\section{Abstract}
+\section*{Abstract}
 Complex hardware documentation, including drones and multicomponent electromechanical systems, presents spatial communication limits when it depends on 2D images, PDF manuals, and fragmented technical sources. This report develops TwinSight X500, an interactive 3D web prototype for technical visualization, inspection, and visual analysis of the Holybro X500~V2. The work is framed through Design Science Research, iterative prototyping, cognitive load theory, 3D interaction, and physically based rendering. The build includes hierarchical part selection, a bottom technical sheet, \textit{Inspect}, \textit{Analyze}, and \textit{Studio} modes, cross-section, exploded view, category filters, and component-based heuristic thermal visualization. The pipeline reduced the model from CAD routes above 6.5 million triangles to 95,617 optimized triangles. Validation combined WebGL profiling, timed task performance, SUS, NASA-TLX Raw, and Think-Aloud with 12 participants: mean SUS was 91.88, NASA-TLX Raw was 8.69 for the 3D viewer versus 19.89 for the 2D reference, lower mean time in the three timed tasks for the 3D condition, and 96 completed task-condition records. The prototype achieved stable desktop performance, functional behavior on real mobile devices, and a defensible scope as a visual product twin, not as an operational digital twin.
 
 \hspace{1.27cm}\textit{\textbf{Keywords:}} WebGL, Unity, WebAssembly, visualization, usability
@@ -248,39 +295,38 @@ Complex hardware documentation, including drones and multicomponent electromecha
 
 % --- LISTAS PRELIMINARES: ORDEN ESTRICTO UNAD (pp. 3, 14-17) ---
 % 1. Tabla de Contenido  2. Lista de Tablas  3. Lista de Figuras  4. Lista de Apendices
+% Ninguna de las listas se registra a si misma en el TOC (build de TOC corto).
 \clearpage
 \tableofcontents
 
 \clearpage
-\phantomsection
-\addcontentsline{toc}{section}{Lista de Tablas}
 \listoftables
 
 \clearpage
-\phantomsection
-\addcontentsline{toc}{section}{Lista de Figuras}
 \listoffigures
 
-\section{Lista de Apéndices}
-\noindent Apéndice A \quad Repositorio de Código Fuente \cftdotfill{\cftdotsep} \pageref{apendice:A}\par\vspace{0.15\baselineskip}
-\noindent Apéndice B \quad Manual de Usuario \cftdotfill{\cftdotsep} \pageref{apendice:B}\par\vspace{0.15\baselineskip}
-\noindent Apéndice C \quad Manual Técnico \cftdotfill{\cftdotsep} \pageref{apendice:C}\par\vspace{0.15\baselineskip}
-\noindent Apéndice D \quad Documentación Técnica Activa \cftdotfill{\cftdotsep} \pageref{apendice:D}\par\vspace{0.15\baselineskip}
-\noindent Apéndice E \quad Matriz de Desconexiones \cftdotfill{\cftdotsep} \pageref{apendice:E}\par\vspace{0.15\baselineskip}
-\noindent Apéndice F \quad Catálogo Canónico del Holybro X500 V2 \cftdotfill{\cftdotsep} \pageref{apendice:F}\par\vspace{0.15\baselineskip}
-\noindent Apéndice G \quad Validación Funcional de la Escena Final \cftdotfill{\cftdotsep} \pageref{apendice:G}\par\vspace{0.15\baselineskip}
-\noindent Apéndice H \quad Instrumentos y Registros de Evaluación \cftdotfill{\cftdotsep} \pageref{apendice:H}\par\vspace{0.15\baselineskip}
-\noindent Apéndice I \quad Estado del Pipeline de Activos \cftdotfill{\cftdotsep} \pageref{apendice:I}\par\vspace{0.15\baselineskip}
-\noindent Apéndice J \quad Demo Público \cftdotfill{\cftdotsep} \pageref{apendice:J}\par\vspace{0.15\baselineskip}
-\noindent Apéndice K \quad Audio y Alcance No Integrado \cftdotfill{\cftdotsep} \pageref{apendice:K}\par\vspace{0.15\baselineskip}
-\noindent Apéndice L \quad Auditoría Matemática y Trazabilidad con Wolfram \cftdotfill{\cftdotsep} \pageref{apendice:L}\par\vspace{0.15\baselineskip}
-\noindent Apéndice M \quad Correlación entre la Propuesta y el Informe Final \cftdotfill{\cftdotsep} \pageref{apendice:M}\par\vspace{0.15\baselineskip}
-\noindent Apéndice N \quad Resumen de Artefactos Activos del Cierre \cftdotfill{\cftdotsep} \pageref{apendice:N}\par\vspace{0.15\baselineskip}
+\section*{Lista de Apéndices}
+% Rotulo en negrilla + titulo en cursiva, un solo espacio, sin \vspace entre entradas
+\noindent\textbf{Apéndice A} \textit{Repositorio de Código Fuente} \cftdotfill{\cftdotsep} \pageref{apendice:A}\par
+\noindent\textbf{Apéndice B} \textit{Manual de Usuario} \cftdotfill{\cftdotsep} \pageref{apendice:B}\par
+\noindent\textbf{Apéndice C} \textit{Manual Técnico} \cftdotfill{\cftdotsep} \pageref{apendice:C}\par
+\noindent\textbf{Apéndice D} \textit{Documentación Técnica Activa} \cftdotfill{\cftdotsep} \pageref{apendice:D}\par
+\noindent\textbf{Apéndice E} \textit{Matriz de Desconexiones} \cftdotfill{\cftdotsep} \pageref{apendice:E}\par
+\noindent\textbf{Apéndice F} \textit{Catálogo Canónico del Holybro X500 V2} \cftdotfill{\cftdotsep} \pageref{apendice:F}\par
+\noindent\textbf{Apéndice G} \textit{Validación Funcional de la Escena Final} \cftdotfill{\cftdotsep} \pageref{apendice:G}\par
+\noindent\textbf{Apéndice H} \textit{Instrumentos y Registros de Evaluación} \cftdotfill{\cftdotsep} \pageref{apendice:H}\par
+\noindent\textbf{Apéndice I} \textit{Estado del Pipeline de Activos} \cftdotfill{\cftdotsep} \pageref{apendice:I}\par
+\noindent\textbf{Apéndice J} \textit{Demo Público} \cftdotfill{\cftdotsep} \pageref{apendice:J}\par
+\noindent\textbf{Apéndice K} \textit{Audio y Alcance No Integrado} \cftdotfill{\cftdotsep} \pageref{apendice:K}\par
+\noindent\textbf{Apéndice L} \textit{Auditoría Matemática y Trazabilidad con Wolfram} \cftdotfill{\cftdotsep} \pageref{apendice:L}\par
+\noindent\textbf{Apéndice M} \textit{Correlación entre la Propuesta y el Informe Final} \cftdotfill{\cftdotsep} \pageref{apendice:M}\par
+\noindent\textbf{Apéndice N} \textit{Resumen de Artefactos Activos del Cierre} \cftdotfill{\cftdotsep} \pageref{apendice:N}\par
 
 % --- INFORMACION GENERAL DEL TRABAJO DE GRADO ---
-\section{Información General del Trabajo de Grado}
+% Con asterisco: NO aparece en la Tabla de Contenido (build de TOC corto)
+\section*{Información General del Trabajo de Grado}
 
-\subsection{Integrantes del Proyecto}
+\subsection*{Integrantes del Proyecto}
 
 \textit{Nombre del estudiante:} Alexander Woodcock Salomón
 
@@ -294,7 +340,7 @@ Complex hardware documentation, including drones and multicomponent electromecha
 
 \textit{Nombre del Asesor:} Gustavo Enrique Vejarano Matiz
 
-\subsection{Datos Específicos del Proyecto}
+\subsection*{Datos Específicos del Proyecto}
 
 \textit{Duración del proyecto:} Un (1) año
 
@@ -305,7 +351,9 @@ Complex hardware documentation, including drones and multicomponent electromecha
 \textit{Descriptores palabras clave:} WebGL, Unity, WebAssembly, visualización técnica 3D, optimización, carga de trabajo percibida, HCI, Technical Art, hardware complejo, visual product twin, digital shadow.
 
 % --- CAPITULOS ---
-\input{chapters/01_introduccion}
+% OJO: este main usa la variante de 01 con secciones asteriscadas
+% (Introduccion, Planteamiento y Justificacion fuera del TOC).
+\input{chapters/01_introduccion_toc_corto}
 \input{chapters/02_marco_referencia}
 \input{chapters/03_marco_metodologico}
 \input{chapters/04_desarrollo}

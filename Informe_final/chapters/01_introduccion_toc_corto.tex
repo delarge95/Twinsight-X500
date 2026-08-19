@@ -1,9 +1,10 @@
 % =============================================================================
-% Capítulo 1 — Introducción
-% Base saneada conforme a APA 7 UNAD (Instructivo marzo 2023)
+% Capítulo 1 — Introducción (Variante para TOC corto)
+% Secciones anteriores a Objetivos con asterisco para no figurar en el TOC.
+% Conforme a APA 7 UNAD (Instructivo marzo 2023)
 % =============================================================================
 
-\section{Introducción}
+\section*{Introducción}
 
 La documentación de hardware técnico complejo ---como drones y otros sistemas electromecánicos multicomponente--- enfrenta un desafío de comunicación espacial cuando depende de imágenes 2D, planos convencionales y documentos PDF estáticos. A lo largo de este trabajo, el término \textit{hardware complejo} designa sistemas con integración estructural, energética, electrónica y de control, alta densidad de relaciones espaciales entre piezas y necesidad de inspección visual detallada del ensamblaje. Bajo estas condiciones, los medios estáticos obligan a ingenieros y técnicos a reconstruir mentalmente relaciones tridimensionales que no se presentan de forma explícita, lo que incrementa la demanda cognitiva asociada a la tarea y dificulta la lectura técnica del sistema (Sweller, 1988; Hegarty \& Waller, 2004).
 
@@ -19,7 +20,7 @@ Esta dificultad no es exclusiva del sector de drones. En industrias que diseñan
 
 La convergencia entre WebAssembly, WebGL y \textit{pipelines} contemporáneos de renderizado físicamente basado abrió una oportunidad concreta para trasladar parte de esa interpretación espacial al propio sistema interactivo (Yu et al., 2023). Sobre esa base, el proyecto se orientó al diseño, desarrollo y documentación de un prototipo web 3D interactivo para la visualización técnica, inspección y análisis visual del ensamblaje del dron Holybro X500~V2, buscando un equilibrio entre claridad técnica, rendimiento web y coherencia de experiencia de usuario.
 
-\section{Planteamiento del Problema}
+\section*{Planteamiento del Problema}
 
 La migración de documentación técnica a entornos 3D interactivos no depende solo de una mejor presentación visual. También exige resolver restricciones reales de despliegue web. Los modelos CAD de ingeniería, basados en NURBS, ensamblajes extensos y activos de alta densidad geométrica, no son directamente compatibles con las condiciones de ejecución de una aplicación web. Si bien WebAssembly permite el crecimiento dinámico de la memoria lineal, la viabilidad práctica del producto depende de dos factores: controlar la huella inicial de los activos y configurar un \textit{heap} contiguo lo suficientemente grande para sostener datos, geometría y ejecución estable en el navegador (Unity Technologies, 2024a; WebAssembly Community Group, s.\,f.).
 
@@ -63,27 +64,27 @@ Desde la perspectiva industrial, el valor del proyecto radica en cerrar una prim
 \apanote[14.4pt]{La versión final se posiciona como \textit{visual product twin}: integra inspección, selección y preparación semántica, pero no telemetría real, sincronización operacional ni modelos calibrados. Elaboración propia.}
 \end{figure}
 
-\subsection{Trade-off Explícito entre Tooling y Huella Inicial}
+\subsection*{Trade-off Explícito entre Tooling y Huella Inicial}
 
 Unity no fue seleccionado por ofrecer la descarga inicial más ligera. Por el contrario, el proyecto aceptó una huella inicial mayor a cambio de un ecosistema de autoría más consistente: editor integrado, \textit{profiling}, flujo de materiales, UI Toolkit, sistema de escenas y facilidad para extender el comportamiento mediante C\# y shaders personalizados (Unity Technologies, 2024b, 2024d).
 
-\subsection{Ejecución de Lógica Compilada en WebAssembly}
+\subsection*{Ejecución de Lógica Compilada en WebAssembly}
 
 En el target web, Unity convierte código intermedio de .NET a C++ mediante IL2CPP y posteriormente compila ese resultado a WebAssembly usando el \textit{toolchain} del \textit{build}. Esto permitió sostener una base tipada para la lógica interactiva del prototipo y mantener el proyecto dentro de un entorno técnico unificado, sin atribuir a IL2CPP, por sí solo, todo el salto a Wasm (Unity Technologies, 2024c; Unity Technologies, s.\,f.).
 
-\subsection{\textit{Pipeline} Integrado de Importación y Renderizado}
+\subsection*{\textit{Pipeline} Integrado de Importación y Renderizado}
 
 El proyecto exigía coordinar limpieza de activos CAD, materiales PBR, UI responsiva, modos analíticos y validación funcional sin fragmentar el flujo entre demasiadas herramientas. Unity aportó un entorno integrado para importar geometría, gestionar materiales, perfilar rendimiento y desplegar un \textit{build} web desde una misma base de trabajo.
 
-\subsection{Capacidad de Extensión para Visualización Técnica}
+\subsection*{Capacidad de Extensión para Visualización Técnica}
 
 La aplicación final no se concibió como un visor pasivo de un modelo tridimensional, sino como una experiencia de inspección técnica. El usuario puede recorrer el ensamblaje, seleccionar componentes, aislar zonas de interés, consultar información contextual, separar visualmente el conjunto para comprender relaciones de montaje, observar cortes del interior y alternar lecturas visuales que resaltan materialidad, estructura o comportamiento térmico aproximado. Estas capacidades exigían una plataforma capaz de articular renderizado realista, interacción con piezas, organización semántica del hardware y herramientas de análisis visual dentro de un mismo producto.
 
-\subsection{Compatibilidad Esperada de la Plataforma Web}
+\subsection*{Compatibilidad Esperada de la Plataforma Web}
 
 La plataforma web de Unity contempla navegadores compatibles de escritorio y algunos navegadores móviles, aunque el comportamiento efectivo depende del navegador, su versión, la memoria disponible y el nivel de optimización del \textit{build} (Unity Technologies, s.\,f.). Por ello, en este trabajo la compatibilidad móvil se documenta como \textit{compatibilidad esperada}, sin pretender constituir una garantía universal ni una validación exhaustiva sobre una matriz cerrada de dispositivos.
 
-\subsection{Aporte a la Ingeniería Multimedia}
+\subsection*{Aporte a la Ingeniería Multimedia}
 
 El proyecto aporta al programa por al menos cuatro vías principales: documenta un \textit{pipeline} técnico para llevar activos CAD a un visor web interactivo; articula computación gráfica, experiencia de usuario, documentación técnica y arte técnico en un mismo caso aplicado; convierte restricciones de rendimiento web en criterios medibles de diseño y optimización; y consolida un caso de estudio pertinente para la Ingeniería Multimedia, donde la claridad técnica del ensamblaje es tan importante como la calidad visual del resultado.
 
