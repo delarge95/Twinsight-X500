@@ -233,15 +233,17 @@ namespace WebGL.UI.ProceduralIcons
                 return;
             }
 
-            var painter = mgc.painter2D;
+            var nativePainter = mgc.painter2D;
             
-            painter.lineCap = LineCap.Round;
-            painter.lineJoin = LineJoin.Round;
-            painter.strokeColor = currentColor;
-            painter.lineWidth = Mathf.Clamp(currentStrokeWidth, 0.25f, 8f);
+            nativePainter.lineCap = LineCap.Round;
+            nativePainter.lineJoin = LineJoin.Round;
+            nativePainter.strokeColor = currentColor;
+            nativePainter.lineWidth = Mathf.Clamp(currentStrokeWidth, 0.25f, 8f);
+
+            var painterAdapter = new UnityPainterAdapter(nativePainter);
 
             // Delegate drawing to the specific icon implementation
-            DrawIconPath(painter, width, height);
+            DrawIconPath(painterAdapter, width, height);
         }
 
         // --- ABSTRACT METHODS FOR CHILDREN TO IMPLEMENT ---
@@ -259,7 +261,7 @@ namespace WebGL.UI.ProceduralIcons
         /// <summary>
         /// Draw the vector math using the Painter2D reference.
         /// </summary>
-        protected abstract void DrawIconPath(Painter2D painter, float width, float height);
+        protected abstract void DrawIconPath(IProceduralPainter painter, float width, float height);
 
         // --- HELPER MATH ---
         

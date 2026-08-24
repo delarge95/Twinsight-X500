@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}

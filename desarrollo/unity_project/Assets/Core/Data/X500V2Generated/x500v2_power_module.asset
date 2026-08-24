@@ -22,7 +22,7 @@ MonoBehaviour:
   dimensions: "~55 \xD7 17 \xD7 8 mm"
   function: "Regulaci\xF3n 5V para autopiloto y medici\xF3n de voltaje/corriente
     del sistema"
-  materialType: "FR4 PCB with SMD components and XT60 connectors"
+  materialType: FR4 PCB with SMD components and XT60 connectors
   materialProperties: 
   manufacturer: Holybro
   partNumber: PM02 V3
@@ -43,9 +43,9 @@ MonoBehaviour:
   thumbnail: {fileID: 0}
   isHotspotTarget: 0
   hotspotLabel: 
-  explosionDirection: {x: 0, y: -0.3, z: 0.2}
-  explosionDistance: 0.3
-  explosionPriority: 2
+  explosionDirection: {x: 0, y: 1, z: 0}
+  explosionDistance: 0.45
+  explosionPriority: 4
   isModular: 0
   compatibleSlots: []
   alternativeParts: []
@@ -72,9 +72,6 @@ MonoBehaviour:
   - BM06B-WO
   - TOU-XT60H-M-14AWG
   - X500-TAO-XT60
-  - 'Fasteners: CapNut M3 x4'
-  - 'Fasteners: Nylon Standoff M3 x 5 mm x4'
-  - 'Fasteners: Pan Head Screw M3 x 14 mm x4'
   fastenerMetadata:
     instanceId: 
     familyId: 

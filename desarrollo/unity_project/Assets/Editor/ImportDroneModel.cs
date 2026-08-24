@@ -34,7 +34,7 @@ public static class ImportDroneModel
     private const float TargetRuntimeDominantSize = 10f;
     private const float RuntimeScaleTolerance = 0.08f;
     private const float MaxImporterScaleMultiplier = 1000f;
-    private static readonly Quaternion RuntimeRootRotation = Quaternion.Euler(0f, 90f, 0f);
+    private static readonly Quaternion RuntimeRootRotation = Quaternion.Euler(-90f, 90f, 0f);
 
     [MenuItem("Tools/Import Final Runtime Drone Model")]
     public static void ImportFinalRuntimeModel()
@@ -340,7 +340,7 @@ public static class ImportDroneModel
         referenceRoot.SetActive(false);
     }
 
-    private static ImportNormalizationReport NormalizeRuntimeHierarchy(Transform root)
+    public static ImportNormalizationReport NormalizeRuntimeHierarchy(Transform root)
     {
         ImportNormalizationReport report = new ImportNormalizationReport();
         if (root == null)
@@ -348,9 +348,38 @@ public static class ImportDroneModel
             return report;
         }
 
+        RemoveDuplicateMeshes(root);
         report.PropellersRenamed = NormalizePropellers(root, out report.PropellerProxiesCreated);
         report.FastenersRenamed = NormalizeFasteners(root);
         return report;
+    }
+
+    private static void RemoveDuplicateMeshes(Transform root)
+    {
+        if (root == null) return;
+        List<GameObject> toDelete = new List<GameObject>();
+        Transform[] allChildren = root.GetComponentsInChildren<Transform>(true);
+        foreach (Transform child in allChildren)
+        {
+            if (child == null || child == root) continue;
+            string name = child.name;
+            if (name.EndsWith(".001", StringComparison.OrdinalIgnoreCase) ||
+                name.Contains(".001_low") ||
+                name.Contains(".001."))
+            {
+                if (!toDelete.Contains(child.gameObject))
+                {
+                    toDelete.Add(child.gameObject);
+                }
+            }
+        }
+        foreach (GameObject obj in toDelete)
+        {
+            if (obj != null)
+            {
+                UnityEngine.Object.DestroyImmediate(obj);
+            }
+        }
     }
 
     private static int NormalizePropellers(Transform root, out int proxiesCreated)
@@ -872,7 +901,7 @@ public static class ImportDroneModel
         }
     }
 
-    private sealed class ImportNormalizationReport
+    public sealed class ImportNormalizationReport
     {
         public int PropellersRenamed;
         public int PropellerProxiesCreated;

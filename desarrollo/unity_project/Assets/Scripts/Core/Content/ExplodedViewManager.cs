@@ -237,7 +237,7 @@ namespace WebGL.Core.Content
                         visible = false;
                     }
 
-                    LodVisibilityUtility.ApplyRendererEnabled(renderer, visible);
+                    renderer.enabled = visible;
                     anyVisible |= visible;
 
                     Collider collider = renderer.GetComponent<Collider>();

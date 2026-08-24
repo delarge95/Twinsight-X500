@@ -80,7 +80,7 @@
     {
       "canonicalPartId": "x500v2_pixhawk6c",
       "displayName": "Pixhawk 6C Autopilot",
-      "subpieceNames": ["DIKE-PIXHAWK6C-LV-C1", "MIANKE-PIXHAWK6C-LV-C1", "PCB-PIXHAWK6C-F1"]
+      "subpieceNames": ["DIKE-PIXHAWK6C-LV-C1", "MIANKE-PIXHAWK6C-LV-C1", "PCB-PIXHAWK6C-F1", "IMU-PIXHAWK6C"]
     },
     {
       "canonicalPartId": "x500v2_gps_m10",
@@ -95,12 +95,12 @@
     {
       "canonicalPartId": "x500v2_arm",
       "displayName": "Arm Assembly Quadrant",
-      "subpieceNames": ["HMX5V-DIGAI-DIANJIZUO-MUJU", "HMX5V-GUAN-DINGWEI", "HMX5V-JIBI-JIA-MUJU", "HMX5V-ZUO-DJ-MUJU", "BAN-DJ-DIAN-F2", "PROPELLER", "PROP"]
+      "subpieceNames": ["HMX5V-DIGAI-DIANJIZUO-MUJU", "HMX5V-GUAN-DINGWEI", "HMX5V-JIBI-JIA-MUJU", "HMX5V-ZUO-DJ-MUJU", "BAN-DJ-DIAN-F2", "PROPELLER", "PROP", "DJ-2216-KV880"]
     },
     {
       "canonicalPartId": "x500v2_motor",
       "displayName": "Motor 2216 Quadrant",
-      "subpieceNames": ["DJ-2216-KV880"]
+      "subpieceNames": []
     },
     {
       "canonicalPartId": "x500v2_esc",
@@ -120,7 +120,7 @@
     {
       "canonicalPartId": "x500v2_misc_group",
       "displayName": "Misc Group",
-      "subpieceNames": ["IMU-PIXHAWK6C"]
+      "subpieceNames": []
     },
     {
       "canonicalPartId": "x500v2_rc_receiver",

@@ -19,7 +19,7 @@ MonoBehaviour:
   weightKg: 0.02
   dimensions: "85\xD744 mm"
   function: Controller bottom shell
-  materialType: "Aluminio / Plastic"
+  materialType: Aluminio / Plastic
   materialProperties: 
   manufacturer: Holybro
   partNumber: 
@@ -84,4 +84,4 @@ MonoBehaviour:
     recipeKey: 
     builderType: 
     orientationMode: 
-  category: 1
+  category: 0

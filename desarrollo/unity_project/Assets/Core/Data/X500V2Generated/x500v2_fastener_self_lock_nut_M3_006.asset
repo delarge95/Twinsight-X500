@@ -31,16 +31,16 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
   thumbnail: {fileID: 0}
   isHotspotTarget: 0
   hotspotLabel: 
-  explosionDirection: {x: 0, y: 0, z: 0}
+  explosionDirection: {x: 0, y: 1, z: 0}
   explosionDistance: 0.03
   explosionPriority: 0
   isModular: 0

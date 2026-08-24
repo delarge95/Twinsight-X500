@@ -15,12 +15,15 @@ MonoBehaviour:
   partName: Motor 2216 KV920 BR
   id: x500v2_motor_BR
   partType: Motor
-  description: "Brushless outrunner 2216 motor, KV920. Supports LiPo 3-4S and 1045 propellers. Approximate 4S current range: 3.5-16.2 A, peak power about 240 W. CNC aluminum housing, steel shaft, copper windings. Mounting pattern 16x16 and 19x19 mm. Position: Back-Right (CW)."
+  description: 'Brushless outrunner 2216 motor, KV920. Supports LiPo 3-4S and 1045
+    propellers. Approximate 4S current range: 3.5-16.2 A, peak power about 240 W.
+    CNC aluminum housing, steel shaft, copper windings. Mounting pattern 16x16 and
+    19x19 mm. Position: Back-Right (CW).'
   weightKg: 0.063
   dimensions: "\u230028 mm \xD7 ~32 mm"
-  function: "Primary thrust generation (CW)"
-  materialType: "CNC aluminum alloy, steel shaft, enamelled copper windings"
-  materialProperties: "Heat dissipation through metal housing, N52 magnets"
+  function: Primary thrust generation (CW)
+  materialType: CNC aluminum alloy, steel shaft, enamelled copper windings
+  materialProperties: Heat dissipation through metal housing, N52 magnets
   manufacturer: Holybro
   partNumber: 2216-920KV-CW
   powerConsumption: 240
@@ -40,9 +43,9 @@ MonoBehaviour:
   thumbnail: {fileID: 0}
   isHotspotTarget: 0
   hotspotLabel: 
-  explosionDirection: {x: 0, y: 1, z: 0}
-  explosionDistance: 2
-  explosionPriority: 9
+  explosionDirection: {x: 0.6738171, y: 0.30321768, z: -0.6738171}
+  explosionDistance: 1.6
+  explosionPriority: 1
   isModular: 0
   compatibleSlots: []
   alternativeParts: []
@@ -50,7 +53,8 @@ MonoBehaviour:
   - M3 socket wrench
   - Loctite
   safetyWarnings: []
-  installationTips: "Preinstalled on the arm. If replaced, apply Loctite to the four M3 screws. Back-Right uses CW rotation."
+  installationTips: Preinstalled on the arm. If replaced, apply Loctite to the four
+    M3 screws. Back-Right uses CW rotation.
   installationTimeMinutes: 5
   difficultyLevel: 2
   torqueSpec: 

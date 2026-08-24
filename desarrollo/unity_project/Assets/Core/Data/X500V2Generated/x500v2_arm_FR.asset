@@ -15,12 +15,14 @@ MonoBehaviour:
   partName: Arm Tube Front-Right
   id: x500v2_arm_FR
   partType: Arm
-  description: "16 mm carbon fiber arm tube with reinforced nylon connectors. Includes preinstalled 2216 motor and BLHeli-S 20A ESC, with internal XT30 wiring routed toward the PDB. Position: front-right, quad-X configuration."
+  description: '16 mm carbon fiber arm tube with reinforced nylon connectors. Includes
+    preinstalled 2216 motor and BLHeli-S 20A ESC, with internal XT30 wiring routed
+    toward the PDB. Position: front-right, quad-X configuration.'
   weightKg: 0.03
   dimensions: "\u230016 mm \xD7 ~220 mm"
-  function: "Motor and ESC support; wiring conduit; thrust transfer to the frame"
-  materialType: "Carbon fiber with reinforced nylon connectors"
-  materialProperties: "High stiffness-to-weight ratio, partial vibration absorption"
+  function: Motor and ESC support; wiring conduit; thrust transfer to the frame
+  materialType: Carbon fiber with reinforced nylon connectors
+  materialProperties: High stiffness-to-weight ratio, partial vibration absorption
   manufacturer: Holybro
   partNumber: '#510177'
   powerConsumption: 0
@@ -40,17 +42,18 @@ MonoBehaviour:
   thumbnail: {fileID: 0}
   isHotspotTarget: 0
   hotspotLabel: 
-  explosionDirection: {x: 1, y: 1, z: 1}
-  explosionDistance: 1.5
-  explosionPriority: 2
+  explosionDirection: {x: 0.70144784, y: 0.12626062, z: 0.70144784}
+  explosionDistance: 0.8
+  explosionPriority: 7
   isModular: 0
   compatibleSlots: []
   alternativeParts: []
   requiredTools:
   - M3 hex key
   safetyWarnings:
-  - "Verify CW/CCW orientation of the preinstalled motor"
-  installationTips: "The nylon connector notches align with the rectangular pockets on the bottom plate."
+  - Verify CW/CCW orientation of the preinstalled motor
+  installationTips: The nylon connector notches align with the rectangular pockets
+    on the bottom plate.
   installationTimeMinutes: 3
   difficultyLevel: 2
   torqueSpec: 0.5 Nm

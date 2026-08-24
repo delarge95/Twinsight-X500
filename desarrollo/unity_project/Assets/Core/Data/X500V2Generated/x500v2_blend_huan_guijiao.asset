@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Silicone Mount Dampener
   id: x500v2_blend_huan_guijiao
   partType: Structure
-  description: "Anti-vibration hardware isolator. Modeled from CAD HUAN-GUIJIAO."
+  description: Anti-vibration hardware isolator. Modeled from CAD HUAN-GUIJIAO.
   weightKg: 0.001
   dimensions: M3-M4
-  function: "Anti-vibration hardware isolator"
+  function: Anti-vibration hardware isolator
   materialType: Silicone
   materialProperties: 
   manufacturer: Holybro

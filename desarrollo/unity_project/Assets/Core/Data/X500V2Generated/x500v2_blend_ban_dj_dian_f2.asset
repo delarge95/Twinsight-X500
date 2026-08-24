@@ -15,8 +15,7 @@ MonoBehaviour:
   partName: Motor Mount Base Plate
   id: x500v2_blend_ban_dj_dian_f2
   partType: Propulsion
-  description: Lower heat-dissipating motor mount. Modeled from CAD
-    BAN-DJ-DIAN-F2.
+  description: Lower heat-dissipating motor mount. Modeled from CAD BAN-DJ-DIAN-F2.
   weightKg: 0.005
   dimensions: "16\xD719 mm base"
   function: Lower heat-dissipating motor mount

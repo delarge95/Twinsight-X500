@@ -15,11 +15,12 @@ MonoBehaviour:
   partName: Holybro 2216 KV920 Motor
   id: x500v2_blend_dj_2216_kv880
   partType: Propulsion
-  description: Brushless outrunner motor used by the X500 V2 propulsion system. Holybro documentation lists the kit motors as 2216 KV920 units with XT30 plugs.
+  description: Brushless outrunner motor used by the X500 V2 propulsion system. Holybro
+    documentation lists the kit motors as 2216 KV920 units with XT30 plugs.
   weightKg: 0.063
   dimensions: "\u230028\xD732 mm"
-  function: "Aerodynamic thrust generation"
-  materialType: "Aluminum alloy / Steel"
+  function: Aerodynamic thrust generation
+  materialType: Aluminum alloy / Steel
   materialProperties: 
   manufacturer: Holybro
   partNumber: 2216-920KV

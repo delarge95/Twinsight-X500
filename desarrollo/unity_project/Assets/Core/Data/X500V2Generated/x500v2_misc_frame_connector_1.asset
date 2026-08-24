@@ -15,7 +15,8 @@ MonoBehaviour:
   partName: Auxiliary Frame Connector B
   id: x500v2_misc_frame_connector_1
   partType: Misc Part
-  description: Auxiliary structural connector retained from the imported frame hierarchy. Review with adjacent frame, rail and landing gear assemblies.
+  description: Auxiliary structural connector retained from the imported frame hierarchy.
+    Review with adjacent frame, rail and landing gear assemblies.
   weightKg: -1
   dimensions: N/A
   function: Auxiliary support
@@ -31,9 +32,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 0.3, g: 0.8, b: 1, a: 1}

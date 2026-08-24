@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: Socket Cap Screw M2.5 x 10 mm
   id: x500v2_fastener_cap_screw_M25x10_008
   partType: Socket Cap Screw
-  description: "Chassis fastening and tightening. Modeled from CAD GB70-M25-10."
+  description: Chassis fastening and tightening. Modeled from CAD GB70-M25-10.
   weightKg: 0
   dimensions: M2.5 x 10 mm
   function: Fastening / mounting | M2.5 x 10 mm | Socket Cap | Hex Socket
@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -81,7 +81,7 @@ MonoBehaviour:
     quantityExpected: 8
     isInspectable: 1
     fallbackReason: 
-    notes: "Chassis fastening and tightening. Modeled from CAD GB70-M25-10."
+    notes: Chassis fastening and tightening. Modeled from CAD GB70-M25-10.
     recipeKey: cap_screw_M25x10_placeholder
     builderType: SocketCapScrew
     orientationMode: LongestAxis

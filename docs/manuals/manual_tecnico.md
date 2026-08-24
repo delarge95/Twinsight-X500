@@ -300,12 +300,12 @@ La optimizacion de fasteners no se resuelve cargando mallas densas todo el tiemp
 
 Esta decision mantiene bajo el costo visual de la escena actual y, al mismo tiempo, valida el flujo de inspeccion detallada que luego recibira las mallas finales producidas en Blender.
 
-### LODs finales de Unity 6
-La escena final incorpora una capa adicional de optimizacion mediante `LODGroup` de Unity 6. Esta capa no sustituye los proxies ni la reconstruccion bajo demanda de fasteners; se aplica sobre renderers medianos o grandes cuya reduccion geometrica aporta rendimiento cuando la pieza queda lejos de camara o ocupa poca altura en pantalla.
+### LODs de Unity 6: evaluación y descarte
+Se evaluó incorporar una capa de `LODGroup` de Unity 6 para reducir carga geométrica en distancias largas. La herramienta generaba niveles `LOD1` y `LOD2` simplificados para renderers medianos o grandes, conservando el mesh original como `LOD0`.
 
-El mesh original se conserva siempre como `LOD0`, por lo que la inspeccion cercana mantiene la calidad visual y semantica esperada. Los niveles `LOD1` y `LOD2` se generan desde una herramienta Editor reproducible (`Tools/X500V2/Optimization/Apply Final LODs (Unity 6)`) y se excluyen fasteners modulares, proxies de inspeccion, mallas pequenas y LODGroups manuales. El preprocesador `WebGLFinalLodBuildPreprocessor` ejecuta la misma pasada antes de compilar WebGL, dejando trazabilidad en `Reports/final_lod_optimization_report.md`.
+Sin embargo, los LOD groups generados degradaban el shading de las piezas del dron: materiales, outlines y modos visuales (`Blueprint`, `Solid`, `X-Ray`, `Thermal`) dejaban de aplicarse correctamente sobre los renderers LOD generados. Dado que la fidelidad visual cercana y la coherencia de los modos de vista son requisitos innegociables del visor técnico, la capa LOD fue descartada y retirada por completo.
 
-Para no romper el comportamiento de la app, cada renderer LOD generado recibe `PartRenderCategory` y `LodGeneratedRenderer`. `LodVisibilityUtility` coordina `LODGroup` con filtros, aislamiento e inspeccion para evitar que Unity reactive un renderer que la aplicacion habia ocultado.
+La optimización de presupuesto geométrico en la build final se apoya en el pipeline MAD-T, la retopología manual y el sistema de proxies/reemplazo modular de fasteners bajo demanda, sin depender de LOD groups automáticos.
 
 En paralelo, `HighlightSystem`, `MaterialController` y `PartVisibilityManager` refrescan sus objetivos visuales y su scope de aislamiento para que el fastener siga respondiendo como unidad completa durante *hover*, seleccion e isolate.
 

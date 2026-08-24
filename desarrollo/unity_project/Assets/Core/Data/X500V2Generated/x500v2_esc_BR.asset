@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: ESC BLHeli-S 20A BR
   id: x500v2_esc_BR
   partType: ESC
-  description: "ESC BLHeli-S 20A. Position BR."
+  description: ESC BLHeli-S 20A. Position BR.
   weightKg: 0.007
   dimensions: "~25 \xD7 13 \xD7 5 mm"
   function: Control de velocidad del motor BR

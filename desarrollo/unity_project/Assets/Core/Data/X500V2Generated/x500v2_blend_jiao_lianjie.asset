@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Landing Skid End Cap
   id: x500v2_blend_jiao_lianjie
   partType: Structure
-  description: "Lower cross end cap. Modeled from CAD JIAO-LIANJIE."
+  description: Lower cross end cap. Modeled from CAD JIAO-LIANJIE.
   weightKg: 0.005
   dimensions: "\u230010 mm"
-  function: "Lower cross end cap"
+  function: Lower cross end cap
   materialType: Protective nylon
   materialProperties: 
   manufacturer: Holybro

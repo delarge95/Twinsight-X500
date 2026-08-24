@@ -89,7 +89,7 @@ namespace WebGL.UI.ProceduralIcons
             return hasChanged;
         }
 
-        protected override void DrawIconPath(Painter2D painter, float width, float height)
+        protected override void DrawIconPath(IProceduralPainter painter, float width, float height)
         {
             float cx = width / 2f;
             float cy = height / 2f;
@@ -109,7 +109,7 @@ namespace WebGL.UI.ProceduralIcons
             DrawDiamondLayer(painter, cx, cy - currentSpreadY, diamondWidth, diamondHeight, 1.0f);
         }
 
-        private void DrawDiamondLayer(Painter2D painter, float cx, float cy, float halfW, float halfH, float alphaMultiplier)
+        private void DrawDiamondLayer(IProceduralPainter painter, float cx, float cy, float halfW, float halfH, float alphaMultiplier)
         {
             Color layerColor = currentColor;
             layerColor.a *= alphaMultiplier;

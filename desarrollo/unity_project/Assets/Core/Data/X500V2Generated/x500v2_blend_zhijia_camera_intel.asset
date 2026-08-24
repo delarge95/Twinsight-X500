@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Intel Realsense Camera Bracket
   id: x500v2_blend_zhijia_camera_intel
   partType: Structure
-  description: "Front mount for stereo/depth camera system. Modeled from CAD ZHIJIA-CAMERA-INTEL."
+  description: Front mount for stereo/depth camera system. Modeled from CAD ZHIJIA-CAMERA-INTEL.
   weightKg: 0.015
   dimensions: Custom fit
-  function: "Front mount for stereo/depth camera system"
+  function: Front mount for stereo/depth camera system
   materialType: Reinforced nylon
   materialProperties: 
   manufacturer: Holybro

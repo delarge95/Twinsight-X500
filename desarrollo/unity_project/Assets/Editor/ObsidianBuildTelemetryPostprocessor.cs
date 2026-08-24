@@ -7,7 +7,6 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using WebGL.Core.Content;
 
 namespace Editor
 {
@@ -51,8 +50,6 @@ namespace Editor
                 sb.AppendLine($"total_triangles: {geometry.TotalTriangles}");
                 sb.AppendLine($"mesh_count: {geometry.MeshCount}");
                 sb.AppendLine($"renderer_count: {geometry.RendererCount}");
-                sb.AppendLine($"lod_group_count: {geometry.LodGroupCount}");
-                sb.AppendLine($"generated_lod_renderer_count: {geometry.GeneratedLodRendererCount}");
                 sb.AppendLine($"brotli_compression: {(brotliCompression ? "true" : "false")} ");
                 sb.AppendLine($"output_path: \"{report.summary.outputPath.Replace("\\", "/")}\"");
                 sb.AppendLine("---");
@@ -68,8 +65,6 @@ namespace Editor
                 sb.AppendLine($"- Triangulos (escena activa): {geometry.TotalTriangles}");
                 sb.AppendLine($"- Mallas unicas: {geometry.MeshCount}");
                 sb.AppendLine($"- Renderers: {geometry.RendererCount}");
-                sb.AppendLine($"- LODGroups: {geometry.LodGroupCount}");
-                sb.AppendLine($"- Renderers LOD generados: {geometry.GeneratedLodRendererCount}");
                 sb.AppendLine($"- Brotli: {(brotliCompression ? "Activo" : "Inactivo")} ");
 
                 File.WriteAllText(outputPath, sb.ToString(), Encoding.UTF8);
@@ -97,8 +92,6 @@ namespace Editor
 
                 Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
                 stats.RendererCount += renderers.Length;
-                stats.LodGroupCount += root.GetComponentsInChildren<LODGroup>(true).Length;
-                stats.GeneratedLodRendererCount += root.GetComponentsInChildren<LodGeneratedRenderer>(true).Length;
 
                 MeshFilter[] meshFilters = root.GetComponentsInChildren<MeshFilter>(true);
                 foreach (MeshFilter meshFilter in meshFilters)
@@ -151,8 +144,6 @@ namespace Editor
         {
             public int MeshCount;
             public int RendererCount;
-            public int LodGroupCount;
-            public int GeneratedLodRendererCount;
             public int TotalVertices;
             public int TotalTriangles;
         }

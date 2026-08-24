@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: Countersunk Screw M2.5 x 6 mm
   id: x500v2_fastener_countersunk_M25x6_012
   partType: Countersunk Screw
-  description: "Instrument mounting hardware. Modeled from CAD M25-6-CHEN-LIU."
+  description: Instrument mounting hardware. Modeled from CAD M25-6-CHEN-LIU.
   weightKg: 0
   dimensions: M2.5 x 6 mm
   function: Fastening / mounting | M2.5 x 6 mm | Countersunk | Unknown
@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -81,7 +81,7 @@ MonoBehaviour:
     quantityExpected: 12
     isInspectable: 1
     fallbackReason: 
-    notes: "Instrument mounting hardware. Modeled from CAD M25-6-CHEN-LIU."
+    notes: Instrument mounting hardware. Modeled from CAD M25-6-CHEN-LIU.
     recipeKey: countersunk_M25x6_placeholder
     builderType: CountersunkScrew
     orientationMode: LongestAxis

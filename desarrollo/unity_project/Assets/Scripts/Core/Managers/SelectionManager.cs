@@ -684,16 +684,6 @@ namespace WebGL.Core.Managers
             {
                 return marker.transform;
             }
-
-            ExplodablePart direct = rawTransform.GetComponent<ExplodablePart>();
-            if (IsFastenerPart(direct))
-            {
-                return direct.transform;
-            }
-
-            // If the raw transform is a child of a Fastener ExplodablePart (group),
-            // return the rawTransform itself - NOT the group parent.
-            // Returning the group would collapse all siblings into one selection,
             // defeating instance-level isolation.
             ExplodablePart parent = rawTransform.GetComponentInParent<ExplodablePart>();
             return IsFastenerPart(parent) ? rawTransform : null;
@@ -1073,18 +1063,29 @@ namespace WebGL.Core.Managers
             }
 
             ExplodablePart direct = rawTransform.GetComponent<ExplodablePart>();
-            if (direct != null)
+            Transform candidate = direct != null ? direct.transform : null;
+            if (candidate == null)
             {
-                return direct.transform;
+                ExplodablePart parent = rawTransform.GetComponentInParent<ExplodablePart>();
+                candidate = parent != null ? parent.transform : rawTransform;
             }
 
-            ExplodablePart parent = rawTransform.GetComponentInParent<ExplodablePart>();
-            if (parent != null)
+            if (candidate != null)
             {
-                return parent.transform;
+                string id = candidate.name;
+                if (id.StartsWith("x500v2_motor_", System.StringComparison.OrdinalIgnoreCase) ||
+                    id.StartsWith("x500v2_prop_", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    string suffix = id.Substring(id.LastIndexOf('_') + 1);
+                    Transform arm = ResolveCanonicalPartTransform("x500v2_arm_" + suffix);
+                    if (arm != null)
+                    {
+                        return arm;
+                    }
+                }
             }
 
-            return rawTransform;
+            return candidate;
         }
 
         private bool ShouldSuppressHoverEffect(Transform hoverTarget)

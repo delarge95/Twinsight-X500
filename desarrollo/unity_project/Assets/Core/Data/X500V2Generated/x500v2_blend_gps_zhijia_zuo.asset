@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: GPS Mast Base Bracket
   id: x500v2_blend_gps_zhijia_zuo
   partType: Structure
-  description: "Bolt-on GPS mast base bracket. Modeled from CAD GPS-ZHIJIA-ZUO."
+  description: Bolt-on GPS mast base bracket. Modeled from CAD GPS-ZHIJIA-ZUO.
   weightKg: 0.005
-  dimensions: "M3 mast"
-  function: "Bolt-on GPS mast base bracket"
+  dimensions: M3 mast
+  function: Bolt-on GPS mast base bracket
   materialType: Reinforced nylon
   materialProperties: 
   manufacturer: Holybro
@@ -84,4 +84,4 @@ MonoBehaviour:
     recipeKey: 
     builderType: 
     orientationMode: 
-  category: 4
+  category: 1

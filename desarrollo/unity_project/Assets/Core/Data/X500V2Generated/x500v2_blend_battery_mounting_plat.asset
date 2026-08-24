@@ -15,11 +15,11 @@ MonoBehaviour:
   partName: Battery Mounting Board
   id: x500v2_blend_battery_mounting_plat
   partType: Structure
-  description: "Adjustable plate for battery straps. Modeled from CAD BATTERY-MOUNTING-PLAT."
+  description: Adjustable plate for battery straps. Modeled from CAD BATTERY-MOUNTING-PLAT.
   weightKg: 0.025
   dimensions: Variable
-  function: "Adjustable plate for battery straps"
-  materialType: "Fiber / Plastic"
+  function: Adjustable plate for battery straps
+  materialType: Fiber / Plastic
   materialProperties: 
   manufacturer: Holybro
   partNumber: 
@@ -84,4 +84,4 @@ MonoBehaviour:
     recipeKey: 
     builderType: 
     orientationMode: 
-  category: 4
+  category: 2

@@ -17,7 +17,7 @@ MonoBehaviour:
   partType: Structure
   description: Sensor protective cover. Modeled from CAD GAI-GUANGLIU.
   weightKg: 0.003
-  dimensions: "Small"
+  dimensions: Small
   function: Sensor protective cover
   materialType: ABS
   materialProperties: 

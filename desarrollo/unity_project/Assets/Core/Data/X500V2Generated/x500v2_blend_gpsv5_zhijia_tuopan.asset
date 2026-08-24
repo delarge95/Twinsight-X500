@@ -19,7 +19,7 @@ MonoBehaviour:
   weightKg: 0.005
   dimensions: "\u230050 mm"
   function: GPS upper circular mounting tray
-  materialType: "Plastic ABS"
+  materialType: Plastic ABS
   materialProperties: 
   manufacturer: Holybro
   partNumber: 
@@ -84,4 +84,4 @@ MonoBehaviour:
     recipeKey: 
     builderType: 
     orientationMode: 
-  category: 4
+  category: 1

@@ -15,11 +15,10 @@ MonoBehaviour:
   partName: Landing Gear 16mm Carbon Tube
   id: x500v2_blend_carbon_fiber_tube
   partType: Structure
-  description: "Main vertical landing gear strut. Modeled from CAD
-    CARBON-FIBER-TUBE."
+  description: Main vertical landing gear strut. Modeled from CAD CARBON-FIBER-TUBE.
   weightKg: 0.02
   dimensions: "\u230016 mm"
-  function: "Main vertical landing gear strut"
+  function: Main vertical landing gear strut
   materialType: Carbon fiber
   materialProperties: 
   manufacturer: Holybro

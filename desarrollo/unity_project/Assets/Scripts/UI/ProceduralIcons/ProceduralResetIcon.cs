@@ -82,7 +82,7 @@ namespace WebGL.UI.ProceduralIcons
             return hasChanged;
         }
 
-        protected override void DrawIconPath(Painter2D painter, float width, float height)
+        protected override void DrawIconPath(IProceduralPainter painter, float width, float height)
         {
             float cx = width / 2f;
             float cy = height / 2f;
@@ -123,7 +123,7 @@ namespace WebGL.UI.ProceduralIcons
         /// <summary>
         /// Draws a small minimal arrow head at the specified point on the circle
         /// </summary>
-        private void DrawArrowHead(Painter2D painter, float cx, float cy, float radius, float angleRad)
+        private void DrawArrowHead(IProceduralPainter painter, float cx, float cy, float radius, float angleRad)
         {
             // Position on loop
             float x = cx + Mathf.Cos(angleRad) * radius;

@@ -49,7 +49,7 @@ namespace WebGL.UI.ProceduralIcons
             return Mathf.Abs(currentStemScale - oldStem) > 0.003f;
         }
 
-        protected override void DrawIconPath(Painter2D painter, float width, float height)
+        protected override void DrawIconPath(IProceduralPainter painter, float width, float height)
         {
             float cx = width / 2f;
             float cy = height / 2f;
@@ -57,7 +57,6 @@ namespace WebGL.UI.ProceduralIcons
 
             painter.strokeColor = currentColor;
             painter.lineWidth = currentStrokeWidth;
-            painter.lineCap = LineCap.Round;
 
             // 1. Static open arc (power symbol circle with gap at top)
             float radius = baseSize * 0.85f;

@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: Countersunk Screw M3 x 16 mm
   id: x500v2_fastener_countersunk_M3x16_002
   partType: Countersunk Screw
-  description: "Flush mounting hardware. Modeled from CAD M3-16-CHEN-LIU."
+  description: Flush mounting hardware. Modeled from CAD M3-16-CHEN-LIU.
   weightKg: 0
   dimensions: M3 x 16 mm
   function: Fastening / mounting | M3 x 16 mm | Countersunk | Unknown
@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -81,7 +81,7 @@ MonoBehaviour:
     quantityExpected: 2
     isInspectable: 1
     fallbackReason: 
-    notes: "Flush mounting hardware. Modeled from CAD M3-16-CHEN-LIU."
+    notes: Flush mounting hardware. Modeled from CAD M3-16-CHEN-LIU.
     recipeKey: countersunk_M3x16_placeholder
     builderType: CountersunkScrew
     orientationMode: LongestAxis

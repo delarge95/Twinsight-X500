@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: Nylon Standoff M2.5 x 5 mm
   id: x500v2_fastener_nylon_standoff_M25x5_004
   partType: Standoff
-  description: "Instrument mounting hardware. Modeled from CAD NILONGZHU-M25-5."
+  description: Instrument mounting hardware. Modeled from CAD NILONGZHU-M25-5.
   weightKg: 0
   dimensions: M2.5 x 5 mm
   function: Fastening / mounting | M2.5 x 5 mm | Standoff
@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -81,7 +81,7 @@ MonoBehaviour:
     quantityExpected: 4
     isInspectable: 1
     fallbackReason: 
-    notes: "Instrument mounting hardware. Modeled from CAD NILONGZHU-M25-5."
+    notes: Instrument mounting hardware. Modeled from CAD NILONGZHU-M25-5.
     recipeKey: nylon_standoff_M25x5_placeholder
     builderType: Standoff
     orientationMode: LongestAxis

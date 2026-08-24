@@ -109,7 +109,6 @@ Este comando:
 1. Ejecuta todos los fixers (paso 4.1)
 2. Compila el proyecto WebGL
 3. Genera output en `../../docs/Build` (relativo al proyecto Unity → carpeta `docs/Build` en la raíz del repositorio)
-4. Ejecuta el preprocesador `WebGLFinalLodBuildPreprocessor`, que aplica los LODs finales de Unity 6 antes de serializar la escena WebGL y deja el reporte en `desarrollo/unity_project/Reports/final_lod_optimization_report.md`.
 
 ### 5.2 Build Manual
 

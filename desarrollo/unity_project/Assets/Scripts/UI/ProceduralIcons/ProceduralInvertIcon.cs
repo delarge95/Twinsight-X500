@@ -80,7 +80,7 @@ namespace WebGL.UI.ProceduralIcons
             return changed;
         }
 
-        protected override void DrawIconPath(Painter2D painter, float width, float height)
+        protected override void DrawIconPath(IProceduralPainter painter, float width, float height)
         {
             float cx = width * 0.5f;
             float cy = height * 0.5f;
@@ -93,7 +93,7 @@ namespace WebGL.UI.ProceduralIcons
             DrawArrow(painter, cx + lineLength * 0.5f - horizontalTravel, cy + lane, cx - lineLength * 0.5f - horizontalTravel, cy + lane, arrowSize);
         }
 
-        private void DrawArrow(Painter2D painter, float x1, float y1, float x2, float y2, float arrowSize)
+        private void DrawArrow(IProceduralPainter painter, float x1, float y1, float x2, float y2, float arrowSize)
         {
             painter.BeginPath();
             painter.MoveTo(new Vector2(x1, y1));

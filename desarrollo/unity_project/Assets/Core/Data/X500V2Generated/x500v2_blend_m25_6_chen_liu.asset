@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Countersunk Screw M2.5 x 6 mm
   id: x500v2_blend_m25_6_chen_liu
   partType: Structure
-  description: "Instrument mounting hardware. Modeled from CAD M25-6-CHEN-LIU."
+  description: Instrument mounting hardware. Modeled from CAD M25-6-CHEN-LIU.
   weightKg: 0.001
   dimensions: M2.5
-  function: "Instrument mounting hardware"
+  function: Instrument mounting hardware
   materialType: Steel
   materialProperties: 
   manufacturer: Holybro

@@ -17,9 +17,9 @@ MonoBehaviour:
   partType: Structure
   description: Captive holder for the XT60 connector. Modeled from CAD X500-TAO-XT60.
   weightKg: 0.003
-  dimensions: "Standard"
+  dimensions: Standard
   function: Captive holder for the XT60 connector
-  materialType: "Injection-molded plastic"
+  materialType: Injection-molded plastic
   materialProperties: 
   manufacturer: Holybro
   partNumber: 

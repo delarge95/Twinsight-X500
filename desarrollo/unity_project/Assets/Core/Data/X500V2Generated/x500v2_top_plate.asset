@@ -15,11 +15,12 @@ MonoBehaviour:
   partName: Carbon Fiber Top Plate
   id: x500v2_top_plate
   partType: Frame
-  description: "2 mm twill carbon fiber top plate, 144x144 mm. Upper structural interface for Pixhawk, telemetry radio and accessory mounting."
+  description: 2 mm twill carbon fiber top plate, 144x144 mm. Upper structural interface
+    for Pixhawk, telemetry radio and accessory mounting.
   weightKg: 0.075
   dimensions: "144 \xD7 144 mm, 2 mm espesor"
-  function: "Upper avionics and radio mounting interface"
-  materialType: "2 mm twill carbon fiber"
+  function: Upper avionics and radio mounting interface
+  materialType: 2 mm twill carbon fiber
   materialProperties: Ultraligero, alta rigidez torsional
   manufacturer: Holybro
   partNumber: '#510179'
@@ -42,7 +43,7 @@ MonoBehaviour:
   hotspotLabel: 
   explosionDirection: {x: 0, y: 1, z: 0}
   explosionDistance: 0.5
-  explosionPriority: 4
+  explosionPriority: 5
   isModular: 0
   compatibleSlots: []
   alternativeParts: []
@@ -66,7 +67,6 @@ MonoBehaviour:
   screwSize: M3
   subComponentNames:
   - TOP-PLATE-X500-V5
-  - 'Shared Fasteners: Socket Cap Screw M3 x 38 mm x16'
   fastenerMetadata:
     instanceId: 
     familyId: 

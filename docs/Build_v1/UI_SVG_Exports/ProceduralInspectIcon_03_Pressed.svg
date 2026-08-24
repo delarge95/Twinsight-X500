@@ -1,0 +1,8 @@
+﻿<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <path d="M 46.07978 78.84787 L 46.07978 46.07978 L 78.84787 46.07978" stroke="#CCCCCC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.9" />
+  <path d="M 177.1521 46.07978 L 209.9202 46.07978 L 209.9202 78.84787" stroke="#CCCCCC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.9" />
+  <path d="M 46.07978 177.1521 L 46.07978 209.9202 L 78.84787 209.9202" stroke="#CCCCCC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.9" />
+  <path d="M 177.1521 209.9202 L 209.9202 209.9202 L 209.9202 177.1521" stroke="#CCCCCC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.9" />
+  <circle cx="128" cy="128" r="2.25" stroke="#CCCCCC" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 39.52616 155.5252 L 216.4738 155.5252" stroke="#CCCCCC" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.9" />
+</svg>

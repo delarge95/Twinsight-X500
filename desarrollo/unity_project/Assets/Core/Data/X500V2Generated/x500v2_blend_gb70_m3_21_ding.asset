@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Socket Cap Screw M3 x 21 mm
   id: x500v2_blend_gb70_m3_21_ding
   partType: Structure
-  description: "Chassis fastening and tightening. Modeled from CAD GB70-M3-21-DING."
+  description: Chassis fastening and tightening. Modeled from CAD GB70-M3-21-DING.
   weightKg: 0.001
-  dimensions: "Metric"
-  function: "Chassis fastening and tightening"
+  dimensions: Metric
+  function: Chassis fastening and tightening
   materialType: Stainless steel
   materialProperties: 
   manufacturer: Holybro
