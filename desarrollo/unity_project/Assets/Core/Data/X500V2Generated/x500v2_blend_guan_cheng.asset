@@ -19,7 +19,7 @@ MonoBehaviour:
   weightKg: 0.005
   dimensions: For 10 mm tube
   function: Hanging holder for 10 mm tubes
-  materialType: "Plastic"
+  materialType: Plastic
   materialProperties: 
   manufacturer: Holybro
   partNumber: 

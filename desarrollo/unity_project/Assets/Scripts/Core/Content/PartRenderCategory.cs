@@ -401,10 +401,10 @@ namespace WebGL.Core.Content
             {
                 return index switch
                 {
-                    1 => "FL",
+                    1 => "FR",
                     2 => "BL",
                     3 => "BR",
-                    4 => "FR",
+                    4 => "FL",
                     _ => string.Empty
                 };
             }
@@ -526,7 +526,7 @@ namespace WebGL.Core.Content
 
             if (token.Contains("dj-2216") || token.Contains("motor"))
             {
-                return !string.IsNullOrWhiteSpace(quadrant) ? "x500v2_motor_" + quadrant.ToUpperInvariant() : string.Empty;
+                return !string.IsNullOrWhiteSpace(quadrant) ? "x500v2_arm_" + quadrant.ToUpperInvariant() : string.Empty;
             }
 
             if (token.Contains("propeller") || token.Contains("prop"))
@@ -568,7 +568,7 @@ namespace WebGL.Core.Content
             if (token.Contains("battery")) return "x500v2_rails_battery";
             if (token.Contains("pdb")) return string.Empty;
             if (token.Contains("pm06") || token.Contains("xt60") || token.Contains("power-module") || token.Contains("bm06b")) return "x500v2_power_module";
-            if (token.Contains("imu-pixhawk")) return MiscGroupId;
+            if (token.Contains("imu-pixhawk")) return "x500v2_pixhawk6c";
             if (token.Contains("pixhawk")) return "x500v2_pixhawk6c";
             if (token.Contains("gps") || token.Contains("gpsv5")) return "x500v2_gps_m10";
             if (token.Contains("receiver")) return "x500v2_rc_receiver";
@@ -1004,7 +1004,7 @@ namespace WebGL.Core.Content
                     Group("x500v2_rails_battery", "Rail System & Battery Mount", "BATTERY-MOUNTING-PLAT", "BATTERY-PAD", "PYLONS-X500", "CARBON-FIBER-TUBE300", "JIA-GUAN", "HUAN-GUIJIAO", "PLATFORM-PLAT-X500", "ZHIJIA-CAMERA-INTEL", "GAI-GUANGLIU", "LIPO", "BATTERY", "BATTERY-STRAP"),
                     Group("x500v2_pdb", "Power Distribution Board"),
                     Group("x500v2_power_module", "Power Module PM06/XT60", "PCB-PM06", "BM06B-WO", "TOU-XT60H-M-14AWG", "X500-TAO-XT60"),
-                    Group("x500v2_pixhawk6c", "Pixhawk 6C Autopilot", "DIKE-PIXHAWK6C-LV-C1", "MIANKE-PIXHAWK6C-LV-C1", "PCB-PIXHAWK6C-F1"),
+                    Group("x500v2_pixhawk6c", "Pixhawk 6C Autopilot", "DIKE-PIXHAWK6C-LV-C1", "MIANKE-PIXHAWK6C-LV-C1", "PCB-PIXHAWK6C-F1", "IMU-PIXHAWK6C"),
                     Group("x500v2_gps_m10", "Holybro M10 GPS Module", "GAN-GPSV5-ZHIJIA", "GPS-ZHIJIA-ZHUANJIETOU", "GPS-ZHIJIA-ZUO", "GPSV5-ZHIJIA-LUOMAO", "GPSV5-ZHIJIA-TUOPAN"),
                     Group("x500v2_landing_gear", "Landing Gear", "CARBON-FIBER-TUBE", "GUAN-CHENG", "JIAO-EVA", "JIAO-LIANJIE", "JIA-LIANJIE", "MAO-JIAO"),
                     Group("x500v2_arm", "Arm Assembly Quadrant", "HMX5V-DIGAI-DIANJIZUO-MUJU", "HMX5V-GUAN-DINGWEI", "HMX5V-JIBI-JIA-MUJU", "HMX5V-ZUO-DJ-MUJU", "BAN-DJ-DIAN-F2", "PROPELLER", "PROP"),
@@ -1014,7 +1014,7 @@ namespace WebGL.Core.Content
                     Group("x500v2_battery", "LiPo Battery"),
                     Group("x500v2_rc_receiver", "RC Receiver", "RECEIVER"),
                     Group("x500v2_telemetry_radio", "Telemetry Radio", "TELEMETRY", "RADIO"),
-                    Group(MiscGroupId, "Misc Group", "IMU-PIXHAWK6C")
+                    Group(MiscGroupId, "Misc Group")
                 }
             };
         }

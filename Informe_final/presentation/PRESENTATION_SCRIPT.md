@@ -1,7 +1,7 @@
 # Guion maestro de sustentacion - TwinSight X500
 
 Estado: canonico para defensa academica.
-Fecha de actualizacion: 2026-06-12.
+Fecha de actualizacion: 2026-06-25.
 Duracion objetivo: 28:30 de exposicion real + 1:30 de margen.
 Fuente autoritativa: `Informe_final/informe_final.pdf`.
 Carpeta de apoyo: `Informe_final/presentation/`.
@@ -11,17 +11,47 @@ Uso complementario: ensayar tiempo con `SPEAKER_CARDS.md`, profundizar con `DEFE
 
 Este documento no es un parrafo para memorizar de corrido. Es una partitura oral: cada slide tiene una tesis, una evidencia visual, un guion base, una transicion y una zona de riesgo. La defensa debe sonar conversacional, tecnica y situada.
 
-La columna vertebral de toda la presentacion es:
+La columna vertebral de toda la presentacion sigue los lineamientos del deep research de storytelling tecnico:
 
 ```text
-problema -> brecha -> propuesta -> decisiones tecnicas -> implementacion -> evidencia -> limites -> contribucion
+problema -> teoria que explica el problema -> alcance -> metodo -> decisiones tecnicas -> implementacion -> evidencia -> limites -> contribucion
 ```
 
 Frase de tesis oral:
 
 > TwinSight X500 no se defiende como un gemelo digital operacional. Se defiende como un visual product twin: una capa web 3D, optimizada y semanticamente organizada, que hace legibles piezas, relaciones y modos de inspeccion de un hardware complejo.
 
-## 2. Convenciones orales
+## 2. Regla de prerequisito conceptual
+
+Ningun termino debe aparecer como argumento antes de haber sido definido. Si un concepto tecnico aparece por primera vez, el guion lo explica en lenguaje comun y luego en lenguaje tecnico.
+
+| Termino | Primera definicion en la ruta | Uso posterior permitido |
+|---|---:|---|
+| CAD | Slide 1 | Pipeline, activo base, optimizacion |
+| WebGL | Slide 1 | Build, runtime, rendimiento |
+| Hardware complejo | Slide 2 | Problema, alcance, contribucion |
+| Reconstruccion espacial | Slide 2 | Carga cognitiva, tareas, Think-Aloud |
+| Carga cognitiva | Slide 3 | Discusion e interpretacion de NASA-TLX |
+| Carga intrinseca, extrinseca y germana | Slide 3 | Discusion; nunca como medicion directa |
+| Aprendizaje multimedia | Slide 4 | Diseno de slides, app, demo |
+| Senalizacion, segmentacion y coherencia | Slide 4 | Animaciones, diagramas, demo |
+| Significadores | Slide 4 | UI, iconos, microinteracciones |
+| Digital twin, digital shadow y visual product twin | Slide 5 | Alcance, limitaciones, trabajo futuro |
+| Telemetria, FEA y simulacion calibrada | Slide 5 | Limites de Thermal y roadmap |
+| DSR / Design Science Research | Slide 7 | Metodologia y contribucion |
+| Validacion formativa y descriptiva | Slide 7 | Resultados y conclusiones |
+| KPIs | Slide 8 | Rendimiento |
+| SUS | Slide 8 | Resultados de usabilidad del prototipo 3D |
+| NASA-TLX Raw | Slide 8 | Workload percibido por condicion |
+| Think-Aloud | Slide 8 | Triangulacion cualitativa |
+| Runtime | Slide 9 | Arquitectura, profiler, rendimiento |
+| Profiler | Slide 19 | Resultados tecnicos |
+| Taxonomia | Slide 12 | Seleccion, hotspots, piezas, fasteners |
+| Shaders y presets | Slide 15 | Studio, modos visuales |
+| Heuristico | Slide 16 | Thermal |
+| Efecto techo | Slide 24 | Discusion metodologica |
+
+## 3. Convenciones orales
 
 - `[pausa]`: detenerse 1 segundo.
 - `[pausa larga]`: detenerse 2 segundos.
@@ -30,7 +60,7 @@ Frase de tesis oral:
 - `[click]`: revelar siguiente capa o pasar slide.
 - `[respirar]`: bajar velocidad antes de un dato numerico o una limitacion.
 
-## 3. Apertura antes de iniciar
+## 4. Apertura antes de iniciar
 
 Antes de hablar:
 
@@ -38,28 +68,30 @@ Antes de hablar:
 2. Verificar que la app, el video local y la deck esten abiertos.
 3. Mantener en mente tres mensajes:
    - ver piezas no basta; hay que comprender relaciones;
-   - el aporte integra pipeline 3D, WebGL, UI de inspeccion y evaluacion formativa;
+   - el aporte integra teoria cognitiva, pipeline 3D, WebGL, UI de inspeccion y evaluacion formativa;
    - la evidencia es favorable, pero acotada y descriptiva.
 
 Si hay nervios, no acelerar. La primera pausa comunica control.
 
-## 4. Guion principal slide por slide
+## 5. Guion principal slide por slide
 
-### Slide 1 - TwinSight X500 convierte un ensamblaje complejo en una experiencia WebGL inspeccionable
+### Slide 1 - TwinSight X500 convierte un ensamblaje CAD en una experiencia WebGL inspeccionable
 
-Tiempo: 0:00-0:30.
+Tiempo: 0:00-0:45.
 
-Objetivo: presentar identidad, caso de estudio y alcance sin sobreprometer.
+Objetivo: presentar identidad, caso de estudio, definicion minima de CAD/WebGL y alcance sin sobreprometer.
 
 Visual: hero de la app con el dron completo visible, titulo, autor, programa, universidad, enlace o QR de demo.
 
 Guion oral:
 
-> Buenos dias, miembros del jurado. Mi nombre es Alexander Woodcock Salomon y hoy presento TwinSight X500, un prototipo WebGL de visualizacion 3D interactiva para inspeccion tecnica del dron Holybro X500 V2.
+> Buenos dias, miembros del jurado. Mi nombre es Alexander Woodcock Salomon y hoy presento TwinSight X500, un prototipo de visualizacion 3D interactiva para inspeccion tecnica del dron Holybro X500 V2.
 >
-> La idea central es sencilla: transformar un ensamblaje complejo, que normalmente se consulta en planos, manuales o archivos CAD pesados, en una experiencia web explorable, seleccionable y explicable. [pausa]
+> Cuando digo CAD me refiero a modelos de diseno asistido por computador: utiles para ingenieria y manufactura, pero no necesariamente preparados para consulta rapida en navegador. Cuando digo WebGL me refiero a render 3D dentro del navegador, sin instalar una aplicacion nativa. [pausa]
 >
-> Durante la sustentacion voy a defender tres cosas: el problema tecnico y cognitivo que origina el proyecto, las decisiones de implementacion que hicieron viable la app, y la evidencia metodologica que permite interpretarla con honestidad academica.
+> La idea central es transformar un ensamblaje complejo, que normalmente se consulta en planos, manuales o archivos CAD pesados, en una experiencia web explorable, seleccionable y explicable.
+>
+> Durante la sustentacion voy a defender tres cosas: el problema tecnico y cognitivo que origina el proyecto, las decisiones de implementacion que hicieron viable la app y la evidencia metodologica que permite interpretarla con honestidad academica.
 
 Clicks/movimiento: no animar demasiado; dejar que el dron sea la primera senal visual.
 
@@ -71,6 +103,7 @@ Evidencia base:
 
 - `Informe_final/chapters/01_introduccion.tex`, introduccion y planteamiento del problema.
 - `README.md`, resumen publico y flujo visible.
+- `Informe_final/figures/screenshots_contextual/fig_ui_hero_mobile_pc.png`.
 
 No decir:
 
@@ -78,9 +111,9 @@ No decir:
 - "Simulador operacional".
 - "Producto final industrial".
 
-### Slide 2 - El reto central es comprender relaciones, no solo ver piezas
+### Slide 2 - El problema no es falta de informacion, sino reconstruccion espacial
 
-Tiempo: 0:30-1:30.
+Tiempo: 0:45-1:45.
 
 Objetivo: instalar el problema humano y tecnico sin atacar la documentacion 2D.
 
@@ -90,7 +123,7 @@ Guion oral:
 
 > La documentacion tecnica tradicional no es un error. Un manual 2D o un plano cumplen una funcion necesaria: nombran piezas, muestran pasos y organizan informacion. El limite aparece cuando el usuario debe reconstruir mentalmente profundidad, orientacion, piezas ocultas y relaciones de ensamblaje.
 >
-> En un hardware complejo como el Holybro X500 V2, la dificultad no es solamente saber que existe un motor, una montura o tornilleria. La dificultad es entender donde vive cada elemento, como se relaciona con los demas y que cambia cuando lo aislo, lo exploto o lo observo desde otro modo visual. [senalar comparacion]
+> A eso llamo reconstruccion espacial: el esfuerzo de convertir vistas planas, textos o archivos tecnicos en una imagen mental tridimensional del sistema. En un hardware complejo como el X500, esa reconstruccion no ocurre sobre una sola pieza, sino sobre componentes estructurales, energeticos, electronicos y de control que se conectan entre si. [senalar comparacion]
 >
 > Por eso el problema no era "falta de informacion". Era una distancia entre informacion disponible y comprension espacial.
 
@@ -98,85 +131,127 @@ Clicks/movimiento: revelar primero manual/CAD y despues la app.
 
 Transicion:
 
-> Esa distancia genera una brecha tecnica: necesitamos fidelidad, legibilidad y rendimiento al mismo tiempo.
+> Esa distancia se entiende mejor desde la teoria de carga cognitiva.
 
 Evidencia base:
 
 - `Informe_final/chapters/01_introduccion.tex`, definicion de hardware complejo.
 - `Informe_final/figures/chapter1/fig_1_fragmentacion_hardware_complejo.pdf`.
+- `BIBLIOGRAPHY_EVIDENCE_ATLAS.md`, Sweller y Hegarty/Waller.
 
 No decir:
 
 - "El 2D no sirve".
 - "El 3D siempre es mejor".
 
-### Slide 3 - La brecha esta entre fidelidad tecnica, legibilidad y ejecucion web
+### Slide 3 - La teoria de carga cognitiva explica por que la forma de presentar importa
 
-Tiempo: 1:30-2:30.
+Tiempo: 1:45-2:55.
 
-Objetivo: explicar el trade-off del proyecto.
+Objetivo: introducir teoria cognitiva antes de usar SUS, NASA, resultados o discusion.
 
-Visual: triangulo con tres vertices: fidelidad tecnica, legibilidad del ensamblaje, rendimiento web.
+Visual: diagrama 2D -> memoria de trabajo -> carga extrinseca / 3D guiado -> apoyo visual -> comprension espacial.
 
 Guion oral:
 
-> La brecha del proyecto aparece en este triangulo. Si privilegio solo fidelidad, puedo terminar con un CAD muy detallado, pero imposible de ejecutar fluidamente en navegador. Si privilegio solo rendimiento, puedo tener una escena ligera, pero pobre para inspeccion tecnica. Y si privilegio solo legibilidad visual, puedo perder trazabilidad hacia piezas reales.
+> La teoria de carga cognitiva parte de una idea sencilla: la memoria de trabajo es limitada. En palabras simples, no podemos sostener muchas piezas nuevas de informacion al mismo tiempo y manipularlas mentalmente sin costo. En terminos tecnicos, Sweller distingue tres cargas: intrinseca, extrinseca y germana.
 >
-> TwinSight X500 se construyo como una respuesta de equilibrio: conservar una lectura tecnica suficiente del dron, organizar semanticamente sus partes y hacerlo correr como experiencia WebGL. Ese equilibrio es la razon de muchas decisiones posteriores: optimizacion geometrica, taxonomia, bottom sheet, modos de inspeccion y profiler.
+> La carga intrinseca viene de la complejidad propia del contenido. Un dron multicomponente es complejo aunque la interfaz sea buena. La carga extrinseca viene de como se presenta la informacion: si obligo al usuario a saltar entre planos, tablas y vistas no conectadas, aumento esfuerzo que no ayuda a entender. La carga germana es el esfuerzo util que si construye esquemas: por ejemplo, entender funcion, ubicacion y relacion de una pieza.
+>
+> Esta tesis no afirma medir esas tres cargas directamente. Las usa como marco para explicar por que una interfaz 3D guiada puede reducir reconstruccion espacial innecesaria. La frase de respaldo a recordar del atlas bibliografico es: "limited working memory which can only process". Es una cita corta de Sweller et al. para anclar la idea de memoria de trabajo limitada.
 
-Clicks/movimiento: mostrar cada vertice y luego el centro del triangulo.
+Clicks/movimiento: revelar las tres cargas una por una; no mostrar todo al inicio.
 
 Transicion:
 
-> Ese equilibrio exige delimitar el alcance. Aqui hay una frontera importante.
+> Esa misma logica tambien guia como se debe presentar una tesis tecnica y como se disena la interfaz.
 
 Evidencia base:
 
-- `Informe_final/chapters/01_introduccion.tex`, planteamiento del problema y justificacion.
-- `Informe_final/chapters/03_marco_metodologico.tex`, delimitacion como visual product twin.
+- `Informe_final/chapters/02_marco_referencia.tex`, teoria de carga cognitiva.
+- `Informe_final/figures/chapter2/fig_2_carga_cognitiva_2d_3d.pdf`.
+- `BIBLIOGRAPHY_EVIDENCE_ATLAS.md`, filas de Sweller 1988 y Sweller et al. 2019.
 
 No decir:
 
-- "Se resolvio toda la cadena industrial".
-- "El navegador no tiene limites".
+- "NASA-TLX mide carga intrinseca, extrinseca y germana".
+- "El 3D elimina la carga cognitiva".
 
-### Slide 4 - La tesis responde con un visual product twin, no con un digital twin operacional
+### Slide 4 - El aprendizaje multimedia exige segmentar, senalizar y quitar ruido
 
-Tiempo: 2:30-4:00.
+Tiempo: 2:55-4:05.
 
-Objetivo: fijar alcance academico y evitar objeciones por sobrepromesa.
+Objetivo: explicar la teoria que guia el deck, la demo y decisiones de interaccion.
 
-Visual: frontera incluido/excluido.
+Visual: cuatro principios aplicados: una idea por slide, senalizacion visual, segmentacion progresiva, coherencia sin decoracion.
 
 Guion oral:
 
-> Una parte clave de la defensa es llamar al sistema por su nombre correcto. TwinSight X500 no es un digital twin operacional. No recibe telemetria real, no sincroniza estado con un dron fisico, no ejecuta mantenimiento predictivo, no se integra con PLM, CMMS, SCADA o IoT, y Thermal no es una simulacion fisica calibrada.
+> La segunda base teorica es el aprendizaje multimedia: las personas construyen representaciones mentales combinando informacion visual y verbal. En palabras sencillas: una imagen y una explicacion pueden ayudarse, pero tambien pueden competir si la pantalla se llena de texto, numeros y decoracion.
+>
+> Por eso uso cuatro principios en la sustentacion y en la app. Segmentacion: mostrar un proceso por partes. Senalizacion: marcar que debe mirar el usuario. Coherencia: quitar lo que no apoya la idea central. Y preentrenamiento: definir primero los terminos que luego se van a usar.
+>
+> En interfaz, esto se traduce en hotspots, bottom sheet, iconos y microinteracciones que actuan como significadores: pistas visibles de lo que se puede hacer. En esta presentacion, se traduce en una regla: primero enseno como leer el diagrama o la metrica, y despues digo que significa.
+>
+> La fuente de apoyo local resume esta idea con la frase "build mental representations from words and pictures". Como Mayer no es una referencia canonica del informe final, lo uso aqui como criterio de diseno de comunicacion, no como resultado empirico de la tesis.
+
+Clicks/movimiento: construir la slide por capas: primero problema de saturacion, luego principios, luego aplicacion a app/deck.
+
+Transicion:
+
+> Con esas bases, puedo delimitar con precision que es y que no es TwinSight.
+
+Evidencia base:
+
+- `desarrollo/docs/investigacion/deep-research-report_storytelling.md`, lineamientos de CTML, una idea por slide y segmentacion.
+- `BIBLIOGRAPHY_EVIDENCE_ATLAS.md`, fila de Mayer como fuente local de apoyo no canonica.
+- `Informe_final/chapters/04_desarrollo.tex`, iconos, bottom sheet y microinteracciones.
+
+No decir:
+
+- "Mayer demuestra los resultados de TwinSight".
+- "La presentacion debe ser llamativa por si misma".
+
+### Slide 5 - TwinSight es un visual product twin, no un digital twin operacional
+
+Tiempo: 4:05-5:15.
+
+Objetivo: fijar alcance academico y evitar objeciones por sobrepromesa.
+
+Visual: frontera incluido/excluido: visual product twin, digital model enriquecido, digital shadow futuro, digital twin operacional excluido.
+
+Guion oral:
+
+> Una parte clave de la defensa es llamar al sistema por su nombre correcto. Un digital twin operacional implica sincronizacion con un activo fisico o con datos que reflejan su estado. Un digital shadow agrega flujo de datos desde el activo hacia el modelo. TwinSight no esta en ese nivel.
+>
+> TwinSight X500 no recibe telemetria real, no sincroniza estado con un dron fisico, no ejecuta mantenimiento predictivo, no se integra con PLM, CMMS, SCADA o IoT, y Thermal no es una simulacion FEA calibrada. FEA aqui significa analisis por elementos finitos: simulacion fisica numerica para estimar esfuerzos, temperatura u otros fenomenos.
 >
 > Lo que si entrega es una capa visual-semantica: un visual product twin. Organiza el producto en piezas, categorias, datos contextuales, herramientas de inspeccion, modos visuales y medicion tecnica de la build. [pausa]
 >
-> Dicho de forma directa: esta tesis no promete operar el dron desde datos vivos; promete hacer legible un hardware complejo desde la web, y dejar una base trazable para fases futuras.
+> Dicho de forma directa: esta tesis no promete operar el dron desde datos vivos; promete hacer legible un hardware complejo desde la web y dejar una base trazable para fases futuras.
 
 Clicks/movimiento: revelar incluido, luego excluido, luego la frase "visual product twin".
 
 Transicion:
 
-> Con esa frontera clara, los objetivos se entienden mejor.
+> Con esa frontera clara, los objetivos se entienden como contrato verificable.
 
 Evidencia base:
 
 - `Informe_final/chapters/01_introduccion.tex`, alcance y limitaciones.
 - `Informe_final/chapters/03_marco_metodologico.tex`, frontera metodologica.
 - `README.md`, Academic Scope y Capability Status.
+- `Informe_final/chapters/04_desarrollo.tex`, digital model enriquecido y roadmap.
 
 No decir:
 
-- "TwinSight ya es un gemelo digital".
+- "TwinSight ya es un gemelo digital completo".
 - "Thermal calcula temperatura real".
 - "La app garantiza compatibilidad universal".
 
-### Slide 5 - Los objetivos conectan pipeline 3D, interaccion, rendimiento y evaluacion formativa
+### Slide 6 - Los objetivos conectan pipeline 3D, interaccion, rendimiento y evaluacion
 
-Tiempo: 4:00-5:20.
+Tiempo: 5:15-6:10.
 
 Objetivo: mostrar que la ruta del proyecto cubre construccion y evaluacion.
 
@@ -186,7 +261,7 @@ Guion oral:
 
 > El objetivo general fue desarrollar un prototipo web 3D interactivo basado en Unity Web, orientado a exploracion tecnica, inspeccion y analisis visual del ensamblaje.
 >
-> Los cuatro objetivos especificos separan el problema en frentes verificables. Primero, disenar un pipeline de optimizacion de activos CAD hacia WebGL. Segundo, integrar materiales y modos visuales en Unity URP. Tercero, implementar la experiencia web con navegacion, seleccion, ficha contextual y herramientas analiticas. Cuarto, evaluar el prototipo con KPIs tecnicos, tareas, NASA-TLX Raw, Think-Aloud y SUS.
+> Los objetivos especificos separan el problema en frentes verificables. Primero, disenar un pipeline de optimizacion de activos CAD hacia WebGL. Segundo, integrar materiales y modos visuales. Tercero, implementar la experiencia web con navegacion, seleccion, ficha contextual y herramientas analiticas. Cuarto, evaluar el prototipo con evidencia tecnica y usuarios.
 >
 > La logica es importante: no se evaluo una idea abstracta. Se evaluo un artefacto construido.
 
@@ -194,7 +269,7 @@ Clicks/movimiento: revelar OE por cuadrantes.
 
 Transicion:
 
-> Por eso la metodologia no podia ser solo desarrollo de software; tenia que incluir evaluacion del artefacto.
+> Por eso la metodologia no podia ser solo desarrollo de software; tenia que evaluar el artefacto.
 
 Evidencia base:
 
@@ -204,22 +279,23 @@ Evidencia base:
 No decir:
 
 - "Todos los objetivos son puramente tecnicos".
+- "La evaluacion ya prueba generalizacion poblacional".
 
-### Slide 6 - La metodologia usa desarrollo iterativo y validacion descriptiva
+### Slide 7 - La metodologia usa DSR y validacion formativa descriptiva
 
-Tiempo: 5:20-6:40.
+Tiempo: 6:10-7:15.
 
-Objetivo: defender DSR y el caracter formativo/descriptivo.
+Objetivo: definir DSR y el caracter formativo/descriptivo antes de resultados.
 
 Visual: ciclo DSR aplicado: problema, objetivos, diseno, demostracion, evaluacion, comunicacion.
 
 Guion oral:
 
-> La investigacion se enmarca como aplicada, con enfoque mixto y predominio cualitativo-formativo. El marco principal es Design Science Research, porque el conocimiento se genera construyendo y evaluando un artefacto que responde a un problema practico.
+> La investigacion se enmarca como aplicada, con enfoque mixto y predominio cualitativo-formativo. El marco principal es Design Science Research, o DSR. En sencillo: se produce conocimiento construyendo y evaluando un artefacto que responde a un problema practico.
 >
-> Esto implica una lectura metodologica especifica. No estoy presentando un experimento poblacional con inferencia estadistica fuerte. Presento una evaluacion formativa y descriptiva de una build funcional: que hace, bajo que condiciones tecnicas corre, como la perciben usuarios con perfil afin y que limites quedan.
+> En tecnico, DSR exige que el artefacto no sea solo programado, sino justificado, demostrado, evaluado y comunicado. Por eso el informe conecta problema, objetivos, construccion, mediciones tecnicas, usuarios, discusion y anexos.
 >
-> En una tesis de pregrado de Ingenieria Multimedia, esa decision es defendible si hay trazabilidad, instrumentos claros y honestidad de alcance.
+> La evaluacion fue formativa y descriptiva. Formativa significa que busca aprender del prototipo y detectar mejoras; descriptiva significa que reporta patrones observados sin vender inferencia estadistica poblacional. En una tesis de pregrado de Ingenieria Multimedia, esa decision es defendible si hay trazabilidad, instrumentos claros y honestidad de alcance.
 
 Clicks/movimiento: construir ciclo por etapas.
 
@@ -231,27 +307,34 @@ Evidencia base:
 
 - `Informe_final/chapters/03_marco_metodologico.tex`, marco DSR y fases.
 - `Informe_final/figures/chapter3/fig_3_dsrm_aplicado_proyecto.pdf`.
+- `BIBLIOGRAPHY_EVIDENCE_ATLAS.md`, Peffers et al. 2007.
 
 No decir:
 
 - "Se probo causalidad".
 - "La muestra representa a toda la poblacion".
 
-### Slide 7 - La evaluacion combina datos tecnicos, tareas, SUS, NASA-TLX Raw y Think-Aloud
+### Slide 8 - La evaluacion triangula KPIs, tareas, SUS, NASA-TLX Raw y Think-Aloud
 
-Tiempo: 6:40-8:00.
+Tiempo: 7:15-8:35.
 
-Objetivo: explicar triangulacion y que mide cada instrumento.
+Objetivo: definir todos los instrumentos antes de usarlos en resultados.
 
-Visual: diagrama de triangulacion con cinco capas.
+Visual: diagrama de triangulacion con cinco capas y una frase de que mide cada una.
 
 Guion oral:
 
-> La evaluacion tiene cinco capas. La primera son KPIs tecnicos: FPS, frame time, memoria, build y profiler. La segunda es desempeno en tareas: completitud, ayudas y tiempos para T1, T2 y T3. La tercera es SUS, aplicado solo al prototipo 3D como lectura global de usabilidad. La cuarta es NASA-TLX Raw, aplicado por condicion 3D y 2D para carga de trabajo percibida. La quinta es Think-Aloud, que explica cualitativamente por que aparecen claridad o friccion.
+> La evaluacion tiene cinco capas. Primera: KPIs tecnicos. KPI significa indicador clave de desempeno; aqui incluye FPS, frame time, memoria, build y profiler. Segunda: desempeno en tareas, con completitud, ayudas y tiempos para T1, T2 y T3. T4 se trato aparte porque fue exploratoria.
 >
-> Dos precisiones evitan malinterpretaciones. SUS no compara 3D contra 2D, porque el soporte 2D no es un sistema interactivo equivalente. NASA-TLX Raw tampoco mide directamente carga intrinseca, extrinseca y germana; mide workload percibido y se interpreta desde ese marco.
+> Tercera: SUS. SUS es System Usability Scale, una escala breve de diez items para percepcion global de usabilidad. En esta tesis se aplico solo al prototipo 3D, no como comparacion 3D contra 2D.
+>
+> Cuarta: NASA-TLX Raw. Es una escala de carga de trabajo percibida con dimensiones como demanda mental, fisica, temporal, esfuerzo, frustracion y rendimiento. Raw significa que se promedian subescalas sin ponderacion pareada. En esta adaptacion, rendimiento se diligencio invertido para mantener la direccion del promedio.
+>
+> Quinta: Think-Aloud. Es verbalizacion concurrente: el participante piensa en voz alta durante la tarea, y esas verbalizaciones se codifican para explicar claridad, friccion y comprension.
+>
+> La triangulacion consiste en no depender de una sola fuente: rendimiento tecnico, conducta en tareas, percepcion subjetiva y comentarios cualitativos se leen juntos.
 
-Clicks/movimiento: revelar cada instrumento y una nota de interpretacion.
+Clicks/movimiento: revelar cada instrumento y su limite.
 
 Transicion:
 
@@ -259,19 +342,24 @@ Transicion:
 
 Evidencia base:
 
-- `Informe_final/chapters/03_marco_metodologico.tex`, instrumentos y triangulacion.
+- `Informe_final/chapters/03_marco_metodologico.tex`, variables e instrumentos.
 - `Informe_final/chapters/05_resultados.tex`, resultados SUS/NASA/Think-Aloud.
+- `Informe_final/validacion/03_CUESTIONARIO_SUS_PARTICIPANTE.md`.
+- `Informe_final/validacion/04_CUESTIONARIO_NASA_TLX_PARTICIPANTE.md`.
+- `Informe_final/validacion/05_FORMATO_REGISTRO_MODERADOR.md`.
+- `BIBLIOGRAPHY_EVIDENCE_ATLAS.md`, Brooke, Hart, Bangor y Ericsson/Simon si aplica.
 
 No decir:
 
 - "NASA mide carga cognitiva teorica de forma directa".
 - "SUS demuestra que 3D es mejor que 2D".
+- "Think-Aloud sustituye los datos cuantitativos".
 
-### Slide 8 - El pipeline convierte activos tecnicos pesados en geometria legible para WebGL
+### Slide 9 - El pipeline traduce activos CAD a geometria runtime para WebGL
 
-Tiempo: 8:00-9:30.
+Tiempo: 8:35-9:50.
 
-Objetivo: mostrar el aporte de Technical Art.
+Objetivo: explicar el pipeline como traduccion tecnica, no como importacion directa.
 
 Visual: CAD/STEP -> MoI3D/STEPper/Blender -> limpieza -> retopologia/proxies -> bake -> FBX -> Unity WebGL.
 
@@ -279,243 +367,251 @@ Guion oral:
 
 > El reto 3D no fue importar un modelo y ponerlo en pantalla. Los modelos CAD de manufactura no estan pensados para render en tiempo real. Pueden traer superficies convertidas con n-gons, vertices repetidos, caras internas, piezas repetidas como mallas unicas y detalle geometrico innecesario para inspeccion.
 >
+> Runtime significa tiempo de ejecucion: lo que realmente corre cuando el usuario abre la app. Una escena runtime para WebGL necesita geometria, materiales, jerarquias, memoria y eventos de interaccion bajo restricciones del navegador.
+>
 > Por eso el pipeline combina rutas de importacion, saneamiento geometrico, remodelado, optimizacion, bake de mapas y exportacion a Unity. La decision tecnica no fue conservar todo el CAD original, sino traducirlo a un activo runtime legible.
 >
-> La palabra clave es traduccion: de geometria de manufactura a geometria de inspeccion web.
+> La ganancia no es solo peso. Es poder seleccionar, aislar, explotar, etiquetar y medir la escena sin romper la lectura del ensamblaje.
 
-Clicks/movimiento: revelar pipeline por etapas; no mostrar todo de golpe.
+Clicks/movimiento: mostrar pipeline de izquierda a derecha.
 
 Transicion:
 
-> Esa traduccion produce dos cifras geometricas que conviene leer correctamente.
+> Esa diferencia entre activo optimizado y escena runtime explica una cifra que puede parecer contradictoria.
 
 Evidencia base:
 
-- `Informe_final/chapters/04_desarrollo.tex`, pipeline 3D.
+- `Informe_final/chapters/04_desarrollo.tex`, pipeline y optimizacion.
+- `Informe_final/figures/chapter4/fig_4_pipeline_modelado_bake.pdf`.
 - `Informe_final/figures/screenshots_contextual/fig_cad_bake_high_pair.png`.
 - `Informe_final/figures/screenshots_contextual/fig_cad_bake_low_pair.png`.
 
 No decir:
 
 - "El CAD original se uso intacto".
-- "La optimizacion fue solo decimacion automatica".
+- "La optimizacion fue solo bajar poligonos".
 
-### Slide 9 - La reduccion geometrica se lee como presupuesto de activo, no como conteo runtime
+### Slide 10 - 95 617 y 229 054 triangulos son metricas distintas, no una contradiccion
 
-Tiempo: 9:30-10:40.
+Tiempo: 9:50-10:45.
 
-Objetivo: blindar la lectura 95 617 vs 229 054.
+Objetivo: neutralizar una objecion tecnica recurrente.
 
-Visual: tarjeta comparativa:
-- 95 617 triangulos: activo base optimizado exportado.
-- 229 054 triangulos estimados: escena runtime instrumentada/profiler.
+Visual: dos tarjetas comparativas: activo base optimizado vs escena runtime instrumentada.
 
 Guion oral:
 
-> En el informe aparecen dos cifras que no deben compararse como si fueran el mismo tipo de medida. La cifra de 95 617 triangulos corresponde al activo base optimizado exportado. Es el resultado del cierre geometrico principal.
+> En el informe aparecen dos cifras que deben leerse con cuidado. La primera es 95 617 triangulos: corresponde al activo base optimizado exportado. Es una metrica del modelo principal despues del proceso de optimizacion.
 >
-> La cifra de 229 054 triangulos estimados corresponde a la escena runtime instrumentada por el profiler. Esa escena incorpora instancias, proxies, assets de apoyo, renderers activos y elementos necesarios para la interaccion.
+> La segunda es 229 054 triangulos estimados: corresponde a la escena runtime instrumentada observada por profiler. Esa escena incorpora instancias, proxies, renderers activos, assets de apoyo y elementos necesarios para la interaccion.
 >
-> Entonces, si el jurado ve esas dos cifras, la lectura correcta es: no hay contradiccion. Son niveles de medicion distintos.
+> Por eso no son metricas equivalentes. Una mide el activo optimizado base; la otra mide una escena en ejecucion con componentes adicionales. Lo importante en defensa no es esconder la diferencia, sino explicarla junto a la primera tabla donde aparece.
 
-Clicks/movimiento: revelar primero cada cifra y luego "no equivalentes".
+Clicks/movimiento: mostrar 95 617, despues 229 054, despues "no equivalentes".
 
 Transicion:
 
-> La misma idea aplica a la arquitectura: no es una sola malla; es un sistema de datos, UI, escena y medicion.
+> Para que esa escena fuera mantenible, la arquitectura se separo en capas.
 
 Evidencia base:
 
-- `Informe_final/chapters/05_resultados.tex`, resultados formativos de rendimiento y pipeline de activos.
+- `Informe_final/chapters/04_desarrollo.tex`, cierre de activo optimizado.
 - `Informe_final/validacion/07_TABLAS_RENDIMIENTO_WEBGL_MEDICIONES.tex`.
+- `Informe_final/presentation/DEFENSE_EVIDENCE_MAP.md`, valores defendibles.
 
 No decir:
 
-- "229 054 invalida la reduccion".
-- "95 617 es todo lo que se renderiza siempre".
+- "Se redujo de 229 054 a 95 617".
+- "Ambas cifras miden lo mismo".
 
-### Slide 10 - La arquitectura separa UI, seleccion, datos runtime, shaders y medicion
+### Slide 11 - La arquitectura separa UI, estados, datos, escena y medicion
 
-Tiempo: 10:40-12:10.
+Tiempo: 10:45-11:55.
 
-Objetivo: demostrar que la app es sistema, no escena suelta.
+Objetivo: demostrar que la app no es un viewer aislado.
 
-Visual: arquitectura por capas.
+Visual: diagrama de arquitectura por capas.
 
 Guion oral:
 
-> La aplicacion se organizo por capas. En la superficie esta la UI: Hero, Explore, bottom sheet y los modos Inspect, Analyze y Studio. Debajo esta la coordinacion de estados, seleccion, visibilidad, exploded view, corte transversal, modos visuales y thermal. Luego esta la capa de datos, con piezas, categorias, fichas y assets. Y finalmente estan la escena runtime, shaders y profiler.
+> La aplicacion se organizo por capas. En la superficie esta la UI: Hero, Explore, bottom sheet y los modos Inspect, Analyze y Studio. Debajo esta la coordinacion de estados: seleccion, visibilidad, exploded view, corte transversal, modos visuales y thermal.
 >
-> Esta separacion importa porque permite que la seleccion de una pieza no sea solo un highlight visual. La seleccion activa informacion, aislamiento, relaciones de ensamblaje y posibles modos de lectura.
+> Luego esta la capa de datos, con piezas, categorias, fichas y assets. Finalmente estan la escena runtime, shaders y profiler. Esta separacion importa porque evita que cada boton sea una solucion aislada. Cada interaccion modifica estado, lectura visual y evidencia tecnica.
 >
-> Por eso defiendo la app como un sistema interactivo de inspeccion tecnica, no como un viewer pasivo.
+> En palabras sencillas: la app no solo muestra un dron. Mantiene una estructura para saber que pieza se selecciona, que informacion aparece, que modo se activa y como se mide el comportamiento.
 
-Clicks/movimiento: revelar capas de arriba abajo.
+Clicks/movimiento: revelar por capas de arriba hacia abajo.
 
 Transicion:
 
-> Para que esa arquitectura se entienda, hay que ver la taxonomia que sostiene la seleccion.
+> La capa de datos se apoya en una taxonomia de piezas y relaciones.
 
 Evidencia base:
 
-- `Informe_final/chapters/04_desarrollo.tex`, normalizacion del sistema y arquitectura.
-- `README.md`, Main Runtime Systems.
+- `Informe_final/chapters/04_desarrollo.tex`, arquitectura runtime.
 - `Informe_final/Manual_tecnico/manual_tecnico.pdf`.
+- `Informe_final/figures/chapter4/fig_4_arquitectura_general_twinsight.pdf`.
 
 No decir:
 
-- "Todos los managers son visibles al usuario".
-- "La arquitectura por si sola prueba usabilidad".
+- "Es solo un visor 3D".
+- "La UI esta desconectada de la escena".
 
-### Slide 11 - La taxonomia permite seleccionar piezas madre, subpiezas, hotspots y fasteners
+### Slide 12 - La taxonomia vuelve seleccionables piezas, hotspots y fasteners
 
-Tiempo: 12:10-13:20.
+Tiempo: 11:55-12:55.
 
-Objetivo: explicar por que hay varios conteos y niveles de lectura.
+Objetivo: explicar taxonomia antes de mostrar flujos de inspeccion.
 
-Visual: jerarquia 28 piezas canonicas -> 30 anchors -> 257 renderers/colliders.
+Visual: jerarquia 28 categorias, 30 piezas madre, 257 subpiezas, hotspots y fasteners.
 
 Guion oral:
 
-> La escena tiene varios niveles. Las 28 piezas canonicas son la taxonomia semantica de investigacion. Los 30 anchors son nodos operativos de Unity: las 28 piezas mas grupos sinteticos para fasteners y miscelaneos. Los 257 renderers y colliders describen la granularidad geometrica de la escena.
+> Taxonomia significa clasificacion operativa. En esta tesis no es una lista decorativa: es el sistema que permite organizar componentes, piezas madre, subpiezas, hotspots y fasteners.
 >
-> Esto evita un error comun: confundir una pieza academica, un nodo de escena y un fragmento renderizable. En la app, esa distincion permite seleccionar una pieza madre, entrar a subpiezas, activar hotspots o inspeccionar fasteners sin que la ficha contextual hable de otro nivel.
+> Un hotspot es un punto interactivo que llama la atencion sobre una zona o pieza. Un fastener es un elemento de sujecion, como tornilleria o fijaciones. Sin esta organizacion, la app podria girar el modelo, pero no entenderia que selecciona el usuario ni que ficha debe abrir.
 >
-> La taxonomia es la estructura que vuelve tecnicamente coherente la interaccion.
+> La taxonomia final no pretende ser inventario industrial absoluto del dron. Pretende ser una estructura funcional y trazable para inspeccion visual, seleccion y consulta dentro del prototipo.
 
-Clicks/movimiento: construir jerarquia.
+Clicks/movimiento: mostrar jerarquia primero y luego ejemplos en UI.
 
 Transicion:
 
-> Sobre esa taxonomia se monta el flujo publico real.
+> Esa estructura se ve en el flujo publico de la app.
 
 Evidencia base:
 
-- `Informe_final/chapters/04_desarrollo.tex`, Tabla de reconciliacion 16/28/30/257.
-- `Informe_final/figures/chapter4/fig_4_taxonomia_28_30_257.pdf`.
+- `Informe_final/chapters/04_desarrollo.tex`, taxonomia y saneamiento de jerarquia.
+- `Informe_final/figures/screenshots_contextual/fig_ui_info_panel.png`.
+- `Informe_final/figures/screenshots_contextual/fig_explore_hotspot_selection.png`.
+- `Informe_final/validacion/02_BUILD_CLOSURE_ACADEMICO.md`.
 
 No decir:
 
-- "Hay 257 piezas canonicas".
-- "Los fasteners se resuelven todos con el mismo nivel de detalle".
+- "La taxonomia es una BOM certificada".
+- "Cada tornillo del dron real esta auditado industrialmente".
 
-### Slide 12 - El flujo publico se concentra en Explore, seleccion, bottom sheet, Inspect, Analyze y Studio
+### Slide 13 - El flujo publico concentra Explore, seleccion y bottom sheet
 
-Tiempo: 13:20-14:35.
+Tiempo: 12:55-13:55.
 
-Objetivo: cerrar alcance visible de UI y evitar funciones sobrevendidas.
+Objetivo: mostrar la experiencia evaluada sin mencionar modulos no publicos.
 
-Visual: flujo Hero -> Explore -> seleccion -> bottom sheet -> Inspect/Analyze/Studio.
+Visual: captura Explore, seleccion de pieza y bottom sheet.
 
 Guion oral:
 
-> El flujo publico defendible es este: Hero, Explore, seleccion de pieza, bottom sheet, y tres modos principales: Inspect, Analyze y Studio.
+> La UI publica se concentra en Explore y sus acciones visibles: navegar el ensamblaje, seleccionar una pieza, abrir una ficha contextual y activar herramientas de inspeccion.
 >
-> El bottom sheet es importante porque convierte una seleccion visual en lectura tecnica. El usuario no solo ve una malla resaltada; lee nombre, categoria, especificaciones, relacion de ensamblaje y nivel de seleccion.
+> El bottom sheet es el panel inferior que aparece con informacion contextual. Su funcion es evitar que el usuario tenga que abandonar la escena para consultar datos. La informacion aparece al lado de la accion, no en un documento separado.
 >
-> Tambien es importante decir lo que no se muestra como promesa final: medicion, BOM, guias de ensamblaje avanzadas, telemetria o modulos legacy no son parte del flujo publico evaluado, aunque puedan existir como codigo, prototipo anterior o trabajo futuro.
+> Esta decision conecta teoria y construccion: si la dificultad inicial era reconstruir relaciones dispersas, la UI intenta mantener pieza, contexto y accion en el mismo espacio visual.
 
-Clicks/movimiento: recorrer flujo de izquierda a derecha.
+Clicks/movimiento: mostrar antes de seleccionar, seleccion y panel abierto.
 
 Transicion:
 
-> Ahora muestro que hacen los dos modos mas orientados a inspeccion: Inspect y Analyze.
+> Sobre ese flujo se montan herramientas de inspeccion para reducir ruido visual.
 
 Evidencia base:
 
-- `README.md`, Current Visible Flow y Capability Status.
-- `Informe_final/presentation/DEMO_SCRIPT.md`.
+- `Informe_final/chapters/04_desarrollo.tex`, interfaz.
 - `Informe_final/figures/screenshots_contextual/fig_ui_explore_mobile_pc.png`.
+- `Informe_final/figures/screenshots_contextual/fig_ui_info_panel.png`.
+- `README.md`, public build scope.
 
 No decir:
 
-- "La UI final incluye BOM, mediciones o annotations".
-- "Todo lo que existe en codigo esta publicado como feature".
+- "Todos los modulos experimentales quedaron publicados".
+- "La UI reemplaza documentacion tecnica completa".
 
-### Slide 13 - Inspect y Analyze reducen ruido visual para leer relaciones de ensamblaje
+### Slide 14 - Inspect y Analyze ayudan a leer relaciones, no solo a activar efectos
 
-Tiempo: 14:35-15:55.
+Tiempo: 13:55-14:55.
 
-Objetivo: conectar herramientas con comprension espacial.
+Objetivo: conectar funciones visibles con comprension espacial.
 
-Visual: GIF o secuencia: seleccionar -> aislar -> exploded view -> cut/filter.
+Visual: secuencia Isolate, Explode, Cut, filtros o outputs de Analyze.
 
 Guion oral:
 
-> Inspect y Analyze no son botones decorativos. Son estrategias para reducir ruido visual.
+> Inspect y Analyze no se defienden como efectos visuales. Se defienden como herramientas para leer relaciones. Isolate reduce ruido alrededor de una pieza. Explode separa componentes para ver ensamblaje. Cut ayuda a inspeccionar interior o capas. Los filtros permiten concentrar la atencion.
 >
-> Inspect permite seleccionar, aislar y concentrarse en una pieza o grupo. Analyze permite separar el ensamblaje con exploded view, cortar la escena con un plano y filtrar por categorias funcionales. En un sistema con muchas piezas, esto cambia la tarea: el usuario deja de buscar visualmente en una masa de geometria y empieza a leer relaciones.
+> En palabras sencillas: la app le quita al usuario parte del trabajo de imaginar que hay detras, que esta conectado y que cambia cuando separo un componente.
 >
-> El aporte aqui no es "ver mas bonito"; es controlar que informacion queda visible para entender el ensamblaje.
+> En tecnico, estas acciones modifican visibilidad, transformaciones, materiales y estados de seleccion sobre la escena runtime. Por eso dependen de la arquitectura y de la taxonomia explicadas antes.
 
-Clicks/movimiento: usar GIF corto o 4 capturas; si hay live demo, solo anticipar.
+Clicks/movimiento: animar secuencia corta, no recorrer menu completo.
 
 Transicion:
 
-> Ademas de aislar y separar piezas, la app cambia la forma de leerlas visualmente.
+> Los modos visuales complementan esa lectura cambiando como se interpreta la superficie.
 
 Evidencia base:
 
-- `Informe_final/chapters/05_resultados.tex`, estado de cierre funcional.
+- `Informe_final/chapters/04_desarrollo.tex`, herramientas de inspeccion.
 - `Informe_final/figures/screenshots_contextual/fig_explore_isolate_sequence.png`.
 - `Informe_final/figures/screenshots_contextual/fig_analyze_tool_outputs.png`.
 
 No decir:
 
-- "La vista explotada reemplaza un procedimiento de ensamble completo".
+- "Explode demuestra ensamblaje fisicamente exacto".
+- "Analyze hace diagnostico real del dron".
 
-### Slide 14 - Studio y los shaders convierten el modelo en lecturas visuales complementarias
+### Slide 15 - Studio y los shaders producen lecturas visuales complementarias
 
-Tiempo: 15:55-17:15.
+Tiempo: 14:55-15:55.
 
-Objetivo: explicar Realistic, X-Ray, Solid, Thermal y presets como lecturas.
+Objetivo: definir shaders/presets y conectar visualidad con funcion tecnica.
 
-Visual: grid de modos reales.
+Visual: Realistic, X-Ray, Solid, Thermal y presets de Studio.
 
 Guion oral:
 
-> Studio agrupa lecturas visuales. Realistic conserva materialidad y forma. X-Ray ayuda a leer superposiciones. Solid Color simplifica la escena por color y volumen. Thermal introduce una lectura relativa por componentes. Los presets de entorno permiten observar el modelo bajo condiciones visuales distintas.
+> Studio agrupa modos visuales y presets. Un shader es el programa o conjunto de instrucciones que define como una superficie responde a luz, color, transparencia o estilo. Un preset es una configuracion guardada para cambiar rapidamente esa lectura.
 >
-> La idea no es multiplicar efectos. Cada modo debe responder a una pregunta de inspeccion: que pieza es, donde esta, que relacion tiene, que zonas resaltan, que queda oculto o que conviene aislar.
+> Realistic favorece reconocimiento visual. X-Ray ayuda a leer superposiciones. Solid reduce textura para concentrarse en forma. Otros modos apoyan comparacion o inspeccion. El aporte multimedia esta en usar apariencia como herramienta de lectura, no como decoracion.
 >
-> En la defensa, los modos ocultos o legacy no se presentan como alcance visible. Se mencionan solo si el jurado pregunta por capacidades internas.
+> Esta parte tambien dialoga con la teoria: si cambio la representacion visual de forma controlada, puedo senalizar relaciones y reducir informacion irrelevante segun la tarea.
 
-Clicks/movimiento: revelar modo por modo, con etiqueta de uso.
+Clicks/movimiento: mostrar un modo por clic; no hacer carrusel largo.
 
 Transicion:
 
-> Hay un modo que requiere una aclaracion especial: Thermal.
+> Hay un modo que requiere una advertencia explicita: Thermal.
 
 Evidencia base:
 
-- `Informe_final/chapters/04_desarrollo.tex`, UX/UI y modos visuales.
+- `Informe_final/chapters/04_desarrollo.tex`, materiales, shaders y Studio.
 - `Informe_final/figures/screenshots_contextual/fig_modes_direct_xray_solid_thermal.png`.
 - `Informe_final/figures/screenshots_contextual/fig_modes_studio_presets.png`.
 
 No decir:
 
-- "Hay siete modos publicos si no estan en la UI final".
-- "Thermal mide temperatura real".
+- "Los shaders simulan comportamiento fisico completo".
+- "Cada color representa una medicion real".
 
-### Slide 15 - Thermal es una visualizacion heuristica, no una simulacion FEA calibrada
+### Slide 16 - Thermal es una visualizacion heuristica, no una simulacion FEA
 
-Tiempo: 17:15-18:15.
+Tiempo: 15:55-16:45.
 
-Objetivo: cerrar riesgo tecnico de simulacion sobrevendida.
+Objetivo: blindar la interpretacion tecnica de Thermal.
 
-Visual: captura Thermal con etiqueta "heuristico".
+Visual: captura Thermal con etiqueta "heuristico relativo".
 
 Guion oral:
 
-> Thermal debe explicarse con precision. En esta tesis, Thermal es una visualizacion heuristica por componentes. Sirve para comunicar tendencias relativas y apoyar lectura tecnica, pero no es FEA, no es telemetria y no reemplaza una medicion fisica calibrada.
+> Thermal debe explicarse con precision. Heuristico significa una regla practica o criterio aproximado para orientar lectura, no una medicion fisica calibrada.
 >
-> Su valor dentro del alcance es pedagogico y analitico: ayuda a que el usuario piense el producto por zonas funcionales y estados relativos. Su evolucion natural seria calibrarlo con datos experimentales o telemetria en una fase futura.
+> En TwinSight, Thermal no recibe sensores, no usa telemetria, no ejecuta FEA y no calcula temperatura real. Es una visualizacion relativa para comunicar zonas de interes o lectura diferencial dentro del prototipo.
+>
+> Por eso en la defensa lo presento como herramienta de comunicacion visual, no como modulo de diagnostico. Si un jurado pregunta si se puede convertir en simulacion, la respuesta es si, pero seria otra fase: requeriria modelo fisico, propiedades materiales, condiciones de frontera, validacion y datos.
 
-Clicks/movimiento: senalar leyenda y poner sello "no FEA".
+Clicks/movimiento: mostrar etiqueta de alcance junto a la captura.
 
 Transicion:
 
-> Hasta aqui he mostrado el argumento tecnico. Ahora la demo comprime ese argumento en una secuencia observable.
+> Con el alcance visual claro, la demo debe probar funciones, no improvisar navegacion.
 
 Evidencia base:
 
@@ -525,28 +621,28 @@ Evidencia base:
 
 No decir:
 
-- "Predice fallas termicas".
-- "Es simulacion fisica".
+- "Thermal diagnostica temperatura".
+- "Thermal reemplaza FEA".
 
-### Slide 16 - La demo debe probar tres capacidades, no navegar improvisadamente
+### Slide 17 - La demo se lee como evidencia, no como recorrido libre
 
-Tiempo: 18:15-18:45.
+Tiempo: 16:45-17:05.
 
-Objetivo: preparar al jurado para observar la demo.
+Objetivo: preparar al jurado para observar tres capacidades concretas.
 
-Visual: tres bullets grandes: explorar, inspeccionar, analizar.
+Visual: checklist de demo: seleccionar, entender relacion, cambiar modo visual.
 
 Guion oral:
 
-> Antes de mostrar la demo, quiero fijar que deben observar. No voy a navegar de forma improvisada. La secuencia prueba tres capacidades: explorar el dron completo, seleccionar una pieza y convertirla en informacion tecnica, y usar herramientas de inspeccion para entender relaciones.
+> Antes de mostrar la demo, les pido mirar tres cosas. Primero, si se puede pasar del dron completo a una pieza concreta. Segundo, si la interfaz mantiene contexto de relacion entre pieza y ensamblaje. Tercero, si los modos visuales cambian la lectura sin cambiar el alcance del sistema.
 >
-> Si uso video, es un respaldo grabado de la build real. Si ejecuto microdemo en vivo, sera solo una confirmacion corta del mismo flujo.
+> La demo no busca mostrar todo. Busca comprobar la promesa minima del prototipo.
 
-Clicks/movimiento: no sobreanimar.
+Clicks/movimiento: dejar checklist fijo mientras inicia video o microdemo.
 
 Transicion:
 
-> Empecemos con el recorrido.
+> Con esa lectura, paso al recorrido.
 
 Evidencia base:
 
@@ -555,234 +651,277 @@ Evidencia base:
 
 No decir:
 
-- "Voy a probar todo".
-- "Voy a explorar un poco".
+- "Voy a navegar un poco".
+- "Si funciona aqui, funciona en cualquier equipo".
 
-### Slide 17 - Demo: de dron completo a pieza, relacion y modo visual
+### Slide 18 - Demo: del dron completo a pieza, relacion y modo visual
 
-Tiempo: 18:45-21:15.
+Tiempo: 17:05-19:05.
 
-Objetivo: demostrar continuidad de la app.
+Objetivo: demostrar continuidad funcional.
 
-Visual: video de 75-90 s o demo vivo corta.
+Visual: demo en vivo o video local de 90-120 segundos.
 
-Guion oral sobre video:
+Guion oral:
 
-> Primero vemos el dron completo en Explore. La navegacion permite orbit, zoom y paneo sin salir del navegador. [pausa]
+> Aqui inicio en el dron completo. Lo primero es orientacion general: el usuario entiende que esta en una escena 3D y puede orbitar el ensamblaje. [pausa breve]
 >
-> Ahora selecciono una pieza. Fijense que no aparece solo un resaltado: aparece el bottom sheet con informacion tecnica y nivel de lectura. [senalar]
+> Ahora selecciono una pieza. La seleccion no solo resalta geometria; abre informacion contextual y mantiene la relacion con el conjunto. Esto responde al problema inicial: no separar dato y forma. [senalar panel]
 >
-> Al pasar a Inspect, puedo aislar la pieza y reducir el contexto visual. En Analyze, la vista explosionada, el corte y los filtros permiten leer relaciones que en una vista plana exigirian reconstruccion mental. [pausa]
+> Activo una herramienta de inspeccion para aislar o separar visualmente el componente. Lo importante es que la accion no es decorativa: reduce ruido visual para leer relacion espacial.
 >
-> Finalmente, Studio cambia la lectura visual: Realistic, X-Ray, Solid y Thermal no son efectos aislados; son formas distintas de mirar el mismo ensamblaje.
+> Finalmente cambio de modo visual. Esta transicion muestra que el mismo ensamblaje puede leerse con distintas capas visuales segun la tarea. [pausa]
 >
-> Esta secuencia demuestra el punto central: la app no solo muestra el dron, organiza la comprension de sus relaciones.
+> Con esto vuelvo a resultados: la pregunta ya no es si la app se ve bien, sino bajo que condiciones corre y que evidencia produjo.
 
-Si falla la demo:
+Plan si falla la demo:
 
-> Para no gastar tiempo en troubleshooting, paso al recorrido grabado. La evidencia que quiero mostrar es esta misma secuencia: exploracion, seleccion, inspeccion y lectura visual.
+> Para no gastar tiempo en troubleshooting, paso al recorrido grabado. La evidencia que quiero mostrar es esta: seleccion, contexto y modo visual.
 
-Clicks/movimiento: despues del video, congelar en una captura final del dron y no seguir jugando con la app.
+Clicks/movimiento: no desviarse del recorrido fijo.
 
 Transicion:
 
-> La demo muestra funcionamiento. El siguiente paso es revisar que tan trazable fue su rendimiento tecnico.
+> Primero reviso la evidencia tecnica de ejecucion.
 
 Evidencia base:
 
+- `docs/Build/`, build publica.
 - `Informe_final/presentation/DEMO_SCRIPT.md`.
-- `docs/Build/`.
-- `docs/index.html`.
+- `Informe_final/Manual_usuario/manual_usuario.pdf`.
 
 No decir:
 
-- "El video demuestra FPS".
-- "Si corre aqui, corre igual en todos los equipos".
+- "La demo reemplaza la validacion".
+- "Esto prueba compatibilidad universal".
 
-### Slide 18 - El profiler interno vuelve trazable el rendimiento por escenario y dispositivo
+### Slide 19 - El profiler vuelve trazable el rendimiento por escenario y dispositivo
 
-Tiempo: 21:15-22:25.
+Tiempo: 19:05-20:05.
 
-Objetivo: explicar medicion tecnica sin ahogar con tablas.
+Objetivo: definir profiler y evidenciar reproducibilidad tecnica.
 
 Visual: captura profiler + tabla simplificada.
 
 Guion oral:
 
-> Para evitar que el rendimiento quedara en percepcion subjetiva, la app integra un profiler interno capaz de registrar sesiones por escenario y exportarlas en JSON o CSV.
+> Para evitar que el rendimiento quedara en percepcion subjetiva, la app integra mediciones y se apoyo en profiler. Un profiler es una herramienta de observacion del comportamiento runtime: registra indicadores como FPS, frame time, memoria, escena y contexto de ejecucion.
 >
-> Cada registro asocia dispositivo, navegador, resolucion, escenario, FPS promedio, frame time, memoria, modo visual, factor de explosion, corte, renderers, mallas y triangulos estimados. Es decir, no se reporta un numero suelto: se reporta un numero en contexto.
+> En WebGL esto importa porque el rendimiento depende de hardware, navegador, memoria, cache y escenario activo. Por eso la tesis no reporta un FPS aislado, sino mediciones asociadas a equipo, build, resolucion, cache y condicion de prueba.
 >
-> Esto es importante porque en WebGL el rendimiento depende de hardware, navegador, memoria, cache y escenario activo.
+> La evidencia tecnica sirve para dos cosas: demostrar viabilidad en entornos probados y reconocer limites, especialmente en movil de gama media-baja.
 
-Clicks/movimiento: resaltar columnas de contexto antes de FPS.
+Clicks/movimiento: senalar FPS, memoria, dispositivo y build.
 
 Transicion:
 
-> Con esa lectura contextual, el resultado de rendimiento es favorable, pero no universal.
+> Leida la medicion, el resultado es viable, pero acotado.
 
 Evidencia base:
 
-- `Informe_final/chapters/05_resultados.tex`, rendimiento.
 - `Informe_final/validacion/06_GUIA_MEDICIONES_TECNICAS_WEBGL.md`.
 - `Informe_final/validacion/07_TABLAS_RENDIMIENTO_WEBGL_MEDICIONES.tex`.
-- `Telemetria/Mediciones_WebGL/`.
+- `Informe_final/figures/screenshots_contextual/fig_profiler_internal_evidence.png`.
+- `Telemetria/Mediciones_WebGL/` si esta disponible localmente.
 
 No decir:
 
-- "El promedio global resume toda la experiencia".
-- "El profiler sustituye prueba en dispositivos".
+- "El profiler sustituye pruebas en dispositivos".
+- "Los FPS son iguales en cualquier navegador".
 
-### Slide 19 - El rendimiento es viable, pero no universal en todo movil
+### Slide 20 - El rendimiento es viable en desktop y limitado en movil probado
 
-Tiempo: 22:25-23:35.
+Tiempo: 20:05-21:05.
 
-Objetivo: interpretar resultados tecnicos con honestidad.
+Objetivo: interpretar rendimiento sin compatibilidad universal.
 
-Visual: barras por dispositivo con linea de 30 FPS.
+Visual: matriz desktop/movil: FPS, frame time, memoria, observacion.
 
 Guion oral:
 
-> La lectura tecnica es esta: en escritorio la build fue estable; en equipos moviles de gama alta o media-alta se mantuvo cercana o superior a la meta; en el limite inferior Android fue navegable, pero estuvo por debajo de 30 FPS.
+> En desktop, el entorno reportado fue Windows 11, GPU GTX 980 Ti, Intel Core i7-5820K, 48 GB de RAM y navegador Chrome. En movil, se uso Redmi Note 10S con MIUI Global 14.0.11 y Chrome. Tambien se controlo cache cargado y build.
 >
-> El valor academico no esta en prometer compatibilidad universal. Esta en mostrar que el prototipo es viable bajo condiciones documentadas y que sus limites fueron medidos.
+> La lectura academica es esta: el prototipo es viable en los entornos probados y muestra una experiencia funcional en desktop. En movil, el soporte existe pero es mas sensible a memoria, resolucion, carga de escena y gestos. Por eso no prometo compatibilidad universal.
 >
-> Por eso la tesis no dice "funciona en cualquier movil". Dice: funciona en los dispositivos y navegadores evaluados, con restricciones claras en gama baja o media-baja.
+> Este resultado conecta con el pipeline: WebGL permite distribucion web, pero obliga a optimizar geometria, materiales, memoria y UI.
 
-Clicks/movimiento: mostrar primero 30 FPS como referencia, luego cada caso.
+Clicks/movimiento: revelar primero desktop, despues movil, despues advertencia de alcance.
 
 Transicion:
 
-> Despues de la capa tecnica, el segundo bloque de resultados es la evaluacion con usuarios.
+> La segunda parte de la evidencia viene de usuarios.
 
 Evidencia base:
 
-- `Informe_final/chapters/05_resultados.tex`, rendimiento y compatibilidad.
+- `Informe_final/chapters/05_resultados.tex`, rendimiento WebGL.
+- `Informe_final/validacion/07_TABLAS_RENDIMIENTO_WEBGL_MEDICIONES.tex`.
 - `Informe_final/figures/screenshots_contextual/fig_device_matrix_clean.png`.
+- `Informe_final/validacion/02_BUILD_CLOSURE_ACADEMICO.md`.
 
 No decir:
 
-- "Mobile ready universal".
-- "30 FPS garantizados".
+- "Funciona perfectamente en todo celular".
+- "Chrome es irrelevante".
 
-### Slide 20 - La validacion de usuarios muestra recepcion favorable del prototipo 3D
+### Slide 21 - SUS muestra recepcion favorable del prototipo 3D
 
-Tiempo: 23:35-24:45.
+Tiempo: 21:05-22:05.
 
-Objetivo: explicar SUS correctamente.
+Objetivo: explicar SUS correctamente y no compararlo contra 2D.
 
-Visual: grafico SUS, referencia 68 y distribucion.
+Visual: grafico SUS, referencia 68, distribucion n=12.
 
 Guion oral:
 
-> La evaluacion con usuarios incluyo 12 participantes anonimizados, con perfiles afines a ingenieria, software, diseno de interaccion o visualizacion. El SUS se aplico solo al prototipo 3D.
+> La muestra final fue de 12 participantes anonimizados, con perfiles afines al contexto del proyecto. SUS se aplico solo al prototipo 3D como lectura global de usabilidad percibida.
 >
-> El promedio SUS fue 91,88, con mediana 95, minimo 60, maximo 100 y desviacion estandar 11,24. La referencia de 68 se usa como promedio historico del instrumento, no como umbral absoluto.
+> El promedio SUS fue 91,88, con mediana 95, minimo 60, maximo 100 y desviacion estandar 11,24. La referencia de 68 se usa como promedio historico del instrumento, no como umbral absoluto de aprobacion.
 >
-> La lectura correcta es descriptiva: en esta muestra, el prototipo 3D tuvo una percepcion de usabilidad muy favorable.
+> La interpretacion prudente es: dentro de esta muestra y este prototipo, la recepcion de usabilidad fue favorable. No digo que SUS pruebe superioridad frente al soporte 2D, porque no se aplico de esa forma.
 
-Clicks/movimiento: destacar "solo 3D" y "descriptivo".
+Clicks/movimiento: mostrar primero n y aplicacion solo 3D, luego media, luego cautela.
 
 Transicion:
 
-> Para comparar condiciones, el instrumento clave no fue SUS sino NASA-TLX Raw.
+> Para comparar condiciones, el instrumento clave fue NASA-TLX Raw junto con tiempos de tareas.
 
 Evidencia base:
 
 - `Informe_final/chapters/05_resultados.tex`, resultados SUS.
-- `Informe_final/figures/chapter5/fig_5_sus_distribucion.pdf`.
+- `Informe_final/validacion/usuarios/` si esta disponible localmente.
+- `BIBLIOGRAPHY_EVIDENCE_ATLAS.md`, Brooke, Bangor, Sauro y Lewis.
 
 No decir:
 
 - "SUS prueba superioridad frente a 2D".
-- "68 es aprobado/reprobado".
+- "68 es un umbral universal de aprobacion".
 
-### Slide 21 - La condicion 3D redujo carga percibida frente al soporte 2D en la muestra
+### Slide 22 - NASA-TLX Raw y tiempos favorecen al 3D de forma descriptiva
 
-Tiempo: 24:45-26:05.
+Tiempo: 22:05-23:10.
 
-Objetivo: explicar NASA-TLX Raw, tiempos T1-T3 y convergencia.
+Objetivo: conectar workload, tiempos T1-T3 y T4 exploratoria.
 
-Visual: comparativa NASA 3D vs 2D + tiempos T1-T3.
+Visual: comparativa NASA 3D vs 2D + tiempos T1-T3 + nota de T4.
 
 Guion oral:
 
-> NASA-TLX Raw si se aplico por condicion. El promedio del visor 3D fue 8,69 y el del soporte 2D fue 19,89. La diferencia pareada media fue 11,19 puntos a favor del visor, y en los 12 casos la carga percibida fue menor en 3D.
+> NASA-TLX Raw si se aplico por condicion. El promedio del visor 3D fue 8,69 y el del soporte 2D fue 19,89. La diferencia pareada media fue 11,19 puntos a favor del visor, y en los 12 casos la carga de trabajo percibida fue menor en 3D.
 >
-> Esto converge con los tiempos de tareas cronometradas. En T1, T2 y T3, el tiempo total medio fue 20,58 segundos en 3D y 54,00 segundos en 2D. La T4 no se cronometro porque era exploratoria guiada.
+> En tiempos, las tareas T1, T2 y T3 se cronometraron porque tenian inicio y cierre comparables. T4 fue exploratoria guiada y no se cronometro; por eso no debe mezclarse con las otras tres.
 >
-> La lectura no es causal-inferencial. La lectura defendible es: dentro de esta muestra formativa, el visor 3D mostro menor workload percibido y menor tiempo descriptivo en tareas cronometradas.
+> Los tiempos medios fueron: T1, 5,75 segundos en 3D frente a 13,00 en 2D; T2, 3,50 frente a 18,00; T3, 11,33 frente a 23,00. El total T1-T3 fue 20,58 segundos en 3D y 54,00 en 2D.
+>
+> La conclusion correcta es descriptiva: en esta muestra, el 3D se asocio con menor workload percibido y menor tiempo medio en tareas cronometradas, no con una prueba universal de superioridad.
 
 Clicks/movimiento: mostrar NASA, luego tiempos, luego nota "T4 exploratoria".
 
 Transicion:
 
-> Ahora bien, si todas las tareas se completaron en ambas condiciones, la discusion debe ser cuidadosa.
+> Los numeros explican el patron, pero las verbalizaciones ayudan a entender por que ocurrio.
 
 Evidencia base:
 
 - `Informe_final/chapters/05_resultados.tex`, tablas de desempeno, NASA-TLX y discusion.
-- `Informe_final/figures/chapter5/fig_5_nasatlx_dimensiones.pdf`.
+- `Informe_final/validacion/04_CUESTIONARIO_NASA_TLX_PARTICIPANTE.md`.
+- `BIBLIOGRAPHY_EVIDENCE_ATLAS.md`, Hart y Hart/Staveland.
 
 No decir:
 
-- "Se comprobo estadisticamente".
-- "La T4 fue mas rapida".
 - "NASA mide aprendizaje".
+- "T4 tambien fue cronometrada".
+- "Esto demuestra causalidad estadistica poblacional".
 
-### Slide 22 - La discusion acota el resultado: efecto techo, muestra pequena y compatibilidad limitada
+### Slide 23 - Think-Aloud explica claridad espacial y fricciones residuales
 
-Tiempo: 26:05-27:45.
+Tiempo: 23:10-24:10.
 
-Objetivo: demostrar criterio de interpretacion.
+Objetivo: hacer visible la triangulacion cualitativa.
 
-Visual: matriz "demuestra / no demuestra".
+Visual: matriz de categorias Think-Aloud: comprension espacial, navegacion/control, iconos, movil, piezas pequenas.
 
 Guion oral:
 
-> La discusion es donde se evita vender de mas. Las cuatro tareas se completaron en ambas condiciones, entonces hay efecto techo en completitud. El hallazgo fuerte no es "solo el 3D permite completar", porque eso no seria cierto. El hallazgo fuerte es que el 3D redujo carga de trabajo percibida y tiempos descriptivos en T1 a T3.
+> Think-Aloud complementa los numeros. Como los participantes verbalizan mientras ejecutan, permite detectar que les ayuda, donde dudan y que no se ve en una metrica agregada.
 >
-> Tambien hay limites: muestra no probabilistica de 12 participantes, validacion formativa, no inferencia poblacional, T4 exploratoria no cronometrada, escritorio como adaptacion funcional y compatibilidad movil acotada a dispositivos probados.
+> La categoria mas recurrente fue comprension espacial, presente en 11 de 12 participantes. Navegacion y control aparecio en 10 de 12. Esto coincide con la lectura cuantitativa: el prototipo ayudo a ubicar y relacionar piezas, pero no elimino todas las fricciones.
 >
-> Estos limites no invalidan el trabajo. Definen exactamente que demuestra: viabilidad tecnica, usabilidad percibida favorable y apoyo descriptivo a la inspeccion espacial dentro del alcance evaluado.
+> Las fricciones residuales se concentraron en iconos, navegacion movil y seleccion de piezas pequenas. Para la defensa, esto es importante porque muestra madurez metodologica: la validacion no solo confirma aciertos, tambien produce una lista concreta de mejoras.
 
-Clicks/movimiento: presentar matriz en dos columnas.
+Clicks/movimiento: mostrar categoria favorable, despues fricciones.
 
 Transicion:
 
-> Con esos limites, la contribucion queda mas clara y mas defendible.
+> Con esas tres evidencias, la discusion debe decir con precision que se demuestra y que no.
+
+Evidencia base:
+
+- `Informe_final/chapters/05_resultados.tex`, Think-Aloud y triangulacion.
+- `Informe_final/validacion/05_FORMATO_REGISTRO_MODERADOR.md`.
+- `Informe_final/validacion/usuarios/` si esta disponible localmente.
+
+No decir:
+
+- "Todos los usuarios prefirieron todo".
+- "Las verbalizaciones son prueba objetiva por si solas".
+
+### Slide 24 - La discusion acota el resultado: efecto techo, muestra y compatibilidad
+
+Tiempo: 24:10-26:40.
+
+Objetivo: integrar resultados con teoria, limites y honestidad academica.
+
+Visual: matriz "demuestra / no demuestra / queda abierto".
+
+Guion oral:
+
+> La discusion es donde se evita vender de mas. Las cuatro tareas se completaron en ambas condiciones. Eso genera efecto techo: cuando todos completan, la tasa de exito ya no distingue bien entre condiciones.
+>
+> Por eso el hallazgo no es "solo el 3D permite completar", porque eso no seria cierto. El hallazgo es mas fino: en esta muestra, el 3D mantuvo completitud, redujo tiempos T1-T3, redujo NASA-TLX Raw y produjo verbalizaciones consistentes con mejor orientacion espacial.
+>
+> Desde la teoria de carga cognitiva, la interpretacion defendible es que el visor puede reducir carga extrinseca de reconstruccion espacial. Pero no afirmo que mida directamente carga intrinseca, extrinseca y germana, ni que pruebe aprendizaje duradero.
+>
+> Tambien hay limites tecnicos. La build es funcional y trazable, pero la compatibilidad movil es acotada; Thermal es heuristico; no hay telemetria real; no hay mantenimiento predictivo; no hay FEA termico; y la muestra es no probabilistica, de 12 participantes.
+>
+> En terminos academicos, esa honestidad no debilita la tesis. La vuelve defendible porque ajusta las conclusiones a la evidencia.
+
+Clicks/movimiento: revelar "demuestra", "no demuestra", "queda abierto".
+
+Transicion:
+
+> Desde ahi, la contribucion queda en tres niveles.
 
 Evidencia base:
 
 - `Informe_final/chapters/05_resultados.tex`, discusion.
-- `Informe_final/chapters/06_conclusiones.tex`, limitaciones.
+- `Informe_final/chapters/06_conclusiones.tex`, conclusiones y trabajo futuro.
+- `Informe_final/figures/chapter5/` si se usan graficos de resultados.
 
 No decir:
 
-- "No hay limitaciones importantes".
-- "Los resultados generalizan".
+- "El prototipo demuestra aprendizaje".
+- "Los resultados se generalizan a cualquier usuario".
+- "La version movil esta completamente resuelta".
 
-### Slide 23 - La contribucion es tecnica, metodologica y comunicativa
+### Slide 25 - La contribucion es tecnica, metodologica y comunicativa
 
-Tiempo: 27:15-28:00.
+Tiempo: 26:40-27:45.
 
-Objetivo: sintetizar aporte.
+Objetivo: resumir aporte sin reducirlo a "una app bonita".
 
 Visual: tres columnas: tecnica, metodologica, comunicativa.
 
 Guion oral:
 
-> La contribucion se puede leer en tres niveles.
+> La contribucion tecnica es un pipeline CAD/Blender/Unity/WebGL con optimizacion geometrica, taxonomia de escena, UI de inspeccion, shaders y profiler.
 >
-> Primero, tecnica: un pipeline CAD/Blender/Unity/WebGL, optimizacion geometrica, taxonomia de escena, UI de inspeccion, shaders y profiler.
+> La contribucion metodologica es una evaluacion formativa diferenciada: rendimiento tecnico, tareas, SUS solo para 3D, NASA-TLX Raw por condicion, Think-Aloud y discusion de limites.
 >
-> Segundo, metodologica: un caso aplicado con DSR, instrumentos diferenciados, datos tecnicos, tareas, SUS, NASA-TLX Raw y Think-Aloud, interpretados de forma descriptiva.
+> La contribucion comunicativa es convertir hardware complejo en una experiencia inspeccionable donde pieza, relacion y contexto aparecen juntos.
 >
-> Tercero, comunicativa: el proyecto convierte un ensamblaje complejo en una experiencia explorable que ayuda a leer relaciones entre piezas, no solo a mirar un modelo.
->
-> Para Ingenieria Multimedia, esa integracion es el punto: computacion grafica, interaccion, experiencia de usuario, documentacion tecnica y evaluacion.
+> Dicho en una frase: TwinSight no reemplaza el ciclo industrial del dron; aporta una forma trazable de hacer legible su ensamblaje en la web.
 
-Clicks/movimiento: revelar cada columna.
+Clicks/movimiento: revelar cada columna con una evidencia asociada.
 
 Transicion:
 
@@ -790,90 +929,127 @@ Transicion:
 
 Evidencia base:
 
-- `Informe_final/chapters/06_conclusiones.tex`, conclusiones y contribuciones.
-- `README.md`, Project Summary.
+- `Informe_final/chapters/06_conclusiones.tex`, conclusiones.
+- `Informe_final/presentation/DEFENSE_EVIDENCE_MAP.md`, matriz de claims.
+- `README.md`, scope academico publico.
 
 No decir:
 
-- "La contribucion es una app bonita".
+- "La contribucion es solo estetica".
+- "Es un producto comercial terminado".
 
-### Slide 24 - Hacer legible el hardware complejo desde la web es el aporte defendible
+### Slide 26 - Hacer legible el hardware complejo desde la web es el aporte defendible
 
-Tiempo: 28:00-28:30 maximo. Si se va en tiempo, cerrar en 30 segundos.
+Tiempo: 27:45-28:30.
 
-Objetivo: cerrar con una frase clara y preparar preguntas.
+Objetivo: cierre breve, memorizable y honesto.
 
-Visual: dron final, tres takeaways.
+Visual: render final o comparacion inicial/final con tres mensajes: legibilidad, trazabilidad, limites.
 
 Guion oral:
 
-> El problema fue convertir informacion tecnica fragmentada en comprension espacial rapida de un hardware complejo.
+> El punto de partida fue una dificultad concreta: informacion tecnica suficiente, pero distribuida en formatos que obligan a reconstruir mentalmente relaciones espaciales.
 >
 > TwinSight X500 responde con un visual product twin WebGL: no telemetria real, sino inspeccion, contexto de piezas, modos visuales y medicion tecnica.
 >
-> La evidencia muestra build funcional, rendimiento viable con limites, SUS favorable, menor NASA-TLX Raw en la muestra y verbalizaciones coherentes con comprension espacial.
+> La evidencia muestra build funcional, rendimiento viable con limites, SUS favorable, menor NASA-TLX Raw en la muestra, menores tiempos en T1-T3 y verbalizaciones coherentes con comprension espacial.
 >
-> La contribucion no es mostrar mas piezas; es hacer legibles sus relaciones desde la web. Muchas gracias. Quedo atento a sus preguntas.
+> Por eso el aporte defendible es este: hacer mas legible un hardware complejo desde la web, con una solucion tecnica trazable y una evaluacion honesta de su alcance. Muchas gracias. Quedo atento a sus preguntas.
 
-Clicks/movimiento: no animar el cierre despues de "Muchas gracias".
+Clicks/movimiento: terminar en imagen estable, no cerrar con pantalla negra.
 
 Evidencia base:
 
-- `Informe_final/chapters/06_conclusiones.tex`.
-- `Informe_final/informe_final.pdf`.
+- Todo el paquete: informe final, anexos, build publica, README y presentacion.
 
 No decir:
 
-- "Eso seria todo" como cierre principal.
-- "Listo, ya esta perfecto".
+- "Eso seria todo" sin sintesis.
+- "El sistema ya no requiere mejoras".
 
-## 5. Ruta de emergencia por tiempo
+## 6. Ruta de emergencia por tiempo
 
-Si faltan 5 minutos y aun no se llego a resultados:
+Si al llegar al slide indicado hay retraso, usar estas fusiones:
 
-1. Saltar detalles de Slide 10 y Slide 11.
-2. Hacer demo en video, sin microdemo viva.
-3. Fusionar Slides 18 y 19 en una sola explicacion de rendimiento.
-4. Mantener siempre Slides 20, 21, 22 y 24.
+1. Si quedan menos de 24 minutos al llegar a Slide 5, fusionar Slides 5-6: alcance + objetivos en 90 segundos.
+2. Si quedan menos de 20 minutos al llegar a Slide 9, fusionar Slides 9-10: pipeline + triangulos en 90 segundos.
+3. Si quedan menos de 14 minutos al llegar a Slide 14, fusionar Slides 14-16: Inspect/Analyze/Studio/Thermal en 2 minutos.
+4. Si quedan menos de 9 minutos al llegar a Slide 19, fusionar Slides 19-20: profiler + rendimiento en 90 segundos.
+5. Si quedan menos de 6 minutos al llegar a Slide 21, fusionar Slides 21-23: SUS, NASA, tiempos y Think-Aloud en 2:30.
+6. Nunca saltar Slide 24. La discusion es el seguro academico de la defensa.
 
-Frase de corte elegante:
+## 7. Respuestas puente para preguntas de jurado
 
-> Para cuidar el tiempo, dejo el detalle tecnico en los slides de respaldo y paso al resultado que interpreta esa implementacion.
+Si preguntan por alcance:
 
-## 6. Ruta si el jurado interrumpe durante la exposicion
+> No presento un gemelo digital operacional; presento un visual product twin. La diferencia es que aqui no hay sincronizacion fisica ni telemetria viva. Hay representacion visual-semantica, interaccion y medicion tecnica.
 
-Si la pregunta es de aclaracion breve:
+Si preguntan por carga cognitiva:
 
-> Si le parece, lo respondo en una frase y continuo con el hilo principal.
+> La teoria de carga cognitiva explica el problema de reconstruccion espacial. La medicion reportada no mide directamente carga intrinseca, extrinseca y germana; NASA-TLX Raw mide workload percibido y se interpreta con esa teoria.
 
-Si la pregunta abre un debate largo:
+Si preguntan por SUS:
 
-> Esa pregunta es importante y tengo un slide de respaldo para ella. La retomo con detalle al final para no romper la secuencia de resultados.
+> SUS se aplico solo al prototipo 3D. Por eso no lo uso para comparar 3D contra 2D. La comparacion entre condiciones se apoya en tareas, NASA-TLX Raw y Think-Aloud.
 
-Si piden una cifra:
+Si preguntan por NASA-TLX:
 
-> La cifra que puedo afirmar es la del informe final: [dato]. Si no esta en el informe, en anexos o en el profiler, prefiero no improvisarla.
+> Se uso Raw TLX sin ponderacion pareada. La dimension rendimiento se oriento de forma invertida para que el promedio mantuviera coherencia direccional. La lectura es descriptiva, no poblacional.
 
-## 7. Frases ancla seguras
+Si preguntan por T4:
 
-- "No presento un gemelo digital operacional; presento un visual product twin."
-- "La evidencia es favorable, pero descriptiva y formativa."
-- "SUS se aplica solo al prototipo 3D; NASA-TLX Raw compara workload percibido por condicion."
-- "T4 no se cronometro porque era una tarea exploratoria guiada."
-- "95 617 y 229 054 triangulos no son metricas equivalentes."
-- "Thermal es heuristico, no FEA ni medicion fisica calibrada."
-- "La compatibilidad movil esta documentada por dispositivo, no garantizada universalmente."
-- "La contribucion no es mostrar mas piezas, sino hacer legibles sus relaciones."
+> T4 fue exploratoria guiada y no tenia un cierre temporal comparable. Por eso se reporta como completitud y observacion, no como tiempo cronometrado.
 
-## 8. Slides de respaldo a preparar
+Si preguntan por triangulos:
 
-- B1. Formula SUS y referencia historica de 68.
-- B2. Formula NASA-TLX Raw y orientacion invertida de rendimiento.
-- B3. Variables de control: dispositivo, navegador, resolucion, build, cache, orden AB/BA.
-- B4. Tabla tecnica completa de rendimiento.
-- B5. Profiler interno y export JSON/CSV.
-- B6. 95 617 vs 229 054 triangulos.
-- B7. Arquitectura ampliada.
-- B8. Thermal heuristico.
-- B9. Limitaciones metodologicas.
-- B10. Trabajo futuro por fases.
+> 95 617 es activo base optimizado exportado; 229 054 es escena runtime instrumentada/profiler. No son metricas equivalentes.
+
+Si preguntan por Thermal:
+
+> Thermal es heuristico y relativo. No hay sensores, telemetria, FEA ni temperatura real. Convertirlo en simulacion requeriria otra fase con modelo fisico y validacion.
+
+Si preguntan por el repo:
+
+> La tesis es la fuente autoritativa del alcance. El README publico debe leerse con el estado academico vigente: build WebGL, flujo visible y limitaciones declaradas.
+
+Si preguntan por una cifra no recordada:
+
+> La cifra que puedo afirmar es la del informe final y sus anexos. Si no esta en informe, anexo o profiler, prefiero no improvisarla.
+
+## 8. Frases prohibidas
+
+- "TwinSight es un digital twin completo".
+- "El sistema tiene telemetria real".
+- "Thermal mide temperatura".
+- "NASA-TLX mide carga cognitiva exacta".
+- "SUS prueba que 3D es mejor que 2D".
+- "La muestra permite generalizar estadisticamente".
+- "La app funciona perfectamente en cualquier movil".
+- "Los 229 054 triangulos son el modelo optimizado".
+
+## 9. Backup slides recomendadas
+
+- B0. Glosario rapido: CAD, WebGL, runtime, visual product twin, profiler, workload.
+- B1. Teoria de carga cognitiva: intrinseca, extrinseca, germana y relacion con reconstruccion espacial.
+- B2. Aprendizaje multimedia: segmentacion, senalizacion, coherencia y preentrenamiento.
+- B3. Formula SUS y referencia historica de 68.
+- B4. Formula NASA-TLX Raw y orientacion invertida de rendimiento.
+- B5. Variables de control y entorno tecnico completo.
+- B6. Pipeline 3D completo con antes/despues.
+- B7. Tabla completa de rendimiento WebGL.
+- B8. Explicacion 95 617 vs 229 054 triangulos.
+- B9. Taxonomia de piezas y evidencia de seleccion.
+- B10. Thermal heuristico.
+- B11. Evidencia de anexos y rutas publicas/locales.
+- B12. Roadmap: twin manifest, digital shadow, telemetria historica, accesibilidad.
+
+## 10. Checklist final de ensayo
+
+- El primer minuto define CAD, WebGL y alcance.
+- Antes de NASA ya se explico carga cognitiva y workload.
+- Antes de resultados ya se explico SUS, NASA-TLX Raw y Think-Aloud.
+- Antes de Thermal ya se definio heuristico y FEA.
+- Antes de hablar de triangulos ya se definio activo base y runtime.
+- La demo tiene ruta fija y video local de respaldo.
+- Cada slide responde una pregunta y no una lista de features.
+- El cierre no promete mas que la evidencia.

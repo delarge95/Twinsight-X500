@@ -8,20 +8,20 @@ Fuentes de apoyo revisadas: carpeta `Informe_final/presentation/` y documento lo
 
 ## 0. Archivos maestros del paquete de defensa
 
-| Archivo | Funcion |
-|---|---|
-| `PRESENTATION_OUTLINE.md` | Estructura principal de 24 slides y backups. |
-| `PRESENTATION_SCRIPT.md` | Guion oral maestro con tiempos, transiciones, riesgos y frases seguras. |
-| `SPEAKER_CARDS.md` | Tarjetas orales cortas para ensayo cronometrado de 28:30. |
-| `DEFENSE_STUDY_GUIDE.md` | Guia robusta por bloques con explicacion simple, tecnica, evidencia y preguntas rebuscadas. |
-| `BIBLIOGRAPHY_EVIDENCE_ATLAS.md` | Atlas de fuentes con citas breves verificadas localmente y limites de uso. |
-| `DEFENSE_EVIDENCE_MAP.md` | Mapa de trazabilidad entre slides, informe, anexos, app, README, manuales y bibliografia. |
-| `DEFENSE_PACKAGE_AUDIT_2026-06-12.md` | Auditoria interna del paquete de defensa y riesgos residuales. |
-| `JURY_QA_BANK.md` | Banco de preguntas de jurado con respuestas cortas, ampliadas, evidencia y alertas. |
-| `DEMO_SCRIPT.md` | Recorrido de demo coherente con la UI publica real. |
-| `ASSETS_REQUIREMENTS.md` | Lista de capturas, videos, GIFs, diagramas y prioridades visuales. |
-| `DESIGN_SYSTEM.md` | Guia visual base para construir deck final. |
-| `KIMI_PROMPT.md` | Prompt actualizado para generar un borrador visual sin inventar claims. |
+| Archivo                               | Funcion                                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `PRESENTATION_OUTLINE.md`             | Estructura principal de 24 slides y backups.                                                |
+| `PRESENTATION_SCRIPT.md`              | Guion oral maestro con tiempos, transiciones, riesgos y frases seguras.                     |
+| `SPEAKER_CARDS.md`                    | Tarjetas orales cortas para ensayo cronometrado de 28:30.                                   |
+| `DEFENSE_STUDY_GUIDE.md`              | Guia robusta por bloques con explicacion simple, tecnica, evidencia y preguntas rebuscadas. |
+| `BIBLIOGRAPHY_EVIDENCE_ATLAS.md`      | Atlas de fuentes con citas breves verificadas localmente y limites de uso.                  |
+| `DEFENSE_EVIDENCE_MAP.md`             | Mapa de trazabilidad entre slides, informe, anexos, app, README, manuales y bibliografia.   |
+| `DEFENSE_PACKAGE_AUDIT_2026-06-12.md` | Auditoria interna del paquete de defensa y riesgos residuales.                              |
+| `JURY_QA_BANK.md`                     | Banco de preguntas de jurado con respuestas cortas, ampliadas, evidencia y alertas.         |
+| `DEMO_SCRIPT.md`                      | Recorrido de demo coherente con la UI publica real.                                         |
+| `ASSETS_REQUIREMENTS.md`              | Lista de capturas, videos, GIFs, diagramas y prioridades visuales.                          |
+| `DESIGN_SYSTEM.md`                    | Guia visual base para construir deck final.                                                 |
+| `KIMI_PROMPT.md`                      | Prompt actualizado para generar un borrador visual sin inventar claims.                     |
 
 ## 1. Criterio rector
 

@@ -98,6 +98,7 @@ internal static class HolybroFastenerCatalogBuilder
     {
     };
 
+    private static string HolybroDocsDir => Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "docs", "investigacion", "Holybro"));
     private static string ResourcesDir => Path.Combine(Application.dataPath, "Resources");
     private static string OptionalSourceJsonPath => Path.Combine(ResourcesDir, OptionalSourceJsonFile);
 
@@ -331,7 +332,7 @@ internal static class HolybroFastenerCatalogBuilder
                 SceneTypeKey = FastenerNamingUtility.ExtractSceneTypeKey(child.name),
                 InstanceId = FastenerNamingUtility.SanitizeId(child.name),
                 HierarchyPath = BuildHierarchyPath(child, droneRoot),
-                ParentCanonicalPartId = ResolveParentCanonicalPartId(child, canonicalAnchors),
+                ParentCanonicalPartId = ResolveParentCanonicalPartId(child, droneRoot, canonicalAnchors),
                 Transform = child
             });
         }
@@ -447,17 +448,17 @@ internal static class HolybroFastenerCatalogBuilder
         return false;
     }
 
-    private static string ResolveParentCanonicalPartId(Transform target, IReadOnlyList<CanonicalAnchorCandidate> canonicalAnchors)
+    private static string ResolveParentCanonicalPartId(Transform target, Transform droneRoot, IReadOnlyList<CanonicalAnchorCandidate> canonicalAnchors)
     {
         if (target == null)
         {
             return string.Empty;
         }
 
-        string manualParent = ResolveManualParentCanonicalPartId(target);
-        if (!string.IsNullOrWhiteSpace(manualParent))
+        string spatialParent = ResolveSpatialParentCanonicalPartId(target, droneRoot, canonicalAnchors);
+        if (!string.IsNullOrWhiteSpace(spatialParent))
         {
-            return manualParent;
+            return spatialParent;
         }
 
         string immediateParent = target.parent != null ? target.parent.name : string.Empty;
@@ -506,70 +507,67 @@ internal static class HolybroFastenerCatalogBuilder
         return bestCanonicalId;
     }
 
-    private static string ResolveManualParentCanonicalPartId(Transform target)
+    private static string ResolveSpatialParentCanonicalPartId(Transform target, Transform droneRoot, IReadOnlyList<CanonicalAnchorCandidate> canonicalAnchors)
     {
-        string sceneTypeKey = FastenerNamingUtility.ExtractSceneTypeKey(target != null ? target.name : string.Empty);
+        if (target == null)
+        {
+            return string.Empty;
+        }
+
+        string sceneTypeKey = FastenerNamingUtility.ExtractSceneTypeKey(target.name);
         string key = (sceneTypeKey ?? string.Empty).ToLowerInvariant();
-        int index = ExtractOneBasedInstanceIndex(target != null ? target.name : string.Empty);
+
+        Renderer renderer = target.GetComponentInChildren<Renderer>(true);
+        Vector3 worldPos = renderer != null ? renderer.bounds.center : target.position;
+        Transform root = droneRoot != null ? droneRoot : target.root;
+
+        string quad = ResolveQuadrantSuffixFromWorld(worldPos, root, canonicalAnchors);
+        if (string.IsNullOrWhiteSpace(quad))
+        {
+            quad = "FL";
+        }
+
+        Vector3 rootCenter = TryComputeWorldCenter(root, out Vector3 computedCenter) ? computedCenter : root.position;
+        float distFromCenter = Vector3.Distance(new Vector3(worldPos.x, rootCenter.y, worldPos.z), rootCenter);
 
         switch (key)
         {
-            case "cap_screw_m25x6":
-                if (index >= 1 && index <= 8) return "x500v2_bottom_plate";
-                return ResolveArmParentByIndex(index, 17, 20, 13, 16, 9, 12, 21, 24);
-
+            case "cap_screw_m3x6":
+            case "cap_screw_m3x38":
+            case "flange_nut_m3":
             case "cap_screw_m25x10":
-                if (index >= 1 && index <= 2) return "x500v2_arm_FL";
-                if (index >= 3 && index <= 4) return "x500v2_arm_FR";
-                if (index >= 5 && index <= 6) return "x500v2_arm_BR";
-                if (index >= 7 && index <= 8) return "x500v2_arm_BL";
-                return FastenerGroupId;
+                return "x500v2_arm_" + quad;
+
+            case "cap_screw_m25x6":
+                // If far from central hub -> arm/motor quadrant; near center -> bottom plate
+                if (distFromCenter > 0.085f)
+                {
+                    return "x500v2_arm_" + quad;
+                }
+                return "x500v2_bottom_plate";
 
             case "cap_screw_m25x12":
-                if ((index >= 2 && index <= 4) || index == 13) return "x500v2_rails_battery";
-                if (index == 1 || (index >= 5 && index <= 6)) return "x500v2_arm_FL";
-                if (index >= 7 && index <= 8) return "x500v2_arm_FR";
-                if (index >= 9 && index <= 10) return "x500v2_arm_BR";
-                if (index >= 11 && index <= 12) return "x500v2_arm_BL";
-                return string.Empty;
+                // If near center -> rails_battery; if in arm zone -> arm quadrant
+                if (distFromCenter < 0.10f)
+                {
+                    return "x500v2_rails_battery";
+                }
+                return "x500v2_arm_" + quad;
 
             case "countersunk_m25x6":
-                return "x500v2_rails_battery";
-
             case "countersunk_m3x16":
+            case "nylon_standoff_m25x5":
+            case "self_lock_nut_m25":
+            case "rubber_grommet":
                 return "x500v2_rails_battery";
 
             case "nylon_lock_nut_m3":
                 return "x500v2_bottom_plate";
 
             case "cap_screw_m3x8":
-                return "x500v2_landing_gear";
-
             case "cap_screw_m3x21":
-                return "x500v2_landing_gear";
-
             case "cap_screw_m3x25":
-                if (index >= 1 && index <= 2) return "x500v2_landing_gear";
-                return FastenerGroupId;
-
-            case "cap_screw_m3x38":
-            case "flange_nut_m3":
-                return ResolveArmParentByIndex(index, 9, 12, 5, 8, 1, 4, 13, 16);
-
-            case "cap_screw_m3x6":
-                return ResolveMotorParentByIndex(index);
-
-            case "lock_nut_m3":
-                if (index == 1 || index == 8) return "x500v2_landing_gear";
-                if (index >= 9 && index <= 12) return "x500v2_power_module";
-                if (index >= 13 && index <= 16) return "x500v2_gps_m10";
-                if (index >= 2 && index <= 7) return "x500v2_landing_gear";
-                return string.Empty;
-
-            case "nylon_standoff_m25x5":
-            case "self_lock_nut_m25":
-            case "rubber_grommet":
-                return "x500v2_rails_battery";
+                return "x500v2_landing_gear";
 
             case "nylon_standoff_m3x5":
             case "pan_head_m3x14":
@@ -578,77 +576,172 @@ internal static class HolybroFastenerCatalogBuilder
             case "pan_head_m3x10":
                 return "x500v2_gps_m10";
 
+            case "lock_nut_m3":
+                return ResolveClosestNutParent(worldPos, root, canonicalAnchors);
+
             default:
                 return string.Empty;
         }
     }
 
-    private static string ResolveArmParentByIndex(
-        int index,
-        int brStart,
-        int brEnd,
-        int frStart,
-        int frEnd,
-        int flStart,
-        int flEnd,
-        int blStart,
-        int blEnd)
+    private static string ResolveClosestNutParent(Vector3 worldPos, Transform root, IReadOnlyList<CanonicalAnchorCandidate> canonicalAnchors)
     {
-        if (index >= brStart && index <= brEnd) return "x500v2_arm_BR";
-        if (index >= frStart && index <= frEnd) return "x500v2_arm_FR";
-        if (index >= flStart && index <= flEnd) return "x500v2_arm_FL";
-        if (index >= blStart && index <= blEnd) return "x500v2_arm_BL";
-        return string.Empty;
+        if (canonicalAnchors != null && canonicalAnchors.Count > 0)
+        {
+            string[] candidateSuffixes = { "gps_m10", "power_module", "landing_gear" };
+            float anchorBestDistance = float.MaxValue;
+            string anchorBestId = null;
+            for (int i = 0; i < canonicalAnchors.Count; i++)
+            {
+                CanonicalAnchorCandidate anchor = canonicalAnchors[i];
+                if (anchor == null || string.IsNullOrWhiteSpace(anchor.CanonicalId))
+                {
+                    continue;
+                }
+
+                string id = anchor.CanonicalId.ToLowerInvariant();
+                bool isCandidate = false;
+                for (int j = 0; j < candidateSuffixes.Length; j++)
+                {
+                    if (id.EndsWith(candidateSuffixes[j], StringComparison.Ordinal))
+                    {
+                        isCandidate = true;
+                        break;
+                    }
+                }
+
+                if (!isCandidate)
+                {
+                    continue;
+                }
+
+                float distance = Vector3.Distance(worldPos, anchor.ReferencePosition);
+                if (distance < anchorBestDistance)
+                {
+                    anchorBestDistance = distance;
+                    anchorBestId = anchor.CanonicalId;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(anchorBestId))
+            {
+                return anchorBestId;
+            }
+        }
+
+        if (root == null) return "x500v2_landing_gear";
+
+        string[] candidateIds = new[] { "x500v2_gps_m10", "x500v2_power_module", "x500v2_landing_gear" };
+        float bestDist = float.MaxValue;
+        string bestId = "x500v2_landing_gear";
+
+        foreach (string cid in candidateIds)
+        {
+            Transform t = root.Find(cid);
+            if (t != null)
+            {
+                Renderer r = t.GetComponentInChildren<Renderer>(true);
+                Vector3 p = r != null ? r.bounds.center : t.position;
+                float d = Vector3.Distance(worldPos, p);
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestId = cid;
+                }
+            }
+        }
+
+        return bestId;
     }
 
-    private static string ResolveMotorParentByIndex(int index)
+    private static string ResolveQuadrantSuffixFromWorld(Vector3 worldPosition, Transform root, IReadOnlyList<CanonicalAnchorCandidate> canonicalAnchors)
     {
-        if (index >= 1 && index <= 4) return "x500v2_motor_FL";
-        if (index >= 5 && index <= 8) return "x500v2_motor_FR";
-        if (index >= 9 && index <= 12) return "x500v2_motor_BR";
-        if (index >= 13 && index <= 16) return "x500v2_motor_BL";
-        return string.Empty;
+        // The drone root carries Quaternion.Euler(-90, 90, 0), which makes root.forward point
+        // along world up; projecting on the world XZ plane against root axes always yields
+        // frontDot == 0 and labels every fastener as "F". Front/right must instead be derived
+        // from the real arm anchor positions, which are rotation-independent.
+        if (TryDeriveWorldAxisDirectionsFromArmAnchors(canonicalAnchors, out Vector3 frontDir, out Vector3 rightDir))
+        {
+            Vector3 center = TryComputeWorldCenter(root, out Vector3 computedCenter) ? computedCenter : root.position;
+            Vector3 offset = worldPosition - center;
+            float frontDot = Vector3.Dot(offset, frontDir.normalized);
+            float rightDot = Vector3.Dot(offset, rightDir.normalized);
+            return (frontDot >= 0f ? "F" : "B") + (rightDot >= 0f ? "R" : "L");
+        }
+
+        if (root == null) return "FL";
+
+        // Fallback when arm anchors are unavailable: drone-local space (X = right, Z = forward).
+        Vector3 localPos = root.InverseTransformPoint(worldPosition);
+        return (localPos.z >= 0f ? "F" : "B") + (localPos.x >= 0f ? "R" : "L");
     }
 
-    private static int ExtractOneBasedInstanceIndex(string rawName)
+    private static bool TryDeriveWorldAxisDirectionsFromArmAnchors(IReadOnlyList<CanonicalAnchorCandidate> anchors, out Vector3 frontDir, out Vector3 rightDir)
     {
-        if (string.IsNullOrWhiteSpace(rawName))
+        frontDir = Vector3.zero;
+        rightDir = Vector3.zero;
+        if (anchors == null || anchors.Count == 0)
         {
-            return -1;
+            return false;
         }
 
-        string normalized = rawName.Trim();
-        if (normalized.EndsWith("_low", StringComparison.OrdinalIgnoreCase) ||
-            normalized.EndsWith("-low", StringComparison.OrdinalIgnoreCase))
+        Vector3 fl = Vector3.zero, fr = Vector3.zero, bl = Vector3.zero, br = Vector3.zero;
+        bool hasFL = false, hasFR = false, hasBL = false, hasBR = false;
+        for (int i = 0; i < anchors.Count; i++)
         {
-            normalized = normalized.Substring(0, normalized.Length - 4);
+            CanonicalAnchorCandidate anchor = anchors[i];
+            if (anchor == null || string.IsNullOrWhiteSpace(anchor.CanonicalId))
+            {
+                continue;
+            }
+
+            string id = anchor.CanonicalId.ToLowerInvariant();
+            if (id.EndsWith("arm_fl", StringComparison.Ordinal)) { fl = anchor.ReferencePosition; hasFL = true; }
+            else if (id.EndsWith("arm_fr", StringComparison.Ordinal)) { fr = anchor.ReferencePosition; hasFR = true; }
+            else if (id.EndsWith("arm_bl", StringComparison.Ordinal)) { bl = anchor.ReferencePosition; hasBL = true; }
+            else if (id.EndsWith("arm_br", StringComparison.Ordinal)) { br = anchor.ReferencePosition; hasBR = true; }
         }
 
-        int end = normalized.Length - 1;
-        while (end >= 0 && !char.IsDigit(normalized[end]))
+        if (!(hasFL && hasFR && hasBL && hasBR))
         {
-            end--;
+            return false;
         }
 
-        if (end < 0)
+        frontDir = (fl + fr) - (bl + br);
+        rightDir = (fr + br) - (fl + bl);
+        return frontDir.sqrMagnitude > 0.0000001f && rightDir.sqrMagnitude > 0.0000001f;
+    }
+
+    private static bool TryComputeWorldCenter(Transform root, out Vector3 center)
+    {
+        center = Vector3.zero;
+        if (root == null) return false;
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
+        if (renderers == null || renderers.Length == 0) return false;
+        Bounds bounds = default;
+        bool hasBounds = false;
+        for (int i = 0; i < renderers.Length; i++)
         {
-            return -1;
+            Renderer r = renderers[i];
+            if (r == null || !r.enabled || r.name.Contains("fastener") || r.name.Contains("proxy")) continue;
+            if (!hasBounds)
+            {
+                bounds = r.bounds;
+                hasBounds = true;
+            }
+            else
+            {
+                bounds.Encapsulate(r.bounds);
+            }
         }
 
-        int start = end;
-        while (start >= 0 && char.IsDigit(normalized[start]))
+        if (hasBounds)
         {
-            start--;
+            center = bounds.center;
+            return true;
         }
 
-        string digits = normalized.Substring(start + 1, end - start);
-        char separator = start >= 0 ? normalized[start] : '\0';
-        if ((separator != '_' && separator != '.') || digits.Length < 3)
-        {
-            return -1;
-        }
-
-        return int.TryParse(digits, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value) ? value : -1;
+        return false;
     }
 
     private static string ResolveParentFromNearestCategorizedRenderer(Transform target)

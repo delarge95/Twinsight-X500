@@ -15,7 +15,8 @@ MonoBehaviour:
   partName: Depth Camera Mount
   id: x500v2_misc_camera_mount
   partType: Misc Part
-  description: Optional mounting bracket for a depth camera or bottom-facing sensor payload. Holybro assembly documentation lists it as Depth Camera Mount (#31110).
+  description: Optional mounting bracket for a depth camera or bottom-facing sensor
+    payload. Holybro assembly documentation lists it as Depth Camera Mount (#31110).
   weightKg: -1
   dimensions: N/A
   function: Auxiliary support
@@ -31,9 +32,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 0.3, g: 0.8, b: 1, a: 1}

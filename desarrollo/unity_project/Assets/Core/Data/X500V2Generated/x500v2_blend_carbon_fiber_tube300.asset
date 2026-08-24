@@ -15,8 +15,7 @@ MonoBehaviour:
   partName: Arm 16mm Carbon Tube (Long)
   id: x500v2_blend_carbon_fiber_tube300
   partType: Structure
-  description: Extended diagonal thrust arm. Modeled from CAD
-    CARBON-FIBER-TUBE300.
+  description: Extended diagonal thrust arm. Modeled from CAD CARBON-FIBER-TUBE300.
   weightKg: 0.03
   dimensions: "\u230016\xD7300 mm"
   function: Extended diagonal thrust arm

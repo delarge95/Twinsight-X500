@@ -9,6 +9,13 @@ Shader "WebGL/ClippableLit"
         [Normal] _BumpMap("Normal Map", 2D) = "bump" {}
         _BumpScale("Normal Scale", Float) = 1.0
         
+        [Header(Curvature and Occlusion)]
+        _CurvatureMap("Curvature Map", 2D) = "gray" {}
+        _CurvatureStrength("Curvature Edge Strength", Range(0, 2)) = 0.6
+        _CurvatureCavityStrength("Curvature Cavity Strength", Range(0, 2)) = 0.5
+        _OcclusionMap("Occlusion Map (AO)", 2D) = "white" {}
+        _OcclusionStrength("Occlusion Strength", Range(0, 1)) = 1.0
+        
         [Header(Clipping)]
         [Toggle(_CLIP_ENABLED)] _ClipEnabled("Enable Clipping", Float) = 0
         _ClipPlane("Clip Plane", Vector) = (0, 1, 0, 0)
@@ -70,6 +77,10 @@ Shader "WebGL/ClippableLit"
             SAMPLER(sampler_BaseMap);
             TEXTURE2D(_BumpMap);
             SAMPLER(sampler_BumpMap);
+            TEXTURE2D(_CurvatureMap);
+            SAMPLER(sampler_CurvatureMap);
+            TEXTURE2D(_OcclusionMap);
+            SAMPLER(sampler_OcclusionMap);
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseMap_ST;
@@ -77,6 +88,9 @@ Shader "WebGL/ClippableLit"
                 half _Metallic;
                 half _Smoothness;
                 half _BumpScale;
+                half _CurvatureStrength;
+                half _CurvatureCavityStrength;
+                half _OcclusionStrength;
                 float4 _ClipPlane;
                 half4 _ClipColor;
                 half _ClipEdgeWidth;
@@ -132,15 +146,28 @@ Shader "WebGL/ClippableLit"
                 }
                 #endif
 
-                // Sample textures
+                // Sample base texture
                 half4 baseMap = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv);
                 half4 albedo = baseMap * _BaseColor;
+
+                // Curvature enhancement (Edge highlights & Crevice darkening)
+                half rawCurv = SAMPLE_TEXTURE2D(_CurvatureMap, sampler_CurvatureMap, IN.uv).r;
+                half deltaCurv = (rawCurv - 0.5) * 2.0;
+                half convex = saturate(deltaCurv) * _CurvatureStrength;
+                half concave = saturate(-deltaCurv) * _CurvatureCavityStrength;
+
+                // Apply curvature to albedo
+                albedo.rgb = albedo.rgb * (1.0 - concave * 0.45) + (convex * 0.45 * (1.0 - albedo.rgb * 0.3));
 
                 // Normal mapping
                 half3 normalTS = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, IN.uv), _BumpScale);
                 half3x3 TBN = half3x3(IN.tangentWS, IN.bitangentWS, IN.normalWS);
                 half3 normalWS = TransformTangentToWorld(normalTS, TBN);
                 normalWS = NormalizeNormalPerPixel(normalWS);
+
+                // Occlusion (AO)
+                half rawAO = SAMPLE_TEXTURE2D(_OcclusionMap, sampler_OcclusionMap, IN.uv).g;
+                half occlusion = lerp(1.0, rawAO, _OcclusionStrength);
 
                 // Lighting
                 InputData inputData = (InputData)0;
@@ -155,7 +182,7 @@ Shader "WebGL/ClippableLit"
                 surfaceData.metallic = _Metallic;
                 surfaceData.smoothness = _Smoothness;
                 surfaceData.normalTS = normalTS;
-                surfaceData.occlusion = 1.0;
+                surfaceData.occlusion = occlusion;
                 surfaceData.alpha = albedo.a;
 
                 half4 color = UniversalFragmentPBR(inputData, surfaceData);

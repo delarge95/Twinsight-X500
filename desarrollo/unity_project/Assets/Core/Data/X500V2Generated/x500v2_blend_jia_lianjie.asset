@@ -19,7 +19,7 @@ MonoBehaviour:
   weightKg: 0.002
   dimensions: Miniature
   function: Structural connector clip
-  materialType: "Plastic"
+  materialType: Plastic
   materialProperties: 
   manufacturer: Holybro
   partNumber: 

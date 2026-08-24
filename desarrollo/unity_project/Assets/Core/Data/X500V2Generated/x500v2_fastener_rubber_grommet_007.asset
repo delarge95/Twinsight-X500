@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: Rubber Grommet
   id: x500v2_fastener_rubber_grommet_007
   partType: Rubber Grommet
-  description: "Anti-vibration hardware isolator. Modeled from CAD HUAN-GUIJIAO."
+  description: Anti-vibration hardware isolator. Modeled from CAD HUAN-GUIJIAO.
   weightKg: 0
   dimensions: 
   function: Fastening / mounting | Dampener
@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -81,8 +81,7 @@ MonoBehaviour:
     quantityExpected: 8
     isInspectable: 1
     fallbackReason: 
-    notes: "Anti-vibration hardware isolator. Modeled from CAD
-      HUAN-GUIJIAO."
+    notes: Anti-vibration hardware isolator. Modeled from CAD HUAN-GUIJIAO.
     recipeKey: rubber_grommet_placeholder
     builderType: RubberGrommet
     orientationMode: ShortestAxis

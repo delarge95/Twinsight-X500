@@ -23,7 +23,7 @@ MonoBehaviour:
   dimensions: "~50 \xD7 50 mm"
   function: "Bus central de distribuci\xF3n de potencia desde bater\xEDa hacia ESCs
     y perif\xE9ricos"
-  materialType: "FR4 PCB with high-current copper traces and XT60/XT30 connectors"
+  materialType: FR4 PCB with high-current copper traces and XT60/XT30 connectors
   materialProperties: Alta conductividad, resistente al calor
   manufacturer: Holybro
   partNumber: Incluido en SKU30120

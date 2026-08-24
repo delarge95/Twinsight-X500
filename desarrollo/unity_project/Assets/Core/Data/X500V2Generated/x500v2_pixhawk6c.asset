@@ -15,12 +15,13 @@ MonoBehaviour:
   partName: Pixhawk 6C Autopilot
   id: x500v2_pixhawk6c
   partType: FlightController
-  description: "Pixhawk 6C autopilot that runs PX4 or ArduPilot and commands motors through PWM/DShot outputs. Includes anodized aluminum housing."
+  description: Pixhawk 6C autopilot that runs PX4 or ArduPilot and commands motors
+    through PWM/DShot outputs. Includes anodized aluminum housing.
   weightKg: 0.035
   dimensions: "84.8 \xD7 44 \xD7 12.4 mm"
   function: "Procesamiento de vuelo, fusi\xF3n de sensores, control de motores y
     navegaci\xF3n aut\xF3noma"
-  materialType: "FR4 PCB, anodized aluminum housing"
+  materialType: FR4 PCB, anodized aluminum housing
   materialProperties: Procesador de alto rendimiento, sensores redundantes, carcasa
     disipadora
   manufacturer: Holybro
@@ -44,7 +45,7 @@ MonoBehaviour:
   hotspotLabel: Flight Controller
   explosionDirection: {x: 0, y: 1, z: 0}
   explosionDistance: 1
-  explosionPriority: 5
+  explosionPriority: 4
   isModular: 0
   compatibleSlots: []
   alternativeParts: []
@@ -75,6 +76,7 @@ MonoBehaviour:
   - DIKE-PIXHAWK6C-LV-C1
   - MIANKE-PIXHAWK6C-LV-C1
   - PCB-PIXHAWK6C-F1
+  - IMU-PIXHAWK6C
   fastenerMetadata:
     instanceId: 
     familyId: 

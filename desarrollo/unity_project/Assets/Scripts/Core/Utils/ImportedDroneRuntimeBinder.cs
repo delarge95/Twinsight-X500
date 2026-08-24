@@ -3216,8 +3216,8 @@ namespace WebGL.Core.Utils
                 suffix = ResolveQuadrantSuffix((anchorId ?? string.Empty).ToLowerInvariant());
             }
 
-            if (searchableName.Contains("prop") && !string.IsNullOrWhiteSpace(suffix)) return $"x500v2_prop_{suffix.ToUpperInvariant()}";
-            if ((searchableName.Contains("motor") || searchableName.Contains("dj-2216")) && !string.IsNullOrWhiteSpace(suffix)) return $"x500v2_motor_{suffix.ToUpperInvariant()}";
+            if (searchableName.Contains("prop") && !string.IsNullOrWhiteSpace(suffix)) return $"x500v2_arm_{suffix.ToUpperInvariant()}";
+            if ((searchableName.Contains("motor") || searchableName.Contains("dj-2216")) && !string.IsNullOrWhiteSpace(suffix)) return $"x500v2_arm_{suffix.ToUpperInvariant()}";
             if (searchableName.Contains("esc") && !string.IsNullOrWhiteSpace(suffix)) return $"x500v2_esc_{suffix.ToUpperInvariant()}";
             if (searchableName.Contains("guan-cheng")) return "x500v2_landing_gear";
             if (searchableName.Contains("battery-mounting") || searchableName.Contains("battery-pad") ||
@@ -3232,7 +3232,7 @@ namespace WebGL.Core.Utils
                 return "x500v2_rails_battery";
             }
             if (searchableName.Contains("battery")) return "x500v2_battery";
-            if (searchableName.Contains("imu-pixhawk")) return MiscGroupId;
+            if (searchableName.Contains("imu-pixhawk")) return "x500v2_pixhawk6c";
             if (searchableName.Contains("pixhawk")) return "x500v2_pixhawk6c";
             if (searchableName.Contains("gps") || searchableName.Contains("gan-gpsv5") || searchableName.Contains("gpsv5-zhijia")) return "x500v2_gps_m10";
             if (searchableName.Contains("pdb")) return string.Empty;
@@ -3283,19 +3283,12 @@ namespace WebGL.Core.Utils
                 return string.Empty;
             }
 
-            // Propellers are visual/functional subpieces of each arm. They remain
-            // thermally independent through InferThermalSourcePartId, but selection
-            // and isolation treat them as part of the arm assembly.
+            // Propellers and motors are visual/functional subpieces of each arm assembly.
             if (!string.IsNullOrWhiteSpace(suffix) &&
-                (searchableName.Contains("propeller") || searchableName.Contains("prop")))
+                (searchableName.Contains("propeller") || searchableName.Contains("prop") ||
+                 searchableName.Contains("motor") || searchableName.Contains("dj-2216")))
             {
                 return $"x500v2_arm_{suffix.ToUpperInvariant()}";
-            }
-
-            if (!string.IsNullOrWhiteSpace(suffix) &&
-                (searchableName.Contains("motor") || searchableName.Contains("dj-2216")))
-            {
-                return $"x500v2_motor_{suffix.ToUpperInvariant()}";
             }
 
             if (!string.IsNullOrWhiteSpace(suffix) && searchableName.Contains("esc"))
@@ -3317,7 +3310,7 @@ namespace WebGL.Core.Utils
             // Core electronics family
             if (searchableName.Contains("imu-pixhawk"))
             {
-                return MiscGroupId;
+                return "x500v2_pixhawk6c";
             }
 
             if (searchableName.Contains("pixhawk") || searchableName.Contains("pcb-pixhawk"))

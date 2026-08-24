@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Cable Routing Clamp
   id: x500v2_blend_jia_guan
   partType: Structure
-  description: "Bundled cable retention. Modeled from CAD JIA-GUAN."
+  description: Bundled cable retention. Modeled from CAD JIA-GUAN.
   weightKg: 0.001
   dimensions: Miniature
-  function: "Bundled cable retention"
+  function: Bundled cable retention
   materialType: Clamp
   materialProperties: 
   manufacturer: Holybro

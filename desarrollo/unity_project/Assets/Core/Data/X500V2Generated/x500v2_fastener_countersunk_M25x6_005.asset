@@ -15,14 +15,15 @@ MonoBehaviour:
   partName: Countersunk Screw M2.5 x 6 mm
   id: x500v2_fastener_countersunk_M25x6_005
   partType: Countersunk Screw
-  description: "Instrument mounting hardware. Modeled from CAD M25-6-CHEN-LIU."
+  description: Derived from temporary Unity proxy family naming only. Final Blender
+    geometry is expected to replace this proxy family later.
   weightKg: 0
   dimensions: M2.5 x 6 mm
   function: Fastening / mounting | M2.5 x 6 mm | Countersunk | Unknown
-  materialType: Steel
-  materialProperties: Standard
+  materialType: Unknown
+  materialProperties: Unspecified
   manufacturer: Holybro
-  partNumber: M25-6-CHEN-LIU
+  partNumber: 
   powerConsumption: 0
   maxLoad: 0
   operatingTemp: 0
@@ -31,9 +32,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -62,11 +63,11 @@ MonoBehaviour:
   fastenerMetadata:
     instanceId: x500v2_fastener_countersunk_M25x6_005
     familyId: holybro_countersunk_m25x6
-    sourceId: x500v2_blend_m25_6_chen_liu
+    sourceId: 
     sceneObjectName: x500v2_fastener.countersunk_M25x6_005
     hierarchyPath: x500v2_Drone/x500v2_fastener_group/x500v2_fastener.countersunk_M25x6_005
     parentCanonicalPartId: x500v2_rails_battery
-    blenderName: M25-6-CHEN-LIU
+    blenderName: 
     sceneTypeKey: countersunk_M25x6
     subtype: CountersunkScrew
     metric: M2.5
@@ -76,12 +77,13 @@ MonoBehaviour:
     driveType: Unknown
     threadPitchMm: 0.45
     turnCount: 12
-    material: Steel
-    finish: Standard
-    quantityExpected: 12
+    material: Unknown
+    finish: Unspecified
+    quantityExpected: 13
     isInspectable: 1
     fallbackReason: 
-    notes: "Instrument mounting hardware. Modeled from CAD M25-6-CHEN-LIU."
+    notes: Derived from temporary Unity proxy family naming only. Final Blender geometry
+      is expected to replace this proxy family later.
     recipeKey: countersunk_M25x6_placeholder
     builderType: CountersunkScrew
     orientationMode: LongestAxis

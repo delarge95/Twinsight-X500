@@ -85,7 +85,7 @@ namespace WebGL.UI.ProceduralIcons
             return hasChanged;
         }
 
-        protected override void DrawIconPath(Painter2D painter, float width, float height)
+        protected override void DrawIconPath(IProceduralPainter painter, float width, float height)
         {
             float cx = width / 2f;
             float cy = height / 2f;

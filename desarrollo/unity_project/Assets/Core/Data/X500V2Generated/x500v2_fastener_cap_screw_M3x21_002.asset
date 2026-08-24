@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: Socket Cap Screw M3 x 21 mm
   id: x500v2_fastener_cap_screw_M3x21_002
   partType: Socket Cap Screw
-  description: "Chassis fastening and tightening. Modeled from CAD GB70-M3-21-DING."
+  description: Chassis fastening and tightening. Modeled from CAD GB70-M3-21-DING.
   weightKg: 0
   dimensions: M3 x 21 mm
   function: Fastening / mounting | M3 x 21 mm | Socket Cap | Hex Socket
@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -81,7 +81,7 @@ MonoBehaviour:
     quantityExpected: 2
     isInspectable: 1
     fallbackReason: 
-    notes: "Chassis fastening and tightening. Modeled from CAD GB70-M3-21-DING."
+    notes: Chassis fastening and tightening. Modeled from CAD GB70-M3-21-DING.
     recipeKey: cap_screw_M3x21_placeholder
     builderType: SocketCapScrew
     orientationMode: LongestAxis

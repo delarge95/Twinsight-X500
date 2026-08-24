@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: GPS Folding Mast Joint
   id: x500v2_blend_gps_zhijia_zhuanjietou
   partType: Structure
-  description: "GPS folding mast joint. Modeled from CAD GPS-ZHIJIA-ZHUANJIETOU."
+  description: GPS folding mast joint. Modeled from CAD GPS-ZHIJIA-ZHUANJIETOU.
   weightKg: 0.005
-  dimensions: "M3 mast"
-  function: "GPS folding mast joint"
+  dimensions: M3 mast
+  function: GPS folding mast joint
   materialType: Reinforced nylon
   materialProperties: 
   manufacturer: Holybro
@@ -84,4 +84,4 @@ MonoBehaviour:
     recipeKey: 
     builderType: 
     orientationMode: 
-  category: 4
+  category: 1

@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: Nylon Standoff M3 x 5 mm
   id: x500v2_fastener_nylon_standoff_M3x5_004
   partType: Standoff
-  description: "Flush mounting hardware. Modeled from CAD NILONGZHU-M3-5."
+  description: Flush mounting hardware. Modeled from CAD NILONGZHU-M3-5.
   weightKg: 0
   dimensions: M3 x 5 mm
   function: Fastening / mounting | M3 x 5 mm | Standoff
@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -81,7 +81,7 @@ MonoBehaviour:
     quantityExpected: 4
     isInspectable: 1
     fallbackReason: 
-    notes: "Flush mounting hardware. Modeled from CAD NILONGZHU-M3-5."
+    notes: Flush mounting hardware. Modeled from CAD NILONGZHU-M3-5.
     recipeKey: nylon_standoff_M3x5_placeholder
     builderType: Standoff
     orientationMode: LongestAxis

@@ -15,8 +15,7 @@ MonoBehaviour:
   partName: Payload 10mm Carbon Rails
   id: x500v2_blend_pylons_x500
   partType: Structure
-  description: Riel inferior porta-elementos 10mm. Modeled from CAD
-    PYLONS-X500.
+  description: Riel inferior porta-elementos 10mm. Modeled from CAD PYLONS-X500.
   weightKg: 0.015
   dimensions: "\u230010\xD7250 mm"
   function: Riel inferior porta-elementos 10mm

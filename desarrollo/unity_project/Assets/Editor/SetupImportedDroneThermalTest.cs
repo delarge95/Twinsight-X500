@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -271,6 +272,12 @@ public static class SetupImportedDroneThermalTest
             out prefixReparented,
             out heuristicReparented);
 
+        int motorsRedistributedByQuadrant = RedistributeQuadrantInstancesByNearestArm(
+            root.transform,
+            anchorsById,
+            "x500v2_motor_",
+            "dj-2216");
+
         foreach (DronePartJson jsonPart in jsonParts)
         {
             if (!anchorsById.TryGetValue(jsonPart.id, out Transform anchor) || anchor == null)
@@ -308,6 +315,7 @@ public static class SetupImportedDroneThermalTest
             $"  - Por grupo sintetico: {syntheticGroupReparented}\n" +
             $"  - Por prefijo canonico: {prefixReparented}\n" +
             $"  - Por heuristica: {heuristicReparented}\n" +
+            $"Motores reasignados por cuadrante: {motorsRedistributedByQuadrant}\n" +
             $"Falsos fasteners estructurales restaurados: {structuralFastenersRestored}\n" +
             $"Subpiezas granularizadas sin anchor seleccionable: {demotedSubpieceAnchors}\n" +
             $"Proxies canonicos temporales: {runtimeProxyAnchors}\n" +
@@ -935,6 +943,7 @@ public static class SetupImportedDroneThermalTest
         // their metadata in documentation, but we do not synthesize fake geometry.
         return canonicalId.StartsWith("x500v2_esc_", StringComparison.OrdinalIgnoreCase) ||
                canonicalId.StartsWith("x500v2_prop_", StringComparison.OrdinalIgnoreCase) ||
+               canonicalId.StartsWith("x500v2_fastener_", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(canonicalId, "x500v2_pdb", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(canonicalId, "x500v2_platform_board", StringComparison.OrdinalIgnoreCase) ||
                string.Equals(canonicalId, "x500v2_battery", StringComparison.OrdinalIgnoreCase) ||
@@ -1589,6 +1598,125 @@ public static class SetupImportedDroneThermalTest
         Vector3 position = renderer != null ? renderer.bounds.center : candidate.position;
         string worldSuffix = ResolveQuadrantSuffixFromWorld(position, root);
         return string.IsNullOrWhiteSpace(worldSuffix) ? string.Empty : "x500v2_arm_" + worldSuffix;
+    }
+
+    private static readonly string[] QuadrantSuffixes = { "FL", "FR", "BL", "BR" };
+
+    private static int RedistributeQuadrantInstancesByNearestArm(
+        Transform root,
+        IReadOnlyDictionary<string, Transform> anchorsById,
+        string targetAnchorPrefix,
+        string meshNameToken)
+    {
+        // Quadrant mesh families (e.g. the four motors share the FBX name DJ-2216-KV880 with
+        // only numeric instance suffixes) carry no quadrant token, so token matching can group
+        // every instance under a single anchor and isolation then shows them all at once.
+        // Reassign each instance to its quadrant anchor using the arm anchors as the frame.
+        if (root == null || anchorsById == null || anchorsById.Count == 0)
+        {
+            return 0;
+        }
+
+        Dictionary<string, Vector3> armCentersBySuffix = new Dictionary<string, Vector3>(StringComparer.OrdinalIgnoreCase);
+        foreach (string suffix in QuadrantSuffixes)
+        {
+            if (!anchorsById.TryGetValue("x500v2_arm_" + suffix, out Transform armAnchor) || armAnchor == null)
+            {
+                continue;
+            }
+
+            Vector3 reference = armAnchor.position;
+            foreach (Renderer armRenderer in armAnchor.GetComponentsInChildren<Renderer>(true))
+            {
+                if (armRenderer == null || armRenderer.name.EndsWith("_runtime_proxy", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                reference = armRenderer.bounds.center;
+                break;
+            }
+
+            armCentersBySuffix[suffix] = reference;
+        }
+
+        if (armCentersBySuffix.Count != QuadrantSuffixes.Length)
+        {
+            Debug.LogWarning("[SetupImportedDroneThermalTest] Reasignacion por cuadrante omitida: faltan anchors x500v2_arm_FL/FR/BL/BR.");
+            return 0;
+        }
+
+        List<Transform> instances = new List<Transform>();
+        foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+        {
+            if (child == null || child == root || child.GetComponent<Renderer>() == null)
+            {
+                continue;
+            }
+
+            if (child.name.EndsWith("_runtime_proxy", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            string normalized = SelectionHierarchy.NormalizeToken(child.name);
+            if (!string.IsNullOrWhiteSpace(normalized) && normalized.Contains(meshNameToken))
+            {
+                instances.Add(child);
+            }
+        }
+
+        int reassigned = 0;
+        foreach (Transform instance in instances)
+        {
+            Renderer instanceRenderer = instance.GetComponent<Renderer>();
+            Vector3 position = instanceRenderer != null ? instanceRenderer.bounds.center : instance.position;
+
+            string bestSuffix = null;
+            float bestDistance = float.MaxValue;
+            foreach (KeyValuePair<string, Vector3> arm in armCentersBySuffix)
+            {
+                float distance = Vector3.SqrMagnitude(position - arm.Value);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestSuffix = arm.Key;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(bestSuffix) ||
+                !anchorsById.TryGetValue(targetAnchorPrefix + bestSuffix, out Transform targetAnchor) ||
+                targetAnchor == null)
+            {
+                Debug.LogWarning($"[SetupImportedDroneThermalTest] No existe anchor {targetAnchorPrefix}{bestSuffix} para {instance.name}.");
+                continue;
+            }
+
+            if (instance.IsChildOf(targetAnchor))
+            {
+                continue;
+            }
+
+            Undo.SetTransformParent(instance, targetAnchor, "Redistribute quadrant instance by nearest arm");
+
+            for (int i = targetAnchor.childCount - 1; i >= 0; i--)
+            {
+                Transform proxyChild = targetAnchor.GetChild(i);
+                if (proxyChild != null && proxyChild.name.EndsWith("_runtime_proxy", StringComparison.OrdinalIgnoreCase))
+                {
+                    Undo.DestroyObjectImmediate(proxyChild.gameObject);
+                }
+            }
+
+            reassigned++;
+        }
+
+        if (reassigned > 0)
+        {
+            Debug.Log($"[SetupImportedDroneThermalTest] {reassigned} instancias '{meshNameToken}' reasignadas a anchors {targetAnchorPrefix}<cuadrante> por brazo mas cercano.");
+        }
+
+        return reassigned;
     }
 
     private static string ResolveStructuralInstanceSuffix(string rawName)
@@ -2517,8 +2645,10 @@ public static class SetupImportedDroneThermalTest
             suffix = ResolveQuadrantSuffix((anchorId ?? string.Empty).ToLowerInvariant());
         }
 
-        if (lowerName.Contains("prop") && !string.IsNullOrWhiteSpace(suffix)) return $"x500v2_prop_{suffix.ToUpperInvariant()}";
-        if (lowerName.Contains("motor") && !string.IsNullOrWhiteSpace(suffix)) return $"x500v2_motor_{suffix.ToUpperInvariant()}";
+        if ((lowerName.Contains("prop") || lowerName.Contains("motor") || lowerName.Contains("dj-2216")) && !string.IsNullOrWhiteSpace(suffix))
+        {
+            return $"x500v2_arm_{suffix.ToUpperInvariant()}";
+        }
         if (lowerName.Contains("esc") && !string.IsNullOrWhiteSpace(suffix)) return $"x500v2_esc_{suffix.ToUpperInvariant()}";
         if (lowerName.Contains("guan-cheng")) return "x500v2_landing_gear";
         if (lowerName.Contains("battery-mounting") || lowerName.Contains("battery-pad") ||
@@ -2532,7 +2662,7 @@ public static class SetupImportedDroneThermalTest
             return "x500v2_rails_battery";
         }
         if (lowerName.Contains("battery")) return "x500v2_battery";
-        if (lowerName.Contains("imu-pixhawk")) return "x500v2_misc_group";
+        if (lowerName.Contains("imu-pixhawk")) return "x500v2_pixhawk6c";
         if (lowerName.Contains("pixhawk")) return "x500v2_pixhawk6c";
         if (lowerName.Contains("gps")) return "x500v2_gps_m10";
         if (lowerName.Contains("pdb")) return string.Empty;

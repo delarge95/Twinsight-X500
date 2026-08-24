@@ -15,8 +15,7 @@ MonoBehaviour:
   partName: Landing Gear Foam Pad
   id: x500v2_blend_jiao_eva
   partType: Structure
-  description: Lower damping foam pad. Modeled from CAD
-    JIAO-EVA.
+  description: Lower damping foam pad. Modeled from CAD JIAO-EVA.
   weightKg: 0.002
   dimensions: "\u230010 Ext"
   function: Lower damping foam pad

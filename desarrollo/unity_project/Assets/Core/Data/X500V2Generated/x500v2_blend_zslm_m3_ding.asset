@@ -19,7 +19,7 @@ MonoBehaviour:
   weightKg: 0.001
   dimensions: M3
   function: Cap nut
-  materialType: "Brass"
+  materialType: Brass
   materialProperties: 
   manufacturer: Holybro
   partNumber: 

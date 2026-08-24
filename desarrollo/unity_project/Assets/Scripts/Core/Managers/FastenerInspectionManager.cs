@@ -343,7 +343,7 @@ namespace WebGL.Core.Managers
                     continue;
                 }
 
-                LodVisibilityUtility.ApplyRendererEnabled(renderer, false);
+                renderer.enabled = false;
                 inspection.HiddenProxyRenderers.Add(renderer);
             }
 
@@ -421,7 +421,7 @@ namespace WebGL.Core.Managers
                 Renderer renderer = inspection.HiddenProxyRenderers[i];
                 if (renderer != null)
                 {
-                    LodVisibilityUtility.ApplyRendererEnabled(renderer, true);
+                    renderer.enabled = true;
                 }
             }
 

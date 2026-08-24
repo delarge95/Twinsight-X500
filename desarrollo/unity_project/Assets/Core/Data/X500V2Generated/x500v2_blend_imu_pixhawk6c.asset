@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c73690adaf8894f87851a149e0fb6a, type: 3}
   m_Name: x500v2_blend_imu_pixhawk6c
   m_EditorClassIdentifier: 
-  partName: Pixhawk 6C IMU Module
+  partName: x500v2 blend imu pixhawk6c
   id: x500v2_blend_imu_pixhawk6c
-  partType: Electronics
-  description: ICM-42688 inertial sensors. Modeled from CAD IMU-PIXHAWK6C.
-  weightKg: 0.005
-  dimensions: Interno
-  function: ICM-42688 inertial sensors
-  materialType: PCB montada en silicona
+  partType: Misc Part
+  description: Individual auxiliary instance imported from the model hierarchy.
+  weightKg: 0
+  dimensions: 
+  function: Auxiliary support
+  materialType: Mixed
   materialProperties: 
   manufacturer: Holybro
   partNumber: 
@@ -41,7 +41,7 @@ MonoBehaviour:
   isHotspotTarget: 0
   hotspotLabel: 
   explosionDirection: {x: 0, y: 1, z: 0}
-  explosionDistance: 0.2
+  explosionDistance: 0.03
   explosionPriority: 0
   isModular: 0
   compatibleSlots: []
@@ -84,4 +84,4 @@ MonoBehaviour:
     recipeKey: 
     builderType: 
     orientationMode: 
-  category: 1
+  category: 0

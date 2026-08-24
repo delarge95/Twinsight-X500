@@ -15,14 +15,15 @@ MonoBehaviour:
   partName: Socket Cap Screw M2.5 x 6 mm
   id: x500v2_fastener_cap_screw_M25x6_018
   partType: Socket Cap Screw
-  description: "Chassis fastening and tightening. Modeled from CAD GB70-M25-6."
+  description: Derived from temporary Unity proxy family naming only. Final Blender
+    geometry is expected to replace this proxy family later.
   weightKg: 0
   dimensions: M2.5 x 6 mm
   function: Fastening / mounting | M2.5 x 6 mm | Socket Cap | Hex Socket
-  materialType: Stainless steel
-  materialProperties: Stainless
+  materialType: Unknown
+  materialProperties: Unspecified
   manufacturer: Holybro
-  partNumber: GB70-M25-6
+  partNumber: 
   powerConsumption: 0
   maxLoad: 0
   operatingTemp: 0
@@ -31,9 +32,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -62,11 +63,11 @@ MonoBehaviour:
   fastenerMetadata:
     instanceId: x500v2_fastener_cap_screw_M25x6_018
     familyId: holybro_cap_screw_m25x6
-    sourceId: x500v2_blend_gb70_m25_6
+    sourceId: 
     sceneObjectName: x500v2_fastener.cap_screw_M25x6_018
     hierarchyPath: x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_018
     parentCanonicalPartId: x500v2_arm_BR
-    blenderName: GB70-M25-6
+    blenderName: 
     sceneTypeKey: cap_screw_M25x6
     subtype: SocketCapScrew
     metric: M2.5
@@ -76,12 +77,13 @@ MonoBehaviour:
     driveType: Hex Socket
     threadPitchMm: 0.45
     turnCount: 12
-    material: Stainless steel
-    finish: Stainless
-    quantityExpected: 24
+    material: Unknown
+    finish: Unspecified
+    quantityExpected: 25
     isInspectable: 1
     fallbackReason: 
-    notes: "Chassis fastening and tightening. Modeled from CAD GB70-M25-6."
+    notes: Derived from temporary Unity proxy family naming only. Final Blender geometry
+      is expected to replace this proxy family later.
     recipeKey: cap_screw_M25x6_placeholder
     builderType: SocketCapScrew
     orientationMode: LongestAxis

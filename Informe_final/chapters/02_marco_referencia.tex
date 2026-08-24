@@ -1,7 +1,7 @@
 % =============================================================================
 % Capítulo 2 — Marco de Referencia
 % Integra estado del arte, marco teórico y marco conceptual
-% Alineado con la propuesta final corregida y con la app real documentada
+% Conforme a APA 7 UNAD (Instructivo marzo 2023)
 % =============================================================================
 
 \section{Marco de Referencia}
@@ -12,7 +12,7 @@ El diseño, desarrollo y evaluación del prototipo web 3D se fundamenta en un ma
 
 Esta sección examina bibliotecas nativas, motores de juego, plataformas \textit{SaaS} y soluciones de \textit{streaming} para identificar la herramienta más adecuada en términos de control del \textit{pipeline}, capacidad de extensión y viabilidad de desarrollo dentro del alcance académico del proyecto.
 
-\subsubsection{Digital twins, digital shadows e interoperabilidad industrial}
+\subsubsection{Digital Twins, Digital Shadows e Interoperabilidad Industrial}
 
 La literatura sobre \textit{digital twins} coincide en que el valor de una representación digital no proviene únicamente del modelo 3D, sino de su capacidad para conectar entidad física, entidad virtual, estado, datos, procesos y frecuencia de sincronización. Kritzinger et al. (2018) proponen diferenciar \textit{digital model}, \textit{digital shadow} y \textit{digital twin} según el flujo de datos entre el objeto físico y su representación digital.
 
@@ -22,25 +22,23 @@ Esta diferenciación es decisiva para el presente trabajo. Un visor 3D interacti
 
 La interoperabilidad aparece como una barrera transversal. NIST identifica retos de integración cuando múltiples sistemas, proveedores, etapas del ciclo de vida y aplicaciones deben intercambiar información con significado preservado (David et al., 2024; Lin et al., 2023). En ese contexto, ISO 23247 es una familia de estándares para \textit{digital twins} de manufactura que propone separar elementos observables, comunicación con dispositivos, entidad digital y aplicaciones de usuario. A su vez, el World Wide Web Consortium (W3C), organismo responsable de estándares web, plantea mediante Web of Things descripciones de propiedades, acciones y eventos para reducir la fragmentación de ecosistemas IoT; es decir, de dispositivos físicos conectados capaces de producir o consumir datos en red (International Organization for Standardization [ISO], 2021; W3C, 2023). Estas referencias sustentan la necesidad futura de un \textit{twin manifest} por pieza, independiente de Unity, que conecte geometría, semántica, variables operativas, procedimientos y sistemas externos (véase la Figura \ref{fig:interoperabilidad_twin_manifest}).
 
-\begin{figure}[H]
-    \caption{Escalera de madurez desde \textit{digital model} hasta \textit{digital twin} operacional.}
-    \label{fig:madurez_digital_model_shadow_twin}
-    \centering
-    \includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{figures/chapter2/fig_2_madurez_digital_model_shadow_twin.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{La build actual se ubica antes de las capas con telemetría histórica, datos en vivo y sincronización operacional. Elaboración propia.}
+\begin{figure}[htbp]
+\caption{Escalera de Madurez desde \textit{Digital Model} hasta \textit{Digital Twin} Operacional}
+\label{fig:madurez_digital_model_shadow_twin}
+\centering
+\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_madurez_digital_model_shadow_twin_trimmed.pdf}
+\apanote[+6.2pt]{La build actual se ubica antes de las capas con telemetría histórica, datos en vivo y sincronización operacional. Elaboración propia.}
 \end{figure}
 
-\begin{figure}[H]
-    \caption{Interoperabilidad futura mediante \textit{twin manifest} por componente.}
-    \label{fig:interoperabilidad_twin_manifest}
-    \centering
-    \includegraphics[width=0.94\textwidth,height=0.76\textheight,keepaspectratio]{figures/chapter2/fig_2_twin_manifest_interoperabilidad.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{El \textit{twin manifest} se presenta como propuesta de evolución, no como módulo implementado en la versión evaluada. Elaboración propia.}
+\begin{figure}[htbp]
+\caption{Interoperabilidad Futura mediante \textit{Twin Manifest} por Componente}
+\label{fig:interoperabilidad_twin_manifest}
+\centering
+\includegraphics[width=0.94\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_twin_manifest_interoperabilidad.pdf}
+\apanote[14.5pt]{El \textit{twin manifest} se presenta como propuesta de evolución, no como módulo implementado en la versión evaluada. Elaboración propia.}
 \end{figure}
 
-\subsubsection{Benchmarking de soluciones Web 3D}
+\subsubsection{Benchmarking de Soluciones Web 3D}
 
 La visualización 3D en la web ha evolucionado de forma significativa desde la introducción de WebGL (Khronos Group, 2011). Yu et al. (2023) identifican a WebGL como la tecnología dominante para renderizado 3D en navegadores, con la aparición progresiva de nuevos \textit{backends} como WebGPU. En este contexto, se revisaron las principales alternativas relevantes para el caso de estudio usando criterios explícitos de comparación: control del \textit{pipeline}, posibilidad de lógica propia, integración de materiales y UI, necesidad de infraestructura externa, compatibilidad con despliegue web directo y esfuerzo de adopción dentro del alcance académico del proyecto (como se resume en la Tabla \ref{tab:comparativa_cualitativa_soluciones_web3d}).
 
@@ -60,64 +58,54 @@ La visualización 3D en la web ha evolucionado de forma significativa desde la i
 
 \paragraph{PlayCanvas} Plataforma de desarrollo web con editor colaborativo, \textit{runtime} ligero, scripting integrado y fuerte orientación web nativa. Es una alternativa seria para experiencias 3D en navegador; sin embargo, para este caso seguía implicando adoptar otro entorno, reconstituir el \textit{pipeline} de importación y rehacer parte del tooling técnico ya consolidado en Unity para inspección, profiling y organización del proyecto (PlayCanvas, s.\,f.-a, s.\,f.-b, s.\,f.-c).
 
-\begin{table}[H]
-\centering
-\caption{Comparativa cualitativa de soluciones Web 3D}
+\begin{table}[htbp]
+\setlength{\tabcolsep}{3.5pt}
+\caption{Comparativa Cualitativa de Soluciones Web 3D}
 \label{tab:comparativa_cualitativa_soluciones_web3d}
-\small
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{lcccccc}
+\begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{1.9cm}>{\RaggedRight\arraybackslash}p{1.2cm}>{\RaggedRight\arraybackslash}p{2.2cm}>{\RaggedRight\arraybackslash}p{1.6cm}>{\RaggedRight\arraybackslash}p{2.6cm}>{\RaggedRight\arraybackslash}p{2.7cm}>{\RaggedRight\arraybackslash}p{2.0cm}@{}}
 \hline
-\textbf{Tecnología} & \textbf{Huella inicial} & \textbf{Control del pipeline} & \textbf{PBR} & \textbf{Interactividad} & \textbf{Infraestructura externa} & \textbf{Pertinencia} \\ \hline
-Three.js & Baja & Alto, pero manual & Manual/extendible & Total & No & Alta para desarrollo a medida \\
-Babylon.js & Media & Alto & Integrado & Total & No & Media/alta para un stack web propio \\
-Unity Web & Alta & Alto e integrado & URP & Total & No & Alta para este caso de estudio \\
-UE Pixel Streaming & Media/Alta & Alto & Muy alto & Alta con latencia & Sí & Baja/media para acceso web directo \\
-Spline & Baja & Bajo & Básico & Limitada & No & Baja/media para este caso \\
-Marmoset Viewer & Baja/Media & Bajo & Alto & Baja/Media & No & Baja/media para este caso \\
-Sketchfab & Media & Medio & Bueno & Media & Parcial & Media para publicación guiada \\
-PlayCanvas & Baja & Alto & Integrado & Total & No & Media/alta para experiencias web nativas \\ \hline
+\textbf{Tecnología} & \textbf{Huella} & \textbf{Control pipeline} & \textbf{PBR} & \textbf{Interactividad} & \textbf{Infraestructura} & \textbf{Pertinencia} \\ \hline
+Three.js & Baja & Alto, pero manual & Manual & Total & No & Alta (a medida) \\
+Babylon.js & Media & Alto & Integrado & Total & No & Media/alta \\
+Unity Web & Alta & Alto e integrado & URP & Total & No & Alta (este estudio) \\
+UE Streaming & Media & Alto & Muy alto & Alta con latencia & Sí & Baja/media \\
+Spline & Baja & Bajo & Básico & Limitada & No & Baja/media \\
+Marmoset & Media & Bajo & Alto & Media & No & Baja/media \\
+Sketchfab & Media & Medio & Bueno & Media & Parcial & Media \\
+PlayCanvas & Baja & Alto & Integrado & Total & No & Media/alta \\ \hline
 \end{tabular}
-}
-\par\vspace{0.5\baselineskip}
-\apanote{Comparación cualitativa basada en documentación oficial, literatura revisada y requerimientos del proyecto; no corresponde a un benchmark experimental uniforme. Los juicios de pertinencia se refieren a este caso de estudio. Elaboración propia.}
+\apanote[14.4pt]{Comparación cualitativa basada en documentación oficial, literatura revisada y requerimientos del proyecto; no corresponde a un benchmark experimental uniforme. Los juicios de pertinencia se refieren a este caso de estudio. Elaboración propia.}
 \end{table}
 
-\subsubsection{Brecha identificada y selección de Unity Web}
+\subsubsection{Brecha Identificada y Selección de Unity Web}
 
 La evaluación técnica identificó limitaciones críticas en tres grupos de soluciones:
 
-\begin{itemize}
-    \item \textbf{Pixel Streaming.} Dependencia de infraestructura de render remoto, red y configuración externa poco compatibles con un prototipo académico de acceso directo en navegador.
-    \item \textbf{Spline, Marmoset y Sketchfab.} Menor alineación con una arquitectura propia que exigía lógica de inspección técnica, flujo de detalle, modos analíticos y control fino del sistema.
-    \item \textbf{Three.js, Babylon.js y PlayCanvas.} Mayor esfuerzo de adopción para reconstruir un \textit{pipeline} integral de importación, materiales, controles, clipping global, modos de visualización técnica y herramientas auxiliares de auditoría dentro del tiempo académico disponible.
-\end{itemize}
+\paragraph{Pixel Streaming} Dependencia de infraestructura de render remoto, red y configuración externa poco compatibles con un prototipo académico de acceso directo en navegador.
 
-Unity Web fue seleccionado no por ofrecer la huella inicial más baja, sino por el equilibrio entre cuatro factores:
-\begin{itemize}
-    \item \textbf{Integración del tooling.} Permite concentrar importación, materiales, UI, perfilado y build en un mismo entorno.
-    \item \textbf{Herramientas visuales y de editor.} Facilita el trabajo conjunto entre programación, diseño y arte técnico.
-    \item \textbf{Arquitectura tipada y extensible.} La cadena C\# $\rightarrow$ IL2CPP $\rightarrow$ C++ $\rightarrow$ WASM ofrece una base estructurada para la lógica interactiva del prototipo.
-    \item \textbf{Soporte para modos analíticos.} Reduce el riesgo técnico al implementar corte transversal, visualización térmica, vista \textit{X-Ray} y otras herramientas especializadas dentro del tiempo académico disponible.
-\end{itemize}
+\paragraph{Spline, Marmoset y Sketchfab} Menor alineación con una arquitectura propia que exigía lógica de inspección técnica, flujo de detalle, modos analíticos y control fino del sistema.
 
+\paragraph{Three.js, Babylon.js y PlayCanvas} Mayor esfuerzo de adopción para reconstruir un \textit{pipeline} integral de importación, materiales, controles, clipping global, modos de visualización técnica y herramientas auxiliares de auditoría dentro del tiempo académico disponible.
+
+Unity Web fue seleccionado no por ofrecer la huella inicial más baja, sino por el equilibrio entre cuatro factores principales: la integración del tooling que permite concentrar importación, materiales, UI, perfilado y build en un mismo entorno; herramientas visuales y de editor que facilitan el trabajo conjunto entre programación, diseño y arte técnico; una arquitectura tipada y extensible donde la cadena C\# $\rightarrow$ IL2CPP $\rightarrow$ C++ $\rightarrow$ WASM ofrece una base estructurada para la lógica interactiva; y soporte para modos analíticos que reduce el riesgo técnico al implementar corte transversal, visualización térmica y modo \textit{X-Ray}.
+
+\FloatBarrier
 \subsection{Marco Teórico}
 
 El marco teórico integra cuatro pilares: madurez de representaciones digitales de hardware complejo, teoría de la carga cognitiva e interacción, computación gráfica en tiempo real y fundamentos matemáticos de optimización y sombreado. Estos fundamentos sustentan la arquitectura, las decisiones de implementación, la estrategia de evaluación del prototipo y el roadmap de evolución hacia capacidades de \textit{digital shadow}.
 
-\subsubsection{Madurez de integración digital en hardware complejo}
+\subsubsection{Madurez de Integración Digital en Hardware Complejo}
 
 La clasificación de Kritzinger et al. (2018) permite ordenar el proyecto como una trayectoria incremental. En la primera etapa, un \textit{digital model} describe el sistema sin flujo automático de datos con el activo físico. En la segunda, un \textit{digital shadow} recibe datos del activo y actualiza su estado digital. En una etapa más avanzada, un \textit{digital twin} operacional combina sincronización, conocimiento de dominio, datos históricos o actuales y capacidades de análisis o simulación para apoyar decisiones (Digital Twin Consortium, 2020; Jones et al., 2020).
 
 Desde este marco, el prototipo desarrollado se ubica en la primera etapa, con una particularidad relevante: no es un CAD bruto ni una escena 3D decorativa, sino un modelo visual-semántico con taxonomía por piezas, selección, aislamiento, fichas técnicas, modos analíticos, profiler interno y documentación asociada. Esa capa resuelve necesidades de comunicación técnica y prepara el terreno para un \textit{twin manifest}, pero todavía no incorpora telemetría ni servicios de mantenimiento. Esta delimitación evita una inflación conceptual del término \textit{digital twin} y permite defender el aporte actual como base técnica e investigativa para fases posteriores (véase la Figura \ref{fig:capas_visual_semanticas_producto}).
 
 \begin{figure}[htbp]
-    \caption{Capas del prototipo como modelo visual-semántico de producto.}
-    \label{fig:capas_visual_semanticas_producto}
-    \centering
-    \includegraphics[width=\textwidth,height=0.58\textheight,keepaspectratio]{figures/chapter2/fig_2_capas_visual_semanticas_producto.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{La lectura visual-semántica del prototipo se apoya en piezas canónicas, \textit{anchors} de escena y \textit{renderers} concretos; la interoperabilidad mediante \textit{twin manifest} queda delimitada como evolución futura. Elaboración propia.}
+\caption{Capas del Prototipo como Modelo Visual-Semántico de Producto}
+\label{fig:capas_visual_semanticas_producto}
+\centering
+\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_capas_visual_semanticas_producto.pdf}
+\apanote[14.5pt]{La lectura visual-semántica del prototipo se apoya en piezas canónicas, \textit{anchors} de escena y \textit{renderers} concretos; la interoperabilidad mediante \textit{twin manifest} queda delimitada como evolución futura. Elaboración propia.}
 \end{figure}
 
 \subsubsection{Teoría de la Carga Cognitiva (Sweller, 1988; Sweller et al., 2019)}
@@ -126,90 +114,78 @@ La Teoría de la Carga Cognitiva plantea que la memoria de trabajo tiene capacid
 
 Sweller, van Merriënboer y Paas (2019) distinguen tres tipos de carga:
 
-\paragraph{Carga intrínseca} Corresponde a la complejidad inherente del contenido. En este proyecto es elevada porque el dron integra componentes estructurales, energéticos, electrónicos y mecánicos con relaciones espaciales y funcionales entre sí.
+\paragraph{Carga Intrínseca} Corresponde a la complejidad inherente del contenido. En este proyecto es elevada porque el dron integra componentes estructurales, energéticos, electrónicos y mecánicos con relaciones espaciales y funcionales entre sí.
 
-\paragraph{Carga extrínseca} Es la carga innecesaria generada por una presentación deficiente. En documentación 2D estática, el usuario debe imaginar relaciones tridimensionales no visibles, lo cual incrementa la necesidad de rotación mental y consume recursos cognitivos que no están dirigidos al objetivo técnico principal.
+\paragraph{Carga Extrínseca} Es la carga innecesaria generada por una presentación deficiente. En documentación 2D estática, el usuario debe imaginar relaciones tridimensionales no visibles, lo cual incrementa la necesidad de rotación mental y consume recursos cognitivos que no están dirigidos al objetivo técnico principal.
 
-\paragraph{Carga germana} Es el esfuerzo que sí contribuye a construir esquemas mentales útiles. En una interfaz 3D bien diseñada, los recursos liberados por la reducción de carga extrínseca pueden redirigirse a comprender mejor la función, ubicación y relación entre componentes del ensamblaje.
+\paragraph{Carga Germana} Es el esfuerzo que sí contribuye a construir esquemas mentales útiles. En una interfaz 3D bien diseñada, los recursos liberados por la reducción de carga extrínseca pueden redirigirse a comprender mejor la función, ubicación y relación entre componentes del ensamblaje.
 
 En el contexto del prototipo, la interfaz 3D orbital, la selección directa sobre el modelo y la consulta contextual de piezas buscan reducir la carga extrínseca y favorecer una carga germana orientada a la comprensión espacial y funcional del ensamblaje. No obstante, cuando la evaluación usa NASA-TLX, la variable observada es carga de trabajo percibida y no una medición directa de las categorías intrínseca, extrínseca y germana de la teoría (véase la Figura \ref{fig:carga_cognitiva_2d_3d}).
 
 \begin{figure}[htbp]
-    \caption{Relación entre documentación 2D, carga cognitiva y apoyo visual 3D.}
-    \label{fig:carga_cognitiva_2d_3d}
-    \centering
-    \includegraphics[width=\textwidth,height=0.68\textheight,keepaspectratio]{figures/chapter2/fig_2_carga_cognitiva_2d_3d.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{La figura no afirma que el visor elimine la complejidad intrínseca del dron; muestra cómo puede reducir carga extrínseca asociada a búsqueda, rotación mental e integración manual de información. Elaboración propia.}
+\caption{Relación entre Documentación 2D, Carga Cognitiva y Apoyo Visual 3D}
+\label{fig:carga_cognitiva_2d_3d}
+\centering
+\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_carga_cognitiva_2d_3d_trimmed.pdf}
+\apanote[+6.2pt]{La figura no afirma que el visor elimine la complejidad intrínseca del dron; muestra cómo puede reducir carga extrínseca asociada a búsqueda, rotación mental e integración manual de información. Elaboración propia.}
 \end{figure}
 
-\subsubsection{Navegación espacial e interacción 3D}
+\FloatBarrier
+\subsubsection{Navegación Espacial e Interacción 3D}
 
 Bowman et al. (2004) definen la interacción 3D como aquella en la cual las tareas del usuario se ejecutan directamente en un contexto espacial tridimensional. Esto es relevante porque el valor del prototipo depende de que el usuario pueda explorar el ensamblaje sin perder contexto global mientras inspecciona detalles locales.
 
-Los controles orbitales siguen principios de navegación espacial orientados a prevenir desorientación:
-\begin{itemize}
-    \item rotación alrededor de un foco de interés estable;
-    \item \textit{pan} y \textit{zoom} como operaciones diferenciadas de la rotación;
-    \item recentrado del interés cuando se selecciona una pieza o se invoca una herramienta de inspección;
-    \item continuidad de movimiento suficiente para evitar saltos bruscos de interpretación espacial.
-\end{itemize}
+Los controles orbitales siguen principios de navegación espacial orientados a prevenir desorientación: rotación alrededor de un foco de interés estable; \textit{pan} y \textit{zoom} como operaciones diferenciadas; recentrado del interés cuando se selecciona una pieza o se invoca una herramienta; y continuidad de movimiento suficiente para evitar saltos bruscos de interpretación espacial.
 
-\paragraph{Cognición distribuida (Hutchins, 1995)} La interfaz no solo presenta información: también funciona como artefacto cognitivo. La cámara orbital externaliza parte de la rotación mental, los \textit{hotspots} y fichas de pieza operan como memoria externa y los modos analíticos convierten procesos de inspección complejos en operaciones visuales guiadas.
+\paragraph{Cognición Distribuida (Hutchins, 1995)} La interfaz no solo presenta información: también funciona como artefacto cognitivo. La cámara orbital externaliza parte de la rotación mental, los \textit{hotspots} y fichas de pieza operan como memoria externa y los modos analíticos convierten procesos de inspección complejos en operaciones visuales guiadas.
 
-\subsubsection{Heurísticas de usabilidad (Nielsen, 1994)}
+\subsubsection{Heurísticas de Usabilidad (Nielsen, 1994)}
 
 Las heurísticas de Nielsen orientan la construcción de la interfaz:
-\begin{enumerate}
-    \item \textbf{Visibilidad del estado del sistema.} La aplicación debe comunicar con claridad qué pieza está seleccionada, qué modo visual está activo y cuándo una herramienta modifica la escena.
-    \item \textbf{Correspondencia con el mundo real.} Los nombres de componentes, la organización por categorías y la lógica de inspección deben alinearse con la terminología técnica del dron.
-    \item \textbf{Control y libertad del usuario.} La navegación, la salida de paneles y el reinicio de estado deben ser previsibles y reversibles.
-    \item \textbf{Reconocimiento antes que memoria.} La interfaz debe reducir la necesidad de recordar nombres, ubicaciones o secuencias de interacción, apoyándose en ayudas visuales y estados explícitos.
-\end{enumerate}
 
-\subsubsection{Rotación mental y visualización espacial}
+\paragraph{Visibilidad del Estado del Sistema} La aplicación debe comunicar con claridad qué pieza está seleccionada, qué modo visual está activo y cuándo una herramienta modifica la escena.
+
+\paragraph{Correspondencia con el Mundo Real} Los nombres de componentes, la organización por categorías y la lógica de inspección deben alinearse con la terminología técnica del dron.
+
+\paragraph{Control y Libertad del Usuario} La navegación, la salida de paneles y el reinicio de estado deben ser previsibles y reversibles.
+
+\paragraph{Reconocimiento antes que Memoria} La interfaz debe reducir la necesidad de recordar nombres, ubicaciones o secuencias de interacción, apoyándose en ayudas visuales y estados explícitos.
+
+\subsubsection{Rotación Mental y Visualización Espacial}
 
 Hegarty y Waller (2004) muestran que la interpretación de estructuras tridimensionales depende de habilidades espaciales que no se distribuyen homogéneamente entre usuarios. Bartlett y Dorribo Camba (2023) refuerzan que los modelos 3D interactivos pueden disminuir esta barrera al facilitar interpretación gráfica y comprensión del ensamblaje. En consecuencia, el visor no se justifica solo por atractivo visual, sino como apoyo cognitivo para usuarios con distintos niveles de habilidad espacial.
 
-\subsubsection{Percepción visual y organización de la información}
+\subsubsection{Percepción Visual y Organización de la Información}
 
-Los principios de Gestalt (Wertheimer, 1923; Köhler, 1929) ayudan a estructurar la escena y la interfaz:
-\begin{itemize}
-    \item \textbf{Proximidad.} Elementos cercanos se perciben como pertenecientes al mismo subsistema.
-    \item \textbf{Similitud.} El color o tratamiento visual de \textit{hotspots} y categorías facilita asociación funcional.
-    \item \textbf{Figura-fondo.} El modelo principal debe destacar sobre el fondo para no competir con el contenido técnico.
-\end{itemize}
+Los principios de Gestalt (Wertheimer, 1923; Köhler, 1929) ayudan a estructurar la escena y la interfaz: proximidad (elementos cercanos pertenecen al mismo subsistema), similitud (tratar cromáticamente categorías facilita asociación funcional) y figura-fondo (el modelo principal destaca sobre el fondo técnico). Ware (2012) y Miller (1956) sustentan el uso de categorías cromáticas distinguibles para no saturar la memoria inmediata del usuario.
 
-Ware (2012) y Miller (1956) sustentan el uso de categorías cromáticas distinguibles, evitando esquemas que dificulten accesibilidad o saturen la memoria inmediata del usuario.
-
-\subsubsection{Fundamentos matemáticos de optimización gráfica}
+\subsubsection{Fundamentos Matemáticos de Optimización Gráfica}
 
 El rendimiento de una aplicación WebGL no depende de una sola variable, sino del equilibrio entre complejidad geométrica, número de lotes renderizados, costo de sombreado, ancho de banda de memoria y tiempo total por cuadro. Por ello, las ecuaciones de esta sección se presentan como modelos operativos para análisis y control de presupuesto, no como leyes universales aisladas del contexto de implementación (véase la Figura \ref{fig:balance_fidelidad_legibilidad_rendimiento}).
 
-\begin{figure}[H]
-    \caption{Balance entre fidelidad visual, legibilidad técnica y rendimiento WebGL.}
-    \label{fig:balance_fidelidad_legibilidad_rendimiento}
-    \centering
-    \includegraphics[width=0.92\textwidth,height=0.62\textheight,keepaspectratio]{figures/chapter2/fig_2_balance_fidelidad_legibilidad_rendimiento.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{La figura resume el criterio de \textit{Technical Art} del proyecto: preservar reconocimiento visual y lectura técnica sin romper el presupuesto de ejecución en navegador. Elaboración propia.}
+\begin{figure}[htbp]
+\caption{Balance entre Fidelidad Visual, Legibilidad Técnica y Rendimiento WebGL}
+\label{fig:balance_fidelidad_legibilidad_rendimiento}
+\centering
+\includegraphics[width=0.92\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_balance_fidelidad_legibilidad_rendimiento.pdf}
+\apanote[+14.5pt]{La figura resume el criterio de \textit{Technical Art} del proyecto: preservar reconocimiento visual y lectura técnica sin romper el presupuesto de ejecución en navegador. Elaboración propia.}
 \end{figure}
 
-\paragraph{Presupuesto poligonal}
+\paragraph{Presupuesto Poligonal}
 Una primera restricción de complejidad geométrica puede expresarse como:
 \[
 P_{\text{total}} = \sum_{i=1}^{n} P_i
 \]
 donde $P_i$ representa los triángulos aportados por cada componente del modelo. En términos de planeación, el proyecto fija un presupuesto objetivo para mantener la escena dentro de un rango compatible con WebGL. Este presupuesto no es una ley universal del motor, sino un criterio de control para el proceso de optimización.
 
-\paragraph{Densidad de texel}
+\paragraph{Densidad de Texel}
 La densidad de texel busca que la nitidez percibida de las texturas sea coherente entre componentes. Una forma operativa de expresarla es:
 \[
 \rho = \frac{R_{\text{texture}}}{L_{\text{mundo}}}
 \]
 donde $R_{\text{texture}}$ es la resolución efectiva aplicada sobre un tramo de referencia y $L_{\text{mundo}}$ es la longitud real correspondiente en el modelo. Si $\rho$ cambia bruscamente entre piezas, algunas se perciben borrosas y otras resultan innecesariamente costosas en memoria.
 
-\paragraph{Costo de dibujo y agrupación de mallas}
+\paragraph{Costo de Dibujo y Agrupación de Mallas}
 El costo de renderizado no depende solo del número de triángulos, sino también del número de lotes o \textit{draw calls}. Sin agrupación, una aproximación simple es:
 \[
 D_{\text{base}} \approx \sum_{k=1}^{m} n_k
@@ -220,7 +196,7 @@ D_{\text{efectivo}} \approx \sum_{k=1}^{m} b_k, \qquad 1 \leq b_k \leq n_k
 \]
 Por tanto, la reducción de \textit{draw calls} no debe modelarse como una división exacta universal, sino como una función de compatibilidad entre materiales, mallas, pasadas de render y estado del \textit{pipeline}.
 
-\paragraph{\textit{Frame time} y objetivo de FPS.}
+\paragraph{Frame Time y Objetivo de FPS}
 En una aplicación interactiva, el tiempo por cuadro determina la fluidez percibida. Una aproximación útil para perfilado es:
 \[
 T_{\text{frame}} \approx \max(T_{\text{CPU}}, T_{\text{GPU}})
@@ -231,16 +207,16 @@ T_{\text{frame}} \leq 33{,}33 \text{ ms}
 \]
 Esto traduce el rendimiento a una restricción directamente medible en navegador y en herramientas de perfilado (véase la Figura \ref{fig:modelo_rendimiento_webgl}).
 
-\begin{figure}[H]
-    \caption{Modelo operativo de rendimiento WebGL.}
-    \label{fig:modelo_rendimiento_webgl}
-    \centering
-    \includegraphics[width=0.96\textwidth,height=0.78\textheight,keepaspectratio]{figures/chapter2/fig_2_modelo_operativo_rendimiento_webgl.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{El tiempo de cuadro efectivo se interpreta como resultado del cuello dominante entre CPU, GPU, memoria/carga y sincronización, no como efecto de una sola técnica de optimización. Elaboración propia.}
+\begin{figure}[htbp]
+\caption{Modelo Operativo de Rendimiento WebGL}
+\label{fig:modelo_rendimiento_webgl}
+\centering
+\includegraphics[width=0.96\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_modelo_operativo_rendimiento_webgl.pdf}
+\apanote[-18.3pt]{El tiempo de cuadro efectivo se interpreta como resultado del cuello dominante entre CPU, GPU, memoria/carga y sincronización, no como efecto de una sola técnica de optimización. Elaboración propia.}
 \end{figure}
 
-\subsubsection{Modelo matemático de renderizado físicamente basado (PBR)}
+\FloatBarrier
+\subsubsection{Modelo Matemático de Renderizado Físicamente Basado (PBR)}
 
 El renderizado físicamente basado parte de la \textit{rendering equation}, formulada por Kajiya (1986) y adoptada como fundamento general de los modelos BRDF utilizados en renderizado en tiempo real (Akenine-Möller et al., 2018):
 \[
@@ -248,112 +224,84 @@ L_o(\omega_o) = \int_{\Omega} f_r(\omega_i,\omega_o)\, L_i(\omega_i)\, (\mathbf{
 \]
 donde $L_o$ es la radiancia saliente en la dirección de observación $\omega_o$, $L_i$ es la radiancia incidente desde la dirección $\omega_i$, $\mathbf{n}$ es la normal de la superficie y $f_r$ es la BRDF del material. Esta ecuación expresa que el color visible depende de cuánta luz llega a la superficie, cómo la superficie la redistribuye y qué parte de esa redistribución coincide con la dirección de la cámara.
 
-\paragraph{BRDF especular de Cook-Torrance}
+\paragraph{BRDF Especular de Cook-Torrance}
 La componente especular puede modelarse como:
 \[
 f_{\text{spec}} = \frac{D(\mathbf{n},\mathbf{h})\, F(\mathbf{v},\mathbf{h})\, G(\mathbf{n},\mathbf{l},\mathbf{v})}{4(\mathbf{n}\cdot\mathbf{l})(\mathbf{n}\cdot\mathbf{v})}
 \]
-donde $\mathbf{l}$ es la dirección de la luz, $\mathbf{v}$ la dirección de vista y $\mathbf{h}$ el vector mitad entre ambas. Cada término cumple una función distinta:
-\begin{itemize}
-    \item $D$ describe la distribución estadística de microfacetas orientadas para reflejar luz hacia la cámara;
-    \item $F$ modela el efecto Fresnel, es decir, el incremento de reflectancia cuando la observación se acerca al ángulo rasante;
-    \item $G$ atenúa la respuesta especular por auto-sombreado y enmascaramiento geométrico entre microfacetas.
-\end{itemize}
+donde $\mathbf{l}$ es la dirección de la luz, $\mathbf{v}$ la dirección de vista y $\mathbf{h}$ el vector mitad entre ambas. El término $D$ describe la distribución de microfacetas, $F$ modela el efecto Fresnel y $G$ atenúa la respuesta por enmascaramiento geométrico.
 
 \paragraph{Aproximación de Fresnel de Schlick}
-Para reducir costo computacional, el término de Fresnel suele aproximarse mediante la expresión de Schlick (1994):
+Para reducir costo computacional, el término de Fresnel se aproxima según Schlick (1994):
 \[
 F = F_0 + (1 - F_0)(1 - \cos\theta)^5
 \]
-donde $F_0$ es la reflectancia a incidencia normal y $\theta$ es el ángulo entre la dirección de vista y el vector mitad. Esta aproximación permite obtener un comportamiento visualmente creíble con un costo bajo en tiempo real.
+donde $F_0$ es la reflectancia a incidencia normal y $\theta$ es el ángulo entre la dirección de vista y el vector mitad.
 
 \paragraph{Distribución GGX}
-La distribución de microfacetas adoptada comúnmente en PBR en tiempo real es GGX (Walter et al., 2007; Karis, 2013):
+La distribución de microfacetas adoptada en PBR en tiempo real es GGX (Walter et al., 2007; Karis, 2013):
 \[
 D_{\text{GGX}} = \frac{\alpha^2}{\pi\left((\mathbf{n}\cdot\mathbf{h})^2(\alpha^2 - 1) + 1\right)^2}
 \]
-donde $\alpha$ controla la amplitud del lóbulo especular y suele derivarse de la rugosidad como $\alpha = roughness^2$. Valores bajos producen reflejos concentrados y valores altos reflejos anchos y difusos.
+donde $\alpha = \text{roughness}^2$. Valores bajos producen reflejos concentrados y valores altos reflejos anchos y difusos.
 
-\paragraph{Conservación de energía}
-En un flujo \textit{metallic-roughness}, la energía reflejada debe mantenerse acotada. De manera simplificada:
-\[
-k_d + k_s \leq 1
-\]
-donde $k_d$ representa la fracción difusa y $k_s$ la especular. En materiales metálicos, la componente difusa tiende a desaparecer y el color especular toma protagonismo; en dieléctricos ocurre lo contrario.
+\paragraph{Conservación de Energía}
+En un flujo \textit{metallic-roughness}, la energía reflejada se acota mediante $k_d + k_s \leq 1$, donde $k_d$ es la fracción difusa y $k_s$ la especular.
 
-\paragraph{Relación con la app real}
-En la aplicación final, el modo \textit{Realistic} no reimplementa manualmente toda la BRDF microfacetada desde cero. El proyecto delega el cálculo PBR base al \textit{pipeline} de Unity URP, mientras que los shaders propios añaden lógica específica del sistema, como planos de corte globales y modos de inspección. Por ello, las ecuaciones anteriores se presentan como fundamento matemático del modelo de iluminación empleado por URP y no como afirmación de un \textit{solver} BRDF completamente escrito desde cero dentro del proyecto.
+\paragraph{Relación con la App Real}
+En la aplicación final, el modo \textit{Realistic} no reimplementa manualmente toda la BRDF microfacetada desde cero. El proyecto delega el cálculo PBR base al \textit{pipeline} de Unity URP, mientras que los shaders propios añaden lógica específica del sistema, como planos de corte globales y modos de inspección.
 
-\paragraph{Iluminación basada en imágenes (IBL)}
-La iluminación ambiental en PBR se apoya en mapas de entorno precalculados. Conceptualmente, la integral ambiental se aproxima mediante dos componentes: un mapa de irradiancia para la parte difusa y un mapa de entorno prefiltrado para la parte especular. Esto permite aproximar reflejos y contribución ambiental con costo constante por píxel, sin necesidad de \textit{ray tracing} completo en tiempo real (véase la Figura \ref{fig:flujo_pbr_urp}).
+\paragraph{Iluminación Basada en Imágenes (IBL)}
+La iluminación ambiental en PBR se apoya en mapas de entorno precalculados (irradiancia difusa y especular prefiltrada), permitiendo aproximar reflejos y luz ambiental con costo constante por píxel (véase la Figura \ref{fig:flujo_pbr_urp}).
 
-\begin{figure}[H]
-    \caption{Lectura visual del flujo PBR usado por URP en la app.}
-    \label{fig:flujo_pbr_urp}
-    \centering
-    \includegraphics[width=\textwidth,height=0.52\textheight,keepaspectratio]{figures/chapter2/fig_2_flujo_pbr_urp_app.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{El diagrama distingue la base PBR delegada a URP de las extensiones propias de inspección técnica, como corte, X-Ray y lectura térmica heurística. Elaboración propia.}
+\begin{figure}[htbp]
+\caption{Lectura Visual del Flujo PBR Usado por URP en la App}
+\label{fig:flujo_pbr_urp}
+\centering
+\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_flujo_pbr_urp_app.pdf}
+\apanote[14.5pt]{El diagrama distingue la base PBR delegada a URP de las extensiones propias de inspección técnica, como corte, X-Ray y lectura térmica heurística. Elaboración propia.}
 \end{figure}
 
-\subsubsection{Matemática aplicada a shaders de inspección y análisis}
+\subsubsection{Matemática Aplicada a Shaders de Inspección y Análisis}
 
-\paragraph{Plano de corte global}
-El corte transversal de la app puede expresarse con la ecuación de un plano:
-\[
-\Pi = (n_x, n_y, n_z, d), \qquad d = -\mathbf{n}\cdot\mathbf{p}
-\]
-donde $\mathbf{n}$ es la normal del plano y $\mathbf{p}$ un punto perteneciente a dicho plano. Para cualquier punto del espacio $\mathbf{x}$, la distancia algebraica al plano se evalúa como:
-\[
-\mathbf{n}\cdot\mathbf{x} + d
-\]
-Si este valor es negativo, el fragmento queda del lado descartado del plano y no se renderiza:
-\[
-\mathbf{n}\cdot\mathbf{x} + d < 0 \Rightarrow \text{fragmento descartado}
-\]
-Esta formulación coincide con el mecanismo usado por los shaders del sistema cuando reciben los planos globales calculados por el gestor de corte (véase la Figura \ref{fig:plano_corte_shader}).
+\paragraph{Plano de Corte Global}
+El corte transversal de la app se expresa mediante la distancia al plano $\Pi = (n_x, n_y, n_z, d)$: $\mathbf{n}\cdot\mathbf{x} + d < 0 \Rightarrow \text{fragmento descartado}$. Esta formulación coincide con el mecanismo usado por los shaders del sistema (véase la Figura \ref{fig:plano_corte_shader}).
 
-\begin{figure}[H]
-    \caption{Proceso de corte transversal aplicado por shader.}
-    \label{fig:plano_corte_shader}
-    \centering
-    \includegraphics[width=0.74\textwidth,height=0.62\textheight,keepaspectratio]{figures/chapter2/fig_2_plano_corte_shader.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{El esquema resume el paso desde el movimiento del plano hasta la evaluación fragmento a fragmento; no representa una operación destructiva sobre la malla. Elaboración propia.}
+\begin{figure}[htbp]
+\caption{Proceso de Corte Transversal Aplicado por Shader}
+\label{fig:plano_corte_shader}
+\centering
+\includegraphics[width=0.74\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_plano_corte_shader.pdf}
+\apanote[-18.4pt]{El esquema resume el paso desde el movimiento del plano hasta la evaluación fragmento a fragmento; no representa una operación destructiva sobre la malla. Elaboración propia.}
 \end{figure}
 
-\paragraph{Fresnel de borde para modos analíticos}
-Modos como \textit{X-Ray} o \textit{Blueprint} usan una intensidad de borde basada en la relación entre normal y vista:
-\[
-F_{\text{borde}} = \left(1 - saturate(\mathbf{n}\cdot\mathbf{v})\right)^p
-\]
-donde $p$ controla la dureza del borde. Cuando la normal es casi perpendicular a la vista, la intensidad aumenta y se resaltan siluetas, contornos o regiones parcialmente transparentes (véase la Figura \ref{fig:fresnel_contornos_tecnicos}).
+\paragraph{Fresnel de Borde para Modos Analíticos}
+Modos como \textit{X-Ray} o \textit{Blueprint} usan intensidad de borde: $F_{\text{borde}} = \left(1 - \text{saturate}(\mathbf{n}\cdot\mathbf{v})\right)^p$. Cuando la normal es perpendicular a la vista, se resaltan siluetas y contornos técnicos (véase la Figura \ref{fig:fresnel_contornos_tecnicos}).
 
-\begin{figure}[H]
-    \caption{Intensidad Fresnel y contornos técnicos en sombreado de borde.}
-    \label{fig:fresnel_contornos_tecnicos}
-    \centering
-    \includegraphics[width=\textwidth,height=0.46\textheight,keepaspectratio]{figures/chapter2/fig_2_fresnel_contornos_tecnicos.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{Representación del cálculo de Fresnel de borde basado en el ángulo entre la normal de superficie y la vista para resaltar siluetas. Elaboración propia.}
+\begin{figure}[htbp]
+\caption{Intensidad Fresnel y Contornos Técnicos en Sombreado de Borde}
+\label{fig:fresnel_contornos_tecnicos}
+\centering
+\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_fresnel_contornos_tecnicos.pdf}
+\apanote[+3.7pt]{Representación del cálculo de Fresnel de borde basado en el ángulo entre la normal de superficie y la vista para resaltar siluetas. Elaboración propia.}
 \end{figure}
 
-\paragraph{Mapeo visual del modo térmico}
-La vista térmica del prototipo no corresponde a un \textit{solver} FEA completo, sino a una visualización híbrida inspirada en un estado térmico simplificado. A nivel visual, la temperatura normalizada puede expresarse como:
+\paragraph{Mapeo Visual del Modo Térmico}
+La vista térmica del prototipo se expresa visualmente como:
 \[
-  T_{\text{vis}} = saturate\left(T_{\text{base}}\, s(\mathbf{x}) - \phi_{\text{edge}}(\mathbf{x},\mathbf{v}) + \eta(\mathbf{x},t) + \delta_{\text{textura}}\right)
+  T_{\text{vis}} = \text{saturate}\left(T_{\text{base}}\, s(\mathbf{x}) - \phi_{\text{edge}}(\mathbf{x},\mathbf{v}) + \eta(\mathbf{x},t) + \delta_{\text{textura}}\right)
 \]
-donde $T_{\text{base}}$ proviene del subsistema térmico, $s(\mathbf{x})$ representa el factor espacial radial o axial, $\phi_{\text{edge}}(\mathbf{x},\mathbf{v})$ modela el enfriamiento visual de borde, $\eta(\mathbf{x},t)$ introduce variación procedural suave y $\delta_{\text{textura}}$ incorpora microvariaciones visuales de la textura base. Esta ecuación describe una capa de visualización, no una simulación termo-mecánica completa (véase la Figura \ref{fig:jerarquia_termica_heuristica}).
+Esta ecuación describe una capa de visualización heurística inspirada en disipación por componentes (véase la Figura \ref{fig:jerarquia_termica_heuristica}).
 
-\begin{figure}[H]
-    \caption{Jerarquía térmica heurística por componentes.}
-    \label{fig:jerarquia_termica_heuristica}
-    \centering
-    \includegraphics[width=\textwidth,height=0.50\textheight,keepaspectratio]{figures/chapter2/fig_2_jerarquia_termica_heuristica.pdf}
-    \par\vspace{0.5\baselineskip}
-    \apanote{Clasificación de disipación térmica heurística entre componentes activos (fuentes de calor primarias) y pasivos del dron Holybro X500 V2. Elaboración propia.}
+\begin{figure}[htbp]
+\caption{Jerarquía Térmica Heurística por Componentes}
+\label{fig:jerarquia_termica_heuristica}
+\centering
+\includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_jerarquia_termica_heuristica.pdf}
+\apanote[+6.2pt]{Clasificación de disipación térmica heurística entre componentes activos (fuentes de calor primarias) y pasivos del dron Holybro X500 V2. Elaboración propia.}
 \end{figure}
 
+\FloatBarrier
 \subsection{Marco Conceptual}
 
 Los siguientes conceptos técnicos fundamentan el proyecto. Algunos corresponden a componentes efectivamente utilizados en la aplicación final y otros a estrategias de optimización evaluadas durante el diseño del \textit{pipeline}; no todos están expuestos como funcionalidad visible en la build final.
@@ -431,5 +379,3 @@ Los siguientes conceptos técnicos fundamentan el proyecto. Algunos corresponden
 \textit{WebGL.} API gráfica del navegador basada en OpenGL ES para renderizado 2D y 3D acelerado por hardware sin complementos externos.
 
 \textit{W3C (\textit{World Wide Web Consortium}).} Organización internacional que desarrolla estándares para la Web. En este informe se cita por Web of Things, una línea de trabajo orientada a describir propiedades, acciones y eventos de dispositivos conectados para reducir fragmentación entre ecosistemas IoT.
-
-\newpage

@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: GPS Mast Securing Nut
   id: x500v2_blend_gpsv5_zhijia_luomao
   partType: Structure
-  description: "GPS mast threaded securing nut. Modeled from CAD GPSV5-ZHIJIA-LUOMAO."
+  description: GPS mast threaded securing nut. Modeled from CAD GPSV5-ZHIJIA-LUOMAO.
   weightKg: 0.002
   dimensions: Manual
-  function: "GPS mast threaded securing nut"
+  function: GPS mast threaded securing nut
   materialType: Reinforced nylon
   materialProperties: 
   manufacturer: Holybro
@@ -84,4 +84,4 @@ MonoBehaviour:
     recipeKey: 
     builderType: 
     orientationMode: 
-  category: 5
+  category: 1

@@ -15,11 +15,12 @@ MonoBehaviour:
   partName: Rail System & Battery Mount
   id: x500v2_rails_battery
   partType: Frame
-  description: "Two 10 mm carbon fiber rails mounted below the bottom plate for battery, payload and accessory support."
+  description: Two 10 mm carbon fiber rails mounted below the bottom plate for battery,
+    payload and accessory support.
   weightKg: 0.025
   dimensions: "2\xD7 barras \u230010 mm \xD7 250 mm"
-  function: "Battery, payload and accessory support rail system"
-  materialType: "Carbon fiber rails with reinforced plastic clamps"
+  function: Battery, payload and accessory support rail system
+  materialType: Carbon fiber rails with reinforced plastic clamps
   materialProperties: 
   manufacturer: Holybro
   partNumber: Incluido en SKU30120
@@ -41,8 +42,8 @@ MonoBehaviour:
   isHotspotTarget: 0
   hotspotLabel: 
   explosionDirection: {x: 0, y: -1, z: 0}
-  explosionDistance: 1
-  explosionPriority: 8
+  explosionDistance: 0.95
+  explosionPriority: 6
   isModular: 0
   compatibleSlots: []
   alternativeParts: []
@@ -74,14 +75,10 @@ MonoBehaviour:
   - HUAN-GUIJIAO
   - PLATFORM-PLAT-X500
   - ZHIJIA-CAMERA-INTEL
+  - GAI-GUANGLIU
   - LIPO
   - BATTERY
   - BATTERY-STRAP
-  - 'Fasteners: Socket Cap Screw M2.5 x 12 mm x4'
-  - 'Fasteners: Countersunk Screw M2.5 x 6 mm x12'
-  - 'Fasteners: Countersunk Screw M3 x 16 mm x2'
-  - 'Fasteners: Nylon Standoff M2.5 x 5 mm x4'
-  - 'Fasteners: Self-lock Nut M2.5 x4'
   fastenerMetadata:
     instanceId: 
     familyId: 

@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Nylon Standoff M3 x 5 mm
   id: x500v2_blend_nilongzhu_m3_5
   partType: Structure
-  description: "Flush mounting hardware. Modeled from CAD NILONGZHU-M3-5."
+  description: Flush mounting hardware. Modeled from CAD NILONGZHU-M3-5.
   weightKg: 0.001
   dimensions: M3
-  function: "Flush mounting hardware"
+  function: Flush mounting hardware
   materialType: Stainless steel
   materialProperties: 
   manufacturer: Holybro

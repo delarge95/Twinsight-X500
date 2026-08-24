@@ -15,11 +15,11 @@ MonoBehaviour:
   partName: JST GH 6-Pin Connector
   id: x500v2_blend_bm06b_wo
   partType: Electronics
-  description: "Internal/external telemetry port. Modeled from CAD BM06B-WO."
+  description: Internal/external telemetry port. Modeled from CAD BM06B-WO.
   weightKg: 0.001
   dimensions: Miniature
-  function: "Internal/external telemetry port"
-  materialType: "Plastic/Cobre"
+  function: Internal/external telemetry port
+  materialType: Plastic/Cobre
   materialProperties: 
   manufacturer: Holybro
   partNumber: 

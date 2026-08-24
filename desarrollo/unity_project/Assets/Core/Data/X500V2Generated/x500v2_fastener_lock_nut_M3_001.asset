@@ -15,15 +15,15 @@ MonoBehaviour:
   partName: Cap Nut M3
   id: x500v2_fastener_lock_nut_M3_001
   partType: Cap Nut
-  description: Cap nut. Modeled from CAD LM-M3-DING. Synced source
-    expects 8 units while the current temporary scene contains 16.
+  description: Derived from temporary Unity proxy family naming only. Final Blender
+    geometry is expected to replace this proxy family later.
   weightKg: 0
   dimensions: M3
   function: Fastening / mounting | M3 | Cap
-  materialType: "Brass"
-  materialProperties: Brass
+  materialType: Unknown
+  materialProperties: Unspecified
   manufacturer: Holybro
-  partNumber: LM-M3-DING
+  partNumber: 
   powerConsumption: 0
   maxLoad: 0
   operatingTemp: 0
@@ -32,9 +32,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -63,11 +63,11 @@ MonoBehaviour:
   fastenerMetadata:
     instanceId: x500v2_fastener_lock_nut_M3_001
     familyId: holybro_lock_nut_m3
-    sourceId: x500v2_blend_lm_m3_ding
+    sourceId: 
     sceneObjectName: x500v2_fastener.lock_nut_M3_001
     hierarchyPath: x500v2_Drone/x500v2_fastener_group/x500v2_fastener.lock_nut_M3_001
     parentCanonicalPartId: x500v2_landing_gear
-    blenderName: LM-M3-DING
+    blenderName: 
     sceneTypeKey: lock_nut_M3
     subtype: CapNut
     metric: M3
@@ -77,13 +77,13 @@ MonoBehaviour:
     driveType: N/A
     threadPitchMm: 0
     turnCount: 0
-    material: "Brass"
-    finish: Brass
-    quantityExpected: 8
+    material: Unknown
+    finish: Unspecified
+    quantityExpected: 18
     isInspectable: 1
     fallbackReason: 
-    notes: Cap nut. Modeled from CAD LM-M3-DING. Synced source
-      expects 8 units while the current temporary scene contains 16.
+    notes: Derived from temporary Unity proxy family naming only. Final Blender geometry
+      is expected to replace this proxy family later.
     recipeKey: lock_nut_M3_placeholder
     builderType: CapNut
     orientationMode: ShortestAxis

@@ -15,8 +15,8 @@ MonoBehaviour:
   partName: Power Module PM02/PM06 Board
   id: x500v2_blend_pcb_pm06
   partType: Electronics
-  description: Distributes 5 V to the Pixhawk and senses voltage/current. Modeled from CAD
-    PCB-PM06.
+  description: Distributes 5 V to the Pixhawk and senses voltage/current. Modeled
+    from CAD PCB-PM06.
   weightKg: 0.02
   dimensions: "55\xD717 mm"
   function: Distributes 5 V to the Pixhawk and senses voltage/current

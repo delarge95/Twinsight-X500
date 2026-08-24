@@ -15,11 +15,10 @@ MonoBehaviour:
   partName: Arm Tube Motor Mount (Bottom)
   id: x500v2_blend_hmx5v_digai_dianjizuo_muju
   partType: Structure
-  description: "Plastic motor-to-arm tube support. Modeled from CAD
-    HMX5V-DIGAI-DIANJIZUO-MUJU."
+  description: Plastic motor-to-arm tube support. Modeled from CAD HMX5V-DIGAI-DIANJIZUO-MUJU.
   weightKg: 0.012
   dimensions: For 16 mm tube
-  function: "Plastic motor-to-arm tube support"
+  function: Plastic motor-to-arm tube support
   materialType: Nylon
   materialProperties: 
   manufacturer: Holybro

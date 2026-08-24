@@ -12,17 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c73690adaf8894f87851a149e0fb6a, type: 3}
   m_Name: x500v2_fastener_nylon_standoff_M3x5_001
   m_EditorClassIdentifier: 
-  partName: Nylon Standoff M3 x 5 mm
+  partName: Standoff M3 x 5 mm
   id: x500v2_fastener_nylon_standoff_M3x5_001
   partType: Standoff
-  description: "Flush mounting hardware. Modeled from CAD NILONGZHU-M3-5."
+  description: Derived from temporary Unity proxy family naming only. Final Blender
+    geometry is expected to replace this proxy family later.
   weightKg: 0
   dimensions: M3 x 5 mm
   function: Fastening / mounting | M3 x 5 mm | Standoff
-  materialType: Stainless steel
-  materialProperties: Stainless
+  materialType: Unknown
+  materialProperties: Unspecified
   manufacturer: Holybro
-  partNumber: NILONGZHU-M3-5
+  partNumber: 
   powerConsumption: 0
   maxLoad: 0
   operatingTemp: 0
@@ -31,9 +32,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -62,11 +63,11 @@ MonoBehaviour:
   fastenerMetadata:
     instanceId: x500v2_fastener_nylon_standoff_M3x5_001
     familyId: holybro_nylon_standoff_m3x5
-    sourceId: x500v2_blend_nilongzhu_m3_5
+    sourceId: 
     sceneObjectName: x500v2_fastener.nylon_standoff_M3x5_001
     hierarchyPath: x500v2_Drone/x500v2_fastener_group/x500v2_fastener.nylon_standoff_M3x5_001
     parentCanonicalPartId: x500v2_power_module
-    blenderName: NILONGZHU-M3-5
+    blenderName: 
     sceneTypeKey: nylon_standoff_M3x5
     subtype: Standoff
     metric: M3
@@ -76,12 +77,13 @@ MonoBehaviour:
     driveType: N/A
     threadPitchMm: 0
     turnCount: 3
-    material: Stainless steel
-    finish: Stainless
-    quantityExpected: 4
+    material: Unknown
+    finish: Unspecified
+    quantityExpected: 5
     isInspectable: 1
     fallbackReason: 
-    notes: "Flush mounting hardware. Modeled from CAD NILONGZHU-M3-5."
+    notes: Derived from temporary Unity proxy family naming only. Final Blender geometry
+      is expected to replace this proxy family later.
     recipeKey: nylon_standoff_M3x5_placeholder
     builderType: Standoff
     orientationMode: LongestAxis

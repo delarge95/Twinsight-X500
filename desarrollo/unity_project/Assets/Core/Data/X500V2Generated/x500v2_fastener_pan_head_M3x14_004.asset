@@ -15,7 +15,7 @@ MonoBehaviour:
   partName: Pan Head Screw M3 x 14 mm
   id: x500v2_fastener_pan_head_M3x14_004
   partType: Pan Head Screw
-  description: "Flush mounting hardware. Modeled from CAD M3-14-PAN."
+  description: Flush mounting hardware. Modeled from CAD M3-14-PAN.
   weightKg: 0
   dimensions: M3 x 14 mm
   function: Fastening / mounting | M3 x 14 mm | Pan/Button | Unknown
@@ -31,9 +31,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -81,7 +81,7 @@ MonoBehaviour:
     quantityExpected: 4
     isInspectable: 1
     fallbackReason: 
-    notes: "Flush mounting hardware. Modeled from CAD M3-14-PAN."
+    notes: Flush mounting hardware. Modeled from CAD M3-14-PAN.
     recipeKey: pan_head_M3x14_placeholder
     builderType: PanHeadScrew
     orientationMode: LongestAxis

@@ -1,0 +1,369 @@
+\documentclass[12pt,letterpaper]{article}
+
+% ============================================================
+% TwinSight X500 - Informe Final
+% BUILD DEFINITIVA v6 - APA 7 UNAD (Instructivo 2023) - Control Estructural de Flotantes
+% TOC corto (inicia en Objetivos).
+% ESTRATEGIA DE FLOTANTES: todos van [tp] (tope de pagina o pagina
+% de flotantes), NUNCA a mitad de texto. El hueco posterior a la
+% nota queda en el interlineal puro (18.5pt, el ritmo 2.0) con
+% \textfloatsep=0pt, y al no haber flotantes a mitad de texto se
+% elimina el caso del hueco previo colapsado. Reemplazar el archivo
+% COMPLETO, sin merge manual.
+% ============================================================
+
+% --- PAQUETES ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{times}
+\usepackage[margin=2.54cm]{geometry}   % Margenes 2.54 cm (p. 8)
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{flafter}                  % \FloatBarrier SOLO para casos puntuales
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{ragged2e}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+
+% Interlineado reducido permitido DENTRO de tablas extensas (p. 23).
+% OJO: la excepcion aplica al cuerpo de la tabla, NO a la nota.
+\AtBeginEnvironment{table}{\setstretch{1.15}}
+\AtBeginEnvironment{longtable}{\setstretch{1.15}}
+
+% --- LISTAS: vineta alineada con la sangria de parrafo (1.27 cm) ---
+\setlist[itemize]{leftmargin=1.9cm, itemindent=0pt, labelsep=0.63cm, label=\textbullet, itemsep=0pt, parsep=0pt, topsep=0pt}
+\setlist[enumerate]{leftmargin=1.9cm, itemindent=0pt, labelsep=0.63cm, itemsep=0pt, parsep=0pt, topsep=0pt}
+
+% --- ROTULOS EN ESPANOL ---
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+\addto\captionsspanish{\renewcommand{\figurename}{Figura}}
+\addto\captionsspanish{\renewcommand{\contentsname}{Tabla de Contenido}}
+\addto\captionsspanish{\renewcommand{\listtablename}{Lista de Tablas}}
+\addto\captionsspanish{\renewcommand{\listfigurename}{Lista de Figuras}}
+
+% --- ESPACIADO GLOBAL (pp. 7-8) ---
+\setstretch{2}                          % Interlineado 2.0 en TODO el documento
+\setlength{\parindent}{1.27cm}          % Sangria de primera linea
+\setlength{\parskip}{0pt}               % Sin espacio libre entre parrafos (p. 7)
+\setlength{\emergencystretch}{3em}
+
+\setcounter{secnumdepth}{0}             % Titulos sin numeracion visible (p. 8)
+\setcounter{tocdepth}{3}                % TOC hasta Nivel 3
+
+\hypersetup{bookmarksopen=true, bookmarksopenlevel=1, bookmarksdepth=3}
+
+% Pagina nueva EXCLUSIVAMENTE para titulos de Nivel 1 (p. 8)
+\pretocmd{\section}{\clearpage}{}{}
+\pretocmd{\subsection}{\phantomsection}{}{}
+\pretocmd{\subsubsection}{\phantomsection}{}{}
+\pretocmd{\paragraph}{\phantomsection}{}{}
+\pretocmd{\subparagraph}{\phantomsection}{}{}
+\makeatletter
+\providecommand{\ttl@finishall}{}
+\providecommand{\contentsfinish}{}
+\makeatother
+
+% --- PAGINACION: arabiga, superior derecha, desde la portada (p. 7) ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{14.5pt}
+\fancyhead[R]{\thepage}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \fancyhead[R]{\thepage}%
+}
+
+% --- FLOTANTES ---
+% Estrategia [tp] (ver nota de cabecera): los flotantes van al tope de
+% una pagina o a una pagina de flotantes; nunca a mitad de texto.
+% \@fptop en 0pt alinea al TOPE el contenido de toda pagina de flotantes
+% (por defecto LaTeX la centra verticalmente con pegamento 1fil).
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
+% Control estructural del colocador de flotantes (v6):
+% Pool ampliado para evitar saturacion de la cola interna de LaTeX.
+\setcounter{topnumber}{4}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{6}
+% Parametros relajados para que una figura grande comparta pagina con
+% texto (debajo del flotante) en vez de ser exiliada a pagina de flotantes.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+% Separadores flotante-texto en CERO. Con flotantes [tp], el unico
+% contacto flotante-texto es "nota -> texto debajo de un flotante al
+% tope": ese hueco queda en \textfloatsep(0) + el pegamento interlineal
+% normal (18.5pt, el ritmo 2.0). Uniforme por construccion.
+% TRAMPA A EVITAR: no usar multiplos de \baselineskip en el preambulo
+% (ahi el registro vale 14.5pt, no 29pt).
+\setlength{\textfloatsep}{0pt}
+\setlength{\intextsep}{0pt}
+\setlength{\floatsep}{0pt}
+
+% --- FORMATO TOC / LISTA DE TABLAS / LISTA DE FIGURAS ---
+\renewcommand{\cftsecpresnum}{\relax}
+\renewcommand{\cftsecnumwidth}{0pt}
+\renewcommand{\cftsubsecpresnum}{\relax}
+\renewcommand{\cftsubsecnumwidth}{0pt}
+\renewcommand{\cftsubsubsecpresnum}{\relax}
+\renewcommand{\cftsubsubsecnumwidth}{0pt}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsubsecleader}{\cftdotfill{\cftdotsep}}
+
+\RaggedRight                            % Alineado a la izquierda, sin justificar (p. 8)
+
+\setlength{\cftbeforetoctitleskip}{0pt}
+\setlength{\cftaftertoctitleskip}{0pt}
+\renewcommand{\cfttoctitlefont}{\hfill\normalfont\bfseries\normalsize}
+\renewcommand{\cftaftertoctitle}{\null\hfill}
+
+\setlength{\cftbeforelottitleskip}{0pt}
+\setlength{\cftafterlottitleskip}{0pt}
+\renewcommand{\cftlottitlefont}{\hfill\normalfont\bfseries\normalsize}
+\renewcommand{\cftafterlottitle}{\null\hfill}
+
+\setlength{\cftbeforeloftitleskip}{0pt}
+\setlength{\cftafterloftitleskip}{0pt}
+\renewcommand{\cftloftitlefont}{\hfill\normalfont\bfseries\normalsize}
+\renewcommand{\cftafterloftitle}{\null\hfill}
+
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsecpagefont}{\normalfont}
+\renewcommand{\cftsubsecfont}{\normalfont}
+\renewcommand{\cftsubsecpagefont}{\normalfont}
+\renewcommand{\cftsubsubsecfont}{\normalfont}
+\renewcommand{\cftsubsubsecpagefont}{\normalfont}
+
+\setlength{\cftsecindent}{0em}
+\setlength{\cftsubsecindent}{1.5em}
+\setlength{\cftsubsubsecindent}{3em}
+
+\newlength{\mytocskip}
+\setlength{\mytocskip}{0pt}
+\setlength{\cftbeforesecskip}{\mytocskip}
+\setlength{\cftbeforesubsecskip}{\mytocskip}
+\setlength{\cftbeforesubsubsecskip}{\mytocskip}
+
+% Listas de Tablas y Figuras segun el ejemplo del Instructivo:
+% rotulo ("Tabla 1" / "Figura 1") en NEGRILLA redonda, titulo en CURSIVA,
+% sin espacio extra entre entradas.
+\renewcommand{\cfttabpresnum}{\normalfont\bfseries\tablename~}
+\renewcommand{\cfttabfont}{\normalfont\itshape}
+\renewcommand{\cfttabpagefont}{\normalfont}
+\renewcommand{\cfttableader}{\cftdotfill{\cftdotsep}}
+\setlength{\cfttabnumwidth}{4.0em}
+\setlength{\cftbeforetabskip}{0pt}
+
+\renewcommand{\cftfigpresnum}{\normalfont\bfseries\figurename~}
+\renewcommand{\cftfigfont}{\normalfont\itshape}
+\renewcommand{\cftfigpagefont}{\normalfont}
+\renewcommand{\cftfigleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftfignumwidth}{4.0em}
+\setlength{\cftbeforefigskip}{0pt}
+
+% Entradas de lista como texto corrido: "Figura 1 Titulo" con un solo
+% espacio. Se elimina la caja de ancho fijo del rotulo (esa caja era la
+% causa del hueco persistente entre rotulo y titulo).
+\cftsetindents{figure}{0pt}{0pt}
+\cftsetindents{table}{0pt}{0pt}
+\makeatletter
+\def\cftnumberline#1{{\@cftbsnum #1\@cftasnum}\ \@cftasnumb}
+\makeatother
+\renewcommand{\numberline}[1]{\cftnumberline{#1}}
+
+% --- TITULOS APA 7 UNAD (p. 21) ---
+% Sin espacio vertical extra alrededor de titulos (p. 7).
+% La forma ESTRELLADA de \titlespacing suprime la sangria del primer
+% parrafo tras el titulo (pp. 7, 18, 19, 25, 26). NO usar \noindent.
+
+% Nivel 1: centrado, negrita, mayusculas capitalizadas, pagina nueva
+\titleformat{\section}{\normalfont\bfseries\centering}{}{0em}{}
+\titlespacing*{\section}{0pt}{0pt}{0pt}
+
+% Nivel 2: izquierda, negrita, mayusculas capitalizadas
+\titleformat{\subsection}{\normalfont\bfseries}{}{0em}{}
+\titlespacing*{\subsection}{0pt}{0pt}{0pt}
+
+% Nivel 3: izquierda, negrita, cursiva, mayusculas capitalizadas
+\titleformat{\subsubsection}{\normalfont\bfseries\itshape}{}{0em}{}
+\titlespacing*{\subsubsection}{0pt}{0pt}{0pt}
+
+% Nivel 4: sangria 1.27 cm, negrita, punto final, texto en la misma linea.
+% Separacion tras el punto = 0.25em = exactamente UN espacio interpalabra
+% de Times 12pt. OJO: titlesec en modo runin ABSORBE el espacio fuente
+% tras la llave de cierre; la separacion debe venir del macro.
+\titleformat{\paragraph}[runin]{\normalfont\bfseries}{}{0em}{}[.]
+\titlespacing*{\paragraph}{1.27cm}{0pt}{0.25em}
+
+% Nivel 5: igual que Nivel 4, con cursiva
+\titleformat{\subparagraph}[runin]{\normalfont\bfseries\itshape}{}{0em}{}[.]
+\titlespacing*{\subparagraph}{1.27cm}{0pt}{0.25em}
+
+% --- CAPTIONS Y NOTAS (pp. 22-24) ---
+% Linea 1: "Tabla 1" / "Figura 1" en negrita, alineado a la izquierda.
+% Linea 2: titulo en cursiva, mayusculas capitalizadas, SIN punto final.
+\DeclareCaptionLabelFormat{table_num_bold_left}{\textbf{#1~#2}}
+\DeclareCaptionLabelSeparator{mediumspace}{\par\vspace{0.25\baselineskip}}
+
+\captionsetup[table]{
+    labelformat=table_num_bold_left,
+    labelsep=mediumspace,
+    textfont=it,
+    justification=raggedright,
+    singlelinecheck=false,
+    skip=0pt,
+    position=top
+}
+\captionsetup[figure]{
+    labelformat=table_num_bold_left,
+    labelsep=mediumspace,
+    textfont=it,
+    justification=raggedright,
+    singlelinecheck=false,
+    skip=0pt,
+    position=top
+}
+
+% Nota de tabla/figura: a INTERLINEADO 2.0 como todo el trabajo (p. 8).
+% El \setstretch{2} explicito dentro del grupo la hace inmune a la
+% herencia del hook 1.15 de las tablas.
+% SIN \vspace inicial: la nota sigue a la figura/tabla con el pegamento
+% interlineal puro. Cualquier \vspace aqui (positivo o NEGATIVO) rompe
+% la geometria: el positivo crea el hueco "demasiado grande" entre
+% imagen y nota; el negativo monta el texto sobre el ultimo renglon.
+\newcommand{\apanote}[1]{%
+    \par%
+    \begingroup%
+    \setstretch{2}%
+    \RaggedRight%
+    \noindent\textit{Nota}. #1\par%
+    \endgroup%
+}
+
+\begin{document}
+
+% --- PORTADA (p. 9) ---
+% Sin entorno titlepage: la portada se numera como pagina 1 (p. 7).
+% Sin \vspace inicial: el titulo inicia en el margen superior.
+\thispagestyle{fancy}
+\begin{center}
+    \setstretch{2}
+    {\normalfont\bfseries TwinSight X500: prototipo web 3D para visualización técnica de hardware complejo\par}
+    \vfill
+    {\normalfont Alexander Woodcock Salomón\par}
+    \vspace{2\baselineskip}
+    {\normalfont Asesor\par
+    Gustavo Enrique Vejarano Matiz\par}
+    \vfill
+    {\normalfont Universidad Nacional Abierta y a Distancia UNAD\par
+    Escuela de Ciencias Básicas, Tecnología e Ingeniería ECBTI\par
+    Ingeniería Multimedia\par
+    2026\par}
+\end{center}
+
+% --- RESUMEN (p. 12): un solo parrafo, sin sangria de primera linea ---
+% Con asterisco: NO aparece en la Tabla de Contenido (build de TOC corto)
+\section*{Resumen}
+\setlength{\parindent}{0pt}
+La documentación de hardware técnico complejo, como drones y sistemas electromecánicos multicomponente, presenta limitaciones de comunicación espacial cuando depende de imágenes 2D, manuales PDF y fuentes técnicas fragmentadas. Este informe desarrolla TwinSight X500, un prototipo web 3D interactivo orientado a la visualización técnica, inspección y análisis visual del dron Holybro X500~V2. El trabajo se enmarca en Design Science Research, prototipado iterativo, Teoría de la Carga Cognitiva, interacción 3D y renderizado físicamente basado. La build integra selección jerárquica de piezas, ficha técnica inferior, modos \textit{Inspect}, \textit{Analyze} y \textit{Studio}, corte transversal, vista explosionada, filtros y visualización térmica heurística. El pipeline redujo el modelo desde rutas CAD superiores a 6,5 millones de triángulos hasta 95\,617 triángulos optimizados. La validación combinó profiler WebGL, desempeño en tareas cronometradas, SUS, NASA-TLX Raw y \textit{Think-Aloud} con 12 participantes: SUS promedio de 91,88, NASA-TLX Raw de 8,69 para el visor 3D frente a 19,89 para el soporte 2D, menor tiempo medio en las tres tareas cronometradas y 96 registros tarea-condición completados. El prototipo alcanzó rendimiento estable en escritorio, comportamiento funcional en móviles reales y alcance defendible como \textit{visual product twin}, no como gemelo digital operacional.
+
+% "Palabras clave" con sangria, cursiva y negrita (p. 12). Sin punto final.
+\hspace{1.27cm}\textit{\textbf{Palabras clave:}} WebGL, Unity, WebAssembly, visualización, usabilidad
+
+% --- ABSTRACT (p. 13) ---
+\section*{Abstract}
+Complex hardware documentation, including drones and multicomponent electromechanical systems, presents spatial communication limits when it depends on 2D images, PDF manuals, and fragmented technical sources. This report develops TwinSight X500, an interactive 3D web prototype for technical visualization, inspection, and visual analysis of the Holybro X500~V2. The work is framed through Design Science Research, iterative prototyping, cognitive load theory, 3D interaction, and physically based rendering. The build includes hierarchical part selection, a bottom technical sheet, \textit{Inspect}, \textit{Analyze}, and \textit{Studio} modes, cross-section, exploded view, category filters, and component-based heuristic thermal visualization. The pipeline reduced the model from CAD routes above 6.5 million triangles to 95,617 optimized triangles. Validation combined WebGL profiling, timed task performance, SUS, NASA-TLX Raw, and Think-Aloud with 12 participants: mean SUS was 91.88, NASA-TLX Raw was 8.69 for the 3D viewer versus 19.89 for the 2D reference, lower mean time in the three timed tasks for the 3D condition, and 96 completed task-condition records. The prototype achieved stable desktop performance, functional behavior on real mobile devices, and a defensible scope as a visual product twin, not as an operational digital twin.
+
+\hspace{1.27cm}\textit{\textbf{Keywords:}} WebGL, Unity, WebAssembly, visualization, usability
+
+\setlength{\parindent}{1.27cm}
+
+% --- LISTAS PRELIMINARES: ORDEN ESTRICTO UNAD (pp. 3, 14-17) ---
+% 1. Tabla de Contenido  2. Lista de Tablas  3. Lista de Figuras  4. Lista de Apendices
+% Ninguna de las listas se registra a si misma en el TOC (build de TOC corto).
+\clearpage
+\tableofcontents
+
+\clearpage
+\listoftables
+
+\clearpage
+\listoffigures
+
+\section*{Lista de Apéndices}
+% Rotulo en negrilla + titulo en cursiva, un solo espacio, sin \vspace entre entradas
+\noindent\textbf{Apéndice A} \textit{Repositorio de Código Fuente} \cftdotfill{\cftdotsep} \pageref{apendice:A}\par
+\noindent\textbf{Apéndice B} \textit{Manual de Usuario} \cftdotfill{\cftdotsep} \pageref{apendice:B}\par
+\noindent\textbf{Apéndice C} \textit{Manual Técnico} \cftdotfill{\cftdotsep} \pageref{apendice:C}\par
+\noindent\textbf{Apéndice D} \textit{Documentación Técnica Activa} \cftdotfill{\cftdotsep} \pageref{apendice:D}\par
+\noindent\textbf{Apéndice E} \textit{Matriz de Desconexiones} \cftdotfill{\cftdotsep} \pageref{apendice:E}\par
+\noindent\textbf{Apéndice F} \textit{Catálogo Canónico del Holybro X500 V2} \cftdotfill{\cftdotsep} \pageref{apendice:F}\par
+\noindent\textbf{Apéndice G} \textit{Validación Funcional de la Escena Final} \cftdotfill{\cftdotsep} \pageref{apendice:G}\par
+\noindent\textbf{Apéndice H} \textit{Instrumentos y Registros de Evaluación} \cftdotfill{\cftdotsep} \pageref{apendice:H}\par
+\noindent\textbf{Apéndice I} \textit{Estado del Pipeline de Activos} \cftdotfill{\cftdotsep} \pageref{apendice:I}\par
+\noindent\textbf{Apéndice J} \textit{Demo Público} \cftdotfill{\cftdotsep} \pageref{apendice:J}\par
+\noindent\textbf{Apéndice K} \textit{Audio y Alcance No Integrado} \cftdotfill{\cftdotsep} \pageref{apendice:K}\par
+\noindent\textbf{Apéndice L} \textit{Auditoría Matemática y Trazabilidad con Wolfram} \cftdotfill{\cftdotsep} \pageref{apendice:L}\par
+\noindent\textbf{Apéndice M} \textit{Correlación entre la Propuesta y el Informe Final} \cftdotfill{\cftdotsep} \pageref{apendice:M}\par
+\noindent\textbf{Apéndice N} \textit{Resumen de Artefactos Activos del Cierre} \cftdotfill{\cftdotsep} \pageref{apendice:N}\par
+
+% --- INFORMACION GENERAL DEL TRABAJO DE GRADO ---
+% Con asterisco: NO aparece en la Tabla de Contenido (build de TOC corto)
+\section*{Información General del Trabajo de Grado}
+
+\subsection*{Integrantes del Proyecto}
+
+\textit{Nombre del estudiante:} Alexander Woodcock Salomón
+
+\textit{Programa Académico:} Ingeniería Multimedia
+
+\textit{Correo Electrónico:} awoodcocks@unadvirtual.edu.co
+
+\textit{Teléfono:} +57 301 234 5678
+
+\textit{Centro Seccional o Zonal:} ZSUR - Pasto
+
+\textit{Nombre del Asesor:} Gustavo Enrique Vejarano Matiz
+
+\subsection*{Datos Específicos del Proyecto}
+
+\textit{Duración del proyecto:} Un (1) año
+
+\textit{Línea de Investigación:} Ingeniería Multimedia, Visualización Técnica 3D Web
+
+\textit{Escuela:} Escuela de Ciencias Básicas, Tecnología e Ingeniería (ECBTI)
+
+\textit{Descriptores palabras clave:} WebGL, Unity, WebAssembly, visualización técnica 3D, optimización, carga de trabajo percibida, HCI, Technical Art, hardware complejo, visual product twin, digital shadow.
+
+% --- CAPITULOS ---
+% OJO: este main usa la variante de 01 con secciones asteriscadas
+% (Introduccion, Planteamiento y Justificacion fuera del TOC).
+\input{chapters/01_introduccion_toc_corto}
+\input{chapters/02_marco_referencia}
+\input{chapters/03_marco_metodologico}
+\input{chapters/04_desarrollo}
+\input{chapters/05_resultados}
+\input{chapters/06_conclusiones}
+\input{chapters/07_referencias}
+\input{chapters/08_apendices}
+
+\end{document}

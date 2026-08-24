@@ -15,12 +15,12 @@ MonoBehaviour:
   partName: Cap Nut M3
   id: x500v2_fastener_lock_nut_M3_015
   partType: Cap Nut
-  description: Cap nut. Modeled from CAD LM-M3-DING. Synced source
-    expects 8 units while the current temporary scene contains 16.
+  description: Cap nut. Modeled from CAD LM-M3-DING. Synced source expects 8 units
+    while the current temporary scene contains 16.
   weightKg: 0
   dimensions: M3
   function: Fastening / mounting | M3 | Cap
-  materialType: "Brass"
+  materialType: Brass
   materialProperties: Brass
   manufacturer: Holybro
   partNumber: LM-M3-DING
@@ -32,9 +32,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 1, g: 0.72, b: 0.2, a: 1}
@@ -77,13 +77,13 @@ MonoBehaviour:
     driveType: N/A
     threadPitchMm: 0
     turnCount: 0
-    material: "Brass"
+    material: Brass
     finish: Brass
     quantityExpected: 8
     isInspectable: 1
     fallbackReason: 
-    notes: Cap nut. Modeled from CAD LM-M3-DING. Synced source
-      expects 8 units while the current temporary scene contains 16.
+    notes: Cap nut. Modeled from CAD LM-M3-DING. Synced source expects 8 units while
+      the current temporary scene contains 16.
     recipeKey: lock_nut_M3_placeholder
     builderType: CapNut
     orientationMode: ShortestAxis

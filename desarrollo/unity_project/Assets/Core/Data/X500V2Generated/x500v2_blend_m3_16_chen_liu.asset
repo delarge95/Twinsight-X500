@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Countersunk Screw M3 x 16 mm
   id: x500v2_blend_m3_16_chen_liu
   partType: Structure
-  description: "Flush mounting hardware. Modeled from CAD M3-16-CHEN-LIU."
+  description: Flush mounting hardware. Modeled from CAD M3-16-CHEN-LIU.
   weightKg: 0.001
   dimensions: M3
-  function: "Flush mounting hardware"
+  function: Flush mounting hardware
   materialType: Stainless steel
   materialProperties: 
   manufacturer: Holybro

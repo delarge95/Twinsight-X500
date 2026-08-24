@@ -15,10 +15,10 @@ MonoBehaviour:
   partName: Battery Silicone Pad
   id: x500v2_blend_battery_pad
   partType: Structure
-  description: "Anti-slip surface for the 4S battery. Modeled from CAD BATTERY-PAD."
+  description: Anti-slip surface for the 4S battery. Modeled from CAD BATTERY-PAD.
   weightKg: 0.008
   dimensions: Universal
-  function: "Anti-slip surface for the 4S battery"
+  function: Anti-slip surface for the 4S battery
   materialType: Adhesive silicone
   materialProperties: 
   manufacturer: Holybro
@@ -84,4 +84,4 @@ MonoBehaviour:
     recipeKey: 
     builderType: 
     orientationMode: 
-  category: 4
+  category: 2

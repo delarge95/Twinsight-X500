@@ -15,7 +15,8 @@ MonoBehaviour:
   partName: Auxiliary Light Cover
   id: x500v2_misc_light_cover
   partType: Misc Part
-  description: Auxiliary cover retained from the imported frame hierarchy for accessory or light/sensor mounting context.
+  description: Auxiliary cover retained from the imported frame hierarchy for accessory
+    or light/sensor mounting context.
   weightKg: -1
   dimensions: N/A
   function: Auxiliary support
@@ -31,9 +32,9 @@ MonoBehaviour:
   thermalPeak: 0
   thermalHover: 0
   thermalWarmupSeconds: 0
-  thermalExposure: 0
-  thermalConductionScale: 0
-  thermalSourceWeight: 0
+  thermalExposure: 0.55
+  thermalConductionScale: 1
+  thermalSourceWeight: 0.2
   isThermallyCritical: 0
   icon: {fileID: 0}
   highlightColor: {r: 0.3, g: 0.8, b: 1, a: 1}
