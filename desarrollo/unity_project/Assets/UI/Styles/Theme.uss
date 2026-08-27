@@ -2865,3 +2865,166 @@
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.15);
 }
+
+/* ═══════════════ Hero corner actions (info + language) ═══════════════ */
+
+.hero-corner-actions {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.hero-info-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 17px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.30);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-right: 12px;
+    transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.hero-info-btn:hover {
+    background-color: rgba(255, 255, 255, 0.16);
+    border-color: rgba(123, 195, 255, 0.55);
+}
+
+/* ═══════════════ Config submenu ═══════════════ */
+
+.config-section-label {
+    font-size: 13px;
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+    color: rgba(255, 255, 255, 0.55);
+    margin-top: 12px;
+    margin-bottom: 10px;
+}
+
+.config-tier-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.config-tier-card {
+    width: 31%;
+    height: 44px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.config-tier-card:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.config-tier-card--active {
+    background-color: rgba(64, 158, 255, 0.28);
+    border-color: rgba(123, 195, 255, 0.85);
+    color: rgb(235, 246, 255);
+}
+
+.config-advanced-toggle {
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.config-advanced-section {
+    margin-top: 8px;
+    padding: 12px;
+    border-radius: 12px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.10);
+}
+
+.config-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 6px;
+}
+
+.config-row-label {
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.config-cycle-btn {
+    min-width: 84px;
+    height: 34px;
+    border-radius: 9px;
+    background-color: rgba(64, 158, 255, 0.20);
+    border-width: 1px;
+    border-color: rgba(123, 195, 255, 0.55);
+    color: rgb(235, 246, 255);
+    font-size: 13px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.config-cycle-btn:hover {
+    background-color: rgba(64, 158, 255, 0.32);
+}
+
+/* ═══════════════ Config tier expansion (AUTO expander) ═══════════════ */
+
+.config-tier-auto {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.config-tier-row {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.config-tier-row .config-tier-card {
+    width: 24%;
+    margin-bottom: 0;
+}
+
+/* Advanced section: stack labels above sliders so nothing is cut off */
+.config-advanced-section .env-slider-group {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 4px;
+}
+
+.config-advanced-section .env-slider-label {
+    white-space: normal;
+    margin-bottom: 6px;
+}
+
+.config-advanced-section .env-slider {
+    width: 100%;
+}
+
+/* Fix overflow: el grupo de slider tiene width fijo 476px que desborda la seccion */
+.config-advanced-section .env-slider-group {
+    width: 100%;
+    align-self: stretch;
+}
+
+.config-advanced-section .env-slider {
+    width: 100%;
+    flex-grow: 0;
+}

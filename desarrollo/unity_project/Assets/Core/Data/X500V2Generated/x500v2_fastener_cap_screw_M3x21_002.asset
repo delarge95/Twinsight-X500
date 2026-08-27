@@ -15,14 +15,15 @@ MonoBehaviour:
   partName: Socket Cap Screw M3 x 21 mm
   id: x500v2_fastener_cap_screw_M3x21_002
   partType: Socket Cap Screw
-  description: Chassis fastening and tightening. Modeled from CAD GB70-M3-21-DING.
+  description: Derived from temporary Unity proxy family naming only. Final Blender
+    geometry is expected to replace this proxy family later.
   weightKg: 0
   dimensions: M3 x 21 mm
   function: Fastening / mounting | M3 x 21 mm | Socket Cap | Hex Socket
-  materialType: Stainless steel
-  materialProperties: Stainless
+  materialType: Unknown
+  materialProperties: Unspecified
   manufacturer: Holybro
-  partNumber: GB70-M3-21
+  partNumber: 
   powerConsumption: 0
   maxLoad: 0
   operatingTemp: 0
@@ -62,11 +63,11 @@ MonoBehaviour:
   fastenerMetadata:
     instanceId: x500v2_fastener_cap_screw_M3x21_002
     familyId: holybro_cap_screw_m3x21
-    sourceId: x500v2_blend_gb70_m3_21_ding
+    sourceId: 
     sceneObjectName: x500v2_fastener.cap_screw_M3x21_002
     hierarchyPath: x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x21_002
     parentCanonicalPartId: x500v2_landing_gear
-    blenderName: GB70-M3-21-DING
+    blenderName: 
     sceneTypeKey: cap_screw_M3x21
     subtype: SocketCapScrew
     metric: M3
@@ -76,12 +77,13 @@ MonoBehaviour:
     driveType: Hex Socket
     threadPitchMm: 0.5
     turnCount: 12
-    material: Stainless steel
-    finish: Stainless
-    quantityExpected: 2
+    material: Unknown
+    finish: Unspecified
+    quantityExpected: 4
     isInspectable: 1
     fallbackReason: 
-    notes: Chassis fastening and tightening. Modeled from CAD GB70-M3-21-DING.
+    notes: Derived from temporary Unity proxy family naming only. Final Blender geometry
+      is expected to replace this proxy family later.
     recipeKey: cap_screw_M3x21_placeholder
     builderType: SocketCapScrew
     orientationMode: LongestAxis

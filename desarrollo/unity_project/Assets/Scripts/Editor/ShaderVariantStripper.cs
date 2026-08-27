@@ -19,7 +19,7 @@ namespace WebGL.Editor
         private static readonly HashSet<string> StripKeywords = new()
         {
             // Lighting variants we don't use
-            "_ADDITIONAL_LIGHTS",
+            // NOTE: _ADDITIONAL_LIGHTS is REQUIRED by the Studio softbox rig (Quality mode).
             "_ADDITIONAL_LIGHTS_VERTEX",
             "_ADDITIONAL_LIGHT_SHADOWS",
             
@@ -61,6 +61,10 @@ namespace WebGL.Editor
             if (UnityEditor.EditorUserBuildSettings.activeBuildTarget != UnityEditor.BuildTarget.WebGL)
                 return;
             #endif
+
+            // Do not strip core pipeline or blit utility shaders
+            if (shader == null || shader.name.StartsWith("Hidden/CoreSRP") || shader.name.StartsWith("Hidden/Universal"))
+                return;
             
             _totalCount += variants.Count;
             

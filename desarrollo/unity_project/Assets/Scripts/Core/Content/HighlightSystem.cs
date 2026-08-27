@@ -18,6 +18,11 @@ namespace WebGL.Core.Content
         [SerializeField] private Color parentSelectedColor = new Color(0.36f, 0.76f, 1f, 0.12f);
         [SerializeField] private Color hotspotGroupColor = new Color(1.0f, 0.78f, 0.24f, 0.2f);
 
+        private const float HoverHighlightIntensity = 0.28f;
+        private const float SelectedHighlightIntensity = 0.55f;
+        private const float ParentHighlightIntensity = 0.38f;
+        private const float HotspotHighlightIntensity = 0.50f;
+
         private MaterialController materialController;
         private bool isHovered = false;
         private bool isSelected = false;
@@ -37,7 +42,7 @@ namespace WebGL.Core.Content
         {
             isHovered = true;
             if (isSelected) return;
-            materialController.SetColor(hoverColor);
+            materialController.SetColor(hoverColor, HoverHighlightIntensity);
         }
 
         public void OnHoverExit()
@@ -61,7 +66,7 @@ namespace WebGL.Core.Content
             currentOverrideColor = null;
             if (isHovered)
             {
-                materialController.SetColor(hoverColor);
+                materialController.SetColor(hoverColor, HoverHighlightIntensity);
             }
             else
             {
@@ -90,7 +95,7 @@ namespace WebGL.Core.Content
 
             if (isHovered)
             {
-                materialController.SetColor(hoverColor);
+                materialController.SetColor(hoverColor, HoverHighlightIntensity);
                 return;
             }
 
@@ -107,19 +112,19 @@ namespace WebGL.Core.Content
             if (currentSelectionMode == SelectionVisualMode.SoftTint)
             {
                 materialController.ResetProperties();
-                materialController.SetColor(parentSelectedColor);
+                materialController.SetColor(parentSelectedColor, ParentHighlightIntensity);
                 return;
             }
 
             if (currentSelectionMode == SelectionVisualMode.HotspotGroupTint)
             {
                 materialController.ResetProperties();
-                materialController.SetColor(currentOverrideColor ?? hotspotGroupColor);
+                materialController.SetColor(currentOverrideColor ?? hotspotGroupColor, HotspotHighlightIntensity);
                 return;
             }
 
             materialController.ResetProperties();
-            materialController.SetColor(selectedColor);
+            materialController.SetColor(selectedColor, SelectedHighlightIntensity);
         }
     }
 }

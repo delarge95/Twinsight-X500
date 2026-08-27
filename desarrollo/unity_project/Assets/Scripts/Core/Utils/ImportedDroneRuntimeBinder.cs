@@ -20,8 +20,14 @@ namespace WebGL.Core.Utils
         [SerializeField] private bool bindOnStart = true;
         [SerializeField] private bool rebuildHotspotsWhenReady = true;
         [SerializeField] private bool logBindingSummary;
+        [SerializeField] private bool logRuntimeProxyPurge = true;
 
         private Coroutine bindRoutine;
+
+        private void Awake()
+        {
+            PurgeRuntimeProxyVisuals(ResolveDroneRoot(), logRuntimeProxyPurge, "Awake");
+        }
 
         private void Start()
         {
@@ -130,6 +136,7 @@ namespace WebGL.Core.Utils
         private void RepairImportedDrone(Transform droneRoot, FastenerRegistry registry)
         {
             Dictionary<string, ExplodablePart> anchorsById = BuildAnchorMap(droneRoot);
+            PurgeRuntimeProxyVisuals(droneRoot, false, "RepairImportedDrone");
             RestoreMisclassifiedStructuralFasteners(droneRoot, anchorsById);
             MovePrimitiveFastenersToRootGroup(droneRoot);
             ReparentTopLevelOrphans(droneRoot, anchorsById);
@@ -144,6 +151,102 @@ namespace WebGL.Core.Utils
             }
 
             SealLooseFastenerMetadata(droneRoot, registry);
+        }
+
+        // Los placeholders antiguos pueden estar serializados activos en la escena. Se
+        // desactivan antes de Start para que reactivar su anchor nunca los haga visibles.
+        // Las mallas FBX con "_PROXY_" (bateria, GPS, radio) son geometria real.
+        private static void PurgeRuntimeProxyVisuals(Transform droneRoot, bool logDetails, string phase)
+        {
+            if (droneRoot == null)
+            {
+                if (logDetails)
+                {
+                    Debug.LogWarning($"[ImportedDroneRuntimeBinder.ProxyPurge] phase={phase} root=NULL");
+                }
+
+                return;
+            }
+
+            int matched = 0;
+            int purged = 0;
+            int collidersRemoved = 0;
+            int restored = 0;
+            Renderer[] renderers = droneRoot.GetComponentsInChildren<Renderer>(true);
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                Renderer renderer = renderers[i];
+                if (renderer == null || renderer.transform == null)
+                {
+                    continue;
+                }
+
+                string name = renderer.transform.name;
+                if (ExplodedViewManager.IsRuntimeProxyVisual(name))
+                {
+                    bool wasEnabled = renderer.enabled;
+                    bool wasActive = renderer.gameObject.activeSelf;
+                    Collider[] staleColliders = renderer.GetComponentsInChildren<Collider>(true);
+
+                    renderer.enabled = false;
+                    for (int colliderIndex = 0; colliderIndex < staleColliders.Length; colliderIndex++)
+                    {
+                        Collider staleCollider = staleColliders[colliderIndex];
+                        if (staleCollider == null)
+                        {
+                            continue;
+                        }
+
+                        staleCollider.enabled = false;
+                        DestroyComponent(staleCollider);
+                        collidersRemoved++;
+                    }
+
+                    renderer.gameObject.SetActive(false);
+                    matched++;
+                    if (wasEnabled || wasActive || staleColliders.Length > 0)
+                    {
+                        purged++;
+                    }
+
+                    if (logDetails)
+                    {
+                        Debug.Log(
+                            $"[ImportedDroneRuntimeBinder.ProxyPurge] placeholder={GetHierarchyPath(renderer.transform)} " +
+                            $"rendererEnabled={wasEnabled} activeSelf={wasActive} colliders={staleColliders.Length}");
+                    }
+                }
+                else if (name.Contains("_PROXY_", StringComparison.OrdinalIgnoreCase) && !renderer.enabled)
+                {
+                    renderer.enabled = true;
+                    restored++;
+                }
+            }
+
+            if (logDetails || purged > 0 || restored > 0)
+            {
+                Debug.Log(
+                    $"[ImportedDroneRuntimeBinder.ProxyPurge] phase={phase} root={GetHierarchyPath(droneRoot)} " +
+                    $"matched={matched} purged={purged} collidersRemoved={collidersRemoved} realProxyMeshesRestored={restored}");
+            }
+        }
+
+        private static string GetHierarchyPath(Transform target)
+        {
+            if (target == null)
+            {
+                return "NULL";
+            }
+
+            string path = target.name;
+            Transform parent = target.parent;
+            while (parent != null)
+            {
+                path = parent.name + "/" + path;
+                parent = parent.parent;
+            }
+
+            return path;
         }
 
         private static List<ExplodablePart> CollectRuntimeAnchors(Transform droneRoot)
@@ -484,16 +587,24 @@ namespace WebGL.Core.Utils
                 return string.Empty;
             }
 
+            if (droneRoot != null)
+            {
+                Renderer candidateRenderer = candidate.GetComponentInChildren<Renderer>(true);
+                Vector3 candidatePosition = candidateRenderer != null ? candidateRenderer.bounds.center : candidate.position;
+                string worldSuffix = ResolveQuadrantSuffixFromWorld(candidatePosition, droneRoot);
+                if (!string.IsNullOrWhiteSpace(worldSuffix))
+                {
+                    return "x500v2_arm_" + worldSuffix;
+                }
+            }
+
             string explicitSuffix = ResolveStructuralInstanceSuffix(candidate.name);
             if (!string.IsNullOrWhiteSpace(explicitSuffix))
             {
                 return "x500v2_arm_" + explicitSuffix;
             }
 
-            Renderer renderer = candidate.GetComponentInChildren<Renderer>(true);
-            Vector3 position = renderer != null ? renderer.bounds.center : candidate.position;
-            string worldSuffix = ResolveQuadrantSuffixFromWorld(position, droneRoot);
-            return string.IsNullOrWhiteSpace(worldSuffix) ? string.Empty : "x500v2_arm_" + worldSuffix;
+            return string.Empty;
         }
 
         private static string ResolveStructuralInstanceSuffix(string rawName)
@@ -629,7 +740,7 @@ namespace WebGL.Core.Utils
                 if (cameraFront.sqrMagnitude > 0.000001f)
                 {
                     front = cameraFront.normalized;
-                    right = Vector3.Cross(Vector3.up, front).normalized;
+                    right = Vector3.Cross(front, Vector3.up).normalized;
                     return right.sqrMagnitude > 0.0001f;
                 }
             }
@@ -1132,6 +1243,11 @@ namespace WebGL.Core.Utils
         private static void EnsureSelectionCollider(Renderer renderer)
         {
             if (renderer == null)
+            {
+                return;
+            }
+
+            if (ExplodedViewManager.IsRuntimeProxyVisual(renderer.transform.name))
             {
                 return;
             }
@@ -3176,6 +3292,13 @@ namespace WebGL.Core.Utils
 
         private static string InferDisplayCategory(string rendererName, string fallbackCategory, string thermalSourceId)
         {
+            string searchableRendererName = (rendererName ?? string.Empty).ToLowerInvariant().Replace('_', '-');
+            if (searchableRendererName.Contains("motor") || searchableRendererName.Contains("prop") ||
+                searchableRendererName.Contains("esc") || searchableRendererName.Contains("dj-2216"))
+            {
+                return "PropulsionSystem";
+            }
+
             string normalized = (thermalSourceId ?? rendererName ?? string.Empty).ToLowerInvariant();
             if (normalized.Contains("motor") || normalized.Contains("prop") || normalized.Contains("esc"))
             {

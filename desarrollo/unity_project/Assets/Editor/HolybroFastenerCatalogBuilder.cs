@@ -529,6 +529,9 @@ internal static class HolybroFastenerCatalogBuilder
 
         Vector3 rootCenter = TryComputeWorldCenter(root, out Vector3 computedCenter) ? computedCenter : root.position;
         float distFromCenter = Vector3.Distance(new Vector3(worldPos.x, rootCenter.y, worldPos.z), rootCenter);
+        float armRadius = EstimateArmAnchorRadius(canonicalAnchors, rootCenter);
+        float centralZoneRadius = armRadius * 0.35f;
+        float batteryZoneRadius = armRadius * 0.55f;
 
         switch (key)
         {
@@ -540,7 +543,7 @@ internal static class HolybroFastenerCatalogBuilder
 
             case "cap_screw_m25x6":
                 // If far from central hub -> arm/motor quadrant; near center -> bottom plate
-                if (distFromCenter > 0.085f)
+                if (distFromCenter > centralZoneRadius)
                 {
                     return "x500v2_arm_" + quad;
                 }
@@ -548,7 +551,7 @@ internal static class HolybroFastenerCatalogBuilder
 
             case "cap_screw_m25x12":
                 // If near center -> rails_battery; if in arm zone -> arm quadrant
-                if (distFromCenter < 0.10f)
+                if (distFromCenter < batteryZoneRadius)
                 {
                     return "x500v2_rails_battery";
                 }
@@ -710,6 +713,38 @@ internal static class HolybroFastenerCatalogBuilder
         frontDir = (fl + fr) - (bl + br);
         rightDir = (fr + br) - (fl + bl);
         return frontDir.sqrMagnitude > 0.0000001f && rightDir.sqrMagnitude > 0.0000001f;
+    }
+
+    private static float EstimateArmAnchorRadius(IReadOnlyList<CanonicalAnchorCandidate> anchors, Vector3 center)
+    {
+        if (anchors == null || anchors.Count == 0)
+        {
+            return 1f;
+        }
+
+        float total = 0f;
+        int count = 0;
+        for (int i = 0; i < anchors.Count; i++)
+        {
+            CanonicalAnchorCandidate anchor = anchors[i];
+            if (anchor == null || string.IsNullOrWhiteSpace(anchor.CanonicalId))
+            {
+                continue;
+            }
+
+            string id = anchor.CanonicalId.ToLowerInvariant();
+            if (!id.Contains("arm_fl") && !id.Contains("arm_fr") && !id.Contains("arm_bl") && !id.Contains("arm_br"))
+            {
+                continue;
+            }
+
+            Vector3 offset = anchor.ReferencePosition - center;
+            offset.y = 0f;
+            total += offset.magnitude;
+            count++;
+        }
+
+        return count > 0 ? total / count : 1f;
     }
 
     private static bool TryComputeWorldCenter(Transform root, out Vector3 center)

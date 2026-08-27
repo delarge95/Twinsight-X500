@@ -1,0 +1,876 @@
+{
+    "exportedAtUtc": "2026-08-25T16:35:32.9498117Z",
+    "kind": "selection",
+    "scene": "Assets/Scenes/MainScene_Final.unity",
+    "entryCount": 28,
+    "entries": [
+        {
+            "objectName": "BAN-DJ-DIAN-F2.002_low",
+            "path": "x500v2_Drone/x500v2_blend_ban_dj_dian_f2/BAN-DJ-DIAN-F2.002_low",
+            "parentPath": "x500v2_Drone/x500v2_blend_ban_dj_dian_f2",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.832200050354004,
+                "y": 0.8130000233650208,
+                "z": -2.851900100708008
+            },
+            "worldRotation": {
+                "x": 270.0198059082031,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "BAN-DJ-DIAN-F2.002_low"
+            ],
+            "explodablePartId": "",
+            "explodablePartPath": "",
+            "canonicalPartId": "x500v2_blend_ban_dj_dian_f2",
+            "subpieceId": "",
+            "primaryCategory": "PropulsionSystem",
+            "auxiliaryCategory": "",
+            "thermalSourcePartId": "x500v2_blend_ban_dj_dian_f2",
+            "fastenerFamilyId": "",
+            "fastenerInstanceId": "",
+            "fastenerTypeKey": "",
+            "fastenerParentId": ""
+        },
+        {
+            "objectName": "HMX5V-DIGAI-DIANJIZUO-MUJU.002_low",
+            "path": "x500v2_Drone/x500v2_blend_hmx5v_digai_dianjizuo_muju/HMX5V-DIGAI-DIANJIZUO-MUJU.002_low",
+            "parentPath": "x500v2_Drone/x500v2_blend_hmx5v_digai_dianjizuo_muju",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.906899929046631,
+                "y": 0.6172999739646912,
+                "z": -2.9265999794006349
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "HMX5V-DIGAI-DIANJIZUO-MUJU.002_low"
+            ],
+            "explodablePartId": "",
+            "explodablePartPath": "",
+            "canonicalPartId": "x500v2_blend_hmx5v_digai_dianjizuo_muju",
+            "subpieceId": "",
+            "primaryCategory": "SkeletonAirframe",
+            "auxiliaryCategory": "",
+            "thermalSourcePartId": "x500v2_blend_hmx5v_digai_dianjizuo_muju",
+            "fastenerFamilyId": "",
+            "fastenerInstanceId": "",
+            "fastenerTypeKey": "",
+            "fastenerParentId": ""
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M25x10_002",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x10_002",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.4263999462127687,
+                "y": 0.7330999970436096,
+                "z": -2.1677000522613527
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M25-10.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M25x10_002",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x10_002",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M25x10_002",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M25x10_002",
+            "fastenerFamilyId": "holybro_cap_screw_m25x10",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M25x10_002",
+            "fastenerTypeKey": "cap_screw_M25x10",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M25x12_007",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x12_007",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.44950008392334,
+                "y": 0.7494000196456909,
+                "z": -2.746500015258789
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M25-12.002_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M25x12_007",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x12_007",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M25x12_007",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M25x12_007",
+            "fastenerFamilyId": "holybro_cap_screw_m25x12",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M25x12_007",
+            "fastenerTypeKey": "cap_screw_M25x12",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M25x6_012",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_012",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 3.21370005607605,
+                "y": 0.7986000180244446,
+                "z": -2.908600091934204
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M25-6.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M25x6_012",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_012",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M25x6_012",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M25x6_012",
+            "fastenerFamilyId": "holybro_cap_screw_m25x6",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M25x6_012",
+            "fastenerTypeKey": "cap_screw_M25x6",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "DJ-2216-KV880.004_low",
+            "path": "x500v2_Drone/x500v2_motor_FR/DJ-2216-KV880.004_low",
+            "parentPath": "x500v2_Drone/x500v2_motor_FR",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.8973000049591066,
+                "y": 1.0880000591278077,
+                "z": -2.9170000553131105
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 270.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "DJ-2216-KV880.002_low"
+            ],
+            "explodablePartId": "x500v2_motor_FR",
+            "explodablePartPath": "x500v2_Drone/x500v2_motor_FR",
+            "canonicalPartId": "x500v2_motor_FR",
+            "subpieceId": "",
+            "primaryCategory": "SkeletonAirframe",
+            "auxiliaryCategory": "",
+            "thermalSourcePartId": "x500v2_arm_FR",
+            "fastenerFamilyId": "",
+            "fastenerInstanceId": "",
+            "fastenerTypeKey": "",
+            "fastenerParentId": ""
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M25x6_013",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_013",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.8894999027252199,
+                "y": 0.7986000180244446,
+                "z": -3.232800006866455
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M25-6.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M25x6_013",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_013",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M25x6_013",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M25x6_013",
+            "fastenerFamilyId": "holybro_cap_screw_m25x6",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M25x6_013",
+            "fastenerTypeKey": "cap_screw_M25x6",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M25x6_015",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_015",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.8889000415802,
+                "y": 0.6391000151634216,
+                "z": -3.2334001064300539
+            },
+            "worldRotation": {
+                "x": 89.9802017211914,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M25-6.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M25x6_015",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_015",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M25x6_015",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M25x6_015",
+            "fastenerFamilyId": "holybro_cap_screw_m25x6",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M25x6_015",
+            "fastenerTypeKey": "cap_screw_M25x6",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M25x10_003",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x10_003",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.1484999656677248,
+                "y": 0.7330999970436096,
+                "z": -2.445499897003174
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M25-10.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M25x10_003",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x10_003",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M25x10_003",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M25x10_003",
+            "fastenerFamilyId": "holybro_cap_screw_m25x10",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M25x10_003",
+            "fastenerTypeKey": "cap_screw_M25x10",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M3x6_004",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x6_004",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 3.044800043106079,
+                "y": 0.8235999941825867,
+                "z": -2.908900022506714
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M3-6.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M3x6_004",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x6_004",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M3x6_004",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M3x6_004",
+            "fastenerFamilyId": "holybro_cap_screw_m3x6",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M3x6_004",
+            "fastenerTypeKey": "cap_screw_M3x6",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "HMX5V-ZUO-DJ-MUJU.002_low",
+            "path": "x500v2_Drone/x500v2_arm_FR/HMX5V-ZUO-DJ-MUJU.002_low",
+            "parentPath": "x500v2_Drone/x500v2_arm_FR",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.680799961090088,
+                "y": 0.7311000227928162,
+                "z": -2.700500011444092
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "HMX5V-ZUO-DJ-MUJU.002_low"
+            ],
+            "explodablePartId": "x500v2_arm_FR",
+            "explodablePartPath": "x500v2_Drone/x500v2_arm_FR",
+            "canonicalPartId": "x500v2_arm_FR",
+            "subpieceId": "hmx5v-zuo-dj-muju",
+            "primaryCategory": "SkeletonAirframe",
+            "auxiliaryCategory": "",
+            "thermalSourcePartId": "x500v2_arm_FR",
+            "fastenerFamilyId": "",
+            "fastenerInstanceId": "",
+            "fastenerTypeKey": "",
+            "fastenerParentId": ""
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M25x12_006",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x12_006",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.727400064468384,
+                "y": 0.7494000196456909,
+                "z": -2.4686999320983888
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M25-12.002_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M25x12_006",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x12_006",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M25x12_006",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M25x12_006",
+            "fastenerFamilyId": "holybro_cap_screw_m25x12",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M25x12_006",
+            "fastenerTypeKey": "cap_screw_M25x12",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M3x6_005",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x6_005",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.7337000370025636,
+                "y": 0.8235999941825867,
+                "z": -2.908900022506714
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M3-6.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M3x6_005",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x6_005",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M3x6_005",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M3x6_005",
+            "fastenerFamilyId": "holybro_cap_screw_m3x6",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M3x6_005",
+            "fastenerTypeKey": "cap_screw_M3x6",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M3x6_007",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x6_007",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.88919997215271,
+                "y": 0.8235999941825867,
+                "z": -3.039900064468384
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M3-6.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M3x6_007",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x6_007",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M3x6_007",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M3x6_007",
+            "fastenerFamilyId": "holybro_cap_screw_m3x6",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M3x6_007",
+            "fastenerTypeKey": "cap_screw_M3x6",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M3x6_006",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x6_006",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.88919997215271,
+                "y": 0.8235999941825867,
+                "z": -2.777899980545044
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M3-6.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M3x6_006",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x6_006",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M3x6_006",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M3x6_006",
+            "fastenerFamilyId": "holybro_cap_screw_m3x6",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M3x6_006",
+            "fastenerTypeKey": "cap_screw_M3x6",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M25x6_014",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_014",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 3.213099956512451,
+                "y": 0.6391000151634216,
+                "z": -2.9091999530792238
+            },
+            "worldRotation": {
+                "x": 89.9802017211914,
+                "y": 180.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M25-6.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M25x6_014",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x6_014",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M25x6_014",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M25x6_014",
+            "fastenerFamilyId": "holybro_cap_screw_m25x6",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M25x6_014",
+            "fastenerTypeKey": "cap_screw_M25x6",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_prop_FR",
+            "path": "x500v2_Drone/x500v2_arm_FR/x500v2_prop_FR",
+            "parentPath": "x500v2_Drone/x500v2_arm_FR",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 2.901400089263916,
+                "y": 1.5256999731063843,
+                "z": -2.8812999725341799
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 249.99330139160157,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "x500v2_propeller_instance_1"
+            ],
+            "explodablePartId": "x500v2_arm_FR",
+            "explodablePartPath": "x500v2_Drone/x500v2_arm_FR",
+            "canonicalPartId": "x500v2_arm_FR",
+            "subpieceId": "",
+            "primaryCategory": "SkeletonAirframe",
+            "auxiliaryCategory": "",
+            "thermalSourcePartId": "x500v2_arm_FR",
+            "fastenerFamilyId": "",
+            "fastenerInstanceId": "",
+            "fastenerTypeKey": "",
+            "fastenerParentId": ""
+        },
+        {
+            "objectName": "HMX5V-GUAN-DINGWEI.002_low",
+            "path": "x500v2_Drone/x500v2_arm_FR/HMX5V-GUAN-DINGWEI.002_low",
+            "parentPath": "x500v2_Drone/x500v2_arm_FR",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 1.708400011062622,
+                "y": 0.7311000227928162,
+                "z": -1.7280999422073365
+            },
+            "worldRotation": {
+                "x": 270.0198059082031,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "HMX5V-GUAN-DINGWEI.002_low"
+            ],
+            "explodablePartId": "x500v2_arm_FR",
+            "explodablePartPath": "x500v2_Drone/x500v2_arm_FR",
+            "canonicalPartId": "x500v2_arm_FR",
+            "subpieceId": "hmx5v-guan-dingwei",
+            "primaryCategory": "SkeletonAirframe",
+            "auxiliaryCategory": "",
+            "thermalSourcePartId": "x500v2_arm_FR",
+            "fastenerFamilyId": "",
+            "fastenerInstanceId": "",
+            "fastenerTypeKey": "",
+            "fastenerParentId": ""
+        },
+        {
+            "objectName": "HMX5V-JIBI-JIA-MUJU.003_low",
+            "path": "x500v2_Drone/x500v2_arm_FR/HMX5V-JIBI-JIA-MUJU.003_low",
+            "parentPath": "x500v2_Drone/x500v2_arm_FR",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 0.9010000228881836,
+                "y": 0.6157000064849854,
+                "z": -0.9207000136375427
+            },
+            "worldRotation": {
+                "x": 270.0198059082031,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "HMX5V-JIBI-JIA-MUJU.002_low"
+            ],
+            "explodablePartId": "x500v2_arm_FR",
+            "explodablePartPath": "x500v2_Drone/x500v2_arm_FR",
+            "canonicalPartId": "x500v2_arm_FR",
+            "subpieceId": "hmx5v-jibi-jia-muju",
+            "primaryCategory": "SkeletonAirframe",
+            "auxiliaryCategory": "",
+            "thermalSourcePartId": "x500v2_arm_FR",
+            "fastenerFamilyId": "",
+            "fastenerInstanceId": "",
+            "fastenerTypeKey": "",
+            "fastenerParentId": ""
+        },
+        {
+            "objectName": "HMX5V-JIBI-JIA-MUJU.004_low",
+            "path": "x500v2_Drone/x500v2_arm_FR/HMX5V-JIBI-JIA-MUJU.004_low",
+            "parentPath": "x500v2_Drone/x500v2_arm_FR",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 0.9010000228881836,
+                "y": 0.8464999794960022,
+                "z": -0.9207000136375427
+            },
+            "worldRotation": {
+                "x": 90.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "HMX5V-JIBI-JIA-MUJU.002_low"
+            ],
+            "explodablePartId": "x500v2_arm_FR",
+            "explodablePartPath": "x500v2_Drone/x500v2_arm_FR",
+            "canonicalPartId": "x500v2_arm_FR",
+            "subpieceId": "hmx5v-jibi-jia-muju",
+            "primaryCategory": "SkeletonAirframe",
+            "auxiliaryCategory": "",
+            "thermalSourcePartId": "x500v2_arm_FR",
+            "fastenerFamilyId": "",
+            "fastenerInstanceId": "",
+            "fastenerTypeKey": "",
+            "fastenerParentId": ""
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M3x38_005",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x38_005",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 0.828499972820282,
+                "y": 0.7041000127792358,
+                "z": -1.1029000282287598
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M3-38.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M3x38_005",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x38_005",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M3x38_005",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M3x38_005",
+            "fastenerFamilyId": "holybro_cap_screw_m3x38",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M3x38_005",
+            "fastenerTypeKey": "cap_screw_M3x38",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M3x38_004",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x38_004",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 1.0831999778747559,
+                "y": 0.7041000127792358,
+                "z": -0.8482000231742859
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M3-38.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M3x38_004",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x38_004",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M3x38_004",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M3x38_004",
+            "fastenerFamilyId": "holybro_cap_screw_m3x38",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M3x38_004",
+            "fastenerTypeKey": "cap_screw_M3x38",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M3x38_007",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x38_007",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 0.9442999958992004,
+                "y": 0.7041000127792358,
+                "z": -0.7092999815940857
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M3-38.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M3x38_007",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x38_007",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M3x38_007",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M3x38_007",
+            "fastenerFamilyId": "holybro_cap_screw_m3x38",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M3x38_007",
+            "fastenerTypeKey": "cap_screw_M3x38",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.cap_screw_M3x38_006",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x38_006",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 0.6895999908447266,
+                "y": 0.7041000127792358,
+                "z": -0.9639999866485596
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "GB70-M3-38.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_cap_screw_M3x38_006",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M3x38_006",
+            "canonicalPartId": "x500v2_fastener_cap_screw_M3x38_006",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_cap_screw_M3x38_006",
+            "fastenerFamilyId": "holybro_cap_screw_m3x38",
+            "fastenerInstanceId": "x500v2_fastener_cap_screw_M3x38_006",
+            "fastenerTypeKey": "cap_screw_M3x38",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.flange_nut_M3_005",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.flange_nut_M3_005",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 1.0831999778747559,
+                "y": 0.42980000376701357,
+                "z": -0.8482000231742859
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "ZSLM-M3-FALAN.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_flange_nut_M3_005",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.flange_nut_M3_005",
+            "canonicalPartId": "x500v2_fastener_flange_nut_M3_005",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_flange_nut_M3_005",
+            "fastenerFamilyId": "holybro_flange_nut_m3",
+            "fastenerInstanceId": "x500v2_fastener_flange_nut_M3_005",
+            "fastenerTypeKey": "flange_nut_M3",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.flange_nut_M3_006",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.flange_nut_M3_006",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 0.828499972820282,
+                "y": 0.42980000376701357,
+                "z": -1.1029000282287598
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "ZSLM-M3-FALAN.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_flange_nut_M3_006",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.flange_nut_M3_006",
+            "canonicalPartId": "x500v2_fastener_flange_nut_M3_006",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_flange_nut_M3_006",
+            "fastenerFamilyId": "holybro_flange_nut_m3",
+            "fastenerInstanceId": "x500v2_fastener_flange_nut_M3_006",
+            "fastenerTypeKey": "flange_nut_M3",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.flange_nut_M3_007",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.flange_nut_M3_007",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 0.6895999908447266,
+                "y": 0.42980000376701357,
+                "z": -0.9639999866485596
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "ZSLM-M3-FALAN.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_flange_nut_M3_007",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.flange_nut_M3_007",
+            "canonicalPartId": "x500v2_fastener_flange_nut_M3_007",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_flange_nut_M3_007",
+            "fastenerFamilyId": "holybro_flange_nut_m3",
+            "fastenerInstanceId": "x500v2_fastener_flange_nut_M3_007",
+            "fastenerTypeKey": "flange_nut_M3",
+            "fastenerParentId": "x500v2_arm_FR"
+        },
+        {
+            "objectName": "x500v2_fastener.flange_nut_M3_004",
+            "path": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.flange_nut_M3_004",
+            "parentPath": "x500v2_Drone/x500v2_fastener_group",
+            "layer": "SelectablePart",
+            "worldPosition": {
+                "x": 0.9442999958992004,
+                "y": 0.42980000376701357,
+                "z": -0.7092999815940857
+            },
+            "worldRotation": {
+                "x": 270.0,
+                "y": 90.0,
+                "z": 0.0
+            },
+            "hasRenderer": true,
+            "meshNames": [
+                "ZSLM-M3-FALAN.001_low_PRIM"
+            ],
+            "explodablePartId": "x500v2_fastener_flange_nut_M3_004",
+            "explodablePartPath": "x500v2_Drone/x500v2_fastener_group/x500v2_fastener.flange_nut_M3_004",
+            "canonicalPartId": "x500v2_fastener_flange_nut_M3_004",
+            "subpieceId": "",
+            "primaryCategory": "Fasteners",
+            "auxiliaryCategory": "Fasteners",
+            "thermalSourcePartId": "x500v2_fastener_flange_nut_M3_004",
+            "fastenerFamilyId": "holybro_flange_nut_m3",
+            "fastenerInstanceId": "x500v2_fastener_flange_nut_M3_004",
+            "fastenerTypeKey": "flange_nut_M3",
+            "fastenerParentId": "x500v2_arm_FR"
+        }
+    ]
+}

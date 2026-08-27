@@ -66,7 +66,7 @@ MonoBehaviour:
     sourceId: 
     sceneObjectName: x500v2_fastener.lock_nut_M3_001
     hierarchyPath: x500v2_Drone/x500v2_fastener_group/x500v2_fastener.lock_nut_M3_001
-    parentCanonicalPartId: x500v2_landing_gear
+    parentCanonicalPartId: x500v2_power_module
     blenderName: 
     sceneTypeKey: lock_nut_M3
     subtype: CapNut
@@ -79,7 +79,7 @@ MonoBehaviour:
     turnCount: 0
     material: Unknown
     finish: Unspecified
-    quantityExpected: 18
+    quantityExpected: 20
     isInspectable: 1
     fallbackReason: 
     notes: Derived from temporary Unity proxy family naming only. Final Blender geometry

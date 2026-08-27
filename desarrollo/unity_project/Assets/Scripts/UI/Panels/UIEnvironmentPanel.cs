@@ -312,7 +312,10 @@ namespace WebGL.UI.Panels
         private void ApplyAndHighlight(string presetName, string buttonKey)
         {
             if (ServiceLocator.TryGet<EnvironmentController>(out var env))
+            {
                 env.ApplyPreset(presetName);
+                _envLightIntSlider?.SetValueWithoutNotify(env.GetPresetIntensity(presetName));
+            }
             _activePreset = buttonKey;
             UpdateEnvPresetActiveState(buttonKey);
         }

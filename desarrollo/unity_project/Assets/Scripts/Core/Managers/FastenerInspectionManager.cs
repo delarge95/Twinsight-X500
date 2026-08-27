@@ -343,6 +343,11 @@ namespace WebGL.Core.Managers
                     continue;
                 }
 
+                if (ExplodedViewManager.IsRuntimeProxyVisual(renderer.transform.name))
+                {
+                    continue;
+                }
+
                 renderer.enabled = false;
                 inspection.HiddenProxyRenderers.Add(renderer);
             }
@@ -419,7 +424,7 @@ namespace WebGL.Core.Managers
             for (int i = 0; i < inspection.HiddenProxyRenderers.Count; i++)
             {
                 Renderer renderer = inspection.HiddenProxyRenderers[i];
-                if (renderer != null)
+                if (renderer != null && !ExplodedViewManager.IsRuntimeProxyVisual(renderer.transform.name))
                 {
                     renderer.enabled = true;
                 }

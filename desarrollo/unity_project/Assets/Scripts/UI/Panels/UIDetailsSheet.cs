@@ -1380,6 +1380,9 @@ namespace WebGL.UI.Panels
             if (lookup.Contains("MISC-FRAME-CONNECTOR")) return "Auxiliary Frame Connector";
             if (lookup.Contains("MISC-LIGHT-COVER")) return "Auxiliary Light Cover";
             if (lookup.Contains("FASTENER-GROUP")) return "Fastener Set";
+            if (lookup.Contains("RUBBER")) return "Silicone Vibration Dampener";
+            if (lookup.Contains("BATTERY-STRAP") || lookup.Contains("BATTERY STRAP")) return "Battery Strap";
+            if (lookup.Contains("LIPO")) return "LiPo Battery";
             return string.Empty;
         }
 

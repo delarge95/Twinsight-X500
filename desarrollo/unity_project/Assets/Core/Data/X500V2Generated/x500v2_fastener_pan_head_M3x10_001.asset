@@ -79,7 +79,7 @@ MonoBehaviour:
     turnCount: 12
     material: Unknown
     finish: Unspecified
-    quantityExpected: 5
+    quantityExpected: 6
     isInspectable: 1
     fallbackReason: 
     notes: Derived from temporary Unity proxy family naming only. Final Blender geometry

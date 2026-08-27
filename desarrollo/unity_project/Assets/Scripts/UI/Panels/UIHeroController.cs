@@ -21,24 +21,27 @@ namespace WebGL.UI.Panels
         private static extern void X500V2ExitToLanding();
 #endif
 
-        public enum SubmenuType { Devices, About, Exit }
+        public enum SubmenuType { Devices, About, Config, Exit }
 
         // ── Elements ──
         private readonly VisualElement _heroContainer;
         private readonly VisualElement _heroMain;
         private readonly VisualElement _submenuDevices;
         private readonly VisualElement _submenuAbout;
+        private readonly VisualElement _submenuConfig;
         private readonly VisualElement _submenuExit;
         private readonly VisualElement _root;
         private readonly Button _languageBtn;
         private readonly Label _languageEnLabel;
         private readonly Label _languageEsLabel;
+        private readonly UIQualityConfigPanel _configPanel;
 
         // ── State ──
         public bool HeroDismissed { get; private set; } = false;
         public bool HasOpenSubmenu =>
             (_submenuDevices != null && _submenuDevices.ClassListContains("hero-submenu--active")) ||
             (_submenuAbout != null && _submenuAbout.ClassListContains("hero-submenu--active")) ||
+            (_submenuConfig != null && _submenuConfig.ClassListContains("hero-submenu--active")) ||
             (_submenuExit != null && _submenuExit.ClassListContains("hero-submenu--active"));
 
         // ── Cleanup ──
@@ -56,10 +59,12 @@ namespace WebGL.UI.Panels
             _heroMain = root.Q<VisualElement>("HeroMain");
             _submenuDevices = root.Q<VisualElement>("HeroSubmenu_Devices");
             _submenuAbout = root.Q<VisualElement>("HeroSubmenu_About");
+            _submenuConfig = root.Q<VisualElement>("HeroSubmenu_Config");
             _submenuExit = root.Q<VisualElement>("HeroSubmenu_Exit");
             _languageBtn = root.Q<Button>("HeroLanguageBtn");
             _languageEnLabel = root.Q<Label>("HeroLangEnLabel");
             _languageEsLabel = root.Q<Label>("HeroLangEsLabel");
+            _configPanel = new UIQualityConfigPanel(root);
 
             AppLanguageManager.LanguageChanged += OnLanguageChanged;
             AddCleanup(() => AppLanguageManager.LanguageChanged -= OnLanguageChanged);
@@ -77,6 +82,7 @@ namespace WebGL.UI.Panels
             OnHeroDismissed = null;
             OnHeroReturned = null;
             OnHelpRequested = null;
+            _configPanel?.Dispose();
             foreach (var action in _cleanupActions) action?.Invoke();
             _cleanupActions.Clear();
         }
@@ -119,6 +125,7 @@ namespace WebGL.UI.Panels
 
             if (_submenuDevices != null) _submenuDevices.RemoveFromClassList("hero-submenu--active");
             if (_submenuAbout != null) _submenuAbout.RemoveFromClassList("hero-submenu--active");
+            if (_submenuConfig != null) _submenuConfig.RemoveFromClassList("hero-submenu--active");
             if (_submenuExit != null) _submenuExit.RemoveFromClassList("hero-submenu--active");
 
             switch (type)
@@ -128,6 +135,9 @@ namespace WebGL.UI.Panels
                     break;
                 case SubmenuType.About:
                     if (_submenuAbout != null) _submenuAbout.AddToClassList("hero-submenu--active");
+                    break;
+                case SubmenuType.Config:
+                    if (_submenuConfig != null) _submenuConfig.AddToClassList("hero-submenu--active");
                     break;
                 case SubmenuType.Exit:
                     if (_submenuExit != null) _submenuExit.AddToClassList("hero-submenu--active");
@@ -139,6 +149,7 @@ namespace WebGL.UI.Panels
         {
             if (_submenuDevices != null) _submenuDevices.RemoveFromClassList("hero-submenu--active");
             if (_submenuAbout != null) _submenuAbout.RemoveFromClassList("hero-submenu--active");
+            if (_submenuConfig != null) _submenuConfig.RemoveFromClassList("hero-submenu--active");
             if (_submenuExit != null) _submenuExit.RemoveFromClassList("hero-submenu--active");
             if (_heroMain != null) _heroMain.style.display = DisplayStyle.Flex;
         }
@@ -178,7 +189,8 @@ namespace WebGL.UI.Panels
         {
             var heroExploreBtn = _root.Q<Button>("HeroExploreBtn");
             var heroDeviceBtn = _root.Q<Button>("HeroDeviceBtn");
-            var heroAboutBtn = _root.Q<Button>("HeroAboutBtn");
+            var heroConfigBtn = _root.Q<Button>("HeroConfigBtn");
+            var heroInfoBtn = _root.Q<Button>("HeroInfoBtn");
             var heroExitBtn = _root.Q<Button>("HeroExitBtn");
             var heroLanguageBtn = _root.Q<Button>("HeroLanguageBtn");
 
@@ -197,9 +209,11 @@ namespace WebGL.UI.Panels
             // Submenu navigation
             System.Action onDevices = () => OpenHeroSubmenu(SubmenuType.Devices);
             System.Action onAbout = () => OpenHeroSubmenu(SubmenuType.About);
+            System.Action onConfig = () => OpenHeroSubmenu(SubmenuType.Config);
             System.Action onExit = () => OpenHeroSubmenu(SubmenuType.Exit);
             if (heroDeviceBtn != null) { heroDeviceBtn.clicked += onDevices; AddCleanup(() => heroDeviceBtn.clicked -= onDevices); }
-            if (heroAboutBtn != null) { heroAboutBtn.clicked += onAbout; AddCleanup(() => heroAboutBtn.clicked -= onAbout); }
+            if (heroInfoBtn != null) { heroInfoBtn.clicked += onAbout; AddCleanup(() => heroInfoBtn.clicked -= onAbout); }
+            if (heroConfigBtn != null) { heroConfigBtn.clicked += onConfig; AddCleanup(() => heroConfigBtn.clicked -= onConfig); }
             if (heroExitBtn != null) { heroExitBtn.clicked += onExit; AddCleanup(() => heroExitBtn.clicked -= onExit); }
             if (heroLanguageBtn != null)
             {
@@ -236,9 +250,11 @@ namespace WebGL.UI.Panels
             // Back buttons
             var backDevices = _root.Q<Button>("SubmenuBackBtn_Devices");
             var backAbout = _root.Q<Button>("SubmenuBackBtn_About");
+            var backConfig = _root.Q<Button>("SubmenuBackBtn_Config");
             var backExit = _root.Q<Button>("SubmenuBackBtn_Exit");
             if (backDevices != null) { backDevices.clicked += CloseHeroSubmenu; AddCleanup(() => backDevices.clicked -= CloseHeroSubmenu); }
             if (backAbout != null) { backAbout.clicked += CloseHeroSubmenu; AddCleanup(() => backAbout.clicked -= CloseHeroSubmenu); }
+            if (backConfig != null) { backConfig.clicked += CloseHeroSubmenu; AddCleanup(() => backConfig.clicked -= CloseHeroSubmenu); }
             if (backExit != null) { backExit.clicked += CloseHeroSubmenu; AddCleanup(() => backExit.clicked -= CloseHeroSubmenu); }
 
             // Exit confirmation

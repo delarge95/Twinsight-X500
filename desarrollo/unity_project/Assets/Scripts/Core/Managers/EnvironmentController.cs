@@ -69,7 +69,28 @@ namespace WebGL.Core.Managers
 
             EnsureStudioLightRig();
             EnsureSkyboxMaterial();
+            RenderQualityController.OnTierChanged += HandleQualityTierChanged;
             ApplyPreset("Studio");
+        }
+
+        private void OnDestroy()
+        {
+            RenderQualityController.OnTierChanged -= HandleQualityTierChanged;
+        }
+
+        private void HandleQualityTierChanged(QualityTier tier)
+        {
+            ApplyPreset(_currentPreset);
+        }
+
+        public float GetPresetIntensity(string presetName)
+        {
+            return GetPresetData(presetName).lightIntensity;
+        }
+
+        public void RefreshLightingForQualityChange()
+        {
+            ApplyPreset(_currentPreset);
         }
 
         private void EnsureStudioLightRig()
@@ -133,7 +154,7 @@ namespace WebGL.Core.Managers
             light.name = lightName;
             light.type = LightType.Spot;
             light.shadows = LightShadows.None;
-            light.renderMode = LightRenderMode.ForcePixel;
+            light.renderMode = LightRenderMode.Auto;
             light.spotAngle = spotAngle;
             light.innerSpotAngle = Mathf.Clamp(spotAngle * 0.62f, 12f, spotAngle);
             light.enabled = true;
@@ -164,7 +185,7 @@ namespace WebGL.Core.Managers
 
         public void SetLightIntensity(float intensity)
         {
-            intensity = Mathf.Clamp(intensity, 0.1f, 3f);
+            intensity = Mathf.Clamp(intensity, 0f, 10f);
 
             if (directionalLight != null)
                 directionalLight.intensity = intensity;
@@ -217,9 +238,9 @@ namespace WebGL.Core.Managers
                     return new PresetData {
                         topColor       = new Color(0.16f, 0.17f, 0.19f),
                         bottomColor    = new Color(0.018f, 0.019f, 0.024f),
-                        lightColor     = new Color(1f, 0.985f, 0.94f),
-                        lightIntensity = 2.25f,
-                        lightRotY = 36f, lightPitch = 52f,
+                        lightColor     = new Color(1f, 0.97f, 0.92f),
+                        lightIntensity = 2.4f,
+                        lightRotY = 36f, lightPitch = 55f,
                         pulseEnabled = true, pulseSpeed = 0.35f, gradientScale = 0.82f,
                         ditherStrength = 0.05f
                     };
@@ -229,8 +250,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.82f, 0.82f, 0.84f),  // soft light grey
                         bottomColor    = new Color(0.55f, 0.55f, 0.58f),  // mid grey edge
                         lightColor     = new Color(1f, 0.98f, 0.95f),     // warm white
-                        lightIntensity = 2.35f,
-                        lightRotY = 34f, lightPitch = 50f,
+                        lightIntensity = 2.6f,
+                        lightRotY = 34f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.4f,
                         ditherStrength = 0.03f
                     };
@@ -240,7 +261,7 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.92f, 0.94f, 0.98f),    // warm white center
                         bottomColor    = new Color(0.45f, 0.62f, 0.82f),    // sky blue edge
                         lightColor     = new Color(1f, 0.98f, 0.92f),
-                        lightIntensity = 1.6f,
+                        lightIntensity = 2.8f,
                         lightRotY = 120f, lightPitch = 55f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.35f,
                         ditherStrength = 0.05f
@@ -251,8 +272,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.95f, 0.72f, 0.35f),    // warm gold center
                         bottomColor    = new Color(0.18f, 0.06f, 0.22f),    // deep purple edge
                         lightColor     = new Color(1f, 0.65f, 0.3f),
-                        lightIntensity = 1.5f,
-                        lightRotY = 220f, lightPitch = 15f,
+                        lightIntensity = 2.4f,
+                        lightRotY = 220f, lightPitch = 24f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.25f,
                         ditherStrength = 0.05f
                     };
@@ -262,7 +283,7 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.01f, 0.015f, 0.04f),   // original dark indigo
                         bottomColor    = new Color(0.002f, 0.002f, 0.008f), // near-black edge
                         lightColor     = new Color(0.5f, 0.6f, 1f),
-                        lightIntensity = 0.4f,
+                        lightIntensity = 1.1f,
                         lightRotY = 180f, lightPitch = 60f,
                         pulseEnabled = true, pulseSpeed = 0.3f, gradientScale = 1.1f,
                         ditherStrength = 0.05f
@@ -273,7 +294,7 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.12f, 0.22f, 0.45f),   // blueprint blue center
                         bottomColor    = new Color(0.04f, 0.08f, 0.18f),   // dark navy edge
                         lightColor     = new Color(0.7f, 0.85f, 1f),
-                        lightIntensity = 0.8f,
+                        lightIntensity = 1.5f,
                         lightRotY = 90f, lightPitch = 45f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.0f,
                         ditherStrength = 0.12f,
@@ -286,8 +307,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.95f, 0.95f, 0.95f),
                         bottomColor    = new Color(0.72f, 0.72f, 0.74f),
                         lightColor     = new Color(1f, 0.98f, 0.95f),
-                        lightIntensity = 1.0f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 2.2f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.45f,
                         ditherStrength = 0.05f
                     };
@@ -297,8 +318,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.30f, 0.30f, 0.32f),    // darkened for WCAG AA contrast with light icons
                         bottomColor    = new Color(0.10f, 0.10f, 0.11f),
                         lightColor     = Color.white,
-                        lightIntensity = 1.0f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 2.0f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.35f,
                         ditherStrength = 0.05f
                     };
@@ -308,8 +329,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.06f, 0.06f, 0.06f),
                         bottomColor    = new Color(0.01f, 0.01f, 0.01f),
                         lightColor     = Color.white,
-                        lightIntensity = 1.2f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 1.8f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.25f,
                         ditherStrength = 0.05f
                     };
@@ -319,8 +340,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.95f, 0.88f, 0.55f),    // soft warm yellow
                         bottomColor    = new Color(0.35f, 0.25f, 0.05f),    // dark amber
                         lightColor     = new Color(1f, 0.95f, 0.80f),       // warm tint on model
-                        lightIntensity = 1.1f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 2.0f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.3f,
                         ditherStrength = 0.05f
                     };
@@ -330,8 +351,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.95f, 0.62f, 0.35f),    // soft peach
                         bottomColor    = new Color(0.30f, 0.10f, 0.02f),    // dark rust
                         lightColor     = new Color(1f, 0.82f, 0.65f),       // warm orange tint
-                        lightIntensity = 1.1f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 2.0f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.3f,
                         ditherStrength = 0.05f
                     };
@@ -341,8 +362,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.45f, 0.75f, 0.52f),    // soft sage
                         bottomColor    = new Color(0.05f, 0.18f, 0.08f),    // deep forest
                         lightColor     = new Color(0.85f, 1f, 0.88f),       // green tint on model
-                        lightIntensity = 1.0f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 1.9f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.3f,
                         ditherStrength = 0.05f
                     };
@@ -352,8 +373,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.35f, 0.55f, 0.88f),    // soft cerulean
                         bottomColor    = new Color(0.04f, 0.08f, 0.25f),    // deep navy
                         lightColor     = new Color(0.80f, 0.88f, 1f),       // cool blue tint
-                        lightIntensity = 1.0f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 1.9f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.3f,
                         ditherStrength = 0.05f
                     };
@@ -363,8 +384,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.65f, 0.48f, 0.82f),    // brighter lavender (WCAG AA with dark icons)
                         bottomColor    = new Color(0.12f, 0.05f, 0.22f),    // deep plum
                         lightColor     = new Color(0.90f, 0.82f, 1f),       // purple tint
-                        lightIntensity = 1.0f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 1.9f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.3f,
                         ditherStrength = 0.05f
                     };
@@ -374,8 +395,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.88f, 0.42f, 0.38f),    // brighter terracotta (WCAG AA with dark icons)
                         bottomColor    = new Color(0.22f, 0.04f, 0.04f),    // deep maroon
                         lightColor     = new Color(1f, 0.85f, 0.82f),       // warm red tint
-                        lightIntensity = 1.0f,
-                        lightRotY = 45f, lightPitch = 50f,
+                        lightIntensity = 1.9f,
+                        lightRotY = 45f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.3f,
                         ditherStrength = 0.05f
                     };
@@ -386,8 +407,8 @@ namespace WebGL.Core.Managers
                         topColor       = new Color(0.18f, 0.18f, 0.20f),
                         bottomColor    = new Color(0.05f, 0.05f, 0.06f),
                         lightColor     = Color.white,
-                        lightIntensity = 1f,
-                        lightRotY = 0f, lightPitch = 50f,
+                        lightIntensity = 1.9f,
+                        lightRotY = 0f, lightPitch = 52f,
                         pulseEnabled = false, pulseSpeed = 0f, gradientScale = 1.25f,
                         ditherStrength = 0.05f
                     };
@@ -529,20 +550,24 @@ namespace WebGL.Core.Managers
 
         private void ResolveAmbientLighting(PresetData target, float bgFactor, out Color skyLighting, out Color equatorLighting, out Color groundLighting)
         {
+            // Sin softboxes (Low/Medium u override avanzado) el ambient compensa
+            // la falta de luces de relleno para que el drone no se vea plano.
+            float ambientBoost = RenderQualityController.SoftboxesEnabled ? 1f : 1.45f;
+
             if (IsStudioLightingPreset(_currentPreset))
             {
-                float exposure = Mathf.Clamp(target.lightIntensity, 1.25f, 2.8f);
-                skyLighting = Color.Lerp(target.lightColor, new Color(0.74f, 0.80f, 0.90f, 1f), 0.34f) * (0.34f * exposure);
-                equatorLighting = Color.Lerp(target.lightColor, new Color(0.55f, 0.62f, 0.72f, 1f), 0.48f) * (0.27f * exposure);
-                groundLighting = new Color(0.36f, 0.40f, 0.48f, 1f) * (0.23f * exposure);
+                float exposure = Mathf.Clamp(target.lightIntensity, 1.25f, 3.4f);
+                skyLighting = Color.Lerp(target.lightColor, new Color(0.74f, 0.80f, 0.90f, 1f), 0.34f) * (0.34f * exposure * ambientBoost);
+                equatorLighting = Color.Lerp(target.lightColor, new Color(0.55f, 0.62f, 0.72f, 1f), 0.48f) * (0.27f * exposure * ambientBoost);
+                groundLighting = new Color(0.36f, 0.40f, 0.48f, 1f) * (0.23f * exposure * ambientBoost);
             }
             else
             {
                 Color top = target.topColor * bgFactor;
                 Color bottom = target.bottomColor * bgFactor;
-                skyLighting = top * 0.72f;
-                equatorLighting = Color.Lerp(top, bottom, 0.5f) * 0.62f;
-                groundLighting = new Color(0.4f, 0.45f, 0.5f, 1f) * (target.lightIntensity * 0.42f);
+                skyLighting = top * (0.72f * ambientBoost);
+                equatorLighting = Color.Lerp(top, bottom, 0.5f) * (0.62f * ambientBoost);
+                groundLighting = new Color(0.4f, 0.45f, 0.5f, 1f) * (target.lightIntensity * 0.42f * ambientBoost);
             }
 
             skyLighting.a = 1f;
@@ -559,6 +584,7 @@ namespace WebGL.Core.Managers
         private void ApplySupplementalStudioLighting(Color keyColor, float keyIntensity, Vector3 keyEuler)
         {
             ResolveStudioTarget(out Vector3 targetCenter, out float targetRadius);
+            bool performanceMode = !RenderQualityController.SoftboxesEnabled;
             float studioBoost = IsStudioLightingPreset(_currentPreset) ? 1f : 0.62f;
             Color coolSoftbox = new Color(0.68f, 0.78f, 1f, 1f);
             Color neutralSoftbox = new Color(0.92f, 0.96f, 1f, 1f);
@@ -568,37 +594,40 @@ namespace WebGL.Core.Managers
                 studioFillLight,
                 targetCenter,
                 targetRadius,
-                keyEuler.y + 138f,
-                0.62f,
-                1.55f,
+                keyEuler.y + 120f,
+                0.55f,
+                1.45f,
                 Color.Lerp(keyColor, coolSoftbox, 0.48f),
-                Mathf.Clamp(keyIntensity * 0.55f * studioBoost, 0.18f, 1.35f),
+                Mathf.Clamp(keyIntensity * 0.50f * studioBoost, 0.18f, 6.0f),
                 3.4f,
-                88f);
+                88f,
+                performanceMode);
 
             PositionStudioSoftbox(
                 studioRimLight,
                 targetCenter,
                 targetRadius,
-                keyEuler.y + 218f,
-                0.88f,
+                keyEuler.y + 205f,
+                0.95f,
                 1.42f,
                 Color.Lerp(keyColor, neutralSoftbox, 0.62f),
-                Mathf.Clamp(keyIntensity * 0.82f * studioBoost, 0.20f, 1.85f),
+                Mathf.Clamp(keyIntensity * 0.75f * studioBoost, 0.20f, 8.0f),
                 3.2f,
-                58f);
+                58f,
+                performanceMode);
 
             PositionStudioSoftbox(
                 studioTopLight,
                 targetCenter,
                 targetRadius,
                 keyEuler.y + 18f,
-                1.85f,
-                0.36f,
+                1.70f,
+                0.42f,
                 Color.Lerp(keyColor, warmSoftbox, 0.35f),
-                Mathf.Clamp(keyIntensity * 0.68f * studioBoost, 0.18f, 1.55f),
+                Mathf.Clamp(keyIntensity * 0.52f * studioBoost, 0.18f, 7.0f),
                 2.8f,
-                104f);
+                104f,
+                performanceMode);
 
             PositionStudioSoftbox(
                 studioBounceLight,
@@ -606,11 +635,12 @@ namespace WebGL.Core.Managers
                 targetRadius,
                 keyEuler.y + 182f,
                 -0.55f,
-                0.82f,
+                0.90f,
                 Color.Lerp(keyColor, coolSoftbox, 0.70f),
-                Mathf.Clamp(keyIntensity * 0.30f * studioBoost, 0.08f, 0.72f),
+                Mathf.Clamp(keyIntensity * 0.28f * studioBoost, 0.08f, 3.0f),
                 2.4f,
-                116f);
+                116f,
+                performanceMode);
         }
 
         private static void PositionStudioSoftbox(
@@ -623,10 +653,17 @@ namespace WebGL.Core.Managers
             Color color,
             float intensity,
             float rangeFactor,
-            float spotAngle)
+            float spotAngle,
+            bool performanceMode)
         {
             if (light == null)
             {
+                return;
+            }
+
+            if (performanceMode)
+            {
+                light.enabled = false;
                 return;
             }
 

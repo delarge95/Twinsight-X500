@@ -1337,6 +1337,11 @@ namespace WebGL.Core.Managers
                 return false;
             }
 
+            if (ExplodedViewManager.IsRuntimeProxyVisual(renderer.transform.name))
+            {
+                return false;
+            }
+
             bool suppressedByModularInspection = visible &&
                 FastenerInspectionManager.Instance != null &&
                 FastenerInspectionManager.Instance.ShouldSuppressProxyRenderer(renderer);

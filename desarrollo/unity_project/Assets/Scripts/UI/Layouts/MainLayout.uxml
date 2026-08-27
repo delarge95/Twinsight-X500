@@ -351,7 +351,7 @@
                     </ui:VisualElement>
                     <ui:VisualElement class="env-slider-group" picking-mode="Position">
                         <ui:Label text="OBJECT INTENSITY" class="env-slider-label" picking-mode="Position" />
-                        <ui:Slider name="EnvLightIntensity" low-value="0.1" high-value="3" value="1" class="glass-slider env-slider" picking-mode="Position" />
+                        <ui:Slider name="EnvLightIntensity" low-value="0" high-value="10" value="1" class="glass-slider env-slider" picking-mode="Position" />
                     </ui:VisualElement>
                     <ui:VisualElement class="env-slider-group" picking-mode="Position">
                         <ui:Label text="BACKGROUND TONE" class="env-slider-label" picking-mode="Position" />
@@ -393,20 +393,23 @@
     <ui:VisualElement name="HeroContainer" class="hero-container">
         <!-- Main Hero Content -->
         <ui:VisualElement name="HeroMain" style="width: 100%; height: 100%; align-items: center; justify-content: center;">
-            <ui:Button name="HeroLanguageBtn" class="hero-language-switch hero-language-switch--en hero-language-corner" text="">
-                <ui:VisualElement class="hero-language-switch-track" picking-mode="Ignore">
-                    <ui:VisualElement name="HeroLanguageThumb" class="hero-language-thumb" picking-mode="Ignore" />
-                    <ui:Label name="HeroLangEnLabel" text="EN" class="hero-language-option hero-language-option--en hero-language-option--active" picking-mode="Ignore" />
-                    <ui:Label name="HeroLangEsLabel" text="ES" class="hero-language-option hero-language-option--es" picking-mode="Ignore" />
-                </ui:VisualElement>
-            </ui:Button>
+            <ui:VisualElement name="HeroCornerActions" class="hero-corner-actions">
+                <ui:Button name="HeroInfoBtn" class="hero-info-btn" text="i" tooltip="About" />
+                <ui:Button name="HeroLanguageBtn" class="hero-language-switch hero-language-switch--en" text="">
+                    <ui:VisualElement class="hero-language-switch-track" picking-mode="Ignore">
+                        <ui:VisualElement name="HeroLanguageThumb" class="hero-language-thumb" picking-mode="Ignore" />
+                        <ui:Label name="HeroLangEnLabel" text="EN" class="hero-language-option hero-language-option--en hero-language-option--active" picking-mode="Ignore" />
+                        <ui:Label name="HeroLangEsLabel" text="ES" class="hero-language-option hero-language-option--es" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                </ui:Button>
+            </ui:VisualElement>
             <ui:Label text="TwinSight X500" class="hero-title" picking-mode="Ignore" />
             <ui:Label text="Visual-semantic WebGL viewer" class="hero-subtitle" picking-mode="Ignore" />
-            
+
             <ui:VisualElement class="hero-menu">
                 <ui:Button name="HeroExploreBtn" class="btn btn-primary btn-wide" text="EXPLORE" />
                 <ui:Button name="HeroDeviceBtn" class="btn btn-ghost btn-wide" text="DEVICE" />
-                <ui:Button name="HeroAboutBtn" class="btn btn-ghost btn-wide" text="ABOUT" />
+                <ui:Button name="HeroConfigBtn" class="btn btn-ghost btn-wide" text="CONFIG" />
                 <ui:Button name="HeroExitBtn" class="btn btn-ghost btn-wide" text="EXIT" />
             </ui:VisualElement>
         </ui:VisualElement>
@@ -419,6 +422,53 @@
                 <ui:Button name="DeviceBtn_Drone" class="device-option device-option--active" text="Holybro X500 Base" />
                 <ui:Button name="DeviceBtn_Robot" class="device-option" text="Additional Device Slot (Coming Soon)" enabled="false" />
                 <ui:Button name="DeviceBtn_Satellite" class="device-option" text="Additional Device Slot (Coming Soon)" enabled="false" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <!-- Submenu: CONFIG -->
+        <ui:VisualElement name="HeroSubmenu_Config" class="hero-submenu hero-submenu--hidden" picking-mode="Position">
+            <ui:Button name="SubmenuBackBtn_Config" class="btn-back" text="&lt;" />
+            <ui:Label text="Configuration" class="hero-title" />
+            <ui:ScrollView class="submenu-scroll" mode="Vertical" touch-scroll-type="Elastic">
+                <ui:Label text="QUALITY PRESET" class="config-section-label" />
+                <ui:Button name="QualityBtn_Auto" class="config-tier-card config-tier-auto" text="AUTO" />
+                <ui:VisualElement name="ConfigTierRow" class="config-tier-row" style="display: none;">
+                    <ui:Button name="QualityBtn_Low" class="config-tier-card" text="LOW" />
+                    <ui:Button name="QualityBtn_Medium" class="config-tier-card" text="MEDIUM" />
+                    <ui:Button name="QualityBtn_High" class="config-tier-card" text="HIGH" />
+                    <ui:Button name="QualityBtn_Ultra" class="config-tier-card" text="ULTRA" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="ConfigAdvancedSection" class="config-advanced-section" style="display: none;">
+                    <ui:VisualElement class="env-slider-group">
+                        <ui:Label text="RENDER SCALE" class="env-slider-label" />
+                        <ui:Slider name="ConfigRenderScale" low-value="0.5" high-value="1.5" value="1" class="glass-slider env-slider" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="env-slider-group">
+                        <ui:Label text="SHADOW DISTANCE" class="env-slider-label" />
+                        <ui:Slider name="ConfigShadowDistance" low-value="0" high-value="40" value="12" class="glass-slider env-slider" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="SHADOWS" class="config-row-label" />
+                        <ui:Button name="ConfigShadowsToggle" class="config-cycle-btn" text="ON" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="ANTI-ALIASING (MSAA)" class="config-row-label" />
+                        <ui:Button name="ConfigMsaaBtn" class="config-cycle-btn" text="2X" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="TEXTURE QUALITY" class="config-row-label" />
+                        <ui:Button name="ConfigTextureBtn" class="config-cycle-btn" text="FULL" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="STUDIO SOFTBOXES" class="config-row-label" />
+                        <ui:Button name="ConfigSoftboxesBtn" class="config-cycle-btn" text="ON" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="SIMPLE LIGHTING (WEBGL)" class="config-row-label" />
+                        <ui:Button name="ConfigCompatBtn" class="config-cycle-btn" text="ON" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:ScrollView>
         </ui:VisualElement>
 
