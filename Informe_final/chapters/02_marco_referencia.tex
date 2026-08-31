@@ -62,9 +62,9 @@ La visualización 3D en la web ha evolucionado de forma significativa desde la i
 \setlength{\tabcolsep}{3.5pt}
 \caption{Comparativa Cualitativa de Soluciones Web 3D}
 \label{tab:comparativa_cualitativa_soluciones_web3d}
-\begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{1.9cm}>{\RaggedRight\arraybackslash}p{1.2cm}>{\RaggedRight\arraybackslash}p{2.2cm}>{\RaggedRight\arraybackslash}p{1.6cm}>{\RaggedRight\arraybackslash}p{2.6cm}>{\RaggedRight\arraybackslash}p{2.7cm}>{\RaggedRight\arraybackslash}p{2.0cm}@{}}
+\begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{2.0cm}>{\RaggedRight\arraybackslash}p{1.3cm}>{\RaggedRight\arraybackslash}p{2.5cm}>{\RaggedRight\arraybackslash}p{1.8cm}>{\RaggedRight\arraybackslash}p{2.8cm}>{\RaggedRight\arraybackslash}p{3.0cm}>{\RaggedRight\arraybackslash}X@{}}
 \hline
-\textbf{Tecnología} & \textbf{Huella} & \textbf{Control pipeline} & \textbf{PBR} & \textbf{Interactividad} & \textbf{Infraestructura} & \textbf{Pertinencia} \\ \hline
+\textit{Tecnología} & \textit{Huella} & \textit{Control pipeline} & \textit{PBR} & \textit{Interactividad} & \textit{Infraestructura} & \textit{Pertinencia} \\ \hline
 Three.js & Baja & Alto, pero manual & Manual & Total & No & Alta (a medida) \\
 Babylon.js & Media & Alto & Integrado & Total & No & Media/alta \\
 Unity Web & Alta & Alto e integrado & URP & Total & No & Alta (este estudio) \\
@@ -73,7 +73,7 @@ Spline & Baja & Bajo & Básico & Limitada & No & Baja/media \\
 Marmoset & Media & Bajo & Alto & Media & No & Baja/media \\
 Sketchfab & Media & Medio & Bueno & Media & Parcial & Media \\
 PlayCanvas & Baja & Alto & Integrado & Total & No & Media/alta \\ \hline
-\end{tabular}
+\end{tabularx}
 \apanote[14.4pt]{Comparación cualitativa basada en documentación oficial, literatura revisada y requerimientos del proyecto; no corresponde a un benchmark experimental uniforme. Los juicios de pertinencia se refieren a este caso de estudio. Elaboración propia.}
 \end{table}
 
@@ -272,7 +272,7 @@ El corte transversal de la app se expresa mediante la distancia al plano $\Pi = 
 \label{fig:plano_corte_shader}
 \centering
 \includegraphics[width=0.74\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter2/fig_2_plano_corte_shader.pdf}
-\apanote[-18.4pt]{El esquema resume el paso desde el movimiento del plano hasta la evaluación fragmento a fragmento; no representa una operación destructiva sobre la malla. Elaboración propia.}
+\apanote{El esquema resume el paso desde el movimiento del plano hasta la evaluación fragmento a fragmento; no representa una operación destructiva sobre la malla. Elaboración propia.}
 \end{figure}
 
 \paragraph{Fresnel de Borde para Modos Analíticos}
@@ -306,76 +306,76 @@ Esta ecuación describe una capa de visualización heurística inspirada en disi
 
 Los siguientes conceptos técnicos fundamentan el proyecto. Algunos corresponden a componentes efectivamente utilizados en la aplicación final y otros a estrategias de optimización evaluadas durante el diseño del \textit{pipeline}; no todos están expuestos como funcionalidad visible en la build final.
 
-\textit{Albedo.} Mapa de textura que define el color base de un material sin incorporar iluminación. Es una de las entradas principales del flujo PBR.
+\textbf{\textit{Albedo.}} Mapa de textura que define el color base de un material sin incorporar iluminación. Es una de las entradas principales del flujo PBR.
 
-\textit{Asset Bundle.} Mecanismo de empaquetado de Unity para distribuir activos en bloques independientes. En este proyecto se consideró como alternativa de despliegue, pero no constituye el eje central documentado para la versión final de la aplicación.
+\textbf{\textit{Asset Bundle.}} Mecanismo de empaquetado de Unity para distribuir activos en bloques independientes. En este proyecto se consideró como alternativa de despliegue, pero no constituye el eje central documentado para la versión final de la aplicación.
 
-\textit{Baking.} Proceso de precalcular información compleja, como detalle geométrico o iluminación, y almacenarla en texturas para reducir costo computacional en tiempo real.
+\textbf{\textit{Baking.}} Proceso de precalcular información compleja, como detalle geométrico o iluminación, y almacenarla en texturas para reducir costo computacional en tiempo real.
 
-\textit{BRDF (\textit{Bidirectional Reflectance Distribution Function}).} Función que describe cómo una superficie refleja luz según la dirección de incidencia y de observación. Es el fundamento matemático del renderizado físicamente basado.
+\textbf{\textit{BRDF (Bidirectional Reflectance Distribution Function).}} Función que describe cómo una superficie refleja luz según la dirección de incidencia y de observación. Es el fundamento matemático del renderizado físicamente basado.
 
-\textit{C\#.} Lenguaje de programación principal usado en Unity para implementar la lógica interactiva del prototipo, incluyendo selección, UI, managers de escena y herramientas de análisis visual.
+\textbf{\textit{C\#.}} Lenguaje de programación principal usado en Unity para implementar la lógica interactiva del prototipo, incluyendo selección, UI, managers de escena y herramientas de análisis visual.
 
-\textit{C++.} Lenguaje de bajo nivel usado como representación intermedia dentro de la cadena IL2CPP de Unity antes de compilar el target web a WebAssembly.
+\textbf{\textit{C++.}} Lenguaje de bajo nivel usado como representación intermedia dentro de la cadena IL2CPP de Unity antes de compilar el target web a WebAssembly.
 
-\textit{Draw Call.} Comando emitido por la CPU para que la GPU renderice un lote de geometría con un material y una pasada concretos. Su reducción es clave para el rendimiento.
+\textbf{\textit{Draw Call.}} Comando emitido por la CPU para que la GPU renderice un lote de geometría con un material y una pasada concretos. Su reducción es clave para el rendimiento.
 
-\textit{Fragment Shader (\textit{Pixel Shader}).} Programa ejecutado por la GPU para cada fragmento visible, encargado de calcular el color final.
+\textbf{\textit{Fragment Shader (Pixel Shader).}} Programa ejecutado por la GPU para cada fragmento visible, encargado de calcular el color final.
 
-\textit{Frame Time.} Tiempo efectivo requerido para producir un cuadro. En una aproximación operativa de perfilado suele modelarse como $T_{\text{frame}} \approx \max(T_{\text{CPU}}, T_{\text{GPU}})$, más el posible costo de sincronización entre ambos.
+\textbf{\textit{Frame Time.}} Tiempo efectivo requerido para producir un cuadro. En una aproximación operativa de perfilado suele modelarse como $T_{\text{frame}} \approx \max(T_{\text{CPU}}, T_{\text{GPU}})$, más el posible costo de sincronización entre ambos.
 
-\textit{GPU Instancing.} Técnica que permite renderizar varias instancias compatibles de una misma malla y material en menos lotes efectivos. La reducción de \textit{draw calls} depende de las condiciones de compatibilidad y no de una división exacta universal.
+\textbf{\textit{GPU Instancing.}} Técnica que permite renderizar varias instancias compatibles de una misma malla y material en menos lotes efectivos. La reducción de \textit{draw calls} depende de las condiciones de compatibilidad y no de una división exacta universal.
 
-\textit{Hardware complejo.} Categoría operativa utilizada en este informe para referirse a sistemas electromecánicos multicomponente con integración estructural, energética, electrónica y de control, alta densidad de relaciones espaciales entre piezas y necesidad de inspección visual detallada del ensamblaje.
+\textbf{\textit{Hardware complejo.}} Categoría operativa utilizada en este informe para referirse a sistemas electromecánicos multicomponente con integración estructural, energética, electrónica y de control, alta densidad de relaciones espaciales entre piezas y necesidad de inspección visual detallada del ensamblaje.
 
-\textit{Digital model.} Representación digital de un objeto o sistema físico en la que los cambios no se transfieren automáticamente entre el activo real y su contraparte digital. En este proyecto, el prototipo WebGL se aproxima a esta categoría enriquecida por una capa visual-semántica.
+\textbf{\textit{Digital model.}} Representación digital de un objeto o sistema físico en la que los cambios no se transfieren automáticamente entre el activo real y su contraparte digital. En este proyecto, el prototipo WebGL se aproxima a esta categoría enriquecida por una capa visual-semántica.
 
-\textit{Digital shadow.} Representación digital que recibe datos del activo físico de manera automática o semiautomática, de forma que el estado real actualiza el estado digital. Requiere telemetría histórica o en vivo y no forma parte del alcance implementado en la build final.
+\textbf{\textit{Digital shadow.}} Representación digital que recibe datos del activo físico de manera automática o semiautomática, de forma que el estado real actualiza el estado digital. Requiere telemetría histórica o en vivo y no forma parte del alcance implementado en la build final.
 
-\textit{Digital twin.} Representación virtual sincronizada con entidades o procesos reales a una frecuencia y fidelidad determinadas, capaz de apoyar comprensión, análisis, simulación o decisiones operacionales. En este informe se reserva el término para trabajo futuro con datos reales, modelos calibrados e integración operacional.
+\textbf{\textit{Digital twin.}} Representación virtual sincronizada con entidades o procesos reales a una frecuencia y fidelidad determinadas, capaz de apoyar comprensión, análisis, simulación o decisiones operacionales. En este informe se reserva el término para trabajo futuro con datos reales, modelos calibrados e integración operacional.
 
-\textit{Visual product twin o technical product twin.} Categoría operativa propuesta para describir la capa actual del proyecto: un modelo web 3D interactivo, semántico y optimizado de un producto físico, orientado a comprensión, inspección, comunicación técnica y preparación de datos.
+\textbf{\textit{Visual product twin o technical product twin.}} Categoría operativa propuesta para describir la capa actual del proyecto: un modelo web 3D interactivo, semántico y optimizado de un producto físico, orientado a comprensión, inspección, comunicación técnica y preparación de datos.
 
-\textit{Twin manifest.} Contrato de datos por componente que conectaría identificador de pieza, geometría, subsistema, material, función, sensores posibles, variables de estado, fallas comunes, repuestos, procedimientos y documentos asociados. Se plantea como trabajo futuro para habilitar interoperabilidad.
+\textbf{\textit{Twin manifest.}} Contrato de datos por componente que conectaría identificador de pieza, geometría, subsistema, material, función, sensores posibles, variables de estado, fallas comunes, repuestos, procedimientos y documentos asociados. Se plantea como trabajo futuro para habilitar interoperabilidad.
 
-\textit{Digital thread.} Continuidad de datos que conecta diseño, manufactura, ensamblaje, operación, mantenimiento y retiro del producto. Un \textit{digital twin} confiable requiere trazabilidad entre estas etapas para preservar significado técnico.
+\textbf{\textit{Digital thread.}} Continuidad de datos que conecta diseño, manufactura, ensamblaje, operación, mantenimiento y retiro del producto. Un \textit{digital twin} confiable requiere trazabilidad entre estas etapas para preservar significado técnico.
 
-\textit{Interoperabilidad.} Capacidad de que modelos, aplicaciones, dispositivos y sistemas de distintos proveedores o etapas del ciclo de vida intercambien datos útiles con significado preservado. Es una condición central para escalar el visor hacia \textit{digital shadow} o \textit{digital twin}.
+\textbf{\textit{Interoperabilidad.}} Capacidad de que modelos, aplicaciones, dispositivos y sistemas de distintos proveedores o etapas del ciclo de vida intercambien datos útiles con significado preservado. Es una condición central para escalar el visor hacia \textit{digital shadow} o \textit{digital twin}.
 
-\textit{IL2CPP (\textit{Intermediate Language to C++}).} \textit{Backend} de compilación de Unity que transforma el código intermedio (IL) de .NET generado a partir de C\# en C++. En el target web, ese código C++ se compila posteriormente a WebAssembly mediante el \textit{toolchain} correspondiente del build.
+\textbf{\textit{IL2CPP (Intermediate Language to C++).}} \textit{Backend} de compilación de Unity que transforma el código intermedio (IL) de .NET generado a partir de C\# en C++. En el target web, ese código C++ se compila posteriormente a WebAssembly mediante el \textit{toolchain} correspondiente del build.
 
-\textit{IoT (\textit{Internet of Things}).} Conjunto de dispositivos físicos conectados que pueden registrar, transmitir o recibir datos mediante redes. En el contexto del proyecto, IoT se entiende como una posible capa futura de sensores y eventos operativos, no como una capacidad implementada en la build actual.
+\textbf{\textit{IoT (Internet of Things).}} Conjunto de dispositivos físicos conectados que pueden registrar, transmitir o recibir datos mediante redes. En el contexto del proyecto, IoT se entiende como una posible capa futura de sensores y eventos operativos, no como una capacidad implementada en la build actual.
 
-\textit{ISO 23247.} Familia de estándares orientada a un marco de gemelos digitales para manufactura. Su valor para este informe está en proponer una separación por capas entre elementos observables, comunicación, entidad digital y aplicaciones de usuario.
+\textbf{\textit{ISO 23247.}} Familia de estándares orientada a un marco de gemelos digitales para manufactura. Su valor para este informe está en proponer una separación por capas entre elementos observables, comunicación, entidad digital y aplicaciones de usuario.
 
-\textit{LOD (\textit{Level of Detail}).} Estrategia de optimización que intercambia versiones de diferente complejidad geométrica según distancia o relevancia visual. Se considera una técnica de referencia del \textit{pipeline}, aunque su adopción final depende del contenido realmente exportado y configurado.
+\textbf{\textit{LOD (Level of Detail).}} Estrategia de optimización que intercambia versiones de diferente complejidad geométrica según distancia o relevancia visual. Se considera una técnica de referencia del \textit{pipeline}, aunque su adopción final depende del contenido realmente exportado y configurado.
 
-\textit{Metallic Map.} Textura que define qué regiones del material deben tratarse como metálicas frente a dieléctricas, afectando la reflectancia especular base.
+\textbf{\textit{Metallic Map.}} Textura que define qué regiones del material deben tratarse como metálicas frente a dieléctricas, afectando la reflectancia especular base.
 
-\textit{MVP (Producto Mínimo Viable).} Versión de un producto con las funcionalidades suficientes para poner a prueba supuestos esenciales con usuarios reales y orientar iteraciones posteriores.
+\textbf{\textit{MVP (Producto Mínimo Viable).}} Versión de un producto con las funcionalidades suficientes para poner a prueba supuestos esenciales con usuarios reales y orientar iteraciones posteriores.
 
-\textit{Normal Map.} Textura que almacena variaciones de normales para simular detalle superficial sin aumentar el conteo de triángulos.
+\textbf{\textit{Normal Map.}} Textura que almacena variaciones de normales para simular detalle superficial sin aumentar el conteo de triángulos.
 
-\textit{Occlusion Culling.} Técnica que evita dibujar objetos no visibles porque quedan ocultos desde la perspectiva de la cámara. En este proyecto se asume como principio general de optimización, no como afirmación automática de uso en todos los escenarios de la build final.
+\textbf{\textit{Occlusion Culling.}} Técnica que evita dibujar objetos no visibles porque quedan ocultos desde la perspectiva de la cámara. En este proyecto se asume como principio general de optimización, no como afirmación automática de uso en todos los escenarios de la build final.
 
-\textit{PBR (\textit{Physically-Based Rendering}).} Modelo de iluminación que aproxima la interacción física entre luz y materiales mediante conservación de energía y teoría de microfacetas.
+\textbf{\textit{PBR (Physically-Based Rendering).}} Modelo de iluminación que aproxima la interacción física entre luz y materiales mediante conservación de energía y teoría de microfacetas.
 
-\textit{Retopología.} Proceso de reconstruir la topología de una malla para optimizar su estructura geométrica y su viabilidad en tiempo real.
+\textbf{\textit{Retopología.}} Proceso de reconstruir la topología de una malla para optimizar su estructura geométrica y su viabilidad en tiempo real.
 
-\textit{Roughness Map.} Textura que controla la rugosidad microscópica de la superficie. Valores bajos producen reflejos nítidos; valores altos generan reflejos difusos.
+\textbf{\textit{Roughness Map.}} Textura que controla la rugosidad microscópica de la superficie. Valores bajos producen reflejos nítidos; valores altos generan reflejos difusos.
 
-\textit{Shader.} Programa ejecutado por la GPU que participa en el cálculo visual de vértices o fragmentos.
+\textbf{\textit{Shader.}} Programa ejecutado por la GPU que participa en el cálculo visual de vértices o fragmentos.
 
-\textit{Specular.} Componente de reflexión dependiente del ángulo de observación y de la microgeometría del material.
+\textbf{\textit{Specular.}} Componente de reflexión dependiente del ángulo de observación y de la microgeometría del material.
 
-\textit{Texel Density.} Relación entre la resolución efectiva de la textura y la longitud real de superficie que representa. Puede expresarse como $\rho = R_{\text{texture}} / L_{\text{mundo}}$ en píxeles por centímetro cuando se toma una dirección o tramo de referencia.
+\textbf{\textit{Texel Density.}} Relación entre la resolución efectiva de la textura y la longitud real de superficie que representa. Puede expresarse como $\rho = R_{\text{texture}} / L_{\text{mundo}}$ en píxeles por centímetro cuando se toma una dirección o tramo de referencia.
 
-\textit{UV Unwrapping.} Proceso de desplegar una superficie 3D en coordenadas 2D para aplicar texturas con la menor distorsión posible.
+\textbf{\textit{UV Unwrapping.}} Proceso de desplegar una superficie 3D en coordenadas 2D para aplicar texturas con la menor distorsión posible.
 
-\textit{Vertex Shader.} Programa ejecutado por la GPU para cada vértice de la malla, responsable de transformar posiciones entre espacios geométricos.
+\textbf{\textit{Vertex Shader.}} Programa ejecutado por la GPU para cada vértice de la malla, responsable de transformar posiciones entre espacios geométricos.
 
-\textit{WebAssembly (WASM).} Formato binario ejecutable en navegadores que permite desplegar lógica compilada dentro de un modelo de memoria lineal, utilizado por Unity para ejecutar en web el código generado a partir de C\#.
+\textbf{\textit{WebAssembly (WASM).}} Formato binario ejecutable en navegadores que permite desplegar lógica compilada dentro de un modelo de memoria lineal, utilizado por Unity para ejecutar en web el código generado a partir de C\#.
 
-\textit{WebGL.} API gráfica del navegador basada en OpenGL ES para renderizado 2D y 3D acelerado por hardware sin complementos externos.
+\textbf{\textit{WebGL.}} API gráfica del navegador basada en OpenGL ES para renderizado 2D y 3D acelerado por hardware sin complementos externos.
 
-\textit{W3C (\textit{World Wide Web Consortium}).} Organización internacional que desarrolla estándares para la Web. En este informe se cita por Web of Things, una línea de trabajo orientada a describir propiedades, acciones y eventos de dispositivos conectados para reducir fragmentación entre ecosistemas IoT.
+\textbf{\textit{W3C (World Wide Web Consortium).}} Organización internacional que desarrolla estándares para la Web. En este informe se cita por Web of Things, una línea de trabajo orientada a describir propiedades, acciones y eventos de dispositivos conectados para reducir fragmentación entre ecosistemas IoT.

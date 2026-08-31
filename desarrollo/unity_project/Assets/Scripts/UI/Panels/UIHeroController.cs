@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.UIElements;
 using WebGL.Core.Managers;
 using WebGL.Core.Utils;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace WebGL.UI.Panels
 {
@@ -34,7 +34,11 @@ namespace WebGL.UI.Panels
         private readonly Button _languageBtn;
         private readonly Label _languageEnLabel;
         private readonly Label _languageEsLabel;
+        private readonly Label _heroTitleCyan;
+        private readonly Label _heroTitleRed;
+        private readonly Label _heroTitleMain;
         private readonly UIQualityConfigPanel _configPanel;
+        private IVisualElementScheduledItem _glitchScheduler;
 
         // ── State ──
         public bool HeroDismissed { get; private set; } = false;
@@ -64,12 +68,16 @@ namespace WebGL.UI.Panels
             _languageBtn = root.Q<Button>("HeroLanguageBtn");
             _languageEnLabel = root.Q<Label>("HeroLangEnLabel");
             _languageEsLabel = root.Q<Label>("HeroLangEsLabel");
+            _heroTitleCyan = root.Q<Label>("HeroTitleGlitchCyan");
+            _heroTitleRed = root.Q<Label>("HeroTitleGlitchRed");
+            _heroTitleMain = root.Q<Label>("HeroTitleMain");
             _configPanel = new UIQualityConfigPanel(root);
 
             AppLanguageManager.LanguageChanged += OnLanguageChanged;
             AddCleanup(() => AppLanguageManager.LanguageChanged -= OnLanguageChanged);
             BindButtons();
             UpdateLanguageVisuals();
+            StartGlitchAnimation();
         }
 
         private void AddCleanup(System.Action action)
@@ -79,6 +87,7 @@ namespace WebGL.UI.Panels
 
         public void Dispose()
         {
+            _glitchScheduler?.Pause();
             OnHeroDismissed = null;
             OnHeroReturned = null;
             OnHelpRequested = null;
@@ -115,8 +124,79 @@ namespace WebGL.UI.Panels
                 _heroContainer.pickingMode = PickingMode.Position;
                 _heroContainer.style.display = DisplayStyle.Flex;
                 CloseHeroSubmenu();
+                ResetGlitchRestingState();
             }
             OnHeroReturned?.Invoke();
+        }
+
+        private void StartGlitchAnimation()
+        {
+            if (_heroContainer == null) return;
+
+            float nextGlitchTime = Time.time + Random.Range(1.8f, 3.8f);
+            bool inGlitch = false;
+            int glitchSteps = 0;
+
+            _glitchScheduler = _heroContainer.schedule.Execute(() =>
+            {
+                if (HeroDismissed) return;
+
+                float now = Time.time;
+                if (!inGlitch && now >= nextGlitchTime)
+                {
+                    inGlitch = true;
+                    glitchSteps = Random.Range(2, 5);
+                }
+
+                if (inGlitch)
+                {
+                    float shiftX = Random.Range(3f, 7f) * (Random.value > 0.5f ? 1f : -1f);
+                    float shiftY = Random.Range(-1.5f, 1.5f);
+
+                    if (_heroTitleCyan != null)
+                    {
+                        _heroTitleCyan.style.translate = new Translate(-shiftX, shiftY, 0);
+                        _heroTitleCyan.style.opacity = Random.Range(0.65f, 0.95f);
+                    }
+
+                    if (_heroTitleRed != null)
+                    {
+                        _heroTitleRed.style.translate = new Translate(shiftX, -shiftY, 0);
+                        _heroTitleRed.style.opacity = Random.Range(0.65f, 0.95f);
+                    }
+
+                    if (_heroTitleMain != null)
+                    {
+                        _heroTitleMain.style.translate = new Translate(Random.Range(-1f, 1f), 0, 0);
+                    }
+
+                    glitchSteps--;
+                    if (glitchSteps <= 0)
+                    {
+                        inGlitch = false;
+                        nextGlitchTime = now + Random.Range(1.8f, 4.2f);
+                        ResetGlitchRestingState();
+                    }
+                }
+            }).Every(45);
+        }
+
+        private void ResetGlitchRestingState()
+        {
+            if (_heroTitleCyan != null)
+            {
+                _heroTitleCyan.style.translate = new Translate(-2f, 0, 0);
+                _heroTitleCyan.style.opacity = 0.85f;
+            }
+            if (_heroTitleRed != null)
+            {
+                _heroTitleRed.style.translate = new Translate(2f, 0, 0);
+                _heroTitleRed.style.opacity = 0.85f;
+            }
+            if (_heroTitleMain != null)
+            {
+                _heroTitleMain.style.translate = new Translate(0, 0, 0);
+            }
         }
 
         public void OpenHeroSubmenu(SubmenuType type)
@@ -206,77 +286,64 @@ namespace WebGL.UI.Panels
                 AddCleanup(() => heroExploreBtn.clicked -= onExplore);
             }
 
-            // Submenu navigation
-            System.Action onDevices = () => OpenHeroSubmenu(SubmenuType.Devices);
-            System.Action onAbout = () => OpenHeroSubmenu(SubmenuType.About);
-            System.Action onConfig = () => OpenHeroSubmenu(SubmenuType.Config);
-            System.Action onExit = () => OpenHeroSubmenu(SubmenuType.Exit);
-            if (heroDeviceBtn != null) { heroDeviceBtn.clicked += onDevices; AddCleanup(() => heroDeviceBtn.clicked -= onDevices); }
-            if (heroInfoBtn != null) { heroInfoBtn.clicked += onAbout; AddCleanup(() => heroInfoBtn.clicked -= onAbout); }
-            if (heroConfigBtn != null) { heroConfigBtn.clicked += onConfig; AddCleanup(() => heroConfigBtn.clicked -= onConfig); }
-            if (heroExitBtn != null) { heroExitBtn.clicked += onExit; AddCleanup(() => heroExitBtn.clicked -= onExit); }
+            // Submenu openers
+            if (heroDeviceBtn != null) { heroDeviceBtn.clicked += () => OpenHeroSubmenu(SubmenuType.Devices); AddCleanup(() => heroDeviceBtn.clicked -= () => OpenHeroSubmenu(SubmenuType.Devices)); }
+            if (heroInfoBtn != null) { heroInfoBtn.clicked += () => OpenHeroSubmenu(SubmenuType.About); AddCleanup(() => heroInfoBtn.clicked -= () => OpenHeroSubmenu(SubmenuType.About)); }
+            if (heroConfigBtn != null) { heroConfigBtn.clicked += () => OpenHeroSubmenu(SubmenuType.Config); AddCleanup(() => heroConfigBtn.clicked -= () => OpenHeroSubmenu(SubmenuType.Config)); }
+            if (heroExitBtn != null) { heroExitBtn.clicked += () => OpenHeroSubmenu(SubmenuType.Exit); AddCleanup(() => heroExitBtn.clicked -= () => OpenHeroSubmenu(SubmenuType.Exit)); }
             if (heroLanguageBtn != null)
             {
-                System.Action onLanguage = AppLanguageManager.ToggleLanguage;
-                heroLanguageBtn.clicked += onLanguage;
-                AddCleanup(() => heroLanguageBtn.clicked -= onLanguage);
+                System.Action onLanguageToggle = () =>
+                {
+                    AppLanguageManager.ToggleLanguage();
+                };
+                heroLanguageBtn.clicked += onLanguageToggle;
+                AddCleanup(() => heroLanguageBtn.clicked -= onLanguageToggle);
             }
 
-            // Help
-            var heroHelpBtn = _root.Q<Button>("HeroHelpBtn");
-            if (heroHelpBtn != null)
+            // Submenu back buttons
+            var backDev = _root.Q<Button>("SubmenuBackBtn_Devices");
+            var backAbt = _root.Q<Button>("SubmenuBackBtn_About");
+            var backCfg = _root.Q<Button>("SubmenuBackBtn_Config");
+            var backExt = _root.Q<Button>("SubmenuBackBtn_Exit");
+            if (backDev != null) { backDev.clicked += CloseHeroSubmenu; AddCleanup(() => backDev.clicked -= CloseHeroSubmenu); }
+            if (backAbt != null) { backAbt.clicked += CloseHeroSubmenu; AddCleanup(() => backAbt.clicked -= CloseHeroSubmenu); }
+            if (backCfg != null) { backCfg.clicked += CloseHeroSubmenu; AddCleanup(() => backCfg.clicked -= CloseHeroSubmenu); }
+            if (backExt != null) { backExt.clicked += CloseHeroSubmenu; AddCleanup(() => backExt.clicked -= CloseHeroSubmenu); }
+
+            // About actions
+            var helpBtn = _root.Q<Button>("HeroHelpBtn");
+            if (helpBtn != null)
             {
-                System.Action onHelp = () => OnHelpRequested?.Invoke();
-                heroHelpBtn.clicked += onHelp;
-                AddCleanup(() => heroHelpBtn.clicked -= onHelp);
+                System.Action onHelp = () =>
+                {
+                    DismissHero();
+                    OnHelpRequested?.Invoke();
+                };
+                helpBtn.clicked += onHelp;
+                AddCleanup(() => helpBtn.clicked -= onHelp);
             }
 
-            var heroGithubBtn = _root.Q<Button>("HeroGithubBtn");
-            if (heroGithubBtn != null)
+            var perfBtn = _root.Q<Button>("HeroPerfCaptureBtn");
+            if (perfBtn != null)
+            {
+                perfBtn.clicked += TogglePerformanceCapture;
+                AddCleanup(() => perfBtn.clicked -= TogglePerformanceCapture);
+            }
+
+            var githubBtn = _root.Q<Button>("HeroGithubBtn");
+            if (githubBtn != null)
             {
                 System.Action onGithub = () => Application.OpenURL(RepositoryUrl);
-                heroGithubBtn.clicked += onGithub;
-                AddCleanup(() => heroGithubBtn.clicked -= onGithub);
+                githubBtn.clicked += onGithub;
+                AddCleanup(() => githubBtn.clicked -= onGithub);
             }
 
-            var heroPerfCaptureBtn = _root.Q<Button>("HeroPerfCaptureBtn");
-            if (heroPerfCaptureBtn != null)
-            {
-                System.Action onPerfCapture = TogglePerformanceCapture;
-                heroPerfCaptureBtn.clicked += onPerfCapture;
-                AddCleanup(() => heroPerfCaptureBtn.clicked -= onPerfCapture);
-            }
-
-            // Back buttons
-            var backDevices = _root.Q<Button>("SubmenuBackBtn_Devices");
-            var backAbout = _root.Q<Button>("SubmenuBackBtn_About");
-            var backConfig = _root.Q<Button>("SubmenuBackBtn_Config");
-            var backExit = _root.Q<Button>("SubmenuBackBtn_Exit");
-            if (backDevices != null) { backDevices.clicked += CloseHeroSubmenu; AddCleanup(() => backDevices.clicked -= CloseHeroSubmenu); }
-            if (backAbout != null) { backAbout.clicked += CloseHeroSubmenu; AddCleanup(() => backAbout.clicked -= CloseHeroSubmenu); }
-            if (backConfig != null) { backConfig.clicked += CloseHeroSubmenu; AddCleanup(() => backConfig.clicked -= CloseHeroSubmenu); }
-            if (backExit != null) { backExit.clicked += CloseHeroSubmenu; AddCleanup(() => backExit.clicked -= CloseHeroSubmenu); }
-
-            // Exit confirmation
-            var exitConfirmBtn = _root.Q<Button>("ExitConfirmBtn");
-            var exitCancelBtn = _root.Q<Button>("ExitCancelBtn");
-            if (exitCancelBtn != null) { exitCancelBtn.clicked += CloseHeroSubmenu; AddCleanup(() => exitCancelBtn.clicked -= CloseHeroSubmenu); }
-            if (exitConfirmBtn != null)
-            {
-                System.Action onExitConfirm = RequestExitToLanding;
-                EventCallback<PointerUpEvent> onExitConfirmPointer = evt =>
-                {
-                    if (evt.button == 0)
-                    {
-                        evt.StopPropagation();
-                        RequestExitToLanding();
-                    }
-                };
-                exitConfirmBtn.clicked += onExitConfirm;
-                AddCleanup(() => exitConfirmBtn.clicked -= onExitConfirm);
-                exitConfirmBtn.RegisterCallback(onExitConfirmPointer);
-                AddCleanup(() => exitConfirmBtn.UnregisterCallback(onExitConfirmPointer));
-            }
+            // Exit actions
+            var exitConfirm = _root.Q<Button>("ExitConfirmBtn");
+            var exitCancel = _root.Q<Button>("ExitCancelBtn");
+            if (exitConfirm != null) { exitConfirm.clicked += RequestExitToLanding; AddCleanup(() => exitConfirm.clicked -= RequestExitToLanding); }
+            if (exitCancel != null) { exitCancel.clicked += CloseHeroSubmenu; AddCleanup(() => exitCancel.clicked -= CloseHeroSubmenu); }
 
             // Home button (return to hero)
             var homeBtn = _root.Q<Button>("HomeBtn");
@@ -316,17 +383,35 @@ namespace WebGL.UI.Panels
         private void UpdateLanguageVisuals()
         {
             AppLanguageManager.ApplyStaticText(_root);
+            bool spanish = AppLanguageManager.IsSpanish;
             if (_languageBtn != null)
             {
-                bool spanish = AppLanguageManager.IsSpanish;
                 _languageBtn.text = string.Empty;
                 _languageBtn.EnableInClassList("hero-language-switch--es", spanish);
                 _languageBtn.EnableInClassList("hero-language-switch--en", !spanish);
-                _languageBtn.tooltip = AppLanguageManager.IsSpanish ? "Switch to English" : "Cambiar a espa\u00f1ol";
+                _languageBtn.tooltip = spanish ? "Switch to English" : "Cambiar a español";
             }
 
-            _languageEnLabel?.EnableInClassList("hero-language-option--active", !AppLanguageManager.IsSpanish);
-            _languageEsLabel?.EnableInClassList("hero-language-option--active", AppLanguageManager.IsSpanish);
+            _languageEnLabel?.EnableInClassList("hero-language-option--active", !spanish);
+            _languageEsLabel?.EnableInClassList("hero-language-option--active", spanish);
+
+            var tagline = _root.Q<Label>("HeroTagline");
+            if (tagline != null)
+            {
+                tagline.text = spanish ? "GEMELO DIGITAL INTERACTIVO · HOLYBRO X500 V2" : "INTERACTIVE DIGITAL TWIN · HOLYBRO X500 V2";
+            }
+
+            var subtitle = _root.Q<Label>("HeroSubtitle");
+            if (subtitle != null)
+            {
+                subtitle.text = spanish ? "Visor WebGL visual-semántico" : "Visual-semantic WebGL viewer";
+            }
+
+            var exploreBtn = _root.Q<Button>("HeroExploreBtn");
+            if (exploreBtn != null)
+            {
+                exploreBtn.text = spanish ? "ABRIR VISOR" : "OPEN VIEWER";
+            }
         }
     }
 }

@@ -12,22 +12,24 @@
 %   clasificación de dispositivo se hizo por sistema operativo, navegador, GPU y
 %   resolución.
 
-\setlength{\LTpre}{-2.0pt}
+\setlength{\LTpre}{15.5pt}
 \setlength{\LTpost}{0pt}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
 
 {
 \renewcommand{\arraystretch}{1.08}
 \setlength{\tabcolsep}{2pt}
-\begin{longtable}{p{2.5cm}p{2.1cm}p{2.65cm}p{0.9cm}p{1.05cm}p{1.25cm}p{1.1cm}p{2.15cm}}
+\begin{longtable}{p{3.5cm}p{2.1cm}p{2.4cm}p{0.9cm}p{1.1cm}p{1.3cm}p{1.1cm}p{2.7cm}}
     \caption{Resumen de Rendimiento WebGL por Dispositivo y Escenario Operativo}
     \label{tab:rendimiento_webgl_resumen_dispositivos}\\
     \hline
-    \textbf{Dispositivo} & \textbf{SO / navegador} & \textbf{Escenarios válidos} & \textbf{Dur. (s)} & \textbf{FPS prom.} & \textbf{Frame prom.} & \textbf{Pico mem.} & \textbf{Lectura} \\ \hline
+    \textit{Dispositivo} & \textit{SO / navegador} & \textit{Escenarios válidos} & \textit{Dur. (s)} & \textit{FPS prom.} & \textit{Frame prom.} & \textit{Pico mem.} & \textit{Lectura} \\ \hline
     \endfirsthead
     \hline
-    \textbf{Dispositivo} & \textbf{SO / navegador} & \textbf{Escenarios válidos} & \textbf{Dur. (s)} & \textbf{FPS prom.} & \textbf{Frame prom.} & \textbf{Pico mem.} & \textbf{Lectura} \\ \hline
+    \textit{Dispositivo} & \textit{SO / navegador} & \textit{Escenarios válidos} & \textit{Dur. (s)} & \textit{FPS prom.} & \textit{Frame prom.} & \textit{Pico mem.} & \textit{Lectura} \\ \hline
     \endhead
-    PC escritorio (Intel Core i7-5820K, GTX 980 Ti, 48 GB RAM), 1910\(\times\)903 & Windows 11 / Chrome 141 & Base, aislamiento, explode, cut, thermal & 253.4 & 59.8 & 16.7 ms & 413 MB & Fluidez estable en todos los escenarios operativos. \\
+    PC escritorio (Intel Core i7-5820K, GTX 980 Ti, 48 GB RAM), 1910x903 & Windows 11 / Chrome 141 & Base, aislamiento, explode, cut, thermal & 253.4 & 59.8 & 16.7 ms & 413 MB & Fluidez estable en todos los escenarios operativos. \\
     Móvil Android (Adreno 610), 720x1300 & Android 10 / Chrome 148 & Base, aislamiento, explode, cut, thermal & 389.5 & 24.5 & 52.1 ms & 311 MB & Rendimiento usable, con picos perceptibles y modo thermal como escenario más exigente. \\
     Móvil Android (Adreno 610), 720x1410 & Android 12 / Chrome 114 & Base, aislamiento, explode, cut, thermal & 115.4 & 17.6 & 61.4 ms & 263 MB & Límite inferior móvil: navegable, pero por debajo de la meta de 30 FPS. \\
     Móvil Android (Adreno 650), 1280x1914 & Android 12 / Chrome 114 & Base, aislamiento, explode, cut, thermal & 149.8 & 30.0 & 36.2 ms & 254 MB & Cerca de la meta de 30 FPS, con picos aislados durante cut. \\
@@ -39,17 +41,18 @@
 \end{longtable}
 }
 
+\setlength{\LTpre}{-2.5pt}
 {
 \renewcommand{\arraystretch}{1.08}
 \setlength{\tabcolsep}{3pt}
-\begin{longtable}{p{3.8cm}p{3.2cm}p{7.0cm}}
+\begin{longtable}{p{4.5cm}p{3.6cm}p{7.8cm}}
     \caption{KPIs Complementarios de Build, Memoria y Escena Runtime}
     \label{tab:kpis_complementarios_build_memoria}\\
     \hline
-    \textbf{Indicador} & \textbf{Valor reportado} & \textbf{Lectura para validación} \\ \hline
+    \textit{Indicador} & \textit{Valor reportado} & \textit{Lectura para validación} \\ \hline
     \endfirsthead
     \hline
-    \textbf{Indicador} & \textbf{Valor reportado} & \textbf{Lectura para validación} \\ \hline
+    \textit{Indicador} & \textit{Valor reportado} & \textit{Lectura para validación} \\ \hline
     \endhead
     Payload activo publicado & 15.78 MB (15.05 MiB) & Suma de los artefactos activos referenciados por \texttt{docs/Build/index.html}: \texttt{.data}, \texttt{.wasm}, framework y loader. \\
     Archivo \texttt{.data.unityweb} & 8.48 MB & Huella principal de datos iniciales del visor WebGL publicado. \\
@@ -65,18 +68,19 @@
 \end{longtable}
 }
 
+\setlength{\LTpre}{-2.5pt}
 {
 \renewcommand{\arraystretch}{1.08}
 \setlength{\tabcolsep}{2pt}
 \setlength{\LTpost}{-22.0pt}
-\begin{longtable}{p{3.0cm}p{2.75cm}p{1.1cm}p{1.05cm}p{1.25cm}p{1.25cm}p{1.35cm}p{1.55cm}}
+\begin{longtable}{p{3.3cm}p{2.9cm}p{1.2cm}p{1.1cm}p{1.4cm}p{1.4cm}p{1.6cm}p{2.5cm}}
     \caption{Detalle de Sesiones de Rendimiento WebGL por Dispositivo y Escenario}
     \label{tab:rendimiento_webgl_detalle_sesiones}\\
     \hline
-    \textbf{Dispositivo} & \textbf{Escenario} & \textbf{Dur. (s)} & \textbf{FPS} & \textbf{Frame ms} & \textbf{Peor ms} & \textbf{Pico mem.} & \textbf{Uso} \\ \hline
+    \textit{Dispositivo} & \textit{Escenario} & \textit{Dur. (s)} & \textit{FPS} & \textit{Frame ms} & \textit{Peor ms} & \textit{Pico mem.} & \textit{Uso} \\ \hline
     \endfirsthead
     \hline
-    \textbf{Dispositivo} & \textbf{Escenario} & \textbf{Dur. (s)} & \textbf{FPS} & \textbf{Frame ms} & \textbf{Peor ms} & \textbf{Pico mem.} & \textbf{Uso} \\ \hline
+    \textit{Dispositivo} & \textit{Escenario} & \textit{Dur. (s)} & \textit{FPS} & \textit{Frame ms} & \textit{Peor ms} & \textit{Pico mem.} & \textit{Uso} \\ \hline
     \endhead
     PC escritorio (GTX 980 Ti) & Base & 5.8 & 54.5 & 24.6 & 93.7 & 119 MB & Excluida: arranque corto \\
     PC escritorio (GTX 980 Ti) & Base & 24.7 & 59.9 & 16.7 & 17.8 & 146 MB & Agregada \\

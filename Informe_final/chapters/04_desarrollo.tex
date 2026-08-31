@@ -42,16 +42,16 @@ La cifra histórica de ``16 piezas'' se conserva solo como antecedente temprano 
 \begin{table}[htbp]
     \caption{Reconciliación entre Conteos Históricos y Convenciones Finales del Proyecto}
     \label{tab:reconciliacion_conteos_sistema}
-    \begin{tabular}{p{2.4cm}p{3.1cm}p{2.0cm}p{5.5cm}}
+    \begin{tabularx}{\textwidth}{p{2.4cm}p{3.1cm}p{2.0cm}X}
         \hline
-        \textbf{Conteo} & \textbf{Nivel de lectura} & \textbf{Estado} & \textbf{Interpretación correcta} \\ \hline
+        \textit{Conteo} & \textit{Nivel de lectura} & \textit{Estado} & \textit{Interpretación correcta} \\ \hline
         16 piezas & Prototipo temprano y simplificación del ensamblaje & Histórico & Útil para entender la etapa inicial del visor, pero no describe la escena ni la taxonomía final del proyecto. \\
         28 piezas & Taxonomía semántica de investigación & Canónico & Corresponde al catálogo académico principal utilizado para narrativa, hotspots, fichas y documentación. \\
         30 \textit{anchors} & Organización de escena en Unity & Canónico técnico & Añade \texttt{x500v2\_fastener\_group} y \texttt{x500v2\_misc\_group} como grupos sintéticos de operación de runtime. \\
         257 \textit{renderers} & Fragmentación geométrica y cobertura de escena & Canónico técnico & Describe la granularidad renderizable/auditable del ensamblaje final, no una nueva taxonomía semántica. \\
         257 assets generados & Capa de datos derivada del runtime & Canónico técnico & Representa la producción de \texttt{DronePartData} y assets auxiliares alineados con la escena final. \\ \hline
-    \end{tabular}
-    \apanote[14.4pt]{Los conteos pertenecen a capas y momentos distintos del proyecto; por ello no deben interpretarse como equivalentes. Elaboración propia a partir del catálogo canónico, la escena final y los activos generados.}
+    \end{tabularx}
+    \apanote[-18.4pt]{Los conteos pertenecen a capas y momentos distintos del proyecto; por ello no deben interpretarse como equivalentes. Elaboración propia a partir del catálogo canónico, la escena final y los activos generados.}
 \end{table}
 
 \begin{figure}[htbp]
@@ -76,15 +76,15 @@ En términos de madurez, la build publicada se ubica en el nivel de \textit{digi
 \begin{table}[htbp]
     \caption{Hitos de Evolución Técnica del Desarrollo del Proyecto}
     \label{tab:hitos_desarrollo_proyecto}
-    \begin{tabular}{p{2.6cm}p{4.0cm}p{2.4cm}p{4.8cm}}
+    \begin{tabularx}{\textwidth}{p{2.6cm}p{4.0cm}p{2.4cm}X}
         \hline
-        \textbf{Etapa} & \textbf{Foco principal} & \textbf{Estado} & \textbf{Lectura para el informe} \\ \hline
+        \textit{Etapa} & \textit{Foco principal} & \textit{Estado} & \textit{Lectura para el informe} \\ \hline
         Prototipo temprano & Arquitectura base del visor y conteo reducido de piezas & Histórica & Explica el antecedente de ``16 piezas'', pero no representa el cierre documental. \\
         Consolidación del caso Holybro & Selección del X500~V2 y ampliación de taxonomía semántica & Ejecutado & Fija el marco real del proyecto y el cambio hacia \textit{hardware complejo}. \\
         Saneamiento de activos y escena & Reorganización de piezas, grupos sintéticos y reparación de runtime & Ejecutado & Sustenta la convención 28/30/257 y el flujo final de la app. \\
         Rediseño UI \textit{mobile-first} & Bottom sheet, navegación inferior, modos y responsive base & Ejecutado & Aporta la capa de diseño con respaldo teórico más fuerte del producto. \\
         Cierre técnico & Build WebGL, QA P1/P2, profiler interno y validación empírica & Build funcional & El flujo visible quedó validado para entrega; las mediciones formales se reportan con datos fechados. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[14.4pt]{Esta tabla resume la evolución del proyecto y distingue cifras o decisiones tempranas frente al estado técnico vigente. Elaboración propia a partir del código, la documentación activa y la propuesta corregida.}
 \end{table}
 
@@ -99,23 +99,23 @@ Durante el proyecto se estudiaron y utilizaron múltiples rutas de entrada para 
 \begin{table}[htbp]
     \caption{Métodos de Importación CAD Considerados en el Proyecto}
     \label{tab:metodos_importacion_cad}
-    \begin{tabular}{p{2.8cm}p{3.1cm}p{2.0cm}p{5.0cm}}
+    \begin{tabularx}{\textwidth}{p{2.8cm}p{3.1cm}p{2.0cm}X}
         \hline
-        \textbf{Ruta técnica} & \textbf{Uso principal} & \textbf{Estado} & \textbf{Interpretación} \\ \hline
+        \textit{Ruta técnica} & \textit{Uso principal} & \textit{Estado} & \textit{Interpretación} \\ \hline
         STEP $\rightarrow$ Blender directo & Inspección rápida de piezas y lectura geométrica inicial & Evaluado & Útil para abrir piezas o familias sencillas, pero no siempre ofrece control de teselación. \\
         STEP $\rightarrow$ STEPper & Importación CAD directa dentro de Blender con addon & Ejecutado & Aportó una ruta práctica para abrir archivos STEP sin salir del entorno de modelado. \\
         MoI3D $\rightarrow$ Blender & Conversión de superficies NURBS con control fino de salida & Ejecutado & Se utilizó para casos donde la importación directa producía mallas difíciles de reutilizar. \\
         Re-modelado & Reconstrucción de piezas con topología defendible para tiempo real & Ejecutado & Fue la ruta dominante para piezas críticas cuando la malla CAD no era apta para WebGL. \\
         Sustitución modular & Tornillería, arandelas y elementos similares de alta repetición & Ejecutado & Redujo redundancia geométrica y abrió la puerta a instanciación y proxies ligeros. \\ \hline
-    \end{tabular}
-    \apanote[-18.4pt]{La coexistencia de varias rutas refleja la necesidad de adaptar el pipeline a distintos tipos de geometría CAD. Elaboración propia.}
+    \end{tabularx}
+    \apanote[11.5pt]{La coexistencia de varias rutas refleja la necesidad de adaptar el pipeline a distintos tipos de geometría CAD. Elaboración propia.}
 \end{table}
 
 \begin{figure}[htbp]
     \caption{Flujo de Decisión para Importación y Optimización CAD a WebGL}
     \label{fig:flujo_decision_cad_webgl}
     \includegraphics[width=0.92\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter4/fig_4_flujo_decision_cad_webgl.pdf}
-    \apanote[3.8pt]{Rutas técnicas de importación evaluadas y ejecutadas para trasladar la geometría CAD a Blender y Unity, indicando criterios de optimización poligonal y control de teselación. Elaboración propia.}
+    \apanote[-18.4pt]{Rutas técnicas de importación evaluadas y ejecutadas para trasladar la geometría CAD a Blender y Unity, indicando criterios de optimización poligonal y control de teselación. Elaboración propia.}
 \end{figure}
 
 Las Figuras \ref{fig:cad_importacion_directa_step_blender} y \ref{fig:cad_importacion_moi_ngons} complementan el flujo anterior con evidencia visual de dos rutas de entrada al pipeline. En ambos casos se muestra la vista sombreada junto a su lectura \textit{wireframe}, porque el problema técnico no se limita a la apariencia externa del dron, sino a la estructura de la malla que luego debe limpiarse, triangularse u optimizarse.
@@ -124,7 +124,7 @@ Las Figuras \ref{fig:cad_importacion_directa_step_blender} y \ref{fig:cad_import
     \caption{Importación Directa STEP a Blender con Vista Sombreada y \textit{Wireframe}}
     \label{fig:cad_importacion_directa_step_blender}
     \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/screenshots_contextual/fig_cad_just_imported_pair.png}
-    \apanote[-52.1pt]{A la izquierda se observa el modelo importado de forma directa desde STEP a Blender; a la derecha se presenta su equivalente en \textit{wireframe}. Elaboración propia.}
+    \apanote[+6.3pt]{A la izquierda se observa el modelo importado de forma directa desde STEP a Blender; a la derecha se presenta su equivalente en \textit{wireframe}. Elaboración propia.}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -155,23 +155,23 @@ Así, MAD-T operó como una capa de saneamiento y preparación de activos hard-s
     \caption{Adaptación del Flujo MAD-T al Pipeline CAD--WebGL del Proyecto}
     \label{fig:madt_adaptado_pipeline}
     \includegraphics[width=0.86\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter4/fig_4_madt_adaptado.pdf}
-    \apanote[-18.4pt]{La adaptación se usó como criterio técnico de producción hard-surface; no reemplaza la metodología académica DSRM del proyecto. Elaboración propia.}
+    \apanote[11.5pt]{La adaptación se usó como criterio técnico de producción hard-surface; no reemplaza la metodología académica DSRM del proyecto. Elaboración propia.}
 \end{figure}
 
 \begin{table}[htbp]
     \setlength{\tabcolsep}{4pt}
     \caption[Trazabilidad CAD--Runtime]{Trazabilidad Representativa entre Familia CAD, Acción Aplicada y Salida Runtime}
     \label{tab:trazabilidad_familias_pipeline}
-    \begin{tabular}{@{}>{\RaggedRight\arraybackslash}p{2.4cm}>{\RaggedRight\arraybackslash}p{3.6cm}>{\RaggedRight\arraybackslash}p{3.8cm}>{\RaggedRight\arraybackslash}p{5.4cm}@{}}
+    \begin{tabularx}{\textwidth}{@{}>{\RaggedRight\arraybackslash}p{2.4cm}>{\RaggedRight\arraybackslash}p{3.6cm}>{\RaggedRight\arraybackslash}p{3.8cm}Y@{}}
         \hline
-        \textbf{Familia o pieza} & \textbf{Entrada o referencia} & \textbf{Acción aplicada} & \textbf{Salida runtime o canónica} \\ \hline
+        \textit{Familia o pieza} & \textit{Entrada o referencia} & \textit{Acción aplicada} & \textit{Salida runtime o canónica} \\ \hline
         Placas del frame & Piezas CAD del kit X500 & Limpieza, renombrado y adaptación & Anchors \path{x500v2_bottom_plate}, \path{x500v2_top_plate}. \\
         Brazos y soportes & Tubos de carbono y clamps & Agrupación e instanciación por cuadrante & Anchors \path{x500v2_arm_FL/FR/BL/BR}. \\
         Pixhawk 6C & Carcasa y PCB en CAD & Encapsulado en lectura semántica única & Anchor \path{x500v2_pixhawk6c}. \\
         GPS M10 & Antena, mástil y base & Unión semántica de subpartes & Anchor \path{x500v2_gps_m10}. \\
         Motores & Modelo base de motor & Instanciación del modelo base & Anchors \path{x500v2_motor_FL/FR/BL/BR}. \\
         Fasteners & Familias CAD GB70 & Clasificación y proxies ligeros & Grupo \path{x500v2_fastener_group}. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[14.5pt]{La tabla resume casos representativos y no pretende listar cada subpieza del pipeline. Su función es hacer auditable la relación entre fuente geométrica, operación aplicada y destino runtime. Elaboración propia.}
 \end{table}
 
@@ -193,27 +193,27 @@ Esta separación permitió que el pipeline no dependiera de colapsar todo el mod
     \caption{Tooling Propio en Blender para Masters, Instancias, Proxies y Manifest}
     \label{fig:automatizacion_blender_masters_instancias}
     \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter4/fig_4_automatizacion_blender_masters_instancias.pdf}
-    \apanote[-23.0pt]{La figura muestra herramientas de preparación de activos; no corresponde a funciones visibles de la app final para usuarios. Elaboración propia.}
+    \apanote{La figura muestra herramientas de preparación de activos; no corresponde a funciones visibles de la app final para usuarios. Elaboración propia.}
 \end{figure}
 
 \begin{figure}[htbp]
     \caption{Saneamiento de Geometría CAD para Runtime WebGL}
     \label{fig:retopologia_pipeline}
     \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter4/fig_4_retopologia_pipeline.pdf}
-    \apanote{Diagrama conceptual del flujo de saneamiento geométrico aplicado para transformar geometría CAD en activos aptos para runtime WebGL. Elaboración propia.}
+    \apanote[6.2pt]{Diagrama conceptual del flujo de saneamiento geométrico aplicado para transformar geometría CAD en activos aptos para runtime WebGL. Elaboración propia.}
 \end{figure}
 
 \begin{table}[htbp]
     \caption{Criterios para Comparar el Saneamiento Geométrico}
     \label{tab:comparativa_saneamiento_geometrico_cap4}
-    \begin{tabular}{p{3.2cm}p{3.6cm}p{6.5cm}}
+    \begin{tabularx}{\textwidth}{p{3.2cm}p{3.6cm}X}
         \hline
-        \textbf{Familia o caso} & \textbf{Métrica de comparación} & \textbf{Lectura técnica} \\ \hline
+        \textit{Familia o caso} & \textit{Métrica de comparación} & \textit{Lectura técnica} \\ \hline
         Brazo o soporte crítico & Triángulos, vértices y normales. & Contrasta la geometría de origen frente a una versión apta para runtime sin perder silueta. \\
         Motor o carcasa compleja & Instancias y sombreado. & Muestra cuándo conviene conservar, limpiar o reconstruir una pieza. \\
         Fasteners repetitivos & Instancias y sustitución por proxy. & Evidencia el ahorro geométrico y semántico obtenido al agrupar sujetadores repetidos. \\
         Ensamble representativo & Costo geométrico agregado. & Relaciona el saneamiento con presupuesto WebGL, selección y comprensión visual. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[+6.2pt]{La tabla define qué se compara; los valores cuantitativos se reportan en el capítulo de resultados con evidencia de la build evaluada. Elaboración propia.}
 \end{table}
 
@@ -227,15 +227,15 @@ La respuesta del proyecto fue construir una capa modular para fasteners. En luga
 \begin{table}[htbp]
     \caption{Lectura Técnica del Sistema Modular de Fasteners}
     \label{tab:fasteners_modulares_runtime}
-    \begin{tabular}{p{3.4cm}p{2.6cm}p{6.8cm}}
+    \begin{tabularx}{\textwidth}{p{3.4cm}p{2.6cm}X}
         \hline
-        \textbf{Componente} & \textbf{Magnitud} & \textbf{Función en el proyecto} \\ \hline
+        \textit{Componente} & \textit{Magnitud} & \textit{Función en el proyecto} \\ \hline
         Familias de fasteners & 20 & Agrupan sujetadores equivalentes para metadatos compartidos por tipo. \\
         Instancias registradas & 168 & Conservan la ubicación de cada ocurrencia concreta dentro del ensamblaje. \\
         Entradas de reconciliación & 9 & Resuelven diferencias entre nombres de escena, catálogo y metadatos. \\
         Reemplazo modular & Tornillos & Se aplicó como caso cerrado de reconstrucción modular y ahorro geométrico. \\ \hline
-    \end{tabular}
-    \apanote[-18.9pt]{La modularización de fasteners integra datos, escena y optimización. Elaboración propia a partir de la escena y del runtime de fasteners del proyecto.}
+    \end{tabularx}
+    \apanote[-18.4pt]{La modularización de fasteners integra datos, escena y optimización. Elaboración propia a partir de la escena y del runtime de fasteners del proyecto.}
 \end{table}
 
 La Figura \ref{fig:fasteners_modular_pieces} muestra las piezas base del sistema modular de tornillos. Estas cinco piezas permiten variar cabeza, diámetro, densidad vertical y longitud mediante repetición controlada del cuerpo. La Figura \ref{fig:fasteners_modular_array} muestra un ejemplo de tornillo generado con una cabeza y un arreglo de siete segmentos de cuerpo.
@@ -244,7 +244,7 @@ La Figura \ref{fig:fasteners_modular_pieces} muestra las piezas base del sistema
     \caption{Piezas Base del Sistema Modular de Tornillos}
     \label{fig:fasteners_modular_pieces}
     \includegraphics[width=\textwidth,height=0.42\textheight,keepaspectratio]{figures/screenshots_contextual/fig_fastener_modular_pieces.png}
-    \apanote[-18.4pt]{La reconstrucción modular de tornillos se basa en combinaciones de cabeza, diámetro y segmentos de cuerpo para ajustar longitud sin conservar una malla CAD única por cada tornillo. Elaboración propia.}
+    \apanote[14.4pt]{La reconstrucción modular de tornillos se basa en combinaciones de cabeza, diámetro y segmentos de cuerpo para ajustar longitud sin conservar una malla CAD única por cada tornillo. Elaboración propia.}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -280,9 +280,9 @@ La producción de activos combinó software libre, herramientas comerciales espe
 \begin{table}[htbp]
     \caption{Software y Addons del Pipeline 3D}
     \label{tab:software_pipeline_3d}
-    \begin{tabular}{p{2.0cm}p{2.8cm}p{2.0cm}p{1.65cm}p{4.0cm}}
+    \begin{tabularx}{\textwidth}{p{2.0cm}p{2.8cm}p{2.0cm}p{1.65cm}X}
     \hline
-    \textbf{Herramienta} & \textbf{Rol principal} & \textbf{Licencia} & \textbf{Rango} & \textbf{Interpretación} \\ \hline
+    \textit{Herramienta} & \textit{Rol principal} & \textit{Licencia} & \textit{Rango} & \textit{Interpretación} \\ \hline
     Blender & Modelado, limpieza y exportación & Libre / gratuita & Sin costo & Núcleo ejecutado del pipeline de producción. \\
     Unity & Integración, UI, shaders y web & Plan académico & Sin costo & Punto de verdad del producto final. \\
     MoI3D & Conversión CAD & Comercial & Medio / alto & Apoyo para teselación con mayor control. \\
@@ -291,7 +291,7 @@ La producción de activos combinó software libre, herramientas comerciales espe
     Hard Ops / Box Cutter & Modelado y booleans & Addon comercial & Bajo / medio & Aceleró remodelado y corrección. \\
     Mesh Machine & Limpieza de bevels & Addon comercial & Bajo / medio & Se aprovechó para superficies duras. \\
     Marmoset Toolbag & Bake y lookdev puntual & Comercial & Medio / alto & Herramienta auxiliar del pipeline. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[-18.4pt]{``Rango'' clasifica el tipo de inversión requerida sin fijar precios exactos sujetos a cambios comerciales. Elaboración propia.}
 \end{table}
 
@@ -317,9 +317,9 @@ Finalmente, se desarrollaron scripts no destructivos para preparar el bake y la 
 \begin{table}[htbp]
     \caption{Automatizaciones y Addons Asociados al Pipeline}
     \label{tab:addons_automatizacion_pipeline}
-    \begin{tabular}{p{3.0cm}p{3.2cm}p{2.8cm}p{4.5cm}}
+    \begin{tabularx}{\textwidth}{p{3.0cm}p{3.2cm}p{2.8cm}X}
         \hline
-        \textbf{Herramienta} & \textbf{Problema} & \textbf{Salida técnica} & \textbf{Estado e interpretación} \\ \hline
+        \textit{Herramienta} & \textit{Problema} & \textit{Salida técnica} & \textit{Estado e interpretación} \\ \hline
         CAD Symmetry Instancer & Piezas CAD repetidas como mallas únicas & Relación master/instancias & Ejecutado; central para reducir trabajo manual. \\
         Variante MoI3D ICP & Piezas con teselación irregular & Alineación por PCA/ICP & Evaluado; aporta una ruta para geometría irregular. \\
         CAD Mesh Swapper & Mallas dañadas o mal convertidas & Sustitución de geometría local & Ejecutado de forma puntual. \\
@@ -327,7 +327,7 @@ Finalmente, se desarrollaron scripts no destructivos para preparar el bake y la 
         Bake Target Setup & Preparación repetitiva para PBR & Targets de BaseColor, Normal, etc. & Documentado como apoyo no destructivo. \\
         Mask Packer & Exceso de texturas separadas & Máscara compacta \texttt{R=AO,G=Rough...} & Documentado para simplificar consumo en Unity. \\
         Runtime Manifest Exporter & Riesgo de perder masters o parentage & Manifest con roles y bounds & Ejecutado/documentado; hace auditable la escena. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[14.4pt]{La documentación de estas herramientas se conserva como parte del desarrollo porque su valor está en la automatización del pipeline. Elaboración propia.}
 \end{table}
 
@@ -346,7 +346,7 @@ La Figura \ref{fig:evidencia_bake_uv_fasteners_runtime} muestra el estado de alt
     \includegraphics[width=\textwidth,height=0.22\textheight,keepaspectratio]{figures/screenshots_contextual/fig_cad_bake_high_shaded_full.png}
     \par\vspace{0.2\baselineskip}
     \includegraphics[width=\textwidth,height=0.22\textheight,keepaspectratio]{figures/screenshots_contextual/fig_cad_bake_high_wireframe_full.png}
-    \apanote{La vista sombreada y su equivalente \textit{wireframe} evidencian la densidad geométrica usada como fuente de bake frente al activo optimizado. Elaboración propia.}
+    \apanote[-24.5pt]{La vista sombreada y su equivalente \textit{wireframe} evidencian la densidad geométrica usada como fuente de bake frente al activo optimizado. Elaboración propia.}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -384,14 +384,14 @@ En la práctica, estas decisiones se tradujeron en una barra inferior persistent
 \begin{table}[htbp]
     \caption{Criterios de Diseño Aplicados a la UI del Prototipo}
     \label{tab:criterios_uix_mobile_first}
-    \begin{tabular}{p{3.2cm}p{4.8cm}p{6.0cm}}
+    \begin{tabularx}{\textwidth}{p{3.2cm}p{4.8cm}X}
         \hline
-        \textbf{Criterio} & \textbf{Aplicación en la app} & \textbf{Interpretación} \\ \hline
+        \textit{Criterio} & \textit{Aplicación en la app} & \textit{Interpretación} \\ \hline
         Jerarquía visual & Separación entre Hero, navegación inferior, modos y ficha inferior. & Permite que el usuario identifique el flujo principal sin menús complejos. \\
         Diseño \textit{mobile-first} & Barra inferior, \textit{bottom sheet}, tarjetas táctiles y scroll elástico. & Es la capa de UI con respaldo teórico más consistente del proyecto. \\
         Adaptación a escritorio & Reacomodo funcional del layout móvil sobre pantalla más amplia. & Utilizable para demostración y revisión técnica. \\
         Consistencia cromática & Paleta contenida, retroalimentación de selección y lectura por modos. & Refuerza la comprensión del sistema y evita ruido visual. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote{Esta tabla evita presentar la versión de escritorio como si hubiera recibido el mismo nivel de diseño sistémico específico que la interfaz móvil. Elaboración propia.}
 \end{table}
 
@@ -406,7 +406,7 @@ En la práctica, estas decisiones se tradujeron en una barra inferior persistent
     \caption{Hero Móvil y Adaptación Funcional a Escritorio}
     \label{fig:ui_mobile_desktop_compare}
     \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/screenshots_contextual/fig_ui_hero_mobile_pc.png}
-    \apanote[-20.0pt]{La comparación muestra el Hero en escritorio junto a su versión móvil, evidenciando que la versión desktop opera como adaptación funcional del diseño \textit{mobile-first}. Elaboración propia.}
+    \apanote{La comparación muestra el Hero en escritorio junto a su versión móvil, evidenciando que la versión desktop opera como adaptación funcional del diseño \textit{mobile-first}. Elaboración propia.}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -442,7 +442,7 @@ En términos conceptuales, el sistema evolucionó desde un plan inicial de icono
     \caption[Iconos Procedurales y Microinteracciones]{Sistema de Iconos Procedurales y Microinteracciones Implementadas en Código}
     \label{fig:iconos_microinteracciones}
     \includegraphics[width=\textwidth,height=0.44\textheight,keepaspectratio]{figures/chapter4/fig_4_iconos_microinteracciones.pdf}
-    \apanote{El diagrama resume la arquitectura de implementación de los iconos procedurales y sus estados interactivos dentro de UI Toolkit. Elaboración propia.}
+    \apanote[-18.3pt]{El diagrama resume la arquitectura de implementación de los iconos procedurales y sus estados interactivos dentro de UI Toolkit. Elaboración propia.}
 \end{figure}
 
 \subsubsection{Onboarding Procedural y Ayuda Contextual}
@@ -457,7 +457,7 @@ La versión actual cubre \textbf{15 tarjetas} y dos variantes de actor: \textbf{
     \caption{Onboarding Procedural de Primer Uso Integrado al Runtime}
     \label{fig:onboarding_runtime}
     \includegraphics[width=\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter4/fig_4_onboarding_runtime.pdf}
-    \apanote[14.4pt]{El diagrama resume la arquitectura de ayuda contextual generada por código; no depende de GIF, video ni spritesheets. Elaboración propia.}
+    \apanote[-18.3pt]{El diagrama resume la arquitectura de ayuda contextual generada por código; no depende de GIF, video ni spritesheets. Elaboración propia.}
 \end{figure}
 
 \begin{figure}[htbp]
@@ -513,7 +513,7 @@ Para evitar el acoplamiento rígido entre controladores de interfaz y managers d
     \caption{Flujo de Comunicación EventBus bajo el Patrón \textit{Publish/Subscribe}}
     \label{fig:flujo_eventbus_sistema}
     \includegraphics[width=0.88\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter4/fig_4_2.pdf}
-    \apanote[14.4pt]{Diagrama del flujo de mensajes desacoplado entre emisores (UI y managers) y suscriptores de eventos mediante el bus central. Elaboración propia.}
+    \apanote[-18.4pt]{Diagrama del flujo de mensajes desacoplado entre emisores (UI y managers) y suscriptores de eventos mediante el bus central. Elaboración propia.}
 \end{figure}
 
 \FloatBarrier
@@ -571,7 +571,7 @@ La separación entre menús, controles y efectos evita mezclar capturas con func
     \caption{Menús Principales de la Barra Inferior de la App}
     \label{fig:evidencia_menus_botones_runtime}
     \includegraphics[width=0.88\textwidth,height=0.45\textheight,keepaspectratio]{figures/screenshots_contextual/fig_ui_main_menus.png}
-    \apanote[-26.2pt]{De izquierda a derecha se presentan los menús principales \textit{Inspect}, \textit{Analyze} y \textit{Studio}. Elaboración propia.}
+    \apanote{De izquierda a derecha se presentan los menús principales \textit{Inspect}, \textit{Analyze} y \textit{Studio}. Elaboración propia.}
 \end{figure}
 
 Los modos internos no publicados, como \textit{Wireframe} y \textit{Ghosted}, quedan implementados pero ocultos. Por esa razón, no se tratan como capturas del flujo final visible.
@@ -675,9 +675,9 @@ La capa de entorno combina dos ciclos. El primero organiza la lectura temporal d
 \begin{table}[htbp]
     \caption{Modos Visuales, Publicación en UI y Lectura Técnica}
     \label{tab:modos_visuales_publicacion}
-    \begin{tabular}{p{2.6cm}p{2.4cm}p{3.0cm}p{5.0cm}}
+    \begin{tabularx}{\textwidth}{p{2.6cm}p{2.4cm}p{3.0cm}X}
         \hline
-        \textbf{Modo o preset} & \textbf{Estado UI} & \textbf{Rol visual} & \textbf{Interpretación} \\ \hline
+        \textit{Modo o preset} & \textit{Estado UI} & \textit{Rol visual} & \textit{Interpretación} \\ \hline
         Realistic & Visible & Estado base PBR & Referencia principal del visor para lectura material. \\
         X-Ray & Visible & Inspección interna & Aporta transparencia y lectura estructural. \\
         Solid View & Visible & Color plano y contorno & Útil para lectura formal y siluetas sin textura. \\
@@ -687,8 +687,8 @@ La capa de entorno combina dos ciclos. El primero organiza la lectura temporal d
         Ghosted & Oculto & Visualización analítica & Capacidad técnica no expuesta. \\
         Day / Night & Visible & Variación ambiental & Afectan contraste y percepción volumétrica. \\
         Studio presets & Visible & Presets de estudio & Sirven para presentación y control visual. \\ \hline
-    \end{tabular}
-    \apanote[-18.4pt]{La tabla distingue entre tarjetas visibles, presets publicados indirectamente y capacidades ocultas. Elaboración propia.}
+    \end{tabularx}
+    \apanote{La tabla distingue entre tarjetas visibles, presets publicados indirectamente y capacidades ocultas. Elaboración propia.}
 \end{table}
 
 La evidencia visual se organiza en grupos pequeños para no mezclar controles con resultados. Los modos directos de render se muestran en la Figura \ref{fig:modes_xray_solid_thermal}; los presets de \textit{Studio}, incluyendo \textit{Blueprint}, se muestran en la Figura \ref{fig:studio_presets_blueprint}; y la variación de entorno/color se muestra en la Figura \ref{fig:presets_ambiente_color_runtime}. Los efectos de \textit{Explode}, \textit{Cut} y \textit{Filter} sobre el modelo se documentaron previamente en la Figura \ref{fig:outputs_analyze_tools_runtime}.
@@ -784,14 +784,14 @@ Hero y navegación principal; selección de piezas y \textit{bottom sheet}; hots
 \begin{table}[htbp]
     \caption{Inventario Sintético de Módulos y Estado de Integración}
     \label{tab:inventario_modulos_integracion}
-    \begin{tabular}{p{3.0cm}p{4.2cm}p{2.8cm}p{4.2cm}}
+    \begin{tabularx}{\textwidth}{p{3.0cm}p{4.2cm}p{2.8cm}X}
         \hline
-        \textbf{Categoría} & \textbf{Componentes} & \textbf{Estado} & \textbf{Interpretación} \\ \hline
+        \textit{Categoría} & \textit{Componentes} & \textit{Estado} & \textit{Interpretación} \\ \hline
         Runtime principal & UI, selección, explode, clipping, view modes, preset \textit{Blueprint} y térmico & Expuesto o activo & Soporta el flujo visible y la arquitectura operativa. \\
         Capacidades ocultas & \texttt{MeasurementTool}, \textit{Wireframe}, \textit{Ghosted}, clipping extendido & Oculto & Capacidad existente no publicada al usuario. \\
         Legado no integrado & Catálogo legado, \texttt{SettingsPanel}, suite de ensamblaje & No integrado & Legado histórico o trabajo futuro. \\
         Tooling de editor & Wizard, auditoría de cobertura, constructor de grafo térmico & Soporte técnico & Trazabilidad del pipeline de desarrollo. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[-18.4pt]{Esta tabla resume el criterio usado para separar funciones visibles, funciones ocultas y módulos no integrados. Elaboración propia.}
 \end{table}
 
@@ -801,7 +801,7 @@ Esta separación también asegura la coherencia documental entre la aplicación,
     \caption{Coherencia Documental entre App, Manuales e Informe}
     \label{fig:coherencia_documental_app_manuales_informe}
     \includegraphics[width=0.86\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter4/fig_4_coherencia_documental.pdf}
-    \apanote[+14.4pt]{El criterio de cierre separa funciones visibles, capacidades ocultas, código legado y trabajo futuro para evitar contradicciones entre la build y la documentación. Elaboración propia.}
+    \apanote[6.2pt]{El criterio de cierre separa funciones visibles, capacidades ocultas, código legado y trabajo futuro para evitar contradicciones entre la build y la documentación. Elaboración propia.}
 \end{figure}
 
 \subsection{Tooling de Editor, Automatización y Verificación}
@@ -816,7 +816,7 @@ Para lograr un despliegue viable en navegadores comerciales, el proyecto debió 
     \caption{Restricciones de WebGL y Mitigaciones Técnicas Aplicadas al Proyecto}
     \label{fig:restricciones_webgl_mitigaciones}
     \includegraphics[width=0.88\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter4/fig_4_8.pdf}
-    \apanote[+14.4pt]{Resumen de los cuellos de botella característicos de la plataforma WebGL (memoria lineal, draw calls, descargas de red) y las correspondientes optimizaciones de Technical Art. Elaboración propia.}
+    \apanote[-18.3pt]{Resumen de los cuellos de botella característicos de la plataforma WebGL (memoria lineal, draw calls, descargas de red) y las correspondientes optimizaciones de Technical Art. Elaboración propia.}
 \end{figure}
 
 Una vez generada la build funcional de Unity Web, los archivos resultantes se integran en un pipeline de despliegue continuo alojado en GitHub Pages. Este flujo automatiza la compresión, publicación y verificación rápida del visor interactivo para la validación formativa y QA (véase la Figura \ref{fig:despliegue_artefactos_build}).
@@ -824,8 +824,8 @@ Una vez generada la build funcional de Unity Web, los archivos resultantes se in
 \begin{figure}[htbp]
     \caption{Flujo de Despliegue y Artefactos desde la Build hasta el \textit{Hosting} y QA}
     \label{fig:despliegue_artefactos_build}
-    \includegraphics[width=0.82\textwidth,height=0.45\textheight,keepaspectratio]{figures/apa_redesign/fig_apa_despliegue_build_qa.pdf}
-    \apanote[+6.2pt]{Diagrama de flujo de integración continua, desde el empaquetado de assets hasta la publicación en el servidor de hosting y la evaluación de usuario. Elaboración propia.}
+    \includegraphics[width=0.82\textwidth,height=0.45\textheight,keepaspectratio]{figures/apa_redesign/fig_apa_deploy_pipeline.pdf}
+    \apanote[-18.4pt]{Diagrama de flujo de integración continua, desde el empaquetado de assets hasta la publicación en el servidor de hosting y la evaluación de usuario. Elaboración propia.}
 \end{figure}
 
 \FloatBarrier
