@@ -1375,6 +1375,40 @@
         pointer-events: none;
       }
 
+      /* DEBUG temporal (#currad): anillos del radio de influencia del cursor */
+      #cursorRadiusDbg {
+        position: fixed;
+        inset: 0;
+        z-index: 399;
+        display: none;
+        pointer-events: none;
+      }
+
+      #cursorRadiusDbg .crd-ring {
+        position: absolute;
+        border: 1.5px dashed oklch(0.78 0.14 200 / 0.85);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      #cursorRadiusDbg .crd-ring.crGlow {
+        border-style: dotted;
+        border-color: oklch(0.78 0.14 130 / 0.5);
+      }
+
+      #cursorRadiusDbg .crd-label {
+        position: absolute;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.62rem;
+        line-height: 1.55;
+        white-space: pre;
+        color: oklch(0.92 0 0 / 0.9);
+        background: oklch(0.135 0 0 / 0.72);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.3rem 0.5rem;
+      }
+
       .hidden {
         display: none;
       }
@@ -2174,6 +2208,7 @@
     </div>
 
     <div id="fpsBadge" aria-hidden="true"></div>
+    <div id="cursorRadiusDbg" aria-hidden="true"></div>
 
     <noscript>
       <style>
@@ -3399,7 +3434,7 @@
             "  vec3 dispCloud=pushDir*repMag*uCursorActive;",
             "  float inf_06=exp(-dcur_scat*dcur_scat*0.18)*uCursorActive;",
             "  vec3 disp_v06=pushDir*inf_06*(0.10+s*0.06);",
-            "  float cloudWeight=(1.0-smoothstep(0.0,0.30,s))*(1.0-smoothstep(0.0,0.40,uProgress));",
+            "  float cloudWeight=(1.0-smoothstep(0.60,0.95,s))*(1.0-smoothstep(0.70,0.96,uProgress));",
             "  float solidWeight=smoothstep(0.10,0.45,max(s,uProgress));",
             "  vec3 cursorDisp=(dispCloud*cloudWeight+disp_v06*solidWeight);",
             "  p=pBase+cursorDisp;",
@@ -4272,6 +4307,63 @@ canvas.addEventListener("pointerup", endDrag);
             return 1;
           }
 
+          // --- DEBUG (#currad): visualiza en pantalla el radio de influencia del cursor ---
+          // Se activa con #currad en la URL o con window.__showCursorRadius = true en consola.
+          // Espeja exactamente las fórmulas del vertex shader (aprox. global con uProgress).
+          const crdHost = document.getElementById("cursorRadiusDbg");
+          const crdActive = () => window.location.hash === "#currad" || window.__showCursorRadius === true;
+          let crdRingPush = null, crdRingGlow = null, crdLabel = null;
+          function updateRadiusDebug(cursorScale) {
+            const on = crdActive();
+            if (crdHost.style.display !== (on ? "block" : "none")) crdHost.style.display = on ? "block" : "none";
+            if (!on) return;
+            if (!crdRingPush) {
+              crdHost.innerHTML =
+                '<div class="crd-ring" id="crdRingPush"></div>' +
+                '<div class="crd-ring crGlow" id="crdRingGlow"></div>' +
+                '<div class="crd-label" id="crdLabel"></div>';
+              crdRingPush = document.getElementById("crdRingPush");
+              crdRingGlow = document.getElementById("crdRingGlow");
+              crdLabel = document.getElementById("crdLabel");
+            }
+
+            // cloudRadFactor = mix(1.0, 0.10, smoothstep(0, 0.40, max(s, uProgress)))
+            const ss = (a, b, x) => { x = Math.min(1, Math.max(0, (x - a) / (b - a))); return x * x * (3 - 2 * x); };
+            const radFactor = 1.0 - 0.9 * ss(0.0, 0.40, progress);
+            const cloudExp = 0.030 / (radFactor * radFactor);
+            const rPush = 1 / Math.sqrt(cloudExp);
+            const rGlow = 1 / Math.sqrt(cloudExp * 0.5);
+
+            // Proyección de cursor3 (mundo) a píxeles CSS: clip = proj · view · p
+            const px = cursor3[0], py = cursor3[1], pz = cursor3[2];
+            const vx = view[0] * px + view[4] * py + view[8] * pz + view[12];
+            const vy = view[1] * px + view[5] * py + view[9] * pz + view[13];
+            const vz = view[2] * px + view[6] * py + view[10] * pz + view[14];
+            const vw = view[3] * px + view[7] * py + view[11] * pz + view[15];
+            const clipX = proj[0] * vx + proj[4] * vy + proj[8] * vz + proj[12] * vw;
+            const clipY = proj[1] * vx + proj[5] * vy + proj[9] * vz + proj[13] * vw;
+            const clipW = proj[3] * vx + proj[7] * vy + proj[11] * vz + proj[15] * vw;
+            if (clipW <= 0.001) return;
+            const sx = (clipX / clipW * 0.5 + 0.5) * canvas.clientWidth;
+            const sy = (1 - (clipY / clipW * 0.5 + 0.5)) * canvas.clientHeight;
+            const dist = Math.hypot(eyeVec[0] - px, eyeVec[1] - py, eyeVec[2] - pz) || 1;
+            const pxPerUnit = (canvas.clientHeight / 2) / Math.tan(21 * Math.PI / 180) / dist;
+
+            const dPush = Math.max(4, 2 * rPush * pxPerUnit);
+            const dGlow = Math.max(4, 2 * rGlow * pxPerUnit);
+            crdRingPush.style.left = sx + "px"; crdRingPush.style.top = sy + "px";
+            crdRingPush.style.width = dPush + "px"; crdRingPush.style.height = dPush + "px";
+            crdRingGlow.style.left = sx + "px"; crdRingGlow.style.top = sy + "px";
+            crdRingGlow.style.width = dGlow + "px"; crdRingGlow.style.height = dGlow + "px";
+            crdLabel.style.left = (sx + 14) + "px"; crdLabel.style.top = (sy + 14) + "px";
+            crdLabel.textContent =
+              "NUBE     R=" + rPush.toFixed(2) + "u  exp=" + cloudExp.toFixed(3) + "  fuerza=" + (1.35 * cursorScale).toFixed(2) + "\n" +
+              "BRILLO   R=" + rGlow.toFixed(2) + "u\n" +
+              "AMBIENTE R=5.35u  fuerza=" + (3.2 * (0.75 + 0.25 * cursorScale)).toFixed(2) + "\n" +
+              "SOLIDO   R=2.36u\n" +
+              "progress=" + progress.toFixed(2) + "  cursorScale=" + cursorScale.toFixed(2);
+          }
+
           function render(now, last) {
             const dt = Math.min(0.05, (now - last) / 1000) || 0.016;
             if (!window.__twBootWarm) window.__twBootWarm = true;
@@ -4538,9 +4630,9 @@ canvas.addEventListener("pointerup", endDrag);
               }
             }
 
-            const textureProgress = structMode ? 1.0 : Math.min(1.0, progress * 0.60 + mReveal * 0.40);
-            const easeReduce = textureProgress * textureProgress * (3 - 2 * textureProgress);
-            const cursorScale = 3.0 - 2.0 * easeReduce;
+            // Fuerza del cursor constante durante todo el recorrido (perfil 3->3 decidido en pruebas A/B)
+            const cursorScale = 3.0;
+            updateRadiusDebug(cursorScale);
 
             let dTarget;
             if (structMode || assembledT >= 0 || progress >= 0.95) dTarget = 1.0;
