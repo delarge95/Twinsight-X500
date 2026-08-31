@@ -1,7 +1,7 @@
 {
     "sourceScene": "Assets/Scenes/MainScene_Final.unity",
     "sourceDataset": "public_runtime_fastener_catalogs",
-    "generatedAtUtc": "2026-08-24T14:19:01.2310522Z",
+    "generatedAtUtc": "2026-08-26T00:48:35.6976629Z",
     "items": [
         {
             "familyId": "holybro_cap_screw_m25x10",
@@ -18,7 +18,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 9,
+            "quantityExpected": 10,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "cap_screw_M25x10_placeholder",
@@ -48,7 +48,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 14,
+            "quantityExpected": 15,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "cap_screw_M25x12_placeholder",
@@ -78,7 +78,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 25,
+            "quantityExpected": 26,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "cap_screw_M25x6_placeholder",
@@ -108,7 +108,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 3,
+            "quantityExpected": 4,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "cap_screw_M3x21_placeholder",
@@ -138,7 +138,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 3,
+            "quantityExpected": 4,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "cap_screw_M3x25_placeholder",
@@ -168,7 +168,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 17,
+            "quantityExpected": 18,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "cap_screw_M3x38_placeholder",
@@ -198,7 +198,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 17,
+            "quantityExpected": 18,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "cap_screw_M3x6_placeholder",
@@ -228,7 +228,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 13,
+            "quantityExpected": 14,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "cap_screw_M3x8_placeholder",
@@ -258,7 +258,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 13,
+            "quantityExpected": 14,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "countersunk_M25x6_placeholder",
@@ -288,7 +288,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 3,
+            "quantityExpected": 4,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "countersunk_M3x16_placeholder",
@@ -318,7 +318,7 @@
             "turnCount": 0,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 17,
+            "quantityExpected": 18,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "flange_nut_M3_placeholder",
@@ -348,7 +348,7 @@
             "turnCount": 0,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 18,
+            "quantityExpected": 20,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "lock_nut_M3_placeholder",
@@ -378,7 +378,7 @@
             "turnCount": 0,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 3,
+            "quantityExpected": 4,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "nylon_lock_nut_M3_placeholder",
@@ -408,7 +408,7 @@
             "turnCount": 3,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 5,
+            "quantityExpected": 6,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "nylon_standoff_M25x5_placeholder",
@@ -438,7 +438,7 @@
             "turnCount": 3,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 5,
+            "quantityExpected": 6,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "nylon_standoff_M3x5_placeholder",
@@ -468,7 +468,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 5,
+            "quantityExpected": 6,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "pan_head_M3x10_placeholder",
@@ -498,7 +498,7 @@
             "turnCount": 12,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 3,
+            "quantityExpected": 4,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "pan_head_M3x14_placeholder",
@@ -528,7 +528,7 @@
             "turnCount": 0,
             "material": "Unknown",
             "finish": "Unspecified",
-            "quantityExpected": 5,
+            "quantityExpected": 6,
             "notes": "Derived from temporary Unity proxy family naming only. Final Blender geometry is expected to replace this proxy family later.",
             "modularRecipe": {
                 "recipeKey": "self_lock_nut_M25_placeholder",

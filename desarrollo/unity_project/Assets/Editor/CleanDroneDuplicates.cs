@@ -30,62 +30,23 @@ namespace WebGL.Editor
             Transform droneTransform = drone.transform;
             HashSet<GameObject> toDelete = new HashSet<GameObject>();
 
-            // 2. Name-based check (.001, (1), etc.)
+            // Los sufijos .001/_001 de Blender son instancias legítimas, NO duplicados.
+            // Solo se eliminan superposiciones exactas: misma malla y misma posición mundial.
             Transform[] allTransforms = droneTransform.GetComponentsInChildren<Transform>(true);
+            HashSet<string> seenMeshSignatures = new HashSet<string>(StringComparer.Ordinal);
             foreach (Transform t in allTransforms)
             {
                 if (t == null || t == droneTransform) continue;
-                string n = t.name.Trim();
 
-                if (n.EndsWith(".001", StringComparison.OrdinalIgnoreCase) ||
-                    n.EndsWith("_001", StringComparison.OrdinalIgnoreCase) ||
-                    n.EndsWith(" (1)", StringComparison.OrdinalIgnoreCase) ||
-                    n.Contains(".001_low") ||
-                    n.Contains(".001.") ||
-                    n.Contains("_low.001"))
+                MeshFilter meshFilter = t.GetComponent<MeshFilter>();
+                Mesh mesh = meshFilter != null ? meshFilter.sharedMesh : null;
+                if (mesh == null || t.GetComponent<Renderer>() == null) continue;
+
+                string signature = $"{mesh.name}@{t.position.ToString("F5")}";
+                if (!seenMeshSignatures.Add(signature))
                 {
                     toDelete.Add(t.gameObject);
-                }
-            }
-
-            // 3. Spatial Coincidence Check: Find renderers sharing identical position & mesh
-            Renderer[] allRenderers = droneTransform.GetComponentsInChildren<Renderer>(true);
-            List<Renderer> validRenderers = new List<Renderer>();
-            foreach (Renderer r in allRenderers)
-            {
-                if (r == null || toDelete.Contains(r.gameObject)) continue;
-                validRenderers.Add(r);
-            }
-
-            for (int i = 0; i < validRenderers.Count; i++)
-            {
-                Renderer rA = validRenderers[i];
-                if (rA == null || toDelete.Contains(rA.gameObject)) continue;
-
-                Vector3 posA = rA.transform.position;
-                MeshFilter mfA = rA.GetComponent<MeshFilter>();
-                Mesh meshA = mfA != null ? mfA.sharedMesh : null;
-
-                for (int j = i + 1; j < validRenderers.Count; j++)
-                {
-                    Renderer rB = validRenderers[j];
-                    if (rB == null || toDelete.Contains(rB.gameObject)) continue;
-
-                    Vector3 posB = rB.transform.position;
-                    MeshFilter mfB = rB.GetComponent<MeshFilter>();
-                    Mesh meshB = mfB != null ? mfB.sharedMesh : null;
-
-                    // If positions are virtually identical (within 1mm)
-                    if (Vector3.Distance(posA, posB) < 0.002f)
-                    {
-                        // Same mesh or same vertex count
-                        if (meshA != null && meshB != null && (meshA == meshB || meshA.vertexCount == meshB.vertexCount))
-                        {
-                            // Mark rB for deletion (keep rA)
-                            toDelete.Add(rB.gameObject);
-                            Debug.Log($"[CleanDroneDuplicates] Spatial duplicate found: '{rB.name}' duplicate of '{rA.name}' at {posA}");
-                        }
-                    }
+                    Debug.Log($"[CleanDroneDuplicates] Superposicion exacta eliminada: '{t.name}' (malla {mesh.name} en {t.position})");
                 }
             }
 

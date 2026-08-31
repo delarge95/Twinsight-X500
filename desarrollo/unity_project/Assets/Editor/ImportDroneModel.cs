@@ -358,25 +358,27 @@ public static class ImportDroneModel
     {
         if (root == null) return;
         List<GameObject> toDelete = new List<GameObject>();
+        HashSet<string> seenMeshSignatures = new HashSet<string>(StringComparer.Ordinal);
         Transform[] allChildren = root.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
             if (child == null || child == root) continue;
-            string name = child.name;
-            if (name.EndsWith(".001", StringComparison.OrdinalIgnoreCase) ||
-                name.Contains(".001_low") ||
-                name.Contains(".001."))
+            Renderer renderer = child.GetComponent<Renderer>();
+            MeshFilter meshFilter = child.GetComponent<MeshFilter>();
+            Mesh mesh = meshFilter != null ? meshFilter.sharedMesh : null;
+            if (renderer == null || mesh == null) continue;
+
+            string signature = $"{mesh.name}@{child.position.ToString("F5")}";
+            if (!seenMeshSignatures.Add(signature))
             {
-                if (!toDelete.Contains(child.gameObject))
-                {
-                    toDelete.Add(child.gameObject);
-                }
+                toDelete.Add(child.gameObject);
             }
         }
         foreach (GameObject obj in toDelete)
         {
             if (obj != null)
             {
+                Debug.LogWarning($"[ImportDroneModel] Malla superpuesta identica eliminada: {obj.name} en {obj.transform.position}");
                 UnityEngine.Object.DestroyImmediate(obj);
             }
         }

@@ -278,6 +278,8 @@ public static class SetupImportedDroneThermalTest
             "x500v2_motor_",
             "dj-2216");
 
+        int armMembersRedistributedByWorld = RedistributeArmMembersByWorldQuadrant(root.transform, anchorsById);
+
         foreach (DronePartJson jsonPart in jsonParts)
         {
             if (!anchorsById.TryGetValue(jsonPart.id, out Transform anchor) || anchor == null)
@@ -303,6 +305,8 @@ public static class SetupImportedDroneThermalTest
         HolybroFastenerCatalogBuildResult fastenerCatalog = HolybroFastenerCatalogBuilder.BuildAndWrite(root.transform);
         ProcessFastenerGroupMembers(root.transform, anchorsById, assetsById, fastenerCatalog);
 
+        int proxiesHidden = HideRuntimeProxyVisuals(root.transform);
+
         EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -316,9 +320,11 @@ public static class SetupImportedDroneThermalTest
             $"  - Por prefijo canonico: {prefixReparented}\n" +
             $"  - Por heuristica: {heuristicReparented}\n" +
             $"Motores reasignados por cuadrante: {motorsRedistributedByQuadrant}\n" +
+            $"Miembros de brazo reubicados por cuadrante fisico: {armMembersRedistributedByWorld}\n" +
             $"Falsos fasteners estructurales restaurados: {structuralFastenersRestored}\n" +
             $"Subpiezas granularizadas sin anchor seleccionable: {demotedSubpieceAnchors}\n" +
             $"Proxies canonicos temporales: {runtimeProxyAnchors}\n" +
+            $"Visuales proxy inactivados: {proxiesHidden}\n" +
             $"Proxies canonicos omitidos/eliminados: {suppressedRuntimeProxies}\n" +
             $"Anchors canonicos fusionados como subpiezas: {suppressedCanonicalAnchorsDemoted}\n" +
             $"Fastener families exportadas: {fastenerCatalog?.FamiliesCatalog?.items?.Length ?? 0}\n" +
@@ -927,9 +933,96 @@ public static class SetupImportedDroneThermalTest
         if (renderer != null)
         {
             renderer.sharedMaterial = CreateRuntimeProxyMaterial(canonicalId);
+            renderer.enabled = false;
         }
 
+        Collider proxyCollider = visual.GetComponent<Collider>();
+        if (proxyCollider != null)
+        {
+            Undo.DestroyObjectImmediate(proxyCollider);
+        }
+
+        // El anchor conserva el placeholder para auditoria, pero el visual nace
+        // inactivo: reactivar el anchor no puede volver a mostrarlo ni hacerlo clicable.
+        visual.SetActive(false);
+
         return anchorObject.transform;
+    }
+
+    private static int HideRuntimeProxyVisuals(Transform root)
+    {
+        if (root == null)
+        {
+            return 0;
+        }
+
+        int hidden = 0;
+        int restored = 0;
+        foreach (Transform candidate in root.GetComponentsInChildren<Transform>(true))
+        {
+            if (candidate == null)
+            {
+                continue;
+            }
+
+            if (IsRuntimeProxyVisualName(candidate.name))
+            {
+                bool changed = candidate.gameObject.activeSelf;
+                Renderer proxyRenderer = candidate.GetComponent<Renderer>();
+                if (proxyRenderer != null)
+                {
+                    changed |= proxyRenderer.enabled;
+                    proxyRenderer.enabled = false;
+                }
+
+                Collider[] proxyColliders = candidate.GetComponentsInChildren<Collider>(true);
+                changed |= proxyColliders.Length > 0;
+                for (int i = 0; i < proxyColliders.Length; i++)
+                {
+                    if (proxyColliders[i] != null)
+                    {
+                        UnityEngine.Object.DestroyImmediate(proxyColliders[i], true);
+                    }
+                }
+
+                candidate.gameObject.SetActive(false);
+                if (changed)
+                {
+                    hidden++;
+                }
+
+                continue;
+            }
+
+            if (candidate.name.Contains("_PROXY_", System.StringComparison.OrdinalIgnoreCase))
+            {
+                Renderer realRenderer = candidate.GetComponent<Renderer>();
+                if (realRenderer != null && !realRenderer.enabled)
+                {
+                    realRenderer.enabled = true;
+                    restored++;
+                }
+            }
+        }
+
+        if (hidden > 0 || restored > 0)
+        {
+            Debug.Log($"[SetupImportedDroneThermalTest] {hidden} proxies ocultados; {restored} mallas reales _PROXY_ restauradas.");
+        }
+
+        return hidden;
+    }
+
+    private static bool IsRuntimeProxyVisualName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return false;
+        }
+
+        // Solo placeholders del pipeline; los "_PROXY_low" del FBX son geometria real.
+        return name.EndsWith("_runtime_proxy", StringComparison.OrdinalIgnoreCase) ||
+               name.StartsWith("RuntimeProxy", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool ShouldSuppressRuntimeProxy(string canonicalId)
@@ -1719,6 +1812,111 @@ public static class SetupImportedDroneThermalTest
         return reassigned;
     }
 
+    private static int RedistributeArmMembersByWorldQuadrant(
+        Transform root,
+        IReadOnlyDictionary<string, Transform> anchorsById)
+    {
+        // Los nombres de nodo del FBX pueden traer cuadrantes cruzados; la posicion
+        // fisica mundial es la unica fuente de verdad. Cada miembro de los cuatro
+        // anchors de brazo se reubica en el anchor de su cuadrante real.
+        if (root == null || anchorsById == null || anchorsById.Count == 0)
+        {
+            return 0;
+        }
+
+        if (!TryResolveDroneReferenceFrame(root, out Vector3 center, out Vector3 front, out Vector3 right, out float dominantSize))
+        {
+            Debug.LogWarning("[SetupImportedDroneThermalTest] Redistribucion de brazos omitida: sin marco de referencia mundial.");
+            return 0;
+        }
+
+        Transform[] armAnchors = new Transform[QuadrantSuffixes.Length];
+        for (int i = 0; i < QuadrantSuffixes.Length; i++)
+        {
+            anchorsById.TryGetValue("x500v2_arm_" + QuadrantSuffixes[i], out Transform armAnchor);
+            armAnchors[i] = armAnchor;
+        }
+
+        if (armAnchors.Any(a => a == null))
+        {
+            Debug.LogWarning("[SetupImportedDroneThermalTest] Redistribucion de brazos omitida: faltan anchors x500v2_arm_FL/FR/BL/BR.");
+            return 0;
+        }
+
+        int redistributed = 0;
+        foreach (Transform armAnchor in armAnchors)
+        {
+            List<Transform> members = new List<Transform>();
+            foreach (Transform child in armAnchor)
+            {
+                if (child == null)
+                {
+                    continue;
+                }
+
+                if (child.name.EndsWith("_runtime_proxy", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (child.name.StartsWith("x500v2_fastener", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                members.Add(child);
+            }
+
+            foreach (Transform member in members)
+            {
+                Renderer[] memberRenderers = member.GetComponentsInChildren<Renderer>(true);
+                if (memberRenderers == null || memberRenderers.Length == 0)
+                {
+                    continue;
+                }
+
+                Bounds memberBounds = memberRenderers[0].bounds;
+                for (int i = 1; i < memberRenderers.Length; i++)
+                {
+                    memberBounds.Encapsulate(memberRenderers[i].bounds);
+                }
+
+                Vector3 offset = Vector3.ProjectOnPlane(memberBounds.center - center, Vector3.up);
+                if (offset.sqrMagnitude < 0.000001f)
+                {
+                    continue;
+                }
+
+                float frontDot = Vector3.Dot(offset, front.normalized);
+                float rightDot = Vector3.Dot(offset, right.normalized);
+                float deadband = Mathf.Max(0.001f, dominantSize * 0.015f);
+                if (Mathf.Abs(frontDot) < deadband && Mathf.Abs(rightDot) < deadband)
+                {
+                    continue;
+                }
+
+                float safeRightDot = Mathf.Abs(rightDot) < deadband ? -deadband : rightDot;
+                string suffix = (frontDot >= 0f ? "F" : "B") + (safeRightDot < 0f ? "L" : "R");
+
+                Transform targetAnchor = anchorsById["x500v2_arm_" + suffix];
+                if (member.IsChildOf(targetAnchor))
+                {
+                    continue;
+                }
+
+                member.SetParent(targetAnchor, true);
+                redistributed++;
+            }
+        }
+
+        if (redistributed > 0)
+        {
+            Debug.Log($"[SetupImportedDroneThermalTest] {redistributed} miembros de brazo reubicados por cuadrante fisico mundial.");
+        }
+
+        return redistributed;
+    }
+
     private static string ResolveStructuralInstanceSuffix(string rawName)
     {
         if (string.IsNullOrWhiteSpace(rawName))
@@ -1852,7 +2050,7 @@ public static class SetupImportedDroneThermalTest
             if (cameraFront.sqrMagnitude > 0.000001f)
             {
                 front = cameraFront.normalized;
-                right = Vector3.Cross(Vector3.up, front).normalized;
+                right = Vector3.Cross(front, Vector3.up).normalized;
                 return right.sqrMagnitude > 0.0001f;
             }
         }
@@ -2695,6 +2893,11 @@ public static class SetupImportedDroneThermalTest
         foreach (Renderer renderer in renderers)
         {
             if (renderer == null)
+            {
+                continue;
+            }
+
+            if (IsRuntimeProxyVisualName(renderer.transform.name))
             {
                 continue;
             }

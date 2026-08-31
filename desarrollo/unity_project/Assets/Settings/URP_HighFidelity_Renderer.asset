@@ -26,6 +26,7 @@ MonoBehaviour:
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
   - {fileID: 7533146996049855353}
+  - {fileID: 8533146996049855354}
   m_RendererFeatureMap: 79435ad4471d8b68
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -75,3 +76,30 @@ MonoBehaviour:
     useNormalEdges: 1
     showEdgesOnly: 0
     backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &8533146996049855354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3619e27dcee1472b965a412c811e0b4d, type: 3}
+  m_Name: CRTGlitchFeature
+  m_EditorClassIdentifier: Core::WebGL.Core.Rendering.CRTGlitchFeature
+  m_Active: 1
+  settings:
+    renderPassEvent: 550
+    crtGlitchMaterial: {fileID: 2100000, guid: 3d191d72cc3a4d68967ead79a31638ab, type: 2}
+    curvature: 0.02
+    scanlineIntensity: 0.14
+    scanlineCount: 720
+    scanlineSpeed: 1
+    chromaticAberration: 0.004
+    glitchIntensity: 0.012
+    glitchFrequency: 0.06
+    glitchBands: 48
+    vignetteStrength: 0.2
+    vignettePower: 0.22
+    noiseStrength: 0.015

@@ -66,7 +66,7 @@ MonoBehaviour:
     sourceId: 
     sceneObjectName: x500v2_fastener.cap_screw_M25x12_001
     hierarchyPath: x500v2_Drone/x500v2_fastener_group/x500v2_fastener.cap_screw_M25x12_001
-    parentCanonicalPartId: x500v2_arm_BL
+    parentCanonicalPartId: x500v2_arm_FL
     blenderName: 
     sceneTypeKey: cap_screw_M25x12
     subtype: SocketCapScrew
@@ -79,7 +79,7 @@ MonoBehaviour:
     turnCount: 12
     material: Unknown
     finish: Unspecified
-    quantityExpected: 14
+    quantityExpected: 15
     isInspectable: 1
     fallbackReason: 
     notes: Derived from temporary Unity proxy family naming only. Final Blender geometry

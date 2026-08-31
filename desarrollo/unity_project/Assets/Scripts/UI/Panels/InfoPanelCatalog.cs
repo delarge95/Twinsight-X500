@@ -117,6 +117,14 @@ namespace WebGL.UI.Panels
                 data.hotspotLabel
             };
 
+            // La subpieza clicada tiene prioridad: su pase loose corre antes de que
+            // el nombre canonico del conjunto haga match exacto y la tapone.
+            if (!string.IsNullOrWhiteSpace(selectionLabel) &&
+                (TryFindExact(selectionLabel, out entry) || TryFindLoose(selectionLabel, out entry)))
+            {
+                return true;
+            }
+
             foreach (string candidate in candidates)
             {
                 if (TryFindExact(candidate, out entry))
@@ -269,6 +277,7 @@ namespace WebGL.UI.Panels
             string normalized = value.Trim().ToLowerInvariant();
             normalized = Regex.Replace(normalized, @"\.\d{3,}", string.Empty);
             normalized = Regex.Replace(normalized, @"(_low|_mesh|_renderer|_proxy)$", string.Empty);
+            normalized = Regex.Replace(normalized, @"_\d{3}$", string.Empty);
             normalized = normalized.Replace("shared fasteners:", string.Empty);
             normalized = normalized.Replace("fasteners:", string.Empty);
             normalized = Regex.Replace(normalized, @"\bx\s*\d+\b", string.Empty);

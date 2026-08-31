@@ -32,6 +32,8 @@ namespace WebGL.UI.Panels
         private readonly VisualElement _platformThumb;
         private readonly VisualElement _platformMobileIcon;
         private readonly VisualElement _platformPcIcon;
+        private readonly Button _closeBtn;
+        private readonly Label _prototypeLabel;
         private readonly Button _prevBtn;
         private readonly Button _nextBtn;
         private readonly Button _skipBtn;
@@ -274,6 +276,8 @@ namespace WebGL.UI.Panels
             _platformThumb = _overlay.Q<VisualElement>("OnboardPlatformThumb");
             _platformMobileIcon = _overlay.Q<VisualElement>("OnboardPlatformMobileIcon");
             _platformPcIcon = _overlay.Q<VisualElement>("OnboardPlatformPcIcon");
+            _closeBtn = _overlay.Q<Button>("OnboardCloseBtn");
+            _prototypeLabel = _overlay.Q<Label>("OnboardPrototypeLabel");
             _prevBtn = _overlay.Q<Button>("OnboardPrevBtn");
             _nextBtn = _overlay.Q<Button>("OnboardNextBtn");
             _skipBtn = _overlay.Q<Button>("OnboardSkipBtn");
@@ -297,6 +301,10 @@ namespace WebGL.UI.Panels
                 _animationView.OnPhaseChanged += HandleAnimationPhaseChanged;
                 _cleanupActions.Add(() => _animationView.OnPhaseChanged -= HandleAnimationPhaseChanged);
             }
+
+            System.Action<string> onLangChanged = _ => UpdateStep();
+            AppLanguageManager.LanguageChanged += onLangChanged;
+            _cleanupActions.Add(() => AppLanguageManager.LanguageChanged -= onLangChanged);
 
             BindButtons();
             BindSwipeNavigation();
@@ -381,17 +389,26 @@ namespace WebGL.UI.Panels
                 _prevBtn.clicked += onPrev;
                 _cleanupActions.Add(() => _prevBtn.clicked -= onPrev);
             }
+
             if (_nextBtn != null)
             {
                 System.Action onNext = OnNextClicked;
                 _nextBtn.clicked += onNext;
                 _cleanupActions.Add(() => _nextBtn.clicked -= onNext);
             }
+
             if (_skipBtn != null)
             {
                 System.Action onSkip = Dismiss;
                 _skipBtn.clicked += onSkip;
                 _cleanupActions.Add(() => _skipBtn.clicked -= onSkip);
+            }
+
+            if (_closeBtn != null)
+            {
+                System.Action onClose = Dismiss;
+                _closeBtn.clicked += onClose;
+                _cleanupActions.Add(() => _closeBtn.clicked -= onClose);
             }
         }
 
@@ -556,15 +573,39 @@ namespace WebGL.UI.Panels
             _animationView?.SetPlaying(true);
             HandleAnimationPhaseChanged(0);
 
+            // Prototype badge text
+            if (_prototypeLabel != null)
+            {
+                _prototypeLabel.text = AppLanguageManager.IsSpanish
+                    ? "BOCETO EN CÓDIGO · PROTOTIPO CONCEPTUAL NO DEFINITIVO"
+                    : "CODE PROTOTYPE · CONCEPTUAL DRAFT (NOT FINAL)";
+            }
+
+            // Close button tooltip
+            if (_closeBtn != null)
+            {
+                _closeBtn.tooltip = AppLanguageManager.IsSpanish ? "Cerrar" : "Close";
+            }
+
+            // Skip button text
+            if (_skipBtn != null)
+            {
+                _skipBtn.text = AppLanguageManager.IsSpanish ? "OMITIR" : "SKIP";
+            }
+
+            // Prev button text
+            if (_prevBtn != null)
+            {
+                _prevBtn.text = AppLanguageManager.IsSpanish ? "ANTERIOR" : "PREV";
+                _prevBtn.SetEnabled(_currentStep > 0);
+            }
+
             // Next button text
             if (_nextBtn != null)
             {
-                _nextBtn.text = _currentStep < _steps.Count - 1 ? "NEXT" : "GOT IT";
-            }
-
-            if (_prevBtn != null)
-            {
-                _prevBtn.SetEnabled(_currentStep > 0);
+                _nextBtn.text = _currentStep < _steps.Count - 1
+                    ? (AppLanguageManager.IsSpanish ? "SIGUIENTE" : "NEXT")
+                    : (AppLanguageManager.IsSpanish ? "ENTENDIDO" : "GOT IT");
             }
 
             // Update dots

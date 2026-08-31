@@ -15,6 +15,11 @@ Shader "WebGL/ClippableLit"
         _CurvatureCavityStrength("Curvature Cavity Strength", Range(0, 2)) = 0.5
         _OcclusionMap("Occlusion Map (AO)", 2D) = "white" {}
         _OcclusionStrength("Occlusion Strength", Range(0, 1)) = 1.0
+
+        [Header(Selection Highlight)]
+        _HighlightColor("Highlight Color", Color) = (0.42, 0.82, 1, 1)
+        _HighlightIntensity("Highlight Intensity", Range(0, 1)) = 0.0
+        _HighlightRimPower("Highlight Rim Power", Range(0.5, 8)) = 2.5
         
         [Header(Clipping)]
         [Toggle(_CLIP_ENABLED)] _ClipEnabled("Enable Clipping", Float) = 0
@@ -32,6 +37,9 @@ Shader "WebGL/ClippableLit"
             "Queue" = "Geometry"
         }
 
+        // ─────────────────────────────────────────────────────────────
+        // 1. FORWARD LIT PASS (Main PBR lighting)
+        // ─────────────────────────────────────────────────────────────
         Pass
         {
             Name "ForwardLit"
@@ -47,8 +55,9 @@ Shader "WebGL/ClippableLit"
             #pragma fragment frag
 
             #pragma shader_feature_local _CLIP_ENABLED
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _SHADOWS_SOFT
             #pragma multi_compile_fog
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -91,6 +100,9 @@ Shader "WebGL/ClippableLit"
                 half _CurvatureStrength;
                 half _CurvatureCavityStrength;
                 half _OcclusionStrength;
+                half4 _HighlightColor;
+                half _HighlightIntensity;
+                half _HighlightRimPower;
                 float4 _ClipPlane;
                 half4 _ClipColor;
                 half _ClipEdgeWidth;
@@ -122,26 +134,26 @@ Shader "WebGL/ClippableLit"
 
             half4 frag(Varyings IN) : SV_Target
             {
-                // Global cross-section clipping (unconditional — works in Realistic mode)
+                // Global cross-section clipping
                 if (_GlobalClipEnabled > 0.5)
                 {
                     float gDist = dot(IN.positionWS, _GlobalClipPlane.xyz) + _GlobalClipPlane.w;
-                    if (gDist < 0) discard;
+                    if (gDist < 0.0) discard;
                     if (gDist < _ClipEdgeWidth) return _ClipColor;
                 }
                 if (_GlobalClipEnabled2 > 0.5)
                 {
                     float gDist2 = dot(IN.positionWS, _GlobalClipPlane2.xyz) + _GlobalClipPlane2.w;
-                    if (gDist2 < 0) discard;
+                    if (gDist2 < 0.0) discard;
                     if (gDist2 < _ClipEdgeWidth) return _ClipColor;
                 }
 
-                // Local per-material clipping (optional keyword)
+                // Local per-material clipping
                 #if defined(_CLIP_ENABLED)
                 if (_GlobalClipEnabled < 0.5)
                 {
                     float dist = dot(IN.positionWS, _ClipPlane.xyz) + _ClipPlane.w;
-                    if (dist < 0) discard;
+                    if (dist < 0.0) discard;
                     if (dist < _ClipEdgeWidth) return _ClipColor;
                 }
                 #endif
@@ -169,31 +181,60 @@ Shader "WebGL/ClippableLit"
                 half rawAO = SAMPLE_TEXTURE2D(_OcclusionMap, sampler_OcclusionMap, IN.uv).g;
                 half occlusion = lerp(1.0, rawAO, _OcclusionStrength);
 
-                // Lighting
+                // Setup InputData with baked GI and screen-space coordinates
                 InputData inputData = (InputData)0;
                 inputData.positionWS = IN.positionWS;
+                inputData.positionCS = IN.positionCS;
                 inputData.normalWS = normalWS;
                 inputData.viewDirectionWS = GetWorldSpaceNormalizeViewDir(IN.positionWS);
                 inputData.shadowCoord = TransformWorldToShadowCoord(IN.positionWS);
                 inputData.fogCoord = IN.fogFactor;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(IN.positionCS);
+                inputData.bakedGI = SampleSH(normalWS);
+                inputData.shadowMask = half4(1.0, 1.0, 1.0, 1.0);
 
+                // Setup SurfaceData (Enforce alpha = 1.0 for solid opaque rendering)
                 SurfaceData surfaceData = (SurfaceData)0;
                 surfaceData.albedo = albedo.rgb;
                 surfaceData.metallic = _Metallic;
                 surfaceData.smoothness = _Smoothness;
                 surfaceData.normalTS = normalTS;
                 surfaceData.occlusion = occlusion;
-                surfaceData.alpha = albedo.a;
+                surfaceData.alpha = 1.0;
 
+                // Highlight dimming for selection visibility
+                half highlightAmount = saturate(_HighlightIntensity);
+                surfaceData.albedo *= (1.0 - highlightAmount * 0.30);
+
+                // Evaluate PBR lighting
                 half4 color = UniversalFragmentPBR(inputData, surfaceData);
+
+                // Selection rim highlight
+                if (highlightAmount > 0.001)
+                {
+                    float ndotv = saturate(dot(normalize(normalWS), normalize(inputData.viewDirectionWS)));
+                    float rim = pow(1.0 - ndotv, max(_HighlightRimPower, 0.5));
+                    color.rgb += _HighlightColor.rgb * highlightAmount * (0.35 + 0.85 * rim);
+                }
+
+                // Apply Fog
                 color.rgb = MixFog(color.rgb, IN.fogFactor);
+
+                // WebGL Safety: NaN/Inf guard & strict opaque alpha
+                if (any(isnan(color.rgb)) || any(isinf(color.rgb)))
+                {
+                    color.rgb = half3(0.5, 0.5, 0.5);
+                }
+                color.a = 1.0;
 
                 return color;
             }
             ENDHLSL
         }
 
-        // Shadow caster pass
+        // ─────────────────────────────────────────────────────────────
+        // 2. SHADOW CASTER PASS
+        // ─────────────────────────────────────────────────────────────
         Pass
         {
             Name "ShadowCaster"
@@ -249,27 +290,173 @@ Shader "WebGL/ClippableLit"
 
             half4 ShadowFrag(Varyings IN) : SV_Target
             {
-                // Global cross-section clipping
                 if (_GlobalClipEnabled > 0.5)
                 {
                     float gDist = dot(IN.positionWS, _GlobalClipPlane.xyz) + _GlobalClipPlane.w;
-                    if (gDist < 0) discard;
+                    if (gDist < 0.0) discard;
                 }
                 if (_GlobalClipEnabled2 > 0.5)
                 {
                     float gDist2 = dot(IN.positionWS, _GlobalClipPlane2.xyz) + _GlobalClipPlane2.w;
-                    if (gDist2 < 0) discard;
+                    if (gDist2 < 0.0) discard;
                 }
 
                 #if defined(_CLIP_ENABLED)
                 if (_GlobalClipEnabled < 0.5)
                 {
                     float dist = dot(IN.positionWS, _ClipPlane.xyz) + _ClipPlane.w;
-                    if (dist < 0) discard;
+                    if (dist < 0.0) discard;
                 }
                 #endif
 
                 return 0;
+            }
+            ENDHLSL
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // 3. DEPTH ONLY PASS (For URP Depth Prepass & Camera Depth Texture)
+        // ─────────────────────────────────────────────────────────────
+        Pass
+        {
+            Name "DepthOnly"
+            Tags { "LightMode" = "DepthOnly" }
+
+            ZWrite On
+            ColorMask R
+            Cull Back
+
+            HLSLPROGRAM
+            #pragma target 3.0
+            #pragma vertex DepthVert
+            #pragma fragment DepthFrag
+
+            #pragma multi_compile_local _ _CLIP_ENABLED
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float3 positionWS : TEXCOORD0;
+            };
+
+            float4 _ClipPlane;
+            float4 _GlobalClipPlane;
+            float _GlobalClipEnabled;
+            float4 _GlobalClipPlane2;
+            float _GlobalClipEnabled2;
+
+            Varyings DepthVert(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
+                OUT.positionCS = TransformWorldToHClip(OUT.positionWS);
+                return OUT;
+            }
+
+            half4 DepthFrag(Varyings IN) : SV_Target
+            {
+                if (_GlobalClipEnabled > 0.5)
+                {
+                    float gDist = dot(IN.positionWS, _GlobalClipPlane.xyz) + _GlobalClipPlane.w;
+                    if (gDist < 0.0) discard;
+                }
+                if (_GlobalClipEnabled2 > 0.5)
+                {
+                    float gDist2 = dot(IN.positionWS, _GlobalClipPlane2.xyz) + _GlobalClipPlane2.w;
+                    if (gDist2 < 0.0) discard;
+                }
+
+                #if defined(_CLIP_ENABLED)
+                if (_GlobalClipEnabled < 0.5)
+                {
+                    float dist = dot(IN.positionWS, _ClipPlane.xyz) + _ClipPlane.w;
+                    if (dist < 0.0) discard;
+                }
+                #endif
+
+                return 0;
+            }
+            ENDHLSL
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // 4. DEPTH NORMALS PASS (For SSAO & Edge Detection)
+        // ─────────────────────────────────────────────────────────────
+        Pass
+        {
+            Name "DepthNormals"
+            Tags { "LightMode" = "DepthNormals" }
+
+            ZWrite On
+            Cull Back
+
+            HLSLPROGRAM
+            #pragma target 3.0
+            #pragma vertex DepthNormalsVert
+            #pragma fragment DepthNormalsFrag
+
+            #pragma multi_compile_local _ _CLIP_ENABLED
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float3 normalOS : NORMAL;
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float3 positionWS : TEXCOORD0;
+                float3 normalWS : TEXCOORD1;
+            };
+
+            float4 _ClipPlane;
+            float4 _GlobalClipPlane;
+            float _GlobalClipEnabled;
+            float4 _GlobalClipPlane2;
+            float _GlobalClipEnabled2;
+
+            Varyings DepthNormalsVert(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.positionWS = TransformObjectToWorld(IN.positionOS.xyz);
+                OUT.positionCS = TransformWorldToHClip(OUT.positionWS);
+                OUT.normalWS = TransformObjectToWorldNormal(IN.normalOS);
+                return OUT;
+            }
+
+            half4 DepthNormalsFrag(Varyings IN) : SV_Target
+            {
+                if (_GlobalClipEnabled > 0.5)
+                {
+                    float gDist = dot(IN.positionWS, _GlobalClipPlane.xyz) + _GlobalClipPlane.w;
+                    if (gDist < 0.0) discard;
+                }
+                if (_GlobalClipEnabled2 > 0.5)
+                {
+                    float gDist2 = dot(IN.positionWS, _GlobalClipPlane2.xyz) + _GlobalClipPlane2.w;
+                    if (gDist2 < 0.0) discard;
+                }
+
+                #if defined(_CLIP_ENABLED)
+                if (_GlobalClipEnabled < 0.5)
+                {
+                    float dist = dot(IN.positionWS, _ClipPlane.xyz) + _ClipPlane.w;
+                    if (dist < 0.0) discard;
+                }
+                #endif
+
+                float3 normalWS = NormalizeNormalPerPixel(IN.normalWS);
+                return half4(NormalizeNormalPerPixel(normalWS), 0.0);
             }
             ENDHLSL
         }

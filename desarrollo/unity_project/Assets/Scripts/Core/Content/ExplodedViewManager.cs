@@ -229,6 +229,11 @@ namespace WebGL.Core.Content
                 {
                     if (renderer == null) continue;
 
+                    if (IsRuntimeProxyVisual(renderer.transform.name))
+                    {
+                        continue;
+                    }
+
                     bool visible = ShouldRendererPassCategoryFilters(renderer, part);
                     if (visible &&
                         FastenerInspectionManager.Instance != null &&
@@ -252,6 +257,19 @@ namespace WebGL.Core.Content
                     DisableRootColliders(part.transform);
                 }
             }
+        }
+
+        public static bool IsRuntimeProxyVisual(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return false;
+            }
+
+            // Solo los cubos placeholder generados por el pipeline son proxys.
+            // Los meshes del FBX con "_PROXY_" (bateria, GPS, radio) son geometria real.
+            return name.EndsWith("_runtime_proxy", StringComparison.OrdinalIgnoreCase) ||
+                   name.StartsWith("RuntimeProxy", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool FiltersShowAll(IReadOnlyList<string> filters)

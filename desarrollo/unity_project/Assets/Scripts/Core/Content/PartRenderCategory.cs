@@ -503,10 +503,14 @@ namespace WebGL.Core.Content
             {
                 if (RequiresQuadrant(explicitParent))
                 {
-                    string suffix = ResolveQuadrantSuffix(lowered);
-                    if (string.IsNullOrWhiteSpace(suffix))
+                    string suffix = string.Empty;
+                    if (root != null)
                     {
                         suffix = ResolveQuadrantSuffixFromWorld(worldPosition, root);
+                    }
+                    if (string.IsNullOrWhiteSpace(suffix))
+                    {
+                        suffix = ResolveQuadrantSuffix(lowered);
                     }
 
                     return string.IsNullOrWhiteSpace(suffix)
@@ -518,10 +522,14 @@ namespace WebGL.Core.Content
             }
 
             string token = NormalizeToken(rawName);
-            string quadrant = ResolveQuadrantSuffix(lowered);
-            if (string.IsNullOrWhiteSpace(quadrant))
+            string quadrant = string.Empty;
+            if (root != null)
             {
                 quadrant = ResolveQuadrantSuffixFromWorld(worldPosition, root);
+            }
+            if (string.IsNullOrWhiteSpace(quadrant))
+            {
+                quadrant = ResolveQuadrantSuffix(lowered);
             }
 
             if (token.Contains("dj-2216") || token.Contains("motor"))
@@ -903,7 +911,7 @@ namespace WebGL.Core.Content
                 if (cameraFront.sqrMagnitude > 0.000001f)
                 {
                     front = cameraFront.normalized;
-                    right = Vector3.Cross(Vector3.up, front).normalized;
+                    right = Vector3.Cross(front, Vector3.up).normalized;
                     return right.sqrMagnitude > 0.0001f;
                 }
             }

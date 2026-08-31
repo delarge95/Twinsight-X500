@@ -507,16 +507,54 @@ namespace WebGL.UI
             var direct = selection.GetComponent<ExplodablePart>();
             if (direct != null)
             {
-                return direct.transform;
+                return ResolveAssemblyAnchor(direct.transform);
             }
 
             var parent = selection.GetComponentInParent<ExplodablePart>();
             if (parent != null)
             {
-                return parent.transform;
+                return ResolveAssemblyAnchor(parent.transform);
             }
 
             return selection;
+        }
+
+        // Los anchors motor_/prop_ viven dentro de su brazo: la seleccion completa
+        // siempre debe resolver al ensamblaje del brazo (misma regla que SelectionManager).
+        private static Transform ResolveAssemblyAnchor(Transform resolved)
+        {
+            if (resolved == null)
+            {
+                return null;
+            }
+
+            ExplodablePart part = resolved.GetComponent<ExplodablePart>();
+            string id = part != null && part.Data != null && !string.IsNullOrWhiteSpace(part.Data.id)
+                ? part.Data.id
+                : resolved.name;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return resolved;
+            }
+
+            string lower = id.ToLowerInvariant();
+            string suffix = null;
+            if (lower.StartsWith("x500v2_motor_", StringComparison.Ordinal))
+            {
+                suffix = id.Substring("x500v2_motor_".Length);
+            }
+            else if (lower.StartsWith("x500v2_prop_", StringComparison.Ordinal))
+            {
+                suffix = id.Substring("x500v2_prop_".Length);
+            }
+
+            if (string.IsNullOrWhiteSpace(suffix))
+            {
+                return resolved;
+            }
+
+            Transform armAnchor = ResolveCanonicalPartTransform("x500v2_arm_" + suffix);
+            return armAnchor != null ? armAnchor : resolved;
         }
 
         private static Transform ResolveCanonicalPartTransform(string canonicalPartId)

@@ -343,6 +343,96 @@
                             <ui:Label text="NEUTRAL" class="submenu-label" picking-mode="Ignore"/>
                         </ui:Button>
                     </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Level 2c — Filter Sub-Panel -->
+                <ui:VisualElement name="FilterSubPanel" class="mode-submenu submenu--hidden" picking-mode="Position">
+                    <ui:Label text="FILTER CATEGORY" class="submenu-title" picking-mode="Ignore"/>
+                    <ui:VisualElement class="submenu-grid">
+                        <ui:Button name="CatBtn_Structure" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-structure" picking-mode="Ignore"/>
+                            <ui:Label text="AIRFRAME" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="CatBtn_Propulsion" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-propulsion" picking-mode="Ignore"/>
+                            <ui:Label text="PROPULSION" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="CatBtn_Avionics" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-avionics" picking-mode="Ignore"/>
+                            <ui:Label text="AVIONICS" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="CatBtn_Sensors" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-avionics" picking-mode="Ignore"/>
+                            <ui:Label text="SENSORS" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="CatBtn_Power" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-power" picking-mode="Ignore"/>
+                            <ui:Label text="POWER" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="CatBtn_Payload" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-payload" picking-mode="Ignore"/>
+                            <ui:Label text="FASTENERS" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- ═══ STUDIO MODE ═══ Shaders + Environment + Lighting (single panel) -->
+            <ui:VisualElement name="StudioModeContainer" class="mode-container mode--hidden" picking-mode="Ignore">
+                <ui:VisualElement name="StudioPanel" class="mode-submenu" picking-mode="Position">
+                    <!-- Shader Section -->
+                    <ui:Label text="RENDER MODE" class="submenu-title" picking-mode="Ignore" />
+                    <ui:VisualElement name="ShaderMenu" class="submenu-grid">
+                        <ui:Button name="ShaderMode_Realistic" class="submenu-card submenu-card--active" style="display: none;">
+                            <pi:ProceduralShadersIcon class="submenu-icon" picking-mode="Ignore"/>
+                            <ui:Label text="REALISTIC" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="ShaderMode_XRay" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-xray" picking-mode="Ignore"/>
+                            <ui:Label text="X-RAY" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="ShaderMode_Blueprint" class="submenu-card" style="display: none;">
+                            <ui:VisualElement class="submenu-icon icon-blueprint" picking-mode="Ignore"/>
+                            <ui:Label text="BLUEPRINT" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="ShaderMode_SolidColor" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-solid" picking-mode="Ignore"/>
+                            <ui:Label text="SOLID" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="ShaderMode_Wireframe" class="submenu-card" style="display: none;">
+                            <ui:VisualElement class="submenu-icon icon-wire" picking-mode="Ignore"/>
+                            <ui:Label text="WIRE" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="ShaderMode_Ghosted" class="submenu-card" style="display: none;">
+                            <ui:VisualElement class="submenu-icon icon-ghost" picking-mode="Ignore"/>
+                            <ui:Label text="GHOST" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="ShaderMode_Thermal" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-thermal" picking-mode="Ignore"/>
+                            <ui:Label text="THERMAL" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                    </ui:VisualElement>
+
+                    <!-- Environment Section -->
+                    <ui:Label text="ENVIRONMENT" class="submenu-title submenu-title--section" picking-mode="Ignore" />
+                    <ui:VisualElement name="EnvGrid" class="submenu-grid">
+                        <ui:Button name="EnvPreset_Studio" class="submenu-card submenu-card--active">
+                            <ui:VisualElement class="submenu-icon icon-env-studio" picking-mode="Ignore"/>
+                            <ui:Label text="STUDIO" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="EnvPreset_Night" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-env-night" picking-mode="Ignore"/>
+                            <ui:Label text="TIME" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="EnvPreset_Blueprint" class="submenu-card">
+                            <ui:VisualElement class="submenu-icon icon-env-blue" picking-mode="Ignore"/>
+                            <ui:Label text="COLOR" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                        <ui:Button name="EnvPreset_Neutral" class="submenu-card" style="display: none;">
+                            <ui:VisualElement class="submenu-icon icon-env-neutral" picking-mode="Ignore"/>
+                            <ui:Label text="NEUTRAL" class="submenu-label" picking-mode="Ignore"/>
+                        </ui:Button>
+                    </ui:VisualElement>
 
                     <!-- Sliders -->
                     <ui:VisualElement class="env-slider-group" picking-mode="Position">
@@ -351,7 +441,7 @@
                     </ui:VisualElement>
                     <ui:VisualElement class="env-slider-group" picking-mode="Position">
                         <ui:Label text="OBJECT INTENSITY" class="env-slider-label" picking-mode="Position" />
-                        <ui:Slider name="EnvLightIntensity" low-value="0.1" high-value="3" value="1" class="glass-slider env-slider" picking-mode="Position" />
+                        <ui:Slider name="EnvLightIntensity" low-value="0" high-value="10" value="1" class="glass-slider env-slider" picking-mode="Position" />
                     </ui:VisualElement>
                     <ui:VisualElement class="env-slider-group" picking-mode="Position">
                         <ui:Label text="BACKGROUND TONE" class="env-slider-label" picking-mode="Position" />
@@ -392,23 +482,36 @@
          ═══════════════════════════════════════════════ -->
     <ui:VisualElement name="HeroContainer" class="hero-container">
         <!-- Main Hero Content -->
-        <ui:VisualElement name="HeroMain" style="width: 100%; height: 100%; align-items: center; justify-content: center;">
-            <ui:Button name="HeroLanguageBtn" class="hero-language-switch hero-language-switch--en hero-language-corner" text="">
+        <ui:VisualElement name="HeroMain" class="hero-main-layout">
+            <ui:Label text="GEMELO DIGITAL INTERACTIVO · HOLYBRO X500 V2" name="HeroTagline" class="hero-tagline" picking-mode="Ignore" />
+
+            <ui:VisualElement name="HeroTitleContainer" class="hero-title-container" picking-mode="Ignore">
+                <ui:Label text="TwinSight&#10;X500" name="HeroTitleGlitchCyan" class="hero-title hero-title--glitch hero-title--cyan" picking-mode="Ignore" />
+                <ui:Label text="TwinSight&#10;X500" name="HeroTitleGlitchRed" class="hero-title hero-title--glitch hero-title--red" picking-mode="Ignore" />
+                <ui:Label text="TwinSight&#10;X500" name="HeroTitleMain" class="hero-title hero-title--main" picking-mode="Ignore" />
+                <ui:VisualElement name="HeroScanlines" class="hero-scanlines-overlay" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:Label text="Visor WebGL visual-semántico" name="HeroSubtitle" class="hero-subtitle" picking-mode="Ignore" />
+
+            <ui:VisualElement class="hero-menu">
+                <ui:Button name="HeroExploreBtn" class="btn btn-start btn-wide" text="ABRIR VISOR" />
+                <ui:Button name="HeroDeviceBtn" class="btn btn-ghost btn-wide" text="DEVICE" />
+                <ui:Button name="HeroConfigBtn" class="btn btn-ghost btn-wide" text="CONFIG" />
+                <ui:Button name="HeroExitBtn" class="btn btn-ghost btn-wide" text="EXIT" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Bottom-Right Screen Corner Actions (Info + Language) -->
+        <ui:VisualElement name="HeroCornerActions" class="hero-corner-actions">
+            <ui:Button name="HeroInfoBtn" class="hero-info-btn" text="i" tooltip="About" />
+            <ui:Button name="HeroLanguageBtn" class="hero-language-switch hero-language-switch--en" text="">
                 <ui:VisualElement class="hero-language-switch-track" picking-mode="Ignore">
                     <ui:VisualElement name="HeroLanguageThumb" class="hero-language-thumb" picking-mode="Ignore" />
                     <ui:Label name="HeroLangEnLabel" text="EN" class="hero-language-option hero-language-option--en hero-language-option--active" picking-mode="Ignore" />
                     <ui:Label name="HeroLangEsLabel" text="ES" class="hero-language-option hero-language-option--es" picking-mode="Ignore" />
                 </ui:VisualElement>
             </ui:Button>
-            <ui:Label text="TwinSight X500" class="hero-title" picking-mode="Ignore" />
-            <ui:Label text="Visual-semantic WebGL viewer" class="hero-subtitle" picking-mode="Ignore" />
-            
-            <ui:VisualElement class="hero-menu">
-                <ui:Button name="HeroExploreBtn" class="btn btn-primary btn-wide" text="EXPLORE" />
-                <ui:Button name="HeroDeviceBtn" class="btn btn-ghost btn-wide" text="DEVICE" />
-                <ui:Button name="HeroAboutBtn" class="btn btn-ghost btn-wide" text="ABOUT" />
-                <ui:Button name="HeroExitBtn" class="btn btn-ghost btn-wide" text="EXIT" />
-            </ui:VisualElement>
         </ui:VisualElement>
 
         <!-- Submenu: DEVICES -->
@@ -419,6 +522,53 @@
                 <ui:Button name="DeviceBtn_Drone" class="device-option device-option--active" text="Holybro X500 Base" />
                 <ui:Button name="DeviceBtn_Robot" class="device-option" text="Additional Device Slot (Coming Soon)" enabled="false" />
                 <ui:Button name="DeviceBtn_Satellite" class="device-option" text="Additional Device Slot (Coming Soon)" enabled="false" />
+            </ui:ScrollView>
+        </ui:VisualElement>
+
+        <!-- Submenu: CONFIG -->
+        <ui:VisualElement name="HeroSubmenu_Config" class="hero-submenu hero-submenu--hidden" picking-mode="Position">
+            <ui:Button name="SubmenuBackBtn_Config" class="btn-back" text="&lt;" />
+            <ui:Label text="Configuration" class="hero-title" />
+            <ui:ScrollView class="submenu-scroll" mode="Vertical" touch-scroll-type="Elastic">
+                <ui:Label text="QUALITY PRESET" class="config-section-label" />
+                <ui:Button name="QualityBtn_Auto" class="config-tier-card config-tier-auto" text="AUTO" />
+                <ui:VisualElement name="ConfigTierRow" class="config-tier-row" style="display: none;">
+                    <ui:Button name="QualityBtn_Low" class="config-tier-card" text="LOW" />
+                    <ui:Button name="QualityBtn_Medium" class="config-tier-card" text="MEDIUM" />
+                    <ui:Button name="QualityBtn_High" class="config-tier-card" text="HIGH" />
+                    <ui:Button name="QualityBtn_Ultra" class="config-tier-card" text="ULTRA" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="ConfigAdvancedSection" class="config-advanced-section" style="display: none;">
+                    <ui:VisualElement class="env-slider-group">
+                        <ui:Label text="RENDER SCALE" class="env-slider-label" />
+                        <ui:Slider name="ConfigRenderScale" low-value="0.5" high-value="1.5" value="1" class="glass-slider env-slider" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="env-slider-group">
+                        <ui:Label text="SHADOW DISTANCE" class="env-slider-label" />
+                        <ui:Slider name="ConfigShadowDistance" low-value="0" high-value="40" value="12" class="glass-slider env-slider" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="SHADOWS" class="config-row-label" />
+                        <ui:Button name="ConfigShadowsToggle" class="config-cycle-btn" text="ON" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="ANTI-ALIASING (MSAA)" class="config-row-label" />
+                        <ui:Button name="ConfigMsaaBtn" class="config-cycle-btn" text="2X" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="TEXTURE QUALITY" class="config-row-label" />
+                        <ui:Button name="ConfigTextureBtn" class="config-cycle-btn" text="FULL" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="STUDIO SOFTBOXES" class="config-row-label" />
+                        <ui:Button name="ConfigSoftboxesBtn" class="config-cycle-btn" text="ON" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="config-row">
+                        <ui:Label text="SIMPLE LIGHTING (WEBGL)" class="config-row-label" />
+                        <ui:Button name="ConfigCompatBtn" class="config-cycle-btn" text="ON" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:ScrollView>
         </ui:VisualElement>
 
@@ -447,7 +597,6 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- Device Selector removed / moved to BottomSheet -->
     </ui:VisualElement>
 
     <!-- ═══════════════════════════════════════════════
@@ -455,19 +604,33 @@
          ═══════════════════════════════════════════════ -->
     <ui:VisualElement name="OnboardingOverlay" class="onboard-overlay" style="display: none;">
         <ui:VisualElement class="onboard-card">
-            <ui:Button name="OnboardPlatformSwitch" class="onboard-platform-switch" text="">
-                <ui:VisualElement class="onboard-platform-switch-track" picking-mode="Ignore">
-                    <ui:VisualElement name="OnboardPlatformThumb" class="onboard-platform-thumb" picking-mode="Ignore" />
-                    <ui:VisualElement name="OnboardPlatformPcIcon" class="onboard-platform-icon onboard-platform-icon--pc" picking-mode="Ignore">
-                        <ui:VisualElement class="onboard-platform-pc-screen" picking-mode="Ignore" />
-                        <ui:VisualElement class="onboard-platform-pc-stand" picking-mode="Ignore" />
+            <!-- Header Bar: Switch, Prototype Banner, Close Button -->
+            <ui:VisualElement class="onboard-top-bar" picking-mode="Ignore">
+                <!-- Platform Switch (left) -->
+                <ui:Button name="OnboardPlatformSwitch" class="onboard-platform-switch" text="">
+                    <ui:VisualElement class="onboard-platform-switch-track" picking-mode="Ignore">
+                        <ui:VisualElement name="OnboardPlatformThumb" class="onboard-platform-thumb" picking-mode="Ignore" />
+                        <ui:VisualElement name="OnboardPlatformPcIcon" class="onboard-platform-icon onboard-platform-icon--pc" picking-mode="Ignore">
+                            <ui:VisualElement class="onboard-platform-pc-screen" picking-mode="Ignore" />
+                            <ui:VisualElement class="onboard-platform-pc-stand" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="OnboardPlatformMobileIcon" class="onboard-platform-icon onboard-platform-icon--mobile" picking-mode="Ignore">
+                            <ui:VisualElement class="onboard-platform-mobile-body" picking-mode="Ignore" />
+                            <ui:VisualElement class="onboard-platform-mobile-notch" picking-mode="Ignore" />
+                        </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="OnboardPlatformMobileIcon" class="onboard-platform-icon onboard-platform-icon--mobile" picking-mode="Ignore">
-                        <ui:VisualElement class="onboard-platform-mobile-body" picking-mode="Ignore" />
-                        <ui:VisualElement class="onboard-platform-mobile-notch" picking-mode="Ignore" />
-                    </ui:VisualElement>
+                </ui:Button>
+
+                <!-- Prototype disclaimer badge (center) -->
+                <ui:VisualElement name="OnboardPrototypeBanner" class="onboard-prototype-banner" picking-mode="Ignore">
+                    <ui:Label name="OnboardPrototypeLabel" text="BOCETO EN CÓDIGO · PROTOTIPO NO DEFINITIVO" class="onboard-prototype-text" picking-mode="Ignore" />
                 </ui:VisualElement>
-            </ui:Button>
+
+                <!-- Close Button (right) -->
+                <ui:Button name="OnboardCloseBtn" class="onboard-close-btn" tooltip="Close">
+                    <pi:ProceduralCloseIcon class="onboard-close-icon" picking-mode="Ignore" />
+                </ui:Button>
+            </ui:VisualElement>
 
             <!-- Step counter -->
             <ui:Label name="OnboardStepCounter" text="1 / 15" class="onboard-counter" picking-mode="Ignore" />
@@ -508,4 +671,3 @@
     </ui:VisualElement>
 
 </ui:UXML>
-

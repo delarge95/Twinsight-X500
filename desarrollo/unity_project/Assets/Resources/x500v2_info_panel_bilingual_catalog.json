@@ -10655,7 +10655,9 @@
       "entryType": "subpiece",
       "selectionIds": [
         "x500v2_blend_huan_guijiao",
-        "HUAN-GUIJIAO"
+        "HUAN-GUIJIAO",
+        "RUBBER-GROMMET",
+        "rubber_grommet"
       ],
       "canonicalPartId": null,
       "parentIds": [

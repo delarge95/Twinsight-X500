@@ -54,6 +54,7 @@ namespace WebGL.UI.Panels
         private readonly Foldout _foldoutRelationship;
         private readonly Foldout _foldoutAssembly;
         private readonly Foldout _foldoutReferences;
+        private readonly ScrollView _sheetScroll;
         private readonly Button _infoBtn;
         private readonly VisualElement _actionsRow;
 
@@ -139,9 +140,12 @@ namespace WebGL.UI.Panels
             _foldoutRelationship = root.Q<Foldout>("FoldoutRelationship");
             _foldoutAssembly = root.Q<Foldout>("FoldoutAssembly");
             _foldoutReferences = root.Q<Foldout>("FoldoutReferences");
+            _sheetScroll = _contentDetails?.Q<ScrollView>(className: "sheet-scroll") ?? root.Q<ScrollView>(className: "sheet-scroll");
 
             _topContextLabel = root.Q<Label>("TopContextLabel");
             _actionsRow = root.Q<VisualElement>(className: "actions-row");
+
+            BindFoldouts();
 
             AppLanguageManager.LanguageChanged += OnLanguageChanged;
             AddCleanup(() => AppLanguageManager.LanguageChanged -= OnLanguageChanged);
@@ -288,12 +292,66 @@ namespace WebGL.UI.Panels
             if (_partNameLabel != null && !_partNameLabel.ClassListContains("selection-label--hidden"))
                 _partNameLabel.style.color = new StyleColor(isLight ? AccentLight : AccentDark);
 
-            if (_topContextLabel != null)
+            if (_sheetCloseBtn != null)
             {
-                bool hasSelection = SelectionManager.Instance?.HasSelection == true;
-                _topContextLabel.style.color = new StyleColor(
-                    hasSelection ? (isLight ? AccentLight : AccentDark) : (isLight ? MutedLight : MutedDark));
+                System.Action onClose = () => SetSheetState(false);
+                _sheetCloseBtn.clicked += onClose;
+                AddCleanup(() => _sheetCloseBtn.clicked -= onClose);
+                RegisterTransientInputBlock(_sheetCloseBtn);
+
+                // Stop click from bubbling to parent containers
+                EventCallback<ClickEvent> stopClick = evt => evt.StopPropagation();
+                _sheetCloseBtn.RegisterCallback(stopClick);
+                AddCleanup(() => _sheetCloseBtn.UnregisterCallback(stopClick));
             }
+
+            BindInteractions();
+        }
+
+        private void BindFoldouts()
+        {
+            Foldout[] foldouts = {
+                _foldoutIdentification,
+                _foldoutSpecifications,
+                _foldoutRelationship,
+                _foldoutAssembly,
+                _foldoutReferences
+            };
+
+            foreach (var foldout in foldouts)
+            {
+                if (foldout == null) continue;
+
+                EventCallback<ChangeEvent<bool>> onToggle = evt =>
+                {
+                    ClampSheetScroll();
+                };
+
+                foldout.RegisterValueChangedCallback(onToggle);
+                AddCleanup(() => foldout.UnregisterValueChangedCallback(onToggle));
+            }
+        }
+
+        private void ClampSheetScroll()
+        {
+            if (_sheetScroll == null) return;
+
+            _sheetScroll.schedule.Execute(() =>
+            {
+                if (_sheetScroll.contentContainer == null || _sheetScroll.contentViewport == null) return;
+
+                float maxScrollY = Mathf.Max(0f, _sheetScroll.contentContainer.layout.height - _sheetScroll.contentViewport.layout.height);
+                Vector2 currentOffset = _sheetScroll.scrollOffset;
+
+                if (currentOffset.y > maxScrollY)
+                {
+                    _sheetScroll.scrollOffset = new Vector2(currentOffset.x, maxScrollY);
+                }
+                else if (currentOffset.y < 0f)
+                {
+                    _sheetScroll.scrollOffset = new Vector2(currentOffset.x, 0f);
+                }
+            }).ExecuteLater(50);
         }
 
         // ═══════════════════════════════════════════════════════
@@ -1380,6 +1438,9 @@ namespace WebGL.UI.Panels
             if (lookup.Contains("MISC-FRAME-CONNECTOR")) return "Auxiliary Frame Connector";
             if (lookup.Contains("MISC-LIGHT-COVER")) return "Auxiliary Light Cover";
             if (lookup.Contains("FASTENER-GROUP")) return "Fastener Set";
+            if (lookup.Contains("RUBBER")) return "Silicone Vibration Dampener";
+            if (lookup.Contains("BATTERY-STRAP") || lookup.Contains("BATTERY STRAP")) return "Battery Strap";
+            if (lookup.Contains("LIPO")) return "LiPo Battery";
             return string.Empty;
         }
 

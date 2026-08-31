@@ -16,16 +16,16 @@ La revisión funcional se complementa con mediciones técnicas y con instrumento
 \begin{table}[htbp]
     \caption{Estado de Cierre Funcional por Frente de Validación}
     \label{tab:estado_cierre_funcional}
-    \begin{tabular}{p{2.8cm}p{2.8cm}p{4.8cm}p{2.4cm}}
+    \begin{tabularx}{\textwidth}{p{2.8cm}p{2.8cm}Xp{2.4cm}}
         \hline
-        \textbf{Frente} & \textbf{Estado} & \textbf{Evidencia de cierre} & \textbf{Dato de validación} \\ \hline
+        \textit{Frente} & \textit{Estado} & \textit{Evidencia de cierre} & \textit{Dato de validación} \\ \hline
         Flujo principal WebGL & QA funcional correcto & La app permite explorar, seleccionar, aislar y analizar sin romper flujo & Métricas por escenario \\
         Interacción móvil & QA P1/P2 correcto & Gestos, \textit{bottom sheet}, doble toque, zoom e iconos ajustados & Tabla por dispositivo \\
         Rendimiento percibido & Correcto en revisión & La app se observó fluida en escritorio y en la mayoría de móviles & FPS, memoria y carga \\
         Usabilidad formativa & Correcta para cierre & La prueba breve permitió convertir gestos en ajustes de interfaz & SUS, NASA-TLX y \textit{Think-Aloud} \\
         Manuales e informe & Coherencia revisada & La documentación distingue funciones visibles y capacidades ocultas & Datos de campo registrados \\ \hline
-    \end{tabular}
-    \apanote[14.4pt]{Esta tabla resume el cierre funcional y no reemplaza las tablas cuantitativas posteriores. Elaboración propia.}
+    \end{tabularx}
+    \apanote[10.6pt]{Esta tabla resume el cierre funcional y no reemplaza las tablas cuantitativas posteriores. Elaboración propia.}
 \end{table}
 
 \subsection{Aporte Frente a Necesidades de la Industria de Hardware Complejo}
@@ -35,16 +35,16 @@ La revisión conceptual de cierre permitió reinterpretar los resultados funcion
 \begin{table}[htbp]
     \caption{Relación entre Necesidades Industriales y Respuesta del Prototipo}
     \label{tab:necesidades_industriales_respuesta_prototipo}
-    \begin{tabular}{p{3.1cm}p{4.8cm}p{3.8cm}p{2.1cm}}
+    \begin{tabularx}{\textwidth}{p{3.1cm}Xp{3.8cm}p{2.1cm}}
         \hline
-        \textbf{Necesidad industrial} & \textbf{Respuesta actual del proyecto} & \textbf{Límite vigente} & \textbf{Madurez} \\ \hline
+        \textit{Necesidad industrial} & \textit{Respuesta actual del proyecto} & \textit{Límite vigente} & \textit{Madurez} \\ \hline
         Comprensión espacial & Navegación 3D, selección, aislamiento, vista explosionada y corte & Se complementa con documentación técnica & Visual product twin \\
         Transferencia técnica & Onboarding, hotspots, fichas por pieza y flujo mobile-first & Falta medir formalmente aprendizaje longitudinal & Visual product twin \\
         Conversión CAD a web & Pipeline CAD/Blender/Unity, saneamiento runtime y profiler & Reducción geométrica reportada por rutas & Digital model \\
         Datos fragmentados & Taxonomía 28/30/257 y fichas como base de identificadores & No existe aún \textit{twin manifest} formal & Preparación semántica \\
         Soporte y mantenimiento & Selección contextual y lectura por componentes como base & No hay repuestos ni reglas de diagnóstico & Trabajo futuro \\
         Estado operacional & Visualización térmica heurística por componente & No hay telemetría real ni sincronización & Pre-shadow conceptual \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[14.4pt]{La tabla distingue respuesta funcional actual, límite técnico y nivel de madurez. No clasifica la build como \textit{digital twin} operacional. Elaboración propia a partir de la investigación conceptual y la build final.}
 \end{table}
 
@@ -75,17 +75,17 @@ Adicionalmente, la compatibilidad del prototipo se evaluó considerando diferent
 \begin{table}[htbp]
     \caption{Compatibilidad por Factor de Forma, Navegador y Estado de Validación}
     \label{tab:compatibilidad_factor_forma}
-    \begin{tabular}{p{2.4cm}p{2.6cm}p{2.8cm}p{1.7cm}p{3.3cm}}
+    \begin{tabularx}{\textwidth}{p{2.4cm}p{2.6cm}p{2.8cm}p{1.7cm}X}
         \hline
-        \textbf{Factor de forma} & \textbf{Navegador} & \textbf{Compatibilidad} & \textbf{Validado} & \textbf{Observaciones} \\ \hline
+        \textit{Factor de forma} & \textit{Navegador} & \textit{Compatibilidad} & \textit{Validado} & \textit{Observaciones} \\ \hline
         Escritorio & Windows 11 / Chrome 141 & Compatible & Sí & Fluidez estable en escenarios base, selección, explode y corte. \\
         Móvil Android gama media & MIUI 14 / Chrome 148 & Compatible con restricciones & Sí & Usable con picos perceptibles; referencia Redmi Note 10S. \\
         Móvil Android límite inf. & Android 12 / Chrome 114 & Compatible con restricciones & Sí & Navegable, por debajo de la meta de 30 FPS. \\
         Móvil Android gama alta & Android 12 / Chrome 114 & Compatible & Sí & Cercano a 30 FPS promedio y estable. \\
         Móvil iOS gama alta & iOS / Safari & Compatible & Sí & Fluidez cercana a 60 FPS en recorrido completo. \\
         Captura descartada & Android 12 / Chrome 91 & No usada & No & Sesión separada por pausa atípica del navegador. \\ \hline
-    \end{tabular}
-    \apanote[6.2pt]{La tabla resume compatibilidad observada por factor de forma y navegador a partir de las sesiones del profiler interno. Elaboración propia.}
+    \end{tabularx}
+    \apanote[6.1pt]{La tabla resume compatibilidad observada por factor de forma y navegador a partir de las sesiones del profiler interno. Elaboración propia.}
 \end{table}
 
 \begin{figure}[htbp]
@@ -114,9 +114,9 @@ La revisión permitió convertir esas observaciones en ajustes concretos: el tut
 \begin{table}[htbp]
     \caption[Hallazgos Formativos y Correcciones]{Hallazgos Formativos y Correcciones Aplicadas antes de la Evaluación con Usuarios}
     \label{tab:hallazgos_formativos_fixes}
-    \begin{tabular}{p{2.8cm}p{3.8cm}p{4.0cm}p{1.8cm}}
+    \begin{tabularx}{\textwidth}{p{2.8cm}p{3.8cm}Xp{1.8cm}}
         \hline
-        \textbf{Observación} & \textbf{Comportamiento detectado} & \textbf{Corrección aplicada} & \textbf{Estado} \\ \hline
+        \textit{Observación} & \textit{Comportamiento detectado} & \textit{Corrección aplicada} & \textit{Estado} \\ \hline
         Tutorial & Usuarios intentaron hacer \textit{swipe} & Navegación por dots/gestos y cierre descendente & QA correcto \\
         Panel de información & Gesto se confundía con el dron & El panel bloquea su área táctil & QA correcto \\
         Zoom y órbita & Sensibilidad táctil percibida alta & Reducción de sensibilidad en móvil & QA correcto \\
@@ -124,7 +124,7 @@ La revisión permitió convertir esas observaciones en ajustes concretos: el tut
         Hotspots & Se esperaba doble toque sobre hotspots & Doble tap para aislamiento de hotspots & QA correcto \\
         Botón Atrás & Salida indeseada del navegador & Navegación por capas y confirmación & QA correcto \\
         Iconos móviles & Microinteracciones en estado incorrecto & Estabilización de estados táctiles & QA correcto \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[14.4pt]{Estos hallazgos provienen de observación formativa previa y explican la evolución P1/P2 aplicada antes de consolidar los instrumentos de usuario. Elaboración propia.}
 \end{table}
 
@@ -132,7 +132,7 @@ La revisión permitió convertir esas observaciones en ajustes concretos: el tut
     \caption{Mapa de Gestos Espontáneos y Correcciones P1/P2}
     \label{fig:mapa_gestos_fixes}
     \includegraphics[width=0.88\textwidth,height=0.45\textheight,keepaspectratio]{figures/chapter5/fig_5_mapa_gestos_fixes.pdf}
-    \apanote[-18.3pt]{Mapeo visual que conecta las fricciones de interacción táctil identificadas en la prueba previa de Think-Aloud con sus correspondientes soluciones implementadas en la interfaz de la build. Elaboración propia.}
+    \apanote[6.1pt]{Mapeo visual que conecta las fricciones de interacción táctil identificadas en la prueba previa de Think-Aloud con sus correspondientes soluciones implementadas en la interfaz de la build. Elaboración propia.}
 \end{figure}
 
 \FloatBarrier
@@ -143,15 +143,15 @@ La evaluación de usabilidad se aplicó a 12 participantes anonimizados entre el
 \begin{table}[htbp]
     \caption{Desempeño Observado por Tarea y Condición}
     \label{tab:desempeno_tareas_condicion}
-    \begin{tabular}{p{3.1cm}p{2.2cm}p{2.2cm}p{2.2cm}p{4.1cm}}
+    \begin{tabularx}{\textwidth}{p{3.1cm}p{2.2cm}p{2.2cm}p{2.2cm}X}
         \hline
-        \textbf{Tarea} & \textbf{Visor 3D} & \textbf{Soporte 2D} & \textbf{Errores / ayudas} & \textbf{Lectura} \\ \hline
+        \textit{Tarea} & \textit{Visor 3D} & \textit{Soporte 2D} & \textit{Errores / ayudas} & \textit{Lectura} \\ \hline
         T1. Ubicación & 12/12 completadas & 12/12 completadas & 0 errores; 0 ayudas & Localizaron el motor y piezas cercanas. \\
         T2. Interpretación & 12/12 completadas & 12/12 completadas & 0 errores; 1 ayuda & El \textit{bottom sheet} permitió consultar información. \\
         T3. Relación espacial & 12/12 completadas & 12/12 completadas & 0 errores; 0 ayudas & Relación motor--montura--tornillería resuelta. \\
         T4. Análisis guiado & 12/12 completadas & 12/12 completadas & 0 errores; 0 ayudas & En 3D se usaron explode, X-Ray y presets. \\ \hline
-    \end{tabular}
-    \apanote[-18.4pt]{La tabla sintetiza los registros estructurados del moderador por tarea y condición. La lectura cualitativa complementaria se presenta en la sección de \textit{Think-Aloud}. Elaboración propia.}
+    \end{tabularx}
+    \apanote[14.4pt]{La tabla sintetiza los registros estructurados del moderador por tarea y condición. La lectura cualitativa complementaria se presenta en la sección de \textit{Think-Aloud}. Elaboración propia.}
 \end{table}
 
 La medición temporal se aplicó a T1, T2 y T3, porque estas tareas tenían inicio y cierre claramente comparables entre visor 3D y soporte 2D. La T4 se mantuvo como tarea exploratoria guiada y, por esa razón, no se cronometró ni se incluye en el análisis temporal. Su lectura se conserva en la observación cualitativa y en el protocolo \textit{Think-Aloud}. Los tiempos se registraron como cronometraje operativo en segundos durante la sesión moderada; por ello se interpretan como evidencia descriptiva de desempeño y no como medición instrumental de alta precisión temporal.
@@ -159,9 +159,9 @@ La medición temporal se aplicó a T1, T2 y T3, porque estas tareas tenían inic
 \begin{table}[htbp]
     \caption{Tiempos Registrados por Participante en Tareas Cronometradas}
     \label{tab:tiempos_tareas_cronometradas_participante}
-    \begin{tabular}{p{1.1cm}p{0.8cm}p{1.7cm}rrrrrr}
+    \begin{tabularx}{\textwidth}{p{1.2cm}p{1.0cm}p{1.8cm}>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X}
         \hline
-        \textbf{Código} & \textbf{Sec.} & \textbf{Disp.} & \textbf{T1 3D} & \textbf{T1 2D} & \textbf{T2 3D} & \textbf{T2 2D} & \textbf{T3 3D} & \textbf{T3 2D} \\ \hline
+        \textit{Código} & \textit{Sec.} & \textit{Disp.} & \textit{T1 3D} & \textit{T1 2D} & \textit{T2 3D} & \textit{T2 2D} & \textit{T3 3D} & \textit{T3 2D} \\ \hline
         P001 & AB & Smartphone & 5 & 13 & 3 & 18 & 15 & 23 \\
         P002 & BA & Smartphone & 5 & 13 & 3 & 18 & 11 & 23 \\
         P003 & AB & Smartphone & 5 & 13 & 3 & 18 & 11 & 23 \\
@@ -174,22 +174,22 @@ La medición temporal se aplicó a T1, T2 y T3, porque estas tareas tenían inic
         P010 & BA & Smartphone & 5 & 13 & 3 & 18 & 11 & 23 \\
         P011 & AB & Smartphone & 5 & 13 & 3 & 18 & 11 & 23 \\
         P012 & BA & PC & 5 & 13 & 3 & 18 & 11 & 23 \\ \hline
-    \end{tabular}
-    \apanote[-18.4pt]{Los tiempos se presentan en segundos. Sec. = secuencia de exposición; AB = visor 3D primero y soporte 2D después; BA = soporte 2D primero y visor 3D después. Elaboración propia a partir de los registros del moderador.}
+    \end{tabularx}
+    \apanote{Los tiempos se presentan en segundos. Sec. = secuencia de exposición; AB = visor 3D primero y soporte 2D después; BA = soporte 2D primero y visor 3D después. Elaboración propia a partir de los registros del moderador.}
 \end{table}
 
 \begin{table}[htbp]
     \caption{Resumen Descriptivo de Tiempos en Tareas Cronometradas}
     \label{tab:resumen_tiempos_tareas_cronometradas}
-    \begin{tabular}{p{2.5cm}rrrrp{4.0cm}}
+    \begin{tabularx}{\textwidth}{p{2.8cm}>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}Xp{4.5cm}}
         \hline
-        \textbf{Tarea} & \textbf{Media 3D} & \textbf{Media 2D} & \textbf{Dif. 2D--3D} & \textbf{n} & \textbf{Lectura} \\ \hline
+        \textit{Tarea} & \textit{Media 3D} & \textit{Media 2D} & \textit{Dif. 2D--3D} & \textit{n} & \textit{Lectura} \\ \hline
         T1 & 5,75 s & 13,00 s & 7,25 s & 12 & Favorable al visor 3D. \\
         T2 & 3,50 s & 18,00 s & 14,50 s & 12 & Favorable al visor 3D. \\
         T3 & 11,33 s & 23,00 s & 11,67 s & 12 & Favorable al visor 3D. \\
-        \textbf{Total T1--T3} & \textbf{20,58 s} & \textbf{54,00 s} & \textbf{33,42 s} & \textbf{12} & \textbf{Menor duración acumulada en 3D.} \\ \hline
-    \end{tabular}
-    \apanote[-18.4pt]{La diferencia se calcula como media del soporte 2D menos media del visor 3D. Elaboración propia.}
+        \textit{Total T1--T3} & \textit{20,58 s} & \textit{54,00 s} & \textit{33,42 s} & \textit{12} & \textit{Menor duración acumulada en 3D.} \\ \hline
+    \end{tabularx}
+    \apanote{La diferencia se calcula como media del soporte 2D menos media del visor 3D. Elaboración propia.}
 \end{table}
 
 En las tres tareas cronometradas, la condición 3D presentó menor tiempo medio que el soporte 2D. El tiempo total medio acumulado en T1--T3 fue de 20,58 s para el visor 3D y de 54,00 s para el soporte 2D, con una diferencia media de 33,42 s a favor del visor. Estos resultados se interpretan de forma descriptiva y complementan la lectura de NASA-TLX Raw, donde el visor 3D también presentó menor carga de trabajo percibida.
@@ -199,9 +199,9 @@ El SUS se aplicó únicamente al prototipo 3D, de acuerdo con el diseño metodol
 \begin{table}[htbp]
     \caption{Resultados SUS y NASA-TLX Raw por Participante}
     \label{tab:validacion_sus_nasa_participantes}
-    \begin{tabular}{p{1.2cm}p{0.9cm}p{1.6cm}p{0.9cm}p{1.3cm}p{1.3cm}p{1.3cm}p{3.4cm}}
+    \begin{tabularx}{\textwidth}{p{1.2cm}p{0.9cm}p{1.6cm}p{0.9cm}p{1.3cm}p{1.3cm}p{1.3cm}X}
         \hline
-        \textbf{Código} & \textbf{Sec.} & \textbf{Dispositivo} & \textbf{SUS} & \textbf{NASA 3D} & \textbf{NASA 2D} & \textbf{Dif.} & \textbf{Lectura} \\ \hline
+        \textit{Código} & \textit{Sec.} & \textit{Dispositivo} & \textit{SUS} & \textit{NASA 3D} & \textit{NASA 2D} & \textit{Dif.} & \textit{Lectura} \\ \hline
         001 & AB & Smartphone & 90,00 & 7,00 & 17,50 & 10,50 & Usabilidad alta y menor carga en visor 3D. \\
         002 & BA & Smartphone & 95,00 & 5,17 & 17,50 & 12,33 & Usabilidad alta y baja carga 3D. \\
         003 & AB & Smartphone & 97,50 & 8,67 & 22,83 & 14,16 & Diferencia favorable al visor. \\
@@ -214,21 +214,21 @@ El SUS se aplicó únicamente al prototipo 3D, de acuerdo con el diseño metodol
         010 & BA & Smartphone & 95,00 & 3,50 & 15,00 & 11,50 & Menor carga 3D del grupo. \\
         011 & AB & Smartphone & 85,00 & 5,17 & 16,67 & 11,50 & Resultado favorable con fricciones menores. \\
         012 & BA & PC & 100,00 & 5,33 & 19,17 & 13,84 & Uso fluido en PC. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[+28.8pt]{Sec. = secuencia de exposición; AB = visor 3D primero y soporte 2D después; BA = soporte 2D primero y visor 3D después. La diferencia se calcula como NASA-TLX Raw 2D menos NASA-TLX Raw 3D. Elaboración propia a partir de los instrumentos de validación aplicados.}
 \end{table}
 
 \begin{table}[htbp]
     \caption{Resumen Descriptivo de Usabilidad y Carga de Trabajo Percibida}
     \label{tab:validacion_resumen_sus_nasa}
-    \begin{tabular}{p{5.0cm}rrrrrr}
+    \begin{tabularx}{\textwidth}{p{5.0cm}>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X}
         \hline
-        \textbf{Medida} & \textbf{n} & \textbf{Media} & \textbf{Mediana} & \textbf{Mín.} & \textbf{Máx.} & \textbf{DE} \\ \hline
+        \textit{Medida} & \textit{n} & \textit{Media} & \textit{Mediana} & \textit{Mín.} & \textit{Máx.} & \textit{DE} \\ \hline
         SUS & 12 & 91,88 & 95,00 & 60,00 & 100,00 & 11,24 \\
         NASA-TLX Raw visor 3D & 12 & 8,69 & 7,25 & 3,50 & 25,00 & 5,66 \\
         NASA-TLX Raw soporte 2D & 12 & 19,89 & 17,50 & 15,00 & 36,67 & 6,18 \\
         Diferencia 2D--3D pareada & 12 & 11,19 & 11,50 & 5,83 & 16,67 & 3,16 \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[+3.7pt]{DE = desviación estándar. Los resultados se interpretan de forma descriptiva y exploratoria por el tamaño de muestra y el muestreo no probabilístico. Elaboración propia.}
 \end{table}
 
@@ -249,16 +249,16 @@ Por dimensiones, el visor 3D presentó menores promedios en demanda mental, dema
 \begin{table}[htbp]
     \caption{Promedios NASA-TLX Raw por Dimensión y Condición}
     \label{tab:nasa_tlx_dimensiones_condicion}
-    \begin{tabular}{p{4.6cm}rrr}
+    \begin{tabularx}{\textwidth}{X>{\raggedleft\arraybackslash}p{2.4cm}>{\raggedleft\arraybackslash}p{2.4cm}>{\raggedleft\arraybackslash}p{2.4cm}}
         \hline
-        \textbf{Dimensión} & \textbf{Visor 3D} & \textbf{Soporte 2D} & \textbf{Diferencia} \\ \hline
+        \textit{Dimensión} & \textit{Visor 3D} & \textit{Soporte 2D} & \textit{Diferencia} \\ \hline
         Demanda mental & 10,58 & 25,00 & 14,42 \\
         Demanda física & 4,08 & 5,58 & 1,50 \\
         Demanda temporal & 10,00 & 10,00 & 0,00 \\
         Rendimiento invertido & 3,33 & 23,75 & 20,42 \\
         Esfuerzo & 19,58 & 27,50 & 7,92 \\
         Frustración & 4,58 & 27,50 & 22,92 \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote[3.7pt]{La dimensión de rendimiento se registró con escala invertida: 0 = perfecto y 100 = fallido. Por ello, valores menores indican mejor percepción de desempeño. Elaboración propia.}
 \end{table}
 
@@ -281,16 +281,16 @@ Los temas de mejora más repetidos fueron inconsistencias visuales o estados inc
 \begin{table}[htbp]
     \caption{Síntesis de Hallazgos \textit{Think-Aloud}}
     \label{tab:thinkaloud_sintesis}
-    \begin{tabular}{p{3.5cm}p{1.9cm}p{5.8cm}p{2.4cm}}
+    \begin{tabularx}{\textwidth}{p{3.5cm}p{1.9cm}Xp{2.4cm}}
         \hline
-        \textbf{Categoría analítica} & \textbf{Frecuencia} & \textbf{Evidencia representativa} & \textbf{Lectura} \\ \hline
+        \textit{Categoría analítica} & \textit{Frecuencia} & \textit{Evidencia representativa} & \textit{Lectura} \\ \hline
         Comprensión espacial & 11/12 & Relación motor, montura, tornillería y conjunto & Fortaleza principal. \\
         Navegación y control & 10/12 & Fricciones con órbita, \textit{pan} y sensibilidad táctil & Punto de mejora UX móvil. \\
         Percepción de claridad & 8/12 & Explosionada, térmica, X-Ray, Blueprint y aislamiento & Apoya menor carga de trabajo. \\
         Interpretación de UI & 7/12 & Lectura de iconos y menús concentró dudas & Pulido visual continuo. \\
         Estrategias de recuperación & 3/12 & Cambios de ángulo o gestos repetidos & Aprendizaje durante la sesión. \\
         Errores o bloqueos & 2/12 & Selección de piezas pequeñas generó fricción & Riesgo localizado. \\ \hline
-    \end{tabular}
+    \end{tabularx}
     \apanote{La frecuencia indica cantidad de participantes en los que apareció la categoría al menos una vez. Elaboración propia.}
 \end{table}
 
@@ -309,15 +309,15 @@ La comparación de rutas de importación y saneamiento geométrico muestra que e
 \begin{table}[htbp]
     \caption{Conteo Total de Triángulos por Método de Importación y Optimización}
     \label{tab:reduccion_geometrica_modelo_total}
-    \begin{tabular}{p{3.7cm}p{2.6cm}p{7.8cm}}
+    \begin{tabularx}{\textwidth}{p{3.7cm}p{2.6cm}X}
         \hline
-        \textbf{Método} & \textbf{Triángulos totales} & \textbf{Detalle técnico observado} \\ \hline
+        \textit{Método} & \textit{Triángulos totales} & \textit{Detalle técnico observado} \\ \hline
         Importación directa & 6\,717\,499 tris & Malla caótica, conexiones en T, vértices y caras repetidas. \\
         MoI3D & 6\,864\,586 tris & Malla más limpia, pero con n-gons y vértices no soldados. \\
         STEPper & 6\,525\,748 tris & Menor cantidad de vértices repetidos, pero malla desordenada. \\
         Modelo optimizado & 95\,617 tris & Conteo del activo base optimizado y sus masters principales. \\ \hline
-    \end{tabular}
-    \apanote[-18.4pt]{La cifra de 95\,617 triángulos corresponde al modelo base optimizado exportado para la build. No equivale al conteo de escena runtime reportado por el profiler. Elaboración propia.}
+    \end{tabularx}
+    \apanote[3.7pt]{La cifra de 95\,617 triángulos corresponde al modelo base optimizado exportado para la build. No equivale al conteo de escena runtime reportado por el profiler. Elaboración propia.}
 \end{table}
 
 \begin{figure}[htbp]
