@@ -1717,6 +1717,63 @@
         transform: translateY(1px);
       }
 
+      @media (max-width: 600px) {
+        .cad-toolbar {
+          width: calc(100% - 1.25rem);
+          max-width: 390px;
+          bottom: 0.65rem;
+          padding: 0.30rem 0.40rem;
+          gap: 0.20rem;
+          justify-content: space-between;
+          border-radius: 10px;
+        }
+
+        .cad-tool-group {
+          gap: 0.18rem;
+        }
+
+        .cad-divider {
+          height: 14px;
+          margin: 0 0.10rem;
+        }
+
+        .cad-btn {
+          padding: 0.32rem 0.42rem;
+          font-size: 0.56rem;
+          gap: 0.20rem;
+          border-radius: 6px;
+        }
+
+        .cad-btn-icon {
+          width: 24px;
+          height: 24px;
+          border-radius: 6px;
+        }
+
+        .cad-btn-icon svg,
+        .cad-btn svg {
+          width: 11px;
+          height: 11px;
+        }
+      }
+
+      @media (max-width: 375px) {
+        .cad-toolbar {
+          padding: 0.25rem 0.30rem;
+          gap: 0.12rem;
+        }
+
+        .cad-btn {
+          padding: 0.30rem 0.35rem;
+          font-size: 0.52rem;
+        }
+
+        .cad-btn-icon {
+          width: 22px;
+          height: 22px;
+        }
+      }
+
       /* Esquinas Tácticas HUD (Blanco) */
       .stage-hud-corners {
         position: absolute;
@@ -4438,9 +4495,9 @@ canvas.addEventListener("pointerup", endDrag);
               mReveal = 0.0;
               wFade = 0.0;
               texEff = 0;
-              edgeAlpha = 0.90;
-              pointAlpha = 0.55;
-              faceAlpha = 0.0;
+              edgeAlpha = 0.50;
+              pointAlpha = 0.0;
+              faceAlpha = 0.40;
             } else if (ctlShown) {
               if (viewMode === "flat") { mReveal = 1; wFade = swEdges ? 0 : 1; texEff = 0; }
               else if (viewMode === "material") { mReveal = 1; wFade = swEdges ? 0 : 1; }
@@ -4472,9 +4529,9 @@ canvas.addEventListener("pointerup", endDrag);
               }
             }
 
-            const drawFaces = isMobileDevice ? false : (!ctlShown || viewMode === "flat" || viewMode === "material");
+            const drawFaces = isMobileDevice ? true : (!ctlShown || viewMode === "flat" || viewMode === "material");
             const drawEdges = isMobileDevice ? true : ((!ctlShown && edgeAlpha > 0.005) || viewMode === "edges" || (ctlShown && swEdges));
-            const drawPoints = isMobileDevice ? true : (!ctlShown || viewMode === "points" || pointAlpha > 0.005);
+            const drawPoints = isMobileDevice ? false : (!ctlShown || viewMode === "points" || pointAlpha > 0.005);
             const ramp = structMode ? 1 : Math.min(rampCur, 1);
             const nFaces = Math.max(3, Math.ceil(setFaces.count * ramp));
             const nEdges = Math.max(2, Math.ceil(setEdges.count * ramp));
