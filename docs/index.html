@@ -961,31 +961,43 @@
         opacity: 1;
       }
 
-      .btn-close-app {
-        position: fixed;
-        top: 1.25rem;
-        right: 1.25rem;
-        width: 2.75rem;
-        height: 2.75rem;
-        border-radius: 50%;
-        background: rgba(18, 18, 22, 0.75);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        color: #ffffff;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 10001;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+      .desktop-adaptation-badge {
+        display: none;
       }
 
-      .btn-close-app:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.8);
-        transform: scale(1.08);
+      @media (min-width: 900px) {
+        .app-overlay.active .desktop-adaptation-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          position: absolute;
+          top: 1.25rem;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 50;
+          background: rgba(18, 18, 22, 0.75);
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          border-radius: 999px;
+          padding: 0.45rem 1.1rem;
+          font-family: "JetBrains Mono", monospace;
+          font-size: 0.65rem;
+          letter-spacing: 0.08em;
+          color: rgba(255, 255, 255, 0.70);
+          pointer-events: none;
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+          animation: desktopBadgeFade 0.6s ease 0.6s both;
+        }
+        .desktop-adaptation-badge svg {
+          color: rgba(255, 255, 255, 0.9);
+          flex-shrink: 0;
+        }
+      }
+
+      @keyframes desktopBadgeFade {
+        from { opacity: 0; transform: translate(-50%, -8px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
       }
 
       .app-status {
@@ -1764,7 +1776,10 @@
     </section>
 
     <div class="app-overlay" id="appOverlay" data-od-id="app-overlay">
-      <button class="btn-close-app" id="btnCloseApp" title="Cerrar visor" aria-label="Cerrar visor" data-i18n-title="closeApp">✕</button>
+      <div class="desktop-adaptation-badge" id="desktopAdaptationBadge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span data-i18n="desktopNotice">Adaptación preliminar para escritorio · UI optimizada para Mobile-First</span>
+      </div>
       <iframe
         title="TwinSight X500"
         class="app-frame"
@@ -2223,6 +2238,7 @@
             cadFxGlitchTitle: "Toggle Glitch & Aberration FX",
             cadFxDeformTitle: "Toggle Vertex Deformation FX",
             closeApp: "Exit viewer",
+            desktopNotice: "Preliminary desktop adaptation · UI optimized for Mobile-First",
             docFinalReport: "Final Report",
             docGithub: "GitHub Repository",
             footerText: "2026 · UNAD · Multimedia Engineering"
@@ -2296,6 +2312,7 @@
             cadFxGlitchTitle: "Alternar FX Glitch & Aberración",
             cadFxDeformTitle: "Alternar FX Deformación de Vértices",
             closeApp: "Cerrar visor",
+            desktopNotice: "Adaptación preliminar para escritorio · UI optimizada para Mobile-First",
             closureTitle: "Estado del cierre",
             closureBuildTitle: "Build publicada",
             closureBuildText:
@@ -2741,14 +2758,6 @@
 
         window.x500v2ExitApp = requestAppExit;
         window.requestAppExit = requestAppExit;
-
-        const btnCloseApp = document.getElementById("btnCloseApp");
-        if (btnCloseApp) {
-          btnCloseApp.addEventListener("click", (e) => {
-            e.stopPropagation();
-            requestAppExit();
-          });
-        }
 
         function isTrustedUnityMessage(event, type) {
           if (!event || !event.data) return false;
