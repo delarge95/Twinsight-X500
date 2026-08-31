@@ -14,11 +14,11 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
       :root {
         --bg: oklch(0.135 0 0);
@@ -2550,6 +2550,7 @@
             gPending = true;
             requestAnimationFrame(() => {
               gPending = false;
+              if (!window.__twBootWarm) return;
               const now = performance.now();
               if (now - gScan < 120) return;
               gScan = now;
@@ -2977,17 +2978,25 @@
         window.addEventListener("scroll", onScroll, { passive: true });
         onScroll();
 
+        // Compuerta de arranque (warm-up): el trabajo pesado ligado al mouse no compite
+        // con la compilación de shaders y el primer frame de WebGL durante la carga
+        window.__twBootWarm = false;
+        setTimeout(() => { window.__twBootWarm = true; }, 1200);
+
         let cxPending = false;
         let cxLast = null;
         if (!isMobileDevice) {
+          const crtEl = document.querySelector(".crt");
           window.addEventListener("pointermove", (e) => {
             cxLast = e;
             if (cxPending) return;
             cxPending = true;
             requestAnimationFrame(() => {
               cxPending = false;
-              if (!cxLast) return;
-              const de = document.documentElement;
+              if (!cxLast || !window.__twBootWarm) return;
+              // Las variables se escriben en .crt (su único consumidor) para acotar el
+              // recálculo de estilos a un solo elemento fijo en vez de todo el documento
+              const de = crtEl || document.documentElement;
               de.style.setProperty("--cx", cxLast.clientX + "px");
               de.style.setProperty("--cy", cxLast.clientY + "px");
             });
@@ -2998,26 +3007,40 @@
         let isAssemblyUnlocked = isMobileDevice;
         window.__isDroneAssembled = isMobileDevice;
 
+        // Caché de métricas del escenario: evita lecturas de layout (getBoundingClientRect /
+        // offsetHeight) en cada frame y en cada evento de scroll. Se refresca en resize y
+        // cada 2 s como auto-corrección; los valores son matemáticamente equivalentes.
+        window.__stageMetrics = null;
+        function getStageMetrics() {
+          const now = performance.now();
+          if (!window.__stageMetrics || now - window.__stageMetrics.stamp > 2000) {
+            const sec = document.getElementById("stage");
+            if (!sec) return { top: 0, h: 1, stamp: now };
+            const r = sec.getBoundingClientRect();
+            window.__stageMetrics = { top: r.top + window.scrollY, h: sec.offsetHeight, stamp: now };
+          }
+          return window.__stageMetrics;
+        }
+        window.addEventListener("resize", () => { if (window.__stageMetrics) window.__stageMetrics.stamp = -1e9; });
+
         // Posición Y exacta donde el #stage queda centrado y fijado en pantalla
         function getStagePinnedY() {
-          const stageEl = document.getElementById("stage");
-          if (!stageEl) return 0;
-          return stageEl.getBoundingClientRect().top + window.scrollY;
+          return getStageMetrics().top;
         }
 
         // 2. Intercepción y bloqueo de scroll: activo ÚNICAMENTE en desktop
         function handleDroneZoneScroll(e) {
           if (isAssemblyUnlocked || isMobileDevice) return;
-          const stageEl = document.getElementById("stage");
-          if (!stageEl) return;
 
-          const stagePinnedY = getStagePinnedY();
-          const rect = stageEl.getBoundingClientRect();
+          const m = getStageMetrics();
+          const rectTop = m.top - window.scrollY;
+          const rectBottom = rectTop + m.h;
 
           // El dron queda centrado en la pantalla cuando rect.top <= 2
-          const isCentered = rect.top <= 2 && rect.bottom >= window.innerHeight * 0.50;
+          const isCentered = rectTop <= 2 && rectBottom >= window.innerHeight * 0.50;
 
           if (isCentered && !isAssemblyUnlocked) {
+            const stagePinnedY = m.top;
             const delta = e.deltaY || (e.touches ? 25 : (e.key === "ArrowDown" || e.key === " " || e.key === "PageDown" ? 50 : 0));
 
             // Si el usuario intenta hacer scroll hacia abajo durante el armado
@@ -3044,12 +3067,9 @@
           // Clamp físico en scroll para garantizar que no se sobrepase la posición centrada antes de desbloquear
           window.addEventListener("scroll", () => {
             if (!isAssemblyUnlocked) {
-              const stageEl = document.getElementById("stage");
-              if (stageEl) {
-                const stagePinnedY = stageEl.getBoundingClientRect().top + window.scrollY;
-                if (window.scrollY > stagePinnedY + 2) {
-                  window.scrollTo(0, stagePinnedY);
-                }
+              const stagePinnedY = getStageMetrics().top;
+              if (window.scrollY > stagePinnedY + 2) {
+                window.scrollTo(0, stagePinnedY);
               }
             }
           }, { passive: false });
@@ -3210,11 +3230,11 @@
           if (!section) return;
 
           function calcProgress() {
-            const rect = section.getBoundingClientRect();
             const vh = window.innerHeight || 1;
-            const totalDist = section.offsetHeight - vh;
+            const m = getStageMetrics();
+            const totalDist = m.h - vh;
             if (totalDist <= 0) return 0;
-            const scrolled = -rect.top;
+            const scrolled = window.scrollY - m.top;
             return Math.min(1.0, Math.max(0.0, scrolled / totalDist));
           }
 
@@ -4225,8 +4245,36 @@ canvas.addEventListener("pointerup", endDrag);
           const view = new Float32Array(16);
           let solidBurstTimer = -1;
           let wasOpaqueState = false;
+
+          // Estado de inercia del progreso de scroll (suavizado exponencial por frame)
+          let scrollySmoothP = 0;
+          let scrollySmoothInit = false;
+
+          // --- Perfiles cinemáticos del scrollytelling (mismos puntos de inicio/fin, física real) ---
+          // Giro 360°: perfil de velocidad trapezoidal — acelera con aceleración constante,
+          // cruza en velocidad angular uniforme y frena simétrico. C1 continuo, sin tirones.
+          const KIN_RAMP = 0.2;
+          function kinTravel(u) {
+            if (u <= 0) return 0;
+            if (u >= 1) return 1;
+            const r = KIN_RAMP, d = 1 - r;
+            if (u < r) return (u * u) / (2 * r * d);
+            if (u > d) return 1 - ((1 - u) * (1 - u)) / (2 * r * d);
+            return (u - r / 2) / d;
+          }
+          // Acercamiento: campana con meseta — entra al primer plano, SE MANTIENE cerca
+          // un tramo para inspección y regresa. Extremos en reposo (smootherstep, C2).
+          function dwellBell(u) {
+            const e = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * x * (x * (x * 6 - 15) + 10); };
+            const a = 0.26, b = 0.72;
+            if (u <= a) return e(u / a);
+            if (u >= b) return e((1 - u) / (1 - b));
+            return 1;
+          }
+
           function render(now, last) {
             const dt = Math.min(0.05, (now - last) / 1000) || 0.016;
+            if (!window.__twBootWarm) window.__twBootWarm = true;
 
             const structMode = structLocked && viewMode !== "points";
 
@@ -4274,10 +4322,21 @@ canvas.addEventListener("pointerup", endDrag);
               if (!reduceMotion && Math.abs(vth) < 0.0008) theta += dt * autoRotSpeed;
             }
 
-            // ---- SCROLLYTELLING: COREOGRAFÍA CINEMÁTICA CALIBRADA (GLITCH 1/3 -> ZOOM 360° -> MARCO ESTABLE) ----
+            // ---- SCROLLYTELLING: COREOGRAFÍA CINEMÁTICA (GLITCH 1/3 -> ZOOM CON MESETA + GIRO 360° DE VELOCIDAD TRAPEZOIDAL) ----
             let scrollyP = 0.0;
             if (typeof window.TwinSightScrolly !== "undefined" && typeof window.TwinSightScrolly.getGlobalProgress === "function") {
               scrollyP = window.TwinSightScrolly.getGlobalProgress();
+            }
+
+            // Inercia crítica: convierte los escalones discretos de la rueda/touchpad en una
+            // respuesta continua con peso físico. El punto final converge idéntico al crudo;
+            // la UI (glitch, marco HUD) sigue el progreso crudo para no perder nitidez.
+            if (!scrollySmoothInit || !isAssemblyUnlocked) {
+              scrollySmoothP = scrollyP;
+              scrollySmoothInit = true;
+            } else {
+              scrollySmoothP += (scrollyP - scrollySmoothP) * (1 - Math.exp(-dt * 7.5));
+              if (Math.abs(scrollyP - scrollySmoothP) < 0.0004) scrollySmoothP = scrollyP;
             }
 
             let scrollyRadAdd = 0.0;
@@ -4293,17 +4352,16 @@ canvas.addEventListener("pointerup", endDrag);
                 scrollyPhiAdd = 0.0;
                 scrollyThetaAdd = 0.0;
               } else if (scrollyP <= 0.64) {
-                // 3. Zoom en primer plano + Rotación completa de 360° de partes medias y superiores
-                const uInspect = (scrollyP - T_glitchEnd) / (0.64 - T_glitchEnd);
-                const zoomBell = Math.sin(uInspect * Math.PI);
-                const easeZoomBell = Math.pow(zoomBell, 0.7);
+                // 3. Zoom a primer plano con meseta de inspección + Rotación completa de 360°
+                const uInspect = (scrollySmoothP - T_glitchEnd) / (0.64 - T_glitchEnd);
+                const easeZoomBell = dwellBell(uInspect);
 
-                // Acercamiento a primer plano (centro del dron a ~3.15 unidades)
+                // Acercamiento a primer plano (centro del dron a ~3.15 unidades), con pausa
+                // cenital para inspeccionar electrónica, Pixhawk, batería y motores
                 scrollyRadAdd = -(radius - 3.15) * easeZoomBell;
-                // Elevación de cámara (ángulo cenital ~54° para ver electrónica, Pixhawk, batería y motores)
                 scrollyPhiAdd = (0.95 - phi) * easeZoomBell;
-                // Rotación suave de 360° exacta durante el recorrido
-                scrollyThetaAdd = (Math.PI * 2.0) * (uInspect * uInspect * (3.0 - 2.0 * uInspect));
+                // Giro de 360° exacto con perfil cinemático de velocidad trapezoidal
+                scrollyThetaAdd = (Math.PI * 2.0) * kinTravel(uInspect);
               } else {
                 // 4. Reducción a tamaño final y estabilidad total (CERO aumento súbito ni rebotes)
                 scrollyRadAdd = 0.0;
@@ -4329,14 +4387,15 @@ canvas.addEventListener("pointerup", endDrag);
               }
 
               // Minimizado cinemático estilo ventana hacia la barra de tareas superior (arriba-izquierda centrado)
-              const rectSt = stageSecEl.getBoundingClientRect();
               const vh = window.innerHeight || 1;
-              const totalDist = stageSecEl.offsetHeight - vh;
-              const scrolledPast = -rectSt.top - totalDist;
+              const mSt = getStageMetrics();
+              const totalDist = mSt.h - vh;
+              const scrolledPast = -(mSt.top - window.scrollY) - totalDist;
               if (scrolledPast > 4) {
                 const exitP = Math.min(1.0, scrolledPast / (vh * 0.65));
-                // Curva suave de minimizado/succión hacia la barra superior
-                const easeExit = exitP * exitP * (3.0 - 2.0 * exitP);
+                // Curva suave de minimizado/succión hacia la barra superior (smootherstep: acelera y frena sin quiebre de velocidad)
+                const eX3 = exitP * exitP * exitP;
+                const easeExit = eX3 * (exitP * (exitP * 6.0 - 15.0) + 10.0);
                 // Se hace significativamente más pequeño (hasta ~6% de su tamaño original)
                 const scale = Math.max(0.04, 1.0 - 0.94 * easeExit);
                 // Trayectoria arriba a la izquierda más centrada (como minimizarse a un slot en navbar superior)
@@ -4748,18 +4807,38 @@ canvas.addEventListener("pointerup", endDrag);
           function loadTextureEnhancement() {
             if (hasTex) return;
             const paths = ["./ready-to-bake_005_rizomUV-packed_04.glb", "ready-to-bake_005_rizomUV-packed_04.glb", "./assets/ready-to-bake_005_rizomUV-packed_04.glb", "assets/ready-to-bake_005_rizomUV-packed_04.glb", "./assets/x500v2.glb", "assets/x500v2.glb"];
+            const scheduleIdle = (fn) => {
+              if (typeof requestIdleCallback === "function") requestIdleCallback(fn, { timeout: 2000 });
+              else setTimeout(fn, 120);
+            };
             (function next(i) {
               if (i >= paths.length || hasTex) return;
               fetch(paths[i])
                 .then((r) => { if (!r.ok) throw new Error("glb " + r.status); return r.arrayBuffer(); })
                 .then((buf) => {
-                  const d = parseGLB(buf);
-                  if (!d) return;
-                  if (!hasTex && d.texInfo) setupTexture(d.texInfo);
-                  if (!fullUpgraded) {
-                    fullUpgraded = true;
-                    useGLBGeometry(d);
-                  }
+                  // El parseo del GLB pesado se divide en dos tareas fuera del camino
+                  // crítico (parseo, luego aplicación de geometría) para no congelar
+                  // el hilo principal durante el arranque; el resultado es idéntico.
+                  scheduleIdle(() => {
+                    let d = null;
+                    try {
+                      d = parseGLB(buf);
+                    } catch (err) {
+                      next(i + 1);
+                      return;
+                    }
+                    if (!d) return;
+                    if (!hasTex && d.texInfo) setupTexture(d.texInfo);
+                    scheduleIdle(() => {
+                      if (fullUpgraded) return;
+                      fullUpgraded = true;
+                      try {
+                        useGLBGeometry(d);
+                      } catch (err2) {
+                        next(i + 1);
+                      }
+                    });
+                  });
                 })
                 .catch(() => { next(i + 1); });
             })(0);
@@ -5012,13 +5091,19 @@ canvas.addEventListener("pointerup", endDrag);
             }
           }
 
+          let lastDraw = 0;
           function loop(now) {
             if (!running) return;
             if (!shouldRun()) {
               running = false;
               return;
             }
-            draw(now);
+            // Tope ~60 fps: en pantallas 120/144 Hz evita multiplicar el costo de GPU del
+            // fondo; en paneles de 60 Hz el comportamiento es exactamente el mismo.
+            if (now - lastDraw >= 14.5) {
+              draw(now);
+              lastDraw = now;
+            }
             rafId = requestAnimationFrame(loop);
           }
 
