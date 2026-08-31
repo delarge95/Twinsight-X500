@@ -72,6 +72,56 @@
         updateBannerVisibility();
       }
 
+      // Bridge helper functions for Unity WebGL runtime
+      window.X500V2ResolveParentOrigin = function() {
+        return "*";
+      };
+
+      window.X500V2SendParentMessage = function(message) {
+        if (typeof window === "undefined" || !window.parent || window.parent === window) {
+          return false;
+        }
+        var sent = false;
+        var origins = ["*"];
+        for (var i = 0; i < origins.length; i++) {
+          try {
+            window.parent.postMessage(message, origins[i]);
+            sent = true;
+          } catch (e) {}
+        }
+        return sent;
+      };
+
+      window.X500V2ExitParentDirectly = function() {
+        try {
+          if (typeof window === "undefined" || !window.parent || window.parent === window) {
+            return false;
+          }
+          if (typeof window.parent.requestAppExit === "function") {
+            window.parent.requestAppExit();
+            return true;
+          }
+          if (typeof window.parent.x500v2ExitApp === "function") {
+            window.parent.x500v2ExitApp();
+            return true;
+          }
+        } catch (e) {}
+        return false;
+      };
+
+      window.X500V2NavigateToLandingFallback = function() {
+        try {
+          if (typeof window !== "undefined" && window.location) {
+            window.location.href = "../";
+          }
+        } catch (e) {}
+      };
+
+      var X500V2ResolveParentOrigin = window.X500V2ResolveParentOrigin;
+      var X500V2SendParentMessage = window.X500V2SendParentMessage;
+      var X500V2ExitParentDirectly = window.X500V2ExitParentDirectly;
+      var X500V2NavigateToLandingFallback = window.X500V2NavigateToLandingFallback;
+
       function installX500V2Bridge(unityInstance) {
         window.x500v2UnityInstance = unityInstance;
         window.addEventListener("message", function (event) {
