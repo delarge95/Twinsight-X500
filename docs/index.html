@@ -961,6 +961,33 @@
         opacity: 1;
       }
 
+      .btn-close-app {
+        position: fixed;
+        top: 1.25rem;
+        right: 1.25rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 50%;
+        background: rgba(18, 18, 22, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10001;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+      }
+
+      .btn-close-app:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.8);
+        transform: scale(1.08);
+      }
+
       .app-status {
         position: absolute;
         inset: 0;
@@ -1737,6 +1764,7 @@
     </section>
 
     <div class="app-overlay" id="appOverlay" data-od-id="app-overlay">
+      <button class="btn-close-app" id="btnCloseApp" title="Cerrar visor" aria-label="Cerrar visor" data-i18n-title="closeApp">✕</button>
       <iframe
         title="TwinSight X500"
         class="app-frame"
@@ -1839,8 +1867,8 @@
         <!-- Header de Sección: Visual Digital Twin -->
         <div class="container stage-section-header" style="position: absolute; top: 2.5rem; left: 0; right: 0; z-index: 10; pointer-events: none;">
           <div class="section-header" style="margin-bottom: 0;">
-            <span class="section-kicker" style="color: rgba(255,255,255,0.7);">04 · VISUAL DIGITAL TWIN</span>
-            <h2 class="section-title" style="color: #fff; font-size: clamp(1.6rem, 3.2vw, 2.4rem);">Inspección Cinemática del X500 V2</h2>
+            <span class="section-kicker" style="color: rgba(255,255,255,0.7);" data-i18n="stageKicker">03 · VISUAL DIGITAL TWIN</span>
+            <h2 class="section-title" style="color: #fff; font-size: clamp(1.6rem, 3.2vw, 2.4rem);" data-i18n="stageHeading">Inspección Cinemática del X500 V2</h2>
           </div>
         </div>
 
@@ -1880,26 +1908,26 @@
             <!-- Barra de Controles Interactiva Inferior -->
             <div class="cad-toolbar" id="cadToolbar">
               <div class="cad-tool-group">
-                <button type="button" class="cad-btn active" id="btnCadOrbit" title="Modo Rotación 360° (Orbit)">
+                <button type="button" class="cad-btn active" id="btnCadOrbit" title="Modo Rotación 360° (Orbit)" data-i18n-title="cadOrbitTitle">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                  <span>Rotar</span>
+                  <span data-i18n="cadBtnOrbit">Rotar</span>
                 </button>
-                <button type="button" class="cad-btn" id="btnCadPan" title="Modo Desplazamiento (Pan de Pantalla)">
+                <button type="button" class="cad-btn" id="btnCadPan" title="Modo Desplazamiento (Pan de Pantalla)" data-i18n-title="cadPanTitle">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M19 9l3 3-3 3M9 19l3 3 3-3M2 12h20M12 2v20"/></svg>
-                  <span>Desplazar</span>
+                  <span data-i18n="cadBtnPan">Desplazar</span>
                 </button>
               </div>
 
               <div class="cad-divider"></div>
 
               <div class="cad-tool-group">
-                <button type="button" class="cad-btn-icon" id="btnCadZoomIn" title="Acercar (Zoom +)">
+                <button type="button" class="cad-btn-icon" id="btnCadZoomIn" title="Acercar (Zoom +)" data-i18n-title="cadZoomInTitle">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                 </button>
-                <button type="button" class="cad-btn-icon" id="btnCadZoomOut" title="Alejar (Zoom -)">
+                <button type="button" class="cad-btn-icon" id="btnCadZoomOut" title="Alejar (Zoom -)" data-i18n-title="cadZoomOutTitle">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
                 </button>
-                <button type="button" class="cad-btn-icon" id="btnCadReset" title="Restablecer Vista Original">
+                <button type="button" class="cad-btn-icon" id="btnCadReset" title="Restablecer Vista Original" data-i18n-title="cadResetTitle">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                 </button>
               </div>
@@ -1907,10 +1935,10 @@
               <div class="cad-divider"></div>
 
               <div class="cad-tool-group">
-                <button type="button" class="cad-btn" id="btnCadFxGlitch" title="Alternar FX Glitch & Aberración">
+                <button type="button" class="cad-btn" id="btnCadFxGlitch" title="Alternar FX Glitch & Aberración" data-i18n-title="cadFxGlitchTitle">
                   <span>FX Glitch</span>
                 </button>
-                <button type="button" class="cad-btn" id="btnCadFxDeform" title="Alternar FX Deformación de Vértices">
+                <button type="button" class="cad-btn" id="btnCadFxDeform" title="Alternar FX Deformación de Vértices" data-i18n-title="cadFxDeformTitle">
                   <span>FX Deform</span>
                 </button>
               </div>
@@ -2183,6 +2211,18 @@
             docNasa: "NASA-TLX Questionnaire",
             docThinkAloud: "Think Aloud Protocol",
             docValidationTasks: "Validation Task Guide",
+            stageKicker: "03 · VISUAL DIGITAL TWIN",
+            stageHeading: "X500 V2 Kinematic Inspection",
+            cadBtnOrbit: "Rotate",
+            cadBtnPan: "Pan",
+            cadOrbitTitle: "360° Orbit Mode (Orbit)",
+            cadPanTitle: "Pan Mode (Screen Pan)",
+            cadZoomInTitle: "Zoom In (+)",
+            cadZoomOutTitle: "Zoom Out (-)",
+            cadResetTitle: "Reset Original View",
+            cadFxGlitchTitle: "Toggle Glitch & Aberration FX",
+            cadFxDeformTitle: "Toggle Vertex Deformation FX",
+            closeApp: "Exit viewer",
             docFinalReport: "Final Report",
             docGithub: "GitHub Repository",
             footerText: "2026 · UNAD · Multimedia Engineering"
@@ -2244,6 +2284,18 @@
             techBlenderTitle: "Blender a Unity",
             techBlenderText: "Pipeline CAD-runtime con saneamiento geométrico, instancias y manifests.",
             techShadersText: "X-Ray, Solid, clipping, Blueprint, Thermal y materiales PBR adaptados a WebGL.",
+            stageKicker: "03 · VISUAL DIGITAL TWIN",
+            stageHeading: "Inspección Cinemática del X500 V2",
+            cadBtnOrbit: "Rotar",
+            cadBtnPan: "Desplazar",
+            cadOrbitTitle: "Modo Rotación 360° (Orbit)",
+            cadPanTitle: "Modo Desplazamiento (Pan de Pantalla)",
+            cadZoomInTitle: "Acercar (Zoom +)",
+            cadZoomOutTitle: "Alejar (Zoom -)",
+            cadResetTitle: "Restablecer Vista Original",
+            cadFxGlitchTitle: "Alternar FX Glitch & Aberración",
+            cadFxDeformTitle: "Alternar FX Deformación de Vértices",
+            closeApp: "Cerrar visor",
             closureTitle: "Estado del cierre",
             closureBuildTitle: "Build publicada",
             closureBuildText:
@@ -2314,6 +2366,11 @@
           document.querySelectorAll("[data-i18n-html]").forEach((element) => {
             const key = element.dataset.i18nHtml;
             if (copy[key]) element.innerHTML = copy[key];
+          });
+
+          document.querySelectorAll("[data-i18n-title]").forEach((element) => {
+            const key = element.dataset.i18nTitle;
+            if (copy[key]) element.setAttribute("title", copy[key]);
           });
 
           document.querySelectorAll(".language-toggle__button, .footer-lang button").forEach((button) => {
@@ -2649,10 +2706,10 @@
         }
 
         function closeAppOverlay() {
-          if (!isAppOpen()) return;
           forceClosingApp = false;
           body.classList.remove("no-scroll");
           body.classList.remove("modal-open");
+          appOverlay.classList.remove("active");
           if (hasGsap && !reduceMotion) {
             gsap
               .timeline()
@@ -2661,8 +2718,6 @@
               .fromTo(heroGlow, { scale: 1.6, opacity: 0.6 }, { scale: 1, opacity: "", duration: 1.2, ease: "power2.out" })
               .to(heroContent, { autoAlpha: 1, duration: 0.4 }, "-=0.9")
               .to(scrollHint, { opacity: 1, duration: 0.4 }, "-=0.9");
-          } else {
-            appOverlay.classList.remove("active");
           }
         }
 
@@ -2676,7 +2731,6 @@
         }
 
         function requestAppExit() {
-          if (!isAppOpen()) return;
           window.clearTimeout(pendingBackTimer);
           pendingBackTimer = null;
           forceClosingApp = false;
@@ -2688,11 +2742,18 @@
         window.x500v2ExitApp = requestAppExit;
         window.requestAppExit = requestAppExit;
 
+        const btnCloseApp = document.getElementById("btnCloseApp");
+        if (btnCloseApp) {
+          btnCloseApp.addEventListener("click", (e) => {
+            e.stopPropagation();
+            requestAppExit();
+          });
+        }
+
         function isTrustedUnityMessage(event, type) {
-          const sameOrigin =
-            window.location.protocol === "file:" || event.origin === window.location.origin;
-          const sameFrame = appFrame && event.source === appFrame.contentWindow;
-          return event.data && event.data.type === type && sameOrigin && (sameFrame || isAppOpen());
+          if (!event || !event.data) return false;
+          const msgType = typeof event.data === "string" ? event.data : event.data.type;
+          return msgType === type;
         }
 
         function pushAppHistoryEntry() {
