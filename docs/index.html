@@ -135,6 +135,20 @@
         height: 0;
       }
 
+      @media (max-width: 900px) {
+        .crt,
+        .crt-defs,
+        #fxCanvas {
+          display: none !important;
+        }
+      }
+
+      .is-mobile .crt,
+      .is-mobile .crt-defs,
+      .is-mobile #fxCanvas {
+        display: none !important;
+      }
+
       #scrollProgress {
         position: fixed;
         top: 0;
@@ -2118,6 +2132,18 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
+        const isMobileDevice = (() => {
+          const ua = navigator.userAgent || "";
+          const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || window.matchMedia("(pointer: coarse)").matches;
+          const isSmallScreen = window.innerWidth <= 900;
+          const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+          return isMobileUA || (isTouch && isSmallScreen);
+        })();
+
+        if (isMobileDevice) {
+          document.documentElement.classList.add("is-mobile");
+        }
+
         const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const hasMermaid = window.mermaid && typeof mermaid.initialize === "function";
         const hasGsap = window.gsap && typeof gsap.timeline === "function";
@@ -2457,31 +2483,33 @@
         }, { threshold: 0.35 }) : null;
         sectionTitles.forEach((el) => { bindTitleFx(el); if (stIO) stIO.observe(el); else revealTitle(el, false); });
 
-        const glitchTargets = Array.from(document.querySelectorAll(".hero-subtitle, .hero-kicker, .grid-item h3, .grid-item p, .link-item > span:first-of-type, .stage-note, footer p, .ctl-btn, .ctl-sw"));
-        const glitchCool = new WeakMap();
-        let gScan = 0, gpx = 0, gpy = 0, gPending = false;
-        window.addEventListener("pointermove", (e) => {
-          gpx = e.clientX; gpy = e.clientY;
-          if (gPending) return;
-          gPending = true;
-          requestAnimationFrame(() => {
-            gPending = false;
-            const now = performance.now();
-            if (now - gScan < 120) return;
-            gScan = now;
-            glitchTargets.forEach((el) => {
-              const r = el.getBoundingClientRect();
-              if (!r.width) return;
-              if (gpx > r.left - 80 && gpx < r.right + 80 && gpy > r.top - 60 && gpy < r.bottom + 60) {
-                const last = glitchCool.get(el) || 0;
-                if (now - last < 1400) return;
-                glitchCool.set(el, now);
-                el.classList.add("glitching");
-                setTimeout(() => el.classList.remove("glitching"), 260);
-              }
+        if (!isMobileDevice) {
+          const glitchTargets = Array.from(document.querySelectorAll(".hero-subtitle, .hero-kicker, .grid-item h3, .grid-item p, .link-item > span:first-of-type, .stage-note, footer p, .ctl-btn, .ctl-sw"));
+          const glitchCool = new WeakMap();
+          let gScan = 0, gpx = 0, gpy = 0, gPending = false;
+          window.addEventListener("pointermove", (e) => {
+            gpx = e.clientX; gpy = e.clientY;
+            if (gPending) return;
+            gPending = true;
+            requestAnimationFrame(() => {
+              gPending = false;
+              const now = performance.now();
+              if (now - gScan < 120) return;
+              gScan = now;
+              glitchTargets.forEach((el) => {
+                const r = el.getBoundingClientRect();
+                if (!r.width) return;
+                if (gpx > r.left - 80 && gpx < r.right + 80 && gpy > r.top - 60 && gpy < r.bottom + 60) {
+                  const last = glitchCool.get(el) || 0;
+                  if (now - last < 1400) return;
+                  glitchCool.set(el, now);
+                  el.classList.add("glitching");
+                  setTimeout(() => el.classList.remove("glitching"), 260);
+                }
+              });
             });
-          });
-        }, { passive: true });
+          }, { passive: true });
+        }
 
         docLinkElements.forEach((link, index) => {
           link.addEventListener("click", async (e) => {
@@ -2894,23 +2922,24 @@
 
         let cxPending = false;
         let cxLast = null;
-        window.addEventListener("pointermove", (e) => {
-          cxLast = e;
-          if (cxPending) return;
-          cxPending = true;
-          requestAnimationFrame(() => {
-            cxPending = false;
-            if (!cxLast) return;
-            const de = document.documentElement;
-            de.style.setProperty("--cx", cxLast.clientX + "px");
-            de.style.setProperty("--cy", cxLast.clientY + "px");
-          });
-        }, { passive: true });
+        if (!isMobileDevice) {
+          window.addEventListener("pointermove", (e) => {
+            cxLast = e;
+            if (cxPending) return;
+            cxPending = true;
+            requestAnimationFrame(() => {
+              cxPending = false;
+              if (!cxLast) return;
+              const de = document.documentElement;
+              de.style.setProperty("--cx", cxLast.clientX + "px");
+              de.style.setProperty("--cy", cxLast.clientY + "px");
+            });
+          }, { passive: true });
+        }
 
-        
-                        // 1. Estado de desbloqueo del ensamblaje del dron
-        let isAssemblyUnlocked = false;
-        window.__isDroneAssembled = false;
+        // 1. Estado de desbloqueo del ensamblaje del dron (en móvil se desbloquea de inmediato para scroll nativo fluido)
+        let isAssemblyUnlocked = isMobileDevice;
+        window.__isDroneAssembled = isMobileDevice;
 
         // Posición Y exacta donde el #stage queda centrado y fijado en pantalla
         function getStagePinnedY() {
@@ -2919,9 +2948,9 @@
           return stageEl.getBoundingClientRect().top + window.scrollY;
         }
 
-        // 2. Intercepción y bloqueo de scroll: inicia exactamente cuando el drone queda centrado en la mitad de la pantalla
+        // 2. Intercepción y bloqueo de scroll: activo ÚNICAMENTE en desktop
         function handleDroneZoneScroll(e) {
-          if (isAssemblyUnlocked) return;
+          if (isAssemblyUnlocked || isMobileDevice) return;
           const stageEl = document.getElementById("stage");
           if (!stageEl) return;
 
@@ -2946,26 +2975,28 @@
           }
         }
 
-        window.addEventListener("wheel", handleDroneZoneScroll, { passive: false });
-        window.addEventListener("touchmove", handleDroneZoneScroll, { passive: false });
-        window.addEventListener("keydown", (e) => {
-          if (["ArrowDown", "PageDown", " "].includes(e.key)) {
-            handleDroneZoneScroll(e);
-          }
-        }, { passive: false });
+        if (!isMobileDevice) {
+          window.addEventListener("wheel", handleDroneZoneScroll, { passive: false });
+          window.addEventListener("touchmove", handleDroneZoneScroll, { passive: false });
+          window.addEventListener("keydown", (e) => {
+            if (["ArrowDown", "PageDown", " "].includes(e.key)) {
+              handleDroneZoneScroll(e);
+            }
+          }, { passive: false });
 
-        // Clamp físico en scroll para garantizar que no se sobrepase la posición centrada antes de desbloquear
-        window.addEventListener("scroll", () => {
-          if (!isAssemblyUnlocked) {
-            const stageEl = document.getElementById("stage");
-            if (stageEl) {
-              const stagePinnedY = stageEl.getBoundingClientRect().top + window.scrollY;
-              if (window.scrollY > stagePinnedY + 2) {
-                window.scrollTo(0, stagePinnedY);
+          // Clamp físico en scroll para garantizar que no se sobrepase la posición centrada antes de desbloquear
+          window.addEventListener("scroll", () => {
+            if (!isAssemblyUnlocked) {
+              const stageEl = document.getElementById("stage");
+              if (stageEl) {
+                const stagePinnedY = stageEl.getBoundingClientRect().top + window.scrollY;
+                if (window.scrollY > stagePinnedY + 2) {
+                  window.scrollTo(0, stagePinnedY);
+                }
               }
             }
-          }
-        }, { passive: false });
+          }, { passive: false });
+        }
 
         if (!reduceMotion && hasGsap) {
           if (hasScrollTrigger) {
@@ -2983,68 +3014,55 @@
                 .to(scrollHint, { opacity: 0, duration: 0.3 }, "<")
             });
 
-            // ZONA 2: INFORMACIÓN INTERMEDIA (#capabilities, #technology) - Absorción incrementada elegante con scrub cinemático
+            // ZONA 2: INFORMACIÓN INTERMEDIA (#capabilities, #technology)
             ["#capabilities", "#technology"].forEach((sel) => {
               const section = document.querySelector(sel);
               if (!section) return;
               const items = section.querySelectorAll(".grid-item, .link-item");
-              gsap.from(items, {
-                opacity: 0,
-                y: 36,
-                filter: "blur(8px)",
-                stagger: 0.08,
-                ease: "power2.out",
-                clearProps: "filter,transform",
-                scrollTrigger: {
-                  trigger: section,
-                  start: "top 82%",
-                  end: "top 42%",
-                  scrub: 0.65
-                }
-              });
+              const animProps = isMobileDevice
+                ? { opacity: 0, y: 22, stagger: 0.05, ease: "power2.out", clearProps: "transform" }
+                : { opacity: 0, y: 36, filter: "blur(8px)", stagger: 0.08, ease: "power2.out", clearProps: "filter,transform" };
+              animProps.scrollTrigger = {
+                trigger: section,
+                start: "top 85%",
+                end: "top 45%",
+                scrub: isMobileDevice ? false : 0.65
+              };
+              gsap.from(items, animProps);
             });
 
             // ZONA 3: Scrollytelling track gestionado exclusivamente por CSS position: sticky
 
-            // ZONA 4: SALIDA POST-SCROLLYTELLING (#closure) - Absorción más perceptible para amortiguar la salida del 3D
+            // ZONA 4: SALIDA POST-SCROLLYTELLING (#closure)
             const closureSec = document.querySelector("#closure");
             if (closureSec) {
               const items = closureSec.querySelectorAll(".grid-item, .link-item");
-              gsap.from(items, {
-                opacity: 0,
-                y: 50,
-                scale: 0.96,
-                filter: "blur(10px)",
-                stagger: 0.10,
-                ease: "power3.out",
-                clearProps: "filter,transform,scale",
-                scrollTrigger: {
-                  trigger: closureSec,
-                  start: "top 90%",
-                  end: "top 35%",
-                  scrub: 1.10
-                }
-              });
+              const animProps = isMobileDevice
+                ? { opacity: 0, y: 24, scale: 0.98, stagger: 0.06, ease: "power2.out", clearProps: "transform,scale" }
+                : { opacity: 0, y: 50, scale: 0.96, filter: "blur(10px)", stagger: 0.10, ease: "power3.out", clearProps: "filter,transform,scale" };
+              animProps.scrollTrigger = {
+                trigger: closureSec,
+                start: "top 90%",
+                end: "top 35%",
+                scrub: isMobileDevice ? false : 1.10
+              };
+              gsap.from(items, animProps);
             }
 
-            // ZONA 5: INFORMACIÓN FINAL (#documentation) - Vuelve exactamente a la absorción calibrada de la Zona 2
+            // ZONA 5: INFORMACIÓN FINAL (#documentation)
             const docSec = document.querySelector("#documentation");
             if (docSec) {
               const items = docSec.querySelectorAll(".grid-item, .link-item");
-              gsap.from(items, {
-                opacity: 0,
-                y: 36,
-                filter: "blur(8px)",
-                stagger: 0.08,
-                ease: "power2.out",
-                clearProps: "filter,transform",
-                scrollTrigger: {
-                  trigger: docSec,
-                  start: "top 82%",
-                  end: "top 42%",
-                  scrub: 0.65
-                }
-              });
+              const animProps = isMobileDevice
+                ? { opacity: 0, y: 22, stagger: 0.05, ease: "power2.out", clearProps: "transform" }
+                : { opacity: 0, y: 36, filter: "blur(8px)", stagger: 0.08, ease: "power2.out", clearProps: "filter,transform" };
+              animProps.scrollTrigger = {
+                trigger: docSec,
+                start: "top 85%",
+                end: "top 45%",
+                scrub: isMobileDevice ? false : 0.65
+              };
+              gsap.from(items, animProps);
             }
           }
         } else {
@@ -3816,26 +3834,28 @@
 
           function edgesFromTris(tris) {
             const seen = new Set(), out = [];
+            const maxEdges = isMobileDevice ? 45000 : 240000;
             function addEdge(x, y) {
               if (x === y) return;
               const k = x < y ? x + "_" + y : y + "_" + x;
               if (!seen.has(k)) { seen.add(k); out.push(x, y); }
             }
-            for (let i = 0; i < tris.length && out.length < 240000; i += 3) {
+            for (let i = 0; i < tris.length && out.length < maxEdges; i += 3) {
               addEdge(tris[i], tris[i + 1]); addEdge(tris[i + 1], tris[i + 2]); addEdge(tris[i + 2], tris[i]);
             }
             return out;
           }
 
           let fullGeom = null;
-          let curDensity = 1.0;
+          let curDensity = isMobileDevice ? 0.25 : 1.0;
           let densIdx = 1;
 
           function autoDensity() {
+            if (isMobileDevice) return 0.25; // Reducción adaptativa del 75% de vértices en móviles para 60 FPS fluidos
             const dm = navigator.deviceMemory;
             const hc = navigator.hardwareConcurrency || 4;
-            if (dm) { if (dm >= 8) return 1; if (dm >= 4) return 0.5; return 0.25; }
-            return hc <= 4 ? 0.25 : 0.5;
+            if (dm) { if (dm >= 8) return 1.0; if (dm >= 4) return 0.5; return 0.25; }
+            return hc <= 4 ? 0.25 : 1.0;
           }
 
           function densityApply(d) {
@@ -3878,8 +3898,8 @@
               tv[i] = (v[i] - cx) * k; tv[i + 1] = (v[i + 1] - cy) * k; tv[i + 2] = (v[i + 2] - cz) * k;
             }
             fullGeom = { tv: tv, tf: t, uv: new Float32Array(data.uvs), nrm: new Float32Array(data.nrms) };
-            curDensity = 1.0;
-            densityApply(1.0);
+            curDensity = autoDensity();
+            densityApply(curDensity);
             return data.texInfo || null;
           }
 
@@ -3992,8 +4012,11 @@
           const ctlEl = document.getElementById("stageCtl");
           let ctlShown = false;
           let viewMode = "material";
-          let structLocked = false;
-          let swEdges = false, swAberr = true, swGlitch = true, swDeform = true;
+          let structLocked = isMobileDevice;
+          let swEdges = false;
+          let swAberr = !isMobileDevice;
+          let swGlitch = !isMobileDevice;
+          let swDeform = !isMobileDevice;
           if (ctlEl) {
             ctlEl.querySelectorAll("[data-view]").forEach((b) => {
               b.addEventListener("click", () => {
@@ -4019,7 +4042,7 @@
           let dpr = 1;
 
           function resize() {
-            dpr = Math.min(window.devicePixelRatio || 1, 2);
+            dpr = isMobileDevice ? Math.min(window.devicePixelRatio || 1, 1.25) : Math.min(window.devicePixelRatio || 1, 2);
             const w = Math.max(1, Math.floor(canvas.clientWidth * dpr));
             const h = Math.max(1, Math.floor(canvas.clientHeight * dpr));
             if (canvas.width !== w || canvas.height !== h) {
@@ -4040,10 +4063,10 @@
           let vth = 0, vph = 0;
           let dragging = false, lx = 0, ly = 0;
           let dragThetaOffset = 0, dragPhiOffset = 0;
-          let progress = 0;
+          let progress = isMobileDevice ? 1.0 : 0;
           let scrollTargetProgress = 0;
           let rampCur = 0.2;
-          let assembledT = -1;
+          let assembledT = isMobileDevice ? 0 : -1;
           let modelTex = null;
           let hasTex = false;
           let fullUpgraded = false;
@@ -4706,6 +4729,11 @@ canvas.addEventListener("pointerup", endDrag);
 
         function initAurora() {
           const canvas = document.getElementById("fxCanvas");
+          if (!canvas) return;
+          if (isMobileDevice) {
+            canvas.remove();
+            return;
+          }
           const opts = { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: "low-power" };
           let gl = canvas.getContext("webgl2", opts);
           const isGL2 = !!gl;
