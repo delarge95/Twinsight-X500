@@ -3834,7 +3834,7 @@
 
           function edgesFromTris(tris) {
             const seen = new Set(), out = [];
-            const maxEdges = isMobileDevice ? 45000 : 240000;
+            const maxEdges = 240000;
             function addEdge(x, y) {
               if (x === y) return;
               const k = x < y ? x + "_" + y : y + "_" + x;
@@ -3847,11 +3847,10 @@
           }
 
           let fullGeom = null;
-          let curDensity = isMobileDevice ? 0.25 : 1.0;
+          let curDensity = 1.0;
           let densIdx = 1;
 
           function autoDensity() {
-            if (isMobileDevice) return 0.25; // Reducción adaptativa del 75% de vértices en móviles para 60 FPS fluidos
             const dm = navigator.deviceMemory;
             const hc = navigator.hardwareConcurrency || 4;
             if (dm) { if (dm >= 8) return 1.0; if (dm >= 4) return 0.5; return 0.25; }
@@ -3898,8 +3897,8 @@
               tv[i] = (v[i] - cx) * k; tv[i + 1] = (v[i + 1] - cy) * k; tv[i + 2] = (v[i + 2] - cz) * k;
             }
             fullGeom = { tv: tv, tf: t, uv: new Float32Array(data.uvs), nrm: new Float32Array(data.nrms) };
-            curDensity = autoDensity();
-            densityApply(curDensity);
+            curDensity = 1.0;
+            densityApply(1.0);
             return data.texInfo || null;
           }
 
@@ -4256,7 +4255,9 @@ canvas.addEventListener("pointerup", endDrag);
               }
             }
 
-            effectiveRadius = Math.max(2.2, radius + scrollyRadAdd);
+            const currentAsp = canvas.width / Math.max(1, canvas.height);
+            const baseRad = isMobileDevice ? (currentAsp < 1.0 ? 8.2 / Math.max(currentAsp, 0.55) : 8.5) : radius;
+            effectiveRadius = Math.max(2.2, baseRad + scrollyRadAdd);
             effectivePhi = Math.min(2.75, Math.max(0.35, phi + scrollyPhiAdd));
             effectiveTheta = theta + scrollyThetaAdd;
 
@@ -4433,14 +4434,21 @@ canvas.addEventListener("pointerup", endDrag);
             rampCur += (dTarget - rampCur) * Math.min(1, dt * 7.0);
 
             let wFade = wireFade, texEff = hasTex ? 1 : 0;
-            if (ctlShown) {
+            if (isMobileDevice) {
+              mReveal = 0.0;
+              wFade = 0.0;
+              texEff = 0;
+              edgeAlpha = 0.90;
+              pointAlpha = 0.55;
+              faceAlpha = 0.0;
+            } else if (ctlShown) {
               if (viewMode === "flat") { mReveal = 1; wFade = swEdges ? 0 : 1; texEff = 0; }
               else if (viewMode === "material") { mReveal = 1; wFade = swEdges ? 0 : 1; }
               else if (viewMode === "edges") { mReveal = 0; wFade = 0; }
               else { mReveal = 0; wFade = 1; }
             }
             
-            const isOpaqueNow = isOpaqueFinal || (faceAlpha >= 0.95 && mReveal >= 0.80);
+            const isOpaqueNow = !isMobileDevice && (isOpaqueFinal || (faceAlpha >= 0.95 && mReveal >= 0.80));
             if (isOpaqueNow && !wasOpaqueState) {
               solidBurstTimer = 0.0;
               const hTitle = document.querySelector(".hero-title");
@@ -4464,9 +4472,9 @@ canvas.addEventListener("pointerup", endDrag);
               }
             }
 
-            const drawFaces = !ctlShown || viewMode === "flat" || viewMode === "material";
-            const drawEdges = (!ctlShown && edgeAlpha > 0.005) || viewMode === "edges" || (ctlShown && swEdges);
-            const drawPoints = !ctlShown || viewMode === "points" || pointAlpha > 0.005;
+            const drawFaces = isMobileDevice ? false : (!ctlShown || viewMode === "flat" || viewMode === "material");
+            const drawEdges = isMobileDevice ? true : ((!ctlShown && edgeAlpha > 0.005) || viewMode === "edges" || (ctlShown && swEdges));
+            const drawPoints = isMobileDevice ? true : (!ctlShown || viewMode === "points" || pointAlpha > 0.005);
             const ramp = structMode ? 1 : Math.min(rampCur, 1);
             const nFaces = Math.max(3, Math.ceil(setFaces.count * ramp));
             const nEdges = Math.max(2, Math.ceil(setEdges.count * ramp));
