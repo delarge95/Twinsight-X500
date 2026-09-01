@@ -45,8 +45,8 @@ Antes de iniciar, el evaluador debe registrar:
 - sistema operativo;
 - navegador y versión;
 - resolución;
-- tipo de conexión;
-- estado de caché;
+- versión de build o fecha de despliegue;
+- estado de caché antes de iniciar;
 - secuencia asignada (`AB` o `BA`).
 
 No se debe registrar el nombre real del participante en la matriz de resultados. La identificación debe hacerse mediante código anónimo.
@@ -62,6 +62,8 @@ No se debe registrar el nombre real del participante en la matriz de resultados.
 ### Secuencia BA
 1. Condición B: soporte 2D.
 2. Condición A: visor 3D.
+
+La asignación del orden se realiza por alternancia simple: los participantes con código impar siguen la secuencia AB y los participantes con código par siguen la secuencia BA. Esta regla permite distribuir el posible efecto de aprendizaje o fatiga sin introducir selección subjetiva del moderador.
 
 ---
 
@@ -98,7 +100,7 @@ El evaluador puede sustituir estas piezas si la build o el soporte 2D usado en l
 **Criterio de éxito:** identifica correctamente la pieza sin ayuda.
 
 **Datos a registrar:**
-- tiempo;
+- tiempo en segundos;
 - éxito o fracaso;
 - errores;
 - ayuda requerida.
@@ -115,7 +117,7 @@ El evaluador puede sustituir estas piezas si la build o el soporte 2D usado en l
 **Criterio de éxito:** ofrece una descripción funcional razonablemente coherente con la referencia técnica.
 
 **Datos a registrar:**
-- tiempo;
+- tiempo en segundos;
 - calidad de respuesta;
 - dudas expresadas;
 - apoyo requerido.
@@ -137,7 +139,7 @@ El evaluador puede sustituir estas piezas si la build o el soporte 2D usado en l
 **Criterio de éxito:** describe al menos una relación espacial correcta entre el componente y el ensamblaje.
 
 **Datos a registrar:**
-- tiempo;
+- tiempo en segundos;
 - éxito;
 - errores de interpretación;
 - necesidad de orientación externa.
@@ -159,11 +161,12 @@ El evaluador puede sustituir estas piezas si la build o el soporte 2D usado en l
 **Criterio de éxito:** completa la acción o interpreta correctamente la información equivalente.
 
 **Datos a registrar:**
-- tiempo;
 - éxito;
 - dudas;
 - errores;
 - ayudas requeridas.
+
+La T4 se conserva como tarea exploratoria guiada. No se cronometra y su aporte se analiza mediante observación cualitativa y protocolo Think-Aloud.
 
 ---
 
@@ -171,7 +174,8 @@ El evaluador puede sustituir estas piezas si la build o el soporte 2D usado en l
 
 Después de cada condición:
 
-- registrar tiempos y éxito por tarea;
+- registrar éxito, errores, ayudas y observaciones por tarea;
+- registrar tiempo en segundos para T1, T2 y T3;
 - diligenciar NASA-TLX Raw para esa condición;
 - conservar observaciones del evaluador.
 

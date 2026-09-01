@@ -149,6 +149,6 @@ El incremento de piezas y subpiezas visibles del dron no cambia la jerarquia ofi
 
 ## Actualizacion 2026-05-20
 
-### Helices como elementos frios
+### Helices como elementos pasivos de baja respuesta
 
-Las helices existen como nodos renderizables del modo Thermal, pero no deben comportarse como fuentes calientes primarias. La lectura final las trata como piezas pasivas de baja respuesta: reciben una transferencia muy reducida desde el motor, el valor visual se limita a una elevacion leve y el shader concentra la huella en el centro del hub mediante patron radial de poco alcance. Los extremos de las palas deben mantenerse en la zona fria del gradiente.
+Las helices existen como nodos renderizables del modo Thermal, pero no deben comportarse como fuentes calientes primarias dentro del modelo heuristico. La lectura final las trata como piezas pasivas de baja respuesta porque no concentran disipacion electrica ni generacion termica interna comparable con motores, bateria o electronica. Si aparece una elevacion visual leve, debe entenderse como acoplamiento aproximado con el conjunto motor-hub, no como medicion calibrada ni como perfil termico experimental de las palas.

@@ -155,6 +155,20 @@ WebGL Renderer string → Detecta: GPU integrada vs. dedicada
 | Frame Time | ≤ 18 ms     | ≤ 33 ms   | ≤ 50 ms  | > 50 ms  |
 | Heap       | < 400 MB    | < 600 MB  | < 800 MB | ≥ 800 MB |
 
+### 5.4 LODs finales en Unity 6
+
+La build final incorpora una pasada conservadora de `LODGroup` para Unity 6. El objetivo no es cambiar la apariencia cercana del dron, sino reducir carga geometrica cuando una pieza ocupa poca altura en pantalla. El mesh original permanece como `LOD0`; los niveles generados se aplican solo a renderers medianos o grandes y se excluyen fasteners modulares, proxies de inspeccion, mallas pequenas y cualquier LOD manual existente.
+
+La herramienta oficial queda en:
+
+```
+Tools/X500V2/Optimization/Apply Final LODs (Unity 6)
+```
+
+Ademas, `WebGLFinalLodBuildPreprocessor` ejecuta la misma optimizacion automaticamente antes de una build WebGL. La evidencia queda en `desarrollo/unity_project/Reports/final_lod_optimization_report.md`, con numero de grupos LOD, renderers omitidos y conteo de triangulos por nivel.
+
+La compatibilidad runtime se protege con `LodVisibilityUtility`: filtros, aislamiento, inspeccion y modos visuales siguen aplicandose a los renderers LOD generados, evitando que `LODGroup` reactive piezas ocultas por la app.
+
 ---
 
 ## 6. Optimizaciones de Texturas

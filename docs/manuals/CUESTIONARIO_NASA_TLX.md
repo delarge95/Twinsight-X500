@@ -3,6 +3,12 @@
 
 ---
 
+## Nota de uso
+
+Este archivo es la versión completa para el evaluador, porque incluye descripción metodológica, cálculo e interpretación. Para entregar al participante, usar `04_CUESTIONARIO_NASA_TLX_PARTICIPANTE.md`, que contiene solo instrucciones de respuesta y escalas.
+
+---
+
 ## Descripción del instrumento
 
 El **NASA Task Load Index (NASA-TLX)** es un instrumento desarrollado por el Human Performance Group de NASA para evaluar la **carga de trabajo subjetiva percibida** durante la ejecución de una tarea. En esta investigación, el instrumento se utiliza como medida de \textit{workload} percibido y no como una medición directa de las categorías intrínseca, extrínseca y germana de la Teoría de la Carga Cognitiva.
