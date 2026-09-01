@@ -3,6 +3,12 @@
 
 ---
 
+## Nota de uso
+
+Este archivo es la versión completa para el evaluador, porque incluye instrucciones de cálculo e interpretación. Para entregar al participante, usar `03_CUESTIONARIO_SUS_PARTICIPANTE.md`, que no muestra el método de puntuación antes de responder.
+
+---
+
 ## Instrucciones para el evaluador
 
 Este cuestionario utiliza la escala **System Usability Scale (SUS)** desarrollada por John Brooke (1996). Es una herramienta validada internacionalmente para medir la usabilidad percibida de un sistema.

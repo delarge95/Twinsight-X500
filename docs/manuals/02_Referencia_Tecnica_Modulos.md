@@ -14,7 +14,7 @@ Inventario tecnico resumido de los modulos relevantes para el cierre, dividido p
 | `AnalyzeModeHandler` | activo | cut, explode, filtros |
 | `StudioModeHandler` | activo | contenedor visible del panel Studio |
 | `UIAnalyzePanel` | activo | cambio de view modes |
-| `UIEnvironmentPanel` | activo | presets y sliders de entorno, incluido `Blueprint` como preset indirecto |
+| `UIEnvironmentPanel` | activo | presets y sliders de entorno |
 | `UICrossSectionPanel` | activo | controles del plano de corte |
 | `SelectionManager` | activo | seleccion de piezas |
 | `ExplodedViewManager` | activo | explode y filtros de categoria |
@@ -39,7 +39,7 @@ Inventario tecnico resumido de los modulos relevantes para el cierre, dividido p
 | `AssignURPConfig` | activo | soporte de configuracion |
 | `FixSceneConfig` | activo | saneamiento de escena |
 | `WebGLBuildFixer` | activo | correcciones previas al build |
-| `WebGLFinalLodOptimizer` | deprecado (solo rollback) | herramienta de limpieza para retirar LODGroups generados; los LODs se descartaron porque degradaban el shading de las piezas |
+| `WebGLFinalLodOptimizer` | activo | genera LODs finales de Unity 6 y reporte de triangulos antes de la build WebGL |
 | `blender_bake_target_setup.py` | soporte offline | prepara targets de bake sin exportar ni guardar el `.blend` |
 | `blender_pack_x500_mask.py` | soporte offline | empaqueta AO, roughness, curvature y metallic en mask runtime |
 | `blender_runtime_manifest_exporter.py` | soporte offline | reporta masters, instancias, transforms y candidatos de pieza madre para fasteners |
@@ -49,7 +49,8 @@ Inventario tecnico resumido de los modulos relevantes para el cierre, dividido p
 | Modulo | Estado | Motivo |
 | --- | --- | --- |
 | `MeasurementTool` | oculto | no se expone hasta validar escala util del modelo |
-| `Blueprint` | expuesto indirectamente | no es botón independiente de shader; se activa desde el ciclo de presets de entorno de `Studio` |
+| `Blueprint` | expuesto indirectamente | no es boton independiente de shader; se activa desde el ciclo de presets de entorno de `Studio` |
+| `Wireframe`, `Ghosted` | oculto | implementados en `ViewModeManager` pero no expuestos en la UI final |
 | `EnvPreset_Neutral` | oculto | boton presente en UXML con `display: none` |
 | partes del flujo termico avanzado | oculto | se preservan como base tecnica, no como feature cerrada |
 

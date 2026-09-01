@@ -175,7 +175,7 @@ git push origin <rama-publicada>
 GitHub Pages detecta automáticamente los cambios en `/docs` y despliega en:
 
 ```
-https://delarge95.github.io/WebGL-Thesis-Proposal/
+https://twinsight.alexwoodcock.me/
 ```
 
 ### 6.3 Headers del Servidor (GitHub Pages)

@@ -16,7 +16,7 @@ Interactive Unity WebGL prototype for technical visualization, inspection and st
 
 ## Public Demo
 
-- Demo and public documentation: <https://delarge95.github.io/WebGL-Thesis-Proposal/>
+- Demo and public documentation: <https://twinsight.alexwoodcock.me/>
 - Canonical repository: <https://github.com/delarge95/WebGL-Thesis-Proposal>
 - Final report: [`Informe_final/informe_final.pdf`](Informe_final/informe_final.pdf)
 - Published report copy: [`docs/manuals/informe_final.pdf`](docs/manuals/informe_final.pdf)

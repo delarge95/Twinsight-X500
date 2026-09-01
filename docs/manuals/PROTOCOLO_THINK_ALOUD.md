@@ -15,6 +15,14 @@ El protocolo se utiliza con fines de análisis cualitativo y triangulación, no 
 
 ---
 
+## Condición previa
+
+Antes de iniciar Think-Aloud, el participante debe haber aceptado el consentimiento informado. Si se grabará audio, pantalla o video, esa autorización debe quedar marcada explícitamente en `01_CONSENTIMIENTO_INFORMADO.md`.
+
+Si el participante no autoriza grabación, el moderador puede tomar notas manuales anonimizadas en `05_FORMATO_REGISTRO_MODERADOR.md`.
+
+---
+
 ## Instrucción inicial al participante
 
 > Mientras realiza las tareas, le pediré que vaya diciendo en voz alta qué está tratando de hacer, qué cree que está ocurriendo, qué dudas tiene y qué espera encontrar. No es necesario que justifique todo de manera perfecta; basta con que verbalice su proceso mientras interactúa.
