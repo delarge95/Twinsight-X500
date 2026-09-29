@@ -668,34 +668,35 @@ Evitar:
 
 - "Si esta en codigo, entonces cuenta como entregado."
 
-### Q35. Por que usar video de demo y no solo vivo?
+### Q35. Por que la demo es en vivo y el video solo respaldo?
 
 Respuesta corta:
 
-Porque el video reduce riesgo y la demo viva puede usarse como confirmacion breve.
+Porque la demo en vivo es la evidencia mas convincente de que la build funciona; el video del mismo recorrido solo cubre un fallo de red o del navegador.
 
 Respuesta ampliada:
 
-En defensa, el demo debe ser evidencia, no improvisacion. Un video local de la build real permite mostrar flujo completo sin depender de red, latencia o fallos del navegador. Si el entorno esta estable, una microdemo viva refuerza autenticidad.
+La demo se hace en la build publica siguiendo una ruta fija (seleccion → Isolate → ficha → Power → Explode → Cut → X-Ray → Thermal → Solid) en 1:35 como maximo. El video de la slide 19 registra exactamente esa ruta en la build real; si la app no responde en 10 s, se reproduce con un clic y se narra igual. Ninguno de los dos reemplaza la evidencia tecnica: muestran el flujo.
 
 Evidencia:
 
 - `Informe_final/presentation/DEMO_SCRIPT.md`
-- `Informe_final/presentation/ASSETS_REQUIREMENTS.md`
+- `Informe_final/presentation/PRESENTATION_SCRIPT.md`, slide 19
 
 Evitar:
 
 - "El video reemplaza evidencia tecnica." No; solo muestra flujo.
+- Improvisar una ruta distinta a la ensayada.
 
 ### Q36. Que pasa si falla WebGL durante la defensa?
 
 Respuesta corta:
 
-Pasar al video local y explicar que la evidencia es la secuencia de build real ya grabada.
+Volver a la slide 19 y reproducir el video del mismo recorrido, sin hacer troubleshooting en pantalla.
 
 Respuesta ampliada:
 
-No conviene hacer troubleshooting en pantalla. La frase preparada es: "Para no gastar tiempo en troubleshooting, paso al recorrido grabado. La evidencia que quiero mostrar es esta." Luego se conecta con resultados y profiler.
+La regla de corte es de 10 s sin respuesta o una congelacion. Frase preparada si el jurado lo nota: "Para no gastar tiempo en troubleshooting, muestro el mismo recorrido grabado en la build real." Luego se continua con el profiler y los resultados.
 
 Evidencia:
 
@@ -862,6 +863,44 @@ Evidencia:
 Evitar:
 
 - Convertir la tesis en marketing exagerado.
+
+## 11b. Preguntas anadidas en la auditoria final (2026-09-29)
+
+### Q45. Si Thermal no mide temperatura, por que la leyenda muestra °C?
+
+Respuesta corta:
+
+Porque el subsistema es un modelo reducido por componentes que calcula una temperatura por nodo; la escala en °C es la de ese modelo heuristico, no una medicion.
+
+Respuesta ampliada:
+
+ThermalSimulationManager toma el factor de carga del dron (control de energia), interpola entre temperatura ambiente, de hover y pico, y aproxima el acoplamiento entre piezas con una logica tipo Fourier sobre un grafo de contactos. Los tiempos de calentamiento estan comprimidos a proposito para que la lectura sea interactiva. Por eso el informe lo llama simulacion termica hibrida y heuristica: no es FEA, no usa sensores y sus grados no son temperatura real calibrada.
+
+Evidencia:
+
+- Informe final, "Modelo matematico operativo del subsistema termico"; Fig. 13, 66 y 67; Tabla 12.
+
+Evitar:
+
+- Leer valores de la leyenda como temperatura del dron.
+
+### Q46. Por que 257 renderers en la taxonomia y 252 en el profiler?
+
+Respuesta corta:
+
+Son conteos de fuentes distintas: 257 es la auditoria de renderers y colliders de la escena final; 252 son los renderers que el profiler conto en la build instrumentada.
+
+Respuesta ampliada:
+
+La convencion 28/30/257 describe la granularidad semantica y renderizable auditada en la escena. El profiler interno reporta 252 renderers, 252 mallas y 229 054 triangulos estimados en la build publicada. El informe reporta cada cifra con su fuente y no las equipara, igual que con 95 617 frente a 229 054.
+
+Evidencia:
+
+- Informe final, Tabla 3 (convenciones) y Tabla 17 (escena runtime instrumentada).
+
+Evitar:
+
+- Inventar una causa unica de la diferencia.
 
 ## 12. Respuestas de seguridad cuando no se sabe
 

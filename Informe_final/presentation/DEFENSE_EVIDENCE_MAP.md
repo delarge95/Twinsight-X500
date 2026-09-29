@@ -1,8 +1,8 @@
 # Mapa de evidencias de sustentacion - TwinSight X500
 
 Estado: canonico para enlazar informe, app, documentacion, presentacion y preguntas.
-Fecha de actualizacion: 2026-06-11.
-Fuente autoritativa: `Informe_final/informe_final.pdf`.
+Fecha de actualizacion: 2026-09-29 (sincronizado con `index_final.html`, 30 slides + B1-B11).
+Fuente autoritativa: `Informe_final/awoodcocks.pdf` (informe final); fuentes LaTeX en `Informe_final/chapters/`.
 
 ## 1. Jerarquia de autoridad
 
@@ -41,37 +41,47 @@ Regla para defensa:
 | README | `README.md` | Limite publico: visible_ui, oculto, legacy, futuro. |
 | Guion oral | `Informe_final/presentation/PRESENTATION_SCRIPT.md` | Tarjetas orales slide por slide. |
 | Demo | `Informe_final/presentation/DEMO_SCRIPT.md` | Recorrido de demostracion. |
-| Assets | `Informe_final/presentation/ASSETS_REQUIREMENTS.md` | Videos, GIFs y capturas requeridas. |
+| Deck | `Informe_final/presentation/index_final.html` | Presentacion final (abrir directamente en Chrome/Edge). |
+| Assets | `Informe_final/presentation/ASSETS_REQUIREMENTS.md` | Inventario final de imagenes, videos y modelo del deck. |
+| Exportaciones del profiler | `Telemetria/Mediciones_WebGL/` | JSON/CSV citados en la slide 20. |
 | Preguntas | `Informe_final/presentation/JURY_QA_BANK.md` | Banco de respuestas para jurado. |
 
 ## 3. Mapa slide -> evidencia
 
-| Slide | Claim defendido | Evidencia documental | Evidencia visual/app | Riesgo que controla |
+Numeracion = posicion en el deck = numero visible de cada slide.
+
+| Slide | Claim defendido | Evidencia documental (informe) | Evidencia visual/app | Riesgo que controla |
 |---:|---|---|---|---|
-| 1 | TwinSight X500 es prototipo WebGL inspeccionable. | `01_introduccion.tex`; `README.md`. | Hero o captura de app. | Evita abrir como pitch comercial. |
-| 2 | El reto es comprender relaciones, no solo ver piezas. | `01_introduccion.tex`, definicion de hardware complejo. | Comparacion manual/CAD/app. | No desacreditar documentacion 2D. |
-| 3 | La brecha esta entre fidelidad, legibilidad y rendimiento. | `01_introduccion.tex`, planteamiento del problema. | Diagrama de trade-off. | Evita justificar solo estetica. |
-| 4 | Es visual product twin, no digital twin operacional. | `01_introduccion.tex`; `03_marco_metodologico.tex`; `README.md`. | Frontera incluido/excluido. | Principal riesgo de sobrepromesa. |
-| 5 | Objetivos cubren pipeline, modos, prototipo y evaluacion. | Objetivos en `01_introduccion.tex`. | Matriz OE1-OE4. | Evita objetivos sin resultado. |
-| 6 | DSR y validacion descriptiva son adecuados al artefacto. | `03_marco_metodologico.tex`, DSRM y enfoque. | Ciclo DSR aplicado. | Evita pedir inferencia experimental. |
-| 7 | La evaluacion triangula tecnicos, tareas, SUS, NASA y Think-Aloud. | `03_marco_metodologico.tex`, instrumentos y triangulacion. | Diagrama de triangulacion. | Evita mal uso de SUS/NASA. |
-| 8 | El pipeline traduce CAD a WebGL viable. | `04_desarrollo.tex`, pipeline 3D. | High/low mesh, bake, Blender/Unity. | Evita parecer importacion directa. |
-| 9 | 95 617 y 229 054 triangulos no son equivalentes. | `05_resultados.tex`; `07_TABLAS_RENDIMIENTO_WEBGL_MEDICIONES.tex`. | Tarjeta de cifras. | Evita contradiccion geometrica. |
-| 10 | La app separa UI, datos, escena, shaders y profiler. | `04_desarrollo.tex`; `Informe_final/Manual_tecnico/manual_tecnico.pdf`. | Diagrama de arquitectura. | Evita lectura de "viewer simple". |
-| 11 | La taxonomia 28/30/257 estructura seleccion y escena. | `04_desarrollo.tex`, reconciliacion de conteos. | Jerarquia de piezas/anchors/renderers. | Evita confusion de conteos. |
-| 12 | El flujo publico real es Hero -> Explore -> bottom sheet -> Inspect/Analyze/Studio. | `README.md`; `Informe_final/Manual_de_usuario/manual_usuario.pdf`; `DEMO_SCRIPT.md`. | Capturas de UI. | Evita vender modulos no visibles. |
-| 13 | Inspect/Analyze reducen ruido visual para leer relaciones. | `05_resultados.tex`, cierre funcional y Think-Aloud. | Isolate, explode, cut, filtros. | Evita feature-list sin proposito. |
-| 14 | Studio/shaders son lecturas visuales complementarias. | `04_desarrollo.tex`; figuras de modos. | Grid Realistic/X-Ray/Solid/Thermal. | Evita presentar efectos como decoracion. |
-| 15 | Thermal es heuristico, no FEA ni telemetria. | `01_introduccion.tex`; `06_conclusiones.tex`. | Captura Thermal con etiqueta. | Riesgo tecnico alto si se sobrevende. |
-| 16 | La demo prueba tres capacidades concretas. | `DEMO_SCRIPT.md`; `ASSETS_REQUIREMENTS.md`. | Slide "explorar, inspeccionar, analizar". | Evita demo improvisada. |
-| 17 | La build realiza el flujo prometido. | `docs/Build/`; `Informe_final/Manual_de_usuario/manual_usuario.pdf`; `DEMO_SCRIPT.md`. | Video o demo vivo. | Evita depender de red o azar. |
-| 18 | El profiler hace trazable rendimiento por escenario. | `06_GUIA_MEDICIONES_TECNICAS_WEBGL.md`; tablas de rendimiento. | Profiler screenshot/export. | Evita FPS sin contexto. |
-| 19 | Rendimiento viable con limites por dispositivo. | `05_resultados.tex`; `07_TABLAS_RENDIMIENTO_WEBGL_MEDICIONES.tex`. | Matriz de dispositivos. | Evita promesa universal movil. |
-| 20 | SUS muestra recepcion favorable del prototipo 3D. | `05_resultados.tex`, resultados SUS. | Grafico SUS. | Evita comparar SUS 3D vs 2D. |
-| 21 | NASA-TLX Raw y tiempos favorecen 3D descriptivamente. | `05_resultados.tex`, NASA y tiempos T1-T3. | Comparativa 3D/2D. | Evita inferencia estadistica. |
-| 22 | Discusion acota efecto techo, muestra y compatibilidad. | `05_resultados.tex`, discusion; `06_conclusiones.tex`. | Matriz demuestra/no demuestra. | Controla objeciones metodologicas. |
-| 23 | Contribucion tecnica, metodologica y comunicativa. | `06_conclusiones.tex`; `README.md`. | Tres columnas. | Evita reducir aporte a app visual. |
-| 24 | Aporte: hacer legibles relaciones de hardware complejo. | `06_conclusiones.tex`; informe completo. | Dron final + takeaways. | Cierre academico, no comercial. |
+| 1 | TwinSight X500 es un prototipo WebGL inspeccionable. | Resumen; `01_introduccion.tex`. | Captura del visor + URL de la demo. | Evita abrir como pitch comercial. |
+| 2 | El reto es comprender relaciones, no solo ver piezas. | Introduccion; Fig. 1 y 2. | Documentacion → friccion → respuesta. | No desacreditar la documentacion 2D. |
+| 3 | La carga cognitiva explica por que importa la forma de presentar. | Marco teorico (Sweller); Fig. 7. | Intrinseca / extrinseca / germana. | Decir que NASA mide las tres cargas. |
+| 4 | La interfaz aplica jerarquia, agrupacion, estado y reconocimiento. | Marco teorico (Nielsen, Hutchins, Gestalt); Tabla 11 (Norman). | Tabla principio / app / deck. | Citar autores fuera de la bibliografia. |
+| 5 | Es visual product twin, no digital twin operacional. | Alcance y limitaciones; Fig. 3, 4 y 15. | Exclusiones / alcance. | Principal riesgo de sobrepromesa. |
+| 6 | Pregunta de investigacion y objetivos verificables. | Preguntas de investigacion; objetivos. | Pregunta + matriz OE1-OE4. | Objetivos sin resultado asociado. |
+| 7 | DSR y validacion formativa descriptiva. | Marco metodologico; Fig. 14. | Ciclo DSRM aplicado. | Pedir inferencia experimental. |
+| 8 | La evaluacion triangula cinco capas. | Instrumentos; Fig. 19 y 20. | Diagrama de triangulacion. | Mal uso de SUS/NASA. |
+| 9 | El pipeline traduce CAD (>6,5M tri) a 95 617 tri. | Pipeline 3D; Tabla 5; Tabla 28; Fig. 22. | Flujo CAD → WebGL. | Parecer importacion directa. |
+| 10 | La escena runtime exportada es real y manipulable. | Tabla 17 (252 mallas, 229 054 tri). | Visor three.js del GLB (229 070 tri). | Confundir visor con activo base. |
+| 11 | 95 617 y 229 054 no son equivalentes. | Tabla 17; Tabla 28 y su nota. | Dos cifras + criterio. | Contradiccion geometrica aparente. |
+| 12 | La arquitectura separa UI, orquestacion, escena y datos. | Arquitectura operativa; Fig. 47-50. | Capas con clases reales del codigo. | Lectura de "viewer simple". |
+| 13 | La taxonomia 28/30/257 estructura la seleccion. | Normalizacion; Tabla 3; Fig. 21; Tabla 8. | Cifras + hotspots/fasteners. | Confusion de conteos. |
+| 14 | El flujo publico revela la complejidad por etapas. | Flujo visible de la build final. | Diagrama de flujo + captura. | Vender modulos no visibles. |
+| 15 | Inspect/Analyze reducen ruido para leer relaciones. | Flujo visible; Fig. 59-60. | Clips de aislamiento y explode. | Feature-list sin proposito. |
+| 16 | Los modos visuales son lecturas tecnicas. | Sistema de visualizacion; Tabla 12; Fig. 61-63. | Realistic / X-Ray / Solid / Thermal. | Presentar efectos como decoracion. |
+| 17 | Thermal es heuristico, no FEA. | Subsistema termico; Fig. 13, 66-67. | Escala relativa (Fig. 13). | Sobrevender Thermal. |
+| 18 | La demo prueba tres capacidades. | `DEMO_SCRIPT.md`. | Capacidades + ruta. | Demo improvisada. |
+| 19 | La build realiza el flujo prometido. | `docs/Build/`; manual de usuario; `DEMO_SCRIPT.md`. | Demo en vivo; video de respaldo. | Depender de red o azar. |
+| 20 | El profiler hace trazable el rendimiento. | Resultados de rendimiento; Tabla 18. | Extracto JSON real del WebGLProfiler. | FPS sin contexto. |
+| 21 | Rendimiento viable, no universal. | Tabla 16; Tabla 19; Fig. 73. | Barras FPS por dispositivo. | Promesa universal movil. |
+| 22 | SUS favorable en el prototipo 3D. | Resultados de usabilidad; Tabla 25; Fig. 75. | SUS, rango, referencia 68. | Comparar SUS 3D vs 2D. |
+| 23 | NASA-TLX Raw y tiempos favorecen al 3D descriptivamente. | Tablas 23, 25 y 26. | Cifras 3D/2D + tabla T1-T3. | Inferencia causal. |
+| 24 | Think-Aloud explica comprension y fricciones. | Tabla 27; Fig. 77. | Barras lima/ambar. | Leer "navegacion y control" como fortaleza. |
+| 25 | La discusion acota el resultado. | Discusion. | Soporta / no afirma. | Objeciones metodologicas. |
+| 26 | Cada objetivo cerrado con evidencia; pregunta respondida. | Conclusiones por objetivo. | Tabla OE → resultado → evidencia. | Conclusiones genericas. |
+| 27 | Limitaciones como alcance declarado. | Limitaciones. | Cuatro limites. | Disculparse o esconder limites. |
+| 28 | Trabajo futuro como ruta de madurez. | Trabajo futuro; Fig. 80. | Escalera + fases 0-5. | Prometer twin operacional inmediato. |
+| 29 | Contribucion tecnica, metodologica y comunicativa. | Aporte a la Ingenieria Multimedia; conclusiones. | Tres columnas. | Reducir el aporte a una app visual. |
+| 30 | Cierre y apertura a preguntas. | — | "Preguntas del jurado" + URL. | Alargar el cierre. |
 
 ## 4. Claims numericos autorizados
 
@@ -234,7 +244,8 @@ Ruta formal:
 | B7 Arquitectura | `Informe_final/Manual_tecnico/manual_tecnico.pdf`; `04_desarrollo.tex` | Managers, eventos, datos, shaders. |
 | B8 Thermal | `01_introduccion.tex`; `06_conclusiones.tex` | Heuristico, no FEA, trabajo futuro. |
 | B9 Limitaciones | `05_resultados.tex`; `06_conclusiones.tex` | Muestra, efecto techo, no inferencia, movil. |
-| B10 Futuro | `06_conclusiones.tex` | Telemetria, twin manifest, mayor muestra, dispositivos. |
+| B10 Futuro | `06_conclusiones.tex`; Fig. 80 | Fases 0-5: validacion ampliada, twin manifest, telemetria, live shadow, modo servicio, twin operacional. |
+| B11 Mobile UX | Tabla 20; Fig. 74; Tabla 16 | Gestos y ajustes moviles de la prueba formativa; rendimiento del Redmi. |
 
 ## 8. Claims prohibidos o condicionados
 
@@ -249,6 +260,10 @@ Ruta formal:
 | "95 617 es todo el runtime" | Prohibido | "95 617 es el activo base optimizado." |
 | "README historico define el alcance final" | Prohibido | "El informe final es fuente academica autoritativa." |
 | "Modulos ocultos son features publicas" | Prohibido | "Visible, oculto, legacy y futuro se diferencian." |
+| "Los °C de Thermal son temperatura real" | Prohibido | "Escala del modelo heuristico por componentes." |
+| "Navegacion y control fue una fortaleza (10/12)" | Prohibido | "Fue la friccion mas frecuente: orbita, pan y sensibilidad tactil." |
+| "El profiler usa telemetria" | Prohibido | "Profiler interno de la build (WebGLProfiler), exporta JSON/CSV." |
+| "Efecto techo en los tiempos" | Prohibido | "Efecto techo en completitud: 96/96 registros en ambas condiciones." |
 
 ## 9. Checklist antes de cerrar deck
 

@@ -15,7 +15,7 @@ Este documento se ensaya junto con `PRESENTATION_SCRIPT.md`. La evidencia por sl
 
 ## Rol de este guion (actualizado 2026-09-29)
 
-- **Durante la exposición (slide 19)** la demo es **en vivo** en la build pública, con la ruta corta de abajo (≤ 1:40) y la narración de `PRESENTATION_SCRIPT.md`.
+- **Durante la exposición (slide 19)** la demo es **en vivo** en la build pública, con la ruta corta de abajo (≤ 1:35) y la narración de `PRESENTATION_SCRIPT.md`.
 - **Respaldo:** si la build no responde en 10 s o se congela, volver al deck y hacer clic sobre el video `assets/video/vid_01_demo_compilado.mp4` (88 s, mismo recorrido), que espera en pausa en 0:00.
 - **Este guion de 5 minutos** es la demo extendida para la ronda de preguntas si el jurado pide profundizar.
 

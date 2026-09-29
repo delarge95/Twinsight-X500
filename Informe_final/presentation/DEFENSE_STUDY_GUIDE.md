@@ -86,7 +86,7 @@ La defensa debe leer los objetivos como un contrato verificable. OE1 se evidenci
 
 "Cual objetivo quedaria mas debil si se cae la demo en vivo?"
 
-Respuesta: OE2 quedaria mas expuesto oralmente, pero no cae si se muestra video/GIF, manuales, capturas, build versionada y evidencia tecnica. La demo viva es apoyo, no unica prueba.
+Respuesta: OE3 (prototipo interactivo) quedaria mas expuesto oralmente, pero no cae si se muestra video/GIF, manuales, capturas, build versionada y evidencia tecnica. La demo viva es apoyo, no unica prueba.
 
 ## 3. Metodologia DSR y diseno comparativo
 

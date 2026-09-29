@@ -155,6 +155,9 @@ kbd{border:1px solid var(--line);border-radius:4px;padding:3px 7px;font:inherit;
   flex-direction:column;
   justify-content:center;
   min-height:0;
+  /* Escala de proyección: el diseño se compone a 1440×860 y se amplía proporcionalmente
+     en pantallas mayores (1920×1080 → hasta ×1.256) para que el texto sea legible a distancia.
+     El factor se ajusta por slide (JS) para no superar nunca la altura de la pantalla. */
 }
 
 [data-reveal]{opacity:0;transform:translateY(24px);filter:blur(8px);transition:opacity .9s var(--ease) var(--d,.2s),transform .9s var(--ease) var(--d,.2s),filter .9s var(--ease) var(--d,.2s)}
@@ -472,6 +475,29 @@ em.acc-amber{font-style:normal;color:var(--amber)}
 }
 @media (max-height:640px){.ticks{display:none}}
 </style>
+<script>
+/* Escala de proyección (ver .slide-inner). Factor global entre 1 y 1.6 respecto de 1440×860;
+   cada slide usa el mayor factor que quepa en la altura de la pantalla (mínimo 0.72 en pantallas pequeñas). */
+(function(){
+  function stage(){
+    var g = Math.max(1, Math.min(1.6, Math.min(innerWidth / 1440, innerHeight / 860)));
+    window.__stage = g;
+    document.querySelectorAll('.slide-inner').forEach(function(inner){
+      inner.style.zoom = '1';
+      var slideH = inner.parentElement.clientHeight || innerHeight;
+      var h = inner.offsetHeight || 1;
+      var z = Math.max(0.72, Math.min(g, slideH / h));
+      inner.style.zoom = z.toFixed(3);
+    });
+  }
+  var t;
+  function later(){ clearTimeout(t); t = setTimeout(stage, 120); }
+  document.addEventListener('DOMContentLoaded', stage);
+  addEventListener('load', stage);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(stage);
+  addEventListener('resize', later);
+})();
+</script>
 </head>
 <body>
 
@@ -486,7 +512,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
   <div class="brand"><span class="brand-mark"></span>TWINSIGHT X500</div>
   <div class="counter" aria-live="polite">
     <span class="counter-roll"><input id="slideJump" class="counter-jump" type="text" inputmode="numeric" maxlength="3" aria-label="Ir al número de diapositiva" value="01"></span>
-    <span>/</span><span id="slideTotal">41</span>
+    <span>/</span><span id="slideTotal">30</span>
   </div>
 </header>
 
@@ -497,7 +523,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
   <div class="slide-inner">
     <div class="cover-grid">
       <div>
-        <p class="kicker" data-reveal style="--d:.12s"><span class="k-num">00</span>Defensa de grado — Ingeniería Multimedia</p>
+        <p class="kicker" data-reveal style="--d:.12s"><span class="k-num">01</span>Defensa de grado — Ingeniería Multimedia</p>
         <h1 class="cover-title"><span class="ln" data-scramble style="--d:.3s">TwinSight <em class="acc">X500</em></span></h1>
         <div class="cover-rule" aria-hidden="true"></div>
         <p class="cover-claim" data-reveal style="--d:.58s">Convierte un ensamblaje complejo en una <strong>experiencia WebGL inspeccionable</strong>.</p>
@@ -517,13 +543,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </figure>
     </div>
   </div>
-  <aside class="notes">Apertura. No es digital twin operacional; es experiencia web 3D para inspección técnica del Holybro X500 V2.</aside>
+  <aside class="notes">⏱ 0:00–0:45 · 0 clics — Apertura. No es digital twin operacional; es experiencia web 3D para inspección técnica del Holybro X500 V2.</aside>
 </section>
 
 <!-- ============ 02 · PROBLEMA ============ -->
 <section class="slide" data-label="Problema">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">01</span>Problema</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">02</span>Problema</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El reto central es comprender <em class="acc">relaciones</em>, no solo ver piezas.</span></h1>
     <div class="rows">
       <div class="row-item" data-step="1"><span class="ri-idx">01</span><h3 class="ri-term">Documentación</h3><p class="ri-desc">Planos, manuales y referencias técnicas contienen información útil, pero la lectura está distribuida en soportes separados.</p></div>
@@ -532,13 +558,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout key" data-step="4"><span class="tag lime">Idea clave</span><p>El problema no es ausencia de datos: es la distancia entre los datos disponibles y la comprensión espacial operativa.</p></div>
   </div>
-  <aside class="notes">Problema: información fragmentada, reconstrucción espacial exigida al usuario.</aside>
+  <aside class="notes">⏱ 0:45–1:45 · 4 clics — Problema: información fragmentada, reconstrucción espacial exigida al usuario.</aside>
 </section>
 
 <!-- ============ 03 · MARCO TEÓRICO I ============ -->
 <section class="slide" data-label="Marco Teórico I">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">02</span>Marco teórico I</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">03</span>Marco teórico I</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La <em class="acc">carga cognitiva</em> explica por qué la forma de presentar importa.</span></h1>
     <div class="rows">
       <div class="row-item slim" data-step="1">
@@ -556,13 +582,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout limit" data-step="4"><span class="tag amber">Límite declarado</span><p>Esta tesis no mide las tres cargas directamente. Las usa como marco teórico para justificar una interfaz 3D guiada que reduce la reconstrucción espacial innecesaria.</p></div>
   </div>
-  <aside class="notes">Memoria de trabajo es limitada (Sweller et al. 2019). Tres tipos: intrínseca = complejidad del contenido; extrínseca = cómo se presenta; germana = esfuerzo útil que construye esquemas. La tesis no mide las tres directamente; las usa como marco de diseño.</aside>
+  <aside class="notes">⏱ 1:45–2:55 · 4 clics — Memoria de trabajo es limitada (Sweller et al. 2019). Tres tipos: intrínseca = complejidad del contenido; extrínseca = cómo se presenta; germana = esfuerzo útil que construye esquemas. La tesis no mide las tres directamente; las usa como marco de diseño.</aside>
 </section>
 
 <!-- ============ 04 · MARCO TEÓRICO II ============ -->
 <section class="slide" data-label="Marco Teórico II">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">03</span>Marco teórico II</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">04</span>Marco teórico II</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La interfaz traduce la teoría en <em class="acc">jerarquía, agrupación, estado y reconocimiento</em>.</span></h1>
     <div class="tscroll">
       <table class="t-mayer">
@@ -576,13 +602,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </table>
     </div>
   </div>
-  <aside class="notes">Principios de interfaz que cita el informe (marco teórico y Tabla 11): jerarquía visual (Norman, 2013), agrupación por proximidad y similitud (Gestalt: Wertheimer, Köhler), visibilidad del estado y reconocimiento antes que memoria (Nielsen, 1994). Marco unificador: cognición distribuida (Hutchins, 1995) — la interfaz funciona como artefacto cognitivo que externaliza la rotación mental.</aside>
+  <aside class="notes">⏱ 2:55–4:05 · 4 clics — Principios de interfaz que cita el informe (marco teórico y Tabla 11): jerarquía visual (Norman, 2013), agrupación por proximidad y similitud (Gestalt: Wertheimer, Köhler), visibilidad del estado y reconocimiento antes que memoria (Nielsen, 1994). Marco unificador: cognición distribuida (Hutchins, 1995) — la interfaz funciona como artefacto cognitivo que externaliza la rotación mental.</aside>
 </section>
 
 <!-- ============ 05 · ALCANCE ============ -->
 <section class="slide" data-label="Alcance">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">04</span>Alcance</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">05</span>Alcance</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La tesis responde con un <em class="acc">visual product twin</em>, no con un digital twin operacional.</span></h1>
     <div class="scope">
       <div class="scope-col" data-step="2">
@@ -609,14 +635,15 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">Aclarar alcance con contundencia desde el inicio: Visual Product Twin vs Digital Twin Operacional.</aside>
+  <aside class="notes">⏱ 4:05–5:15 · 2 clics — Aclarar alcance con contundencia desde el inicio: Visual Product Twin vs Digital Twin Operacional.</aside>
 </section>
 
 <!-- ============ 06 · OBJETIVOS ============ -->
 <section class="slide" data-label="Objetivos">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">05</span>Objetivos</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">06</span>Objetivos</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Los objetivos definen el contrato: <em class="acc">construir y evaluar</em> un artefacto interactivo.</span></h1>
+    <p class="slide-body" data-reveal style="--d:.5s;margin:0 0 clamp(14px,2vh,22px);max-width:78ch"><strong style="color:var(--ink)">Pregunta de investigación:</strong> ¿qué diferencias descriptivas de desempeño y carga de trabajo percibida aparecen entre un visor 3D web y un soporte 2D, y bajo qué condiciones es viable en el navegador?</p>
     <div class="obj-grid">
       <div class="obj-card" data-step="1"><span class="obj-num">01</span><div><div class="obj-head"><span class="tag">OE1</span><h3>Pipeline de optimización CAD</h3></div><p>Diseñar un pipeline 3D que reduzca modelos CAD a presupuesto WebGL (6,5M a 95 617 tri), preservando legibilidad formal y piezas.</p></div></div>
       <div class="obj-card" data-step="2"><span class="obj-num">02</span><div><div class="obj-head"><span class="tag">OE2</span><h3>Materiales, modos y rendimiento</h3></div><p>Integrar en Unity URP renderizado realista y herramientas de inspección, procurando frame time &le; 33,33 ms (&ge; 30 FPS).</p></div></div>
@@ -624,13 +651,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <div class="obj-card" data-step="4"><span class="obj-num">04</span><div><div class="obj-head"><span class="tag">OE4</span><h3>Evaluación con usuarios</h3></div><p>Evaluar formativamente tareas y carga percibida (3D vs. 2D con NASA-TLX Raw y Think-Aloud), y estimar usabilidad global con SUS.</p></div></div>
     </div>
   </div>
-  <aside class="notes">Objetivos como contrato verificable. No se evaluó una idea abstracta: se evaluó un artefacto construido y medible.</aside>
+  <aside class="notes">⏱ 5:15–6:10 · 4 clics — Objetivos como contrato verificable. No se evaluó una idea abstracta: se evaluó un artefacto construido y medible.</aside>
 </section>
 
 <!-- ============ 07 · METODOLOGÍA ============ -->
 <section class="slide" data-label="Metodología">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">06</span>Metodología</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">07</span>Metodología</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La metodología usa <em class="acc">DSR</em> con validación formativa descriptiva.</span></h1>
     <div class="flow-wrap" data-reveal="media" style="--d:.4s">
       <svg viewBox="0 0 960 92" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ciclo DSR">
@@ -656,13 +683,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">DSRM (Peffers et al., 2007) en 6 fases continuas. Evaluación formativa y descriptiva con muestra de 12 participantes.</aside>
+  <aside class="notes">⏱ 6:10–7:15 · 7 clics — DSRM (Peffers et al., 2007) en 6 fases continuas. Evaluación formativa y descriptiva con muestra de 12 participantes.</aside>
 </section>
 
 <!-- ============ 08 · EVALUACIÓN ============ -->
 <section class="slide" data-label="Evaluación">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">07</span>Evaluación</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">08</span>Evaluación</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Ninguna métrica mide todo: la evaluación <em class="acc">triangula</em> cinco capas de evidencia.</span></h1>
     <div class="eval-grid">
       <div class="svg-panel" data-reveal="media" style="--d:.4s">
@@ -700,13 +727,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">Instrumentos y triangulación. Rendimiento técnico, conducta en tareas, percepción subjetiva y comentarios cualitativos se interpretan en conjunto.</aside>
+  <aside class="notes">⏱ 7:15–8:35 · 6 clics — Instrumentos y triangulación. Rendimiento técnico, conducta en tareas, percepción subjetiva y comentarios cualitativos se interpretan en conjunto.</aside>
 </section>
 
 <!-- ============ 09 · PIPELINE ============ -->
 <section class="slide" data-label="Pipeline">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">08</span>Pipeline</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">09</span>Pipeline</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">De 6,5 millones a 95 617 triángulos: la traducción de activos CAD para <em class="acc">WebGL</em>.</span></h1>
     <div class="flow-wrap" data-reveal="media" style="--d:.4s">
       <svg viewBox="0 0 960 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline CAD a WebGL">
@@ -725,13 +752,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <div data-step="8"><span class="tag lime">Preservación semántica</span><h3>Qué se conserva</h3><p>La optimización mantiene la estructura jerárquica para selección y desglose interactivo, preservando silueta y lectura funcional.</p><div class="callout key"><span class="tag lime">Principio</span><p>No se simplifica por simplificar: se preserva la coherencia para inspección técnica en web.</p></div></div>
     </div>
   </div>
-  <aside class="notes">Pipeline CAD → WebGL. Traducción técnica para mantener rendimiento y jerarquía seleccionable.</aside>
+  <aside class="notes">⏱ 8:35–9:50 · 8 clics — Pipeline CAD → WebGL. Traducción técnica para mantener rendimiento y jerarquía seleccionable.</aside>
 </section>
 
 <!-- ============ 10 · ACTIVO 3D INTERACTIVO ============ -->
 <section class="slide" data-label="Activo 3D">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">09</span>Activo 3D</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">10</span>Activo 3D</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La escena runtime exportada es <em class="acc">explorable</em>: rota, acerca y alterna la lectura técnica.</span></h1>
     <div class="gl-wrap">
       <div class="gl-host" id="glHost" data-3d data-reveal="media" style="--d:.4s">
@@ -756,13 +783,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">Visor 3D de la escena runtime exportada (252 mallas, ~229 000 triángulos): rotación libre, zoom y wireframe. Puente hacia Geometría: esta es la cifra runtime; el activo base optimizado es de 95 617 triángulos.</aside>
+  <aside class="notes">⏱ 9:50–10:20 · 2 clics — Visor 3D de la escena runtime exportada (252 mallas, ~229 000 triángulos): rotación libre, zoom y wireframe. Puente hacia Geometría: esta es la cifra runtime; el activo base optimizado es de 95 617 triángulos.</aside>
 </section>
 
 <!-- ============ 10 · GEOMETRÍA ============ -->
 <section class="slide" data-label="Geometría">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">10</span>Geometría</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">11</span>Geometría</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La reducción geométrica se lee como <em class="acc">presupuesto de activo</em>, no como conteo runtime.</span></h1>
     <div class="duo">
       <div data-step="1">
@@ -782,13 +809,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout limit" data-step="3"><span class="tag amber">Criterio de interpretación</span><p>Las cifras no son equivalentes ni se contradicen: una mide el costo del activo; la otra, la complejidad de la escena en ejecución.</p></div>
   </div>
-  <aside class="notes">No comparar 95 617 y 229 054 como la misma métrica. Una es el activo base optimizado (masters principales); la otra es el conteo runtime estimado por el profiler, con instancias, proxies, assets de apoyo y renderers adicionales.</aside>
+  <aside class="notes">⏱ 10:20–11:15 · 3 clics — No comparar 95 617 y 229 054 como la misma métrica. Una es el activo base optimizado (masters principales); la otra es el conteo runtime estimado por el profiler, con instancias, proxies, assets de apoyo y renderers adicionales.</aside>
 </section>
 
 <!-- ============ 11 · ARQUITECTURA ============ -->
 <section class="slide" data-label="Arquitectura">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">11</span>Arquitectura</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">12</span>Arquitectura</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La arquitectura separa <em class="acc">UI, orquestación, servicios de escena y datos</em>.</span></h1>
     <div class="stack">
       <div class="layer" data-step="1"><span class="layer-tag lime">UI</span><div class="chips"><span class="chip">UIManager</span><span class="chip">UIDetailsSheet</span><span class="chip">HotspotManager</span><span class="chip">Hero · Explore · Inspect · Analyze · Studio</span></div></div>
@@ -797,13 +824,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <div class="layer" data-step="4"><span class="layer-tag lime">Data</span><div class="chips"><span class="chip lime">DronePartData</span><span class="chip lime">PartCatalogManager</span><span class="chip lime">ExplodablePart</span><span class="chip lime">Shader Materials (URP)</span></div></div>
     </div>
   </div>
-  <aside class="notes">Arquitectura en cuatro capas (Fig. 47 del informe): presentación (UIManager, UIDetailsSheet, HotspotManager), orquestación (EventBus publish/subscribe, AppStateMachine, SelectionManager, ViewModeManager), servicios de escena (explode, corte, visibilidad, térmico y profiler interno) y datos (DronePartData, catálogo). La UI publica un evento y no conoce a sus receptores.</aside>
+  <aside class="notes">⏱ 11:15–12:25 · 4 clics — Arquitectura en cuatro capas (Fig. 47 del informe): presentación (UIManager, UIDetailsSheet, HotspotManager), orquestación (EventBus publish/subscribe, AppStateMachine, SelectionManager, ViewModeManager), servicios de escena (explode, corte, visibilidad, térmico y profiler interno) y datos (DronePartData, catálogo). La UI publica un evento y no conoce a sus receptores.</aside>
 </section>
 
 <!-- ============ 12 · TAXONOMÍA ============ -->
 <section class="slide" data-label="Taxonomía">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">12</span>Taxonomía</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">13</span>Taxonomía</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La taxonomía permite seleccionar <em class="acc">piezas madre, subpiezas, hotspots y fasteners</em>.</span></h1>
     <div class="band">
       <div class="metric" data-step="1"><span class="tag">Piezas canónicas</span><div class="m-value"><span data-count="28">0</span></div><p>Entidades semánticas principales con asset DronePartData.</p></div>
@@ -820,13 +847,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <figcaption class="figcap">Hotspots «select a part» sobre el ensamblaje — la taxonomía dirige la lectura visual.</figcaption>
     </figure>
   </div>
-  <aside class="notes">Taxonomía como estructura operativa: 28 piezas canónicas (DronePartData), 30 anchors de escena (28 + fastener_group + misc_group) y 257 renderers/colliders auditados. Cuatro niveles de selección: pieza madre, subpieza, hotspot y fastener.</aside>
+  <aside class="notes">⏱ 12:25–13:25 · 7 clics — Taxonomía como estructura operativa: 28 piezas canónicas (DronePartData), 30 anchors de escena (28 + fastener_group + misc_group) y 257 renderers/colliders auditados. Cuatro niveles de selección: pieza madre, subpieza, hotspot y fastener.</aside>
 </section>
 
 <!-- ============ 13 · FLUJO PÚBLICO ============ -->
 <section class="slide" data-label="Flujo público">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">13</span>Flujo público</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">14</span>Flujo público</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El flujo de usuario revela la complejidad del dron de forma <em class="acc">progresiva</em>.</span></h1>
     <div class="flow-wrap" data-reveal="media" style="--d:.4s">
       <svg viewBox="0 0 960 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flujo de usuario">
@@ -860,13 +887,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <figcaption class="figcap">Selección de pieza → herramientas Analyze (Cut · Explode · Filter) → navegación Inspect / Analyze / Studio.</figcaption>
     </figure>
   </div>
-  <aside class="notes">Flujo público y visible: Hero → Explore → Selección → Bottom Sheet → Herramientas.</aside>
+  <aside class="notes">⏱ 13:25–14:25 · 7 clics — Flujo público y visible: Hero → Explore → Selección → Bottom Sheet → Herramientas.</aside>
 </section>
 
 <!-- ============ 14 · INSPECT & ANALYZE ============ -->
 <section class="slide" data-label="Inspect · Analyze">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">14</span>Inspect · Analyze</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">15</span>Inspect · Analyze</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Inspect y Analyze eliminan el ruido visual para hacer <em class="acc">legible el ensamblaje</em>.</span></h1>
     <div class="ia-grid">
       <div class="ia-col" data-step="1">
@@ -895,13 +922,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">Inspect / Analyze. Herramientas analíticas para reducir carga extrínseca.</aside>
+  <aside class="notes">⏱ 14:25–15:25 · 4 clics — Inspect / Analyze. Herramientas analíticas para reducir carga extrínseca.</aside>
 </section>
 
 <!-- ============ 15 · STUDIO ============ -->
 <section class="slide" data-label="Studio">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">15</span>Studio</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">16</span>Studio</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Los shaders son herramientas de <em class="acc">inspección técnica</em>, no filtros estéticos.</span></h1>
     <div class="studio-wrap">
       <div class="studio-content">
@@ -924,13 +951,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </figure>
     </div>
   </div>
-  <aside class="notes">Studio y modos visuales. El valor multimedia radica en la capacidad de inspección técnica visual.</aside>
+  <aside class="notes">⏱ 15:25–16:25 · 6 clics — Studio y modos visuales. El valor multimedia radica en la capacidad de inspección técnica visual.</aside>
 </section>
 
 <!-- ============ 16 · THERMAL ============ -->
 <section class="slide" data-label="Thermal">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">16</span>Thermal</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">17</span>Thermal</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Thermal es una visualización <em class="acc-amber">heurística</em>, no una simulación FEA calibrada.</span></h1>
     <div class="duo-cols">
       <div data-step="1">
@@ -956,13 +983,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">Thermal con límites explícitos. Modelo reducido por componentes (lumped) con factor de carga del dron y tiempos comprimidos; la leyenda en °C es escala del modelo heurístico. No recibe telemetría, no es FEA ni temperatura real. Jerarquía (Fig. 13): alta = motores y batería; media = ESC, controladora y electrónica; baja = estructura y hélices.</aside>
+  <aside class="notes">⏱ 16:25–17:15 · 2 clics — Thermal con límites explícitos. Modelo reducido por componentes (lumped) con factor de carga del dron y tiempos comprimidos; la leyenda en °C es escala del modelo heurístico. No recibe telemetría, no es FEA ni temperatura real. Jerarquía (Fig. 13): alta = motores y batería; media = ESC, controladora y electrónica; baja = estructura y hélices.</aside>
 </section>
 
 <!-- ============ 17 · DEMO (3 CAPACIDADES) ============ -->
 <section class="slide" data-label="Demo capacidades">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">17</span>Demo</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">18</span>Demo</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La demo debe probar <em class="acc">tres capacidades</em>, no navegar improvisadamente.</span></h1>
     <div class="trio">
       <div class="metric" data-step="1"><span class="obj-num">01</span><h3 style="margin-top:10px">Selección</h3><p>Pasar del dron completo a una pieza concreta con su ficha contextual.</p></div>
@@ -975,13 +1002,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <figcaption class="figcap">El prototipo que se demostrará: dron completo, selección y herramientas Analyze.</figcaption>
     </figure>
   </div>
-  <aside class="notes">Tres capacidades concretas a probar en demo: Selección, Relación y Modo visual.</aside>
+  <aside class="notes">⏱ 17:15–17:45 · 5 clics — Tres capacidades concretas a probar en demo: Selección, Relación y Modo visual.</aside>
 </section>
 
 <!-- ============ 18 · DEMO VIDEO ============ -->
 <section class="slide" data-label="Demo video">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">18</span>Demo</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">19</span>Demo</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Demo: de dron completo a pieza, relación y <em class="acc">modo visual</em>.</span></h1>
     <div class="demo-wrap">
       <figure class="phone phone-lg" data-reveal="media" style="--d:.4s">
@@ -1001,13 +1028,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">DEMO EN VIVO (principal): pasar a la ventana de la build ya abierta y en estado inicial; recorrido en ≤ 1:40 con los mismos pasos y marcas del video. RESPALDO: si la build tarda > 10 s o se congela, volver a esta slide y hacer clic en el video (espera en pausa en 0:00): 0:00 selección → Isolate → ficha; 0:17 Power; 0:34 Explode; 0:56 Cut; 1:08 X-Ray → 1:16 Thermal → 1:22 Solid.</aside>
+  <aside class="notes">⏱ 17:45–19:20 · 2 clics — DEMO EN VIVO (principal): pasar a la ventana de la build ya abierta y en estado inicial; recorrido en ≤ 1:40 con los mismos pasos y marcas del video. RESPALDO: si la build tarda > 10 s o se congela, volver a esta slide y hacer clic en el video (espera en pausa en 0:00): 0:00 selección → Isolate → ficha; 0:17 Power; 0:34 Explode; 0:56 Cut; 1:08 X-Ray → 1:16 Thermal → 1:22 Solid.</aside>
 </section>
 
 <!-- ============ 19 · PROFILER ============ -->
 <section class="slide" data-label="Profiler">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">19</span>Profiler</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">20</span>Profiler</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El profiler interno vuelve <em class="acc">trazable</em> el rendimiento por escenario y dispositivo.</span></h1>
     <div class="duo-cols">
       <div data-step="1">
@@ -1031,13 +1058,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </figure>
     </div>
   </div>
-  <aside class="notes">Profiler y trazabilidad. Extracto literal de la exportación JSON del WebGLProfiler (sesión thermal_studio, escritorio, 4 jun 2026; Tabla 18 del informe). El mismo archivo contiene el conteo runtime 229 054 y 252 renderers.</aside>
+  <aside class="notes">⏱ 19:20–20:20 · 2 clics — Profiler y trazabilidad. Extracto literal de la exportación JSON del WebGLProfiler (sesión thermal_studio, escritorio, 4 jun 2026; Tabla 18 del informe). El mismo archivo contiene el conteo runtime 229 054 y 252 renderers.</aside>
 </section>
 
 <!-- ============ 20 · RENDIMIENTO ============ -->
 <section class="slide" data-label="Rendimiento">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">20</span>Rendimiento</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">21</span>Rendimiento</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El rendimiento es <em class="acc">viable</em>, pero no universal en todo móvil.</span></h1>
     <div class="duo-cols">
       <div class="svg-panel" data-step="1">
@@ -1065,13 +1092,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout limit" data-step="5"><span class="tag amber">Compatibilidad declarada</span><p>La compatibilidad está acotada a los entornos documentados, sin promesas de uniformidad universal en móvil.</p></div>
   </div>
-  <aside class="notes">Rendimiento viable pero no universal en todo móvil. Se midieron seis configuraciones (Tabla 16); se muestran cuatro representativas. Escritorio e iPhone 17 Pro ≈60 FPS; Redmi Note 10S 26,5 FPS (funcional, bajo la meta); Adreno 610 17,6 FPS (límite inferior). Las sesiones con usuarios usaron solo dos entornos: este PC y el Redmi.</aside>
+  <aside class="notes">⏱ 20:20–21:20 · 5 clics — Rendimiento viable pero no universal en todo móvil. Se midieron seis configuraciones (Tabla 16); se muestran cuatro representativas. Escritorio e iPhone 17 Pro ≈60 FPS; Redmi Note 10S 26,5 FPS (funcional, bajo la meta); Adreno 610 17,6 FPS (límite inferior). Las sesiones con usuarios usaron solo dos entornos: este PC y el Redmi.</aside>
 </section>
 
 <!-- ============ 21 · USABILIDAD SUS ============ -->
 <section class="slide" data-label="Usabilidad SUS">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">21</span>Usabilidad</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">22</span>Usabilidad</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">SUS de <em class="acc">91,88</em>: recepción favorable del visor interactivo 3D.</span></h1>
     <div class="band">
       <div class="metric" data-step="1"><span class="tag lime">SUS · Prototipo 3D</span><div class="m-value lime"><span data-count="91.88" data-decimals="2">0</span></div><h3>Usabilidad</h3><p>Mediana 95,00 · DE 11,24 (n=12)</p></div>
@@ -1080,13 +1107,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout key" data-step="4"><span class="tag lime">Lectura correcta</span><p>SUS se aplicó solo al prototipo 3D: describe una usabilidad percibida favorable en esta muestra, no una comparación 3D frente a 2D.</p></div>
   </div>
-  <aside class="notes">SUS aplicado exclusivamente al prototipo 3D: media 91,88, mediana 95, DE 11,24, mínimo 60, máximo 100, n=12. La referencia 68 es la media histórica del instrumento (Bangor et al.), no un umbral. La comparación 3D vs 2D se hace en la slide siguiente con NASA-TLX Raw y tiempos.</aside>
+  <aside class="notes">⏱ 21:20–22:20 · 4 clics — SUS aplicado exclusivamente al prototipo 3D: media 91,88, mediana 95, DE 11,24, mínimo 60, máximo 100, n=12. La referencia 68 es la media histórica del instrumento (Bangor et al.), no un umbral. La comparación 3D vs 2D se hace en la slide siguiente con NASA-TLX Raw y tiempos.</aside>
 </section>
 
 <!-- ============ 22 · NASA-TLX ============ -->
 <section class="slide" data-label="NASA-TLX">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">22</span>NASA-TLX Raw</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">23</span>NASA-TLX Raw</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">En la muestra, el visor 3D se asoció con menor <em class="acc">carga de trabajo percibida</em>.</span></h1>
     <div class="duo-cols">
       <div>
@@ -1113,13 +1140,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">Menor carga percibida en 3D. Diferencia pareada de 11,19 puntos consistente en los 12 participantes.</aside>
+  <aside class="notes">⏱ 22:20–23:25 · 5 clics — Menor carga percibida en 3D. Diferencia pareada de 11,19 puntos consistente en los 12 participantes.</aside>
 </section>
 
 <!-- ============ 23 · VALIDACIÓN CUALITATIVA ============ -->
 <section class="slide" data-label="Validación cualitativa">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">23</span>Validación cualitativa</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">24</span>Validación cualitativa</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Think-Aloud explica comprensión espacial y <em class="acc-amber">fricciones residuales</em>.</span></h1>
     <div class="eval-grid">
       <div class="svg-panel" data-step="1">
@@ -1165,13 +1192,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <p class="figcap" data-step="4">Rigor académico: identificar fricciones residuales orienta el trabajo futuro y refuerza la transparencia de la evaluación formativa.</p>
   </div>
-  <aside class="notes">Think-Aloud complementa los números (Tabla 27). Apoyo: comprensión espacial 11/12 y percepción de claridad 8/12. Fricción: navegación y control 10/12 (órbita, pan, sensibilidad táctil), iconos procedurales 6 participantes, piezas pequeñas 2/12. Las fricciones demuestran una evaluación real y honesta.</aside>
+  <aside class="notes">⏱ 23:25–24:25 · 4 clics — Think-Aloud complementa los números (Tabla 27). Apoyo: comprensión espacial 11/12 y percepción de claridad 8/12. Fricción: navegación y control 10/12 (órbita, pan, sensibilidad táctil), iconos procedurales 6 participantes, piezas pequeñas 2/12. Las fricciones demuestran una evaluación real y honesta.</aside>
 </section>
 
 <!-- ============ 24 · DISCUSIÓN ============ -->
 <section class="slide" data-label="Discusión">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">24</span>Discusión</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">25</span>Discusión</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La discusión acota el resultado: efecto techo, muestra pequeña y <em class="acc-amber">compatibilidad limitada</em>.</span></h1>
     <div class="scope">
       <div class="scope-col" data-step="1">
@@ -1194,13 +1221,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">Discusión con límites explícitos. Saber qué se puede afirmar y qué no demuestra madurez investigativa.</aside>
+  <aside class="notes">⏱ 24:25–25:35 · 2 clics — Discusión con límites explícitos. Saber qué se puede afirmar y qué no demuestra madurez investigativa.</aside>
 </section>
 
 <!-- ============ 25 · CONCLUSIONES ============ -->
 <section class="slide" data-label="Conclusiones">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">25</span>Conclusiones</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">26</span>Conclusiones</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Las conclusiones cierran cada objetivo con <em class="acc">evidencia trazable</em>.</span></h1>
     <div class="tscroll">
       <table class="t-obj">
@@ -1214,13 +1241,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </table>
     </div>
   </div>
-  <aside class="notes">Las conclusiones responden directamente a los 4 objetivos específicos del proyecto.</aside>
+  <aside class="notes">⏱ 25:35–26:40 · 4 clics — Las conclusiones responden directamente a los 4 objetivos específicos del proyecto.</aside>
 </section>
 
 <!-- ============ 26 · LIMITACIONES ============ -->
 <section class="slide" data-label="Limitaciones">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">26</span>Limitaciones</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">27</span>Limitaciones</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Las limitaciones son <em class="acc-amber">alcance declarado</em>, no fallas ocultas.</span></h1>
     <div class="quad">
       <div data-step="1"><span class="tag amber">Modelo único</span><span class="sub">Holybro X500 V2</span><p>La arquitectura está preparada para generalizarse, pero la compatibilidad con otros drones no se ha validado.</p></div>
@@ -1230,13 +1257,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout limit" data-step="5"><span class="tag amber">Rigor metodológico</span><p>Declarar los límites del prototipo define con precisión el espacio de validez de las afirmaciones del proyecto.</p></div>
   </div>
-  <aside class="notes">Las limitaciones no son fallas ocultas; son límites de diseño declarados con rigor.</aside>
+  <aside class="notes">⏱ 26:40–27:25 · 5 clics — Las limitaciones no son fallas ocultas; son límites de diseño declarados con rigor.</aside>
 </section>
 
 <!-- ============ 27 · TRABAJO FUTURO ============ -->
 <section class="slide" data-label="Trabajo futuro">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">27</span>Trabajo futuro</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">28</span>Trabajo futuro</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El trabajo futuro es una <em class="acc">ruta de madurez</em>, no una lista de deseos.</span></h1>
     <div class="flow-wrap" data-reveal="media" style="--d:.4s">
       <svg viewBox="0 0 960 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escalera de madurez">
@@ -1253,13 +1280,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <div data-step="6"><span class="tag lime">Fases 4–5 · Largo plazo</span><ul class="mini-list"><li>Modo servicio y mantenimiento guiado.</li><li>Digital twin operacional con modelos calibrados.</li></ul></div>
     </div>
   </div>
-  <aside class="notes">Ruta de madurez del informe (Fig. 80): Fase 0 ampliación del VPT, 1 twin manifest, 2 telemetría histórica (shadow de reproducción), 3 live digital shadow, 4 modo servicio, 5 digital twin operacional (modelos calibrados, what-if, human-in-the-loop).</aside>
+  <aside class="notes">⏱ 27:25–27:55 · 6 clics — Ruta de madurez del informe (Fig. 80): Fase 0 ampliación del VPT, 1 twin manifest, 2 telemetría histórica (shadow de reproducción), 3 live digital shadow, 4 modo servicio, 5 digital twin operacional (modelos calibrados, what-if, human-in-the-loop).</aside>
 </section>
 
 <!-- ============ 28 · CONTRIBUCIÓN ============ -->
 <section class="slide" data-label="Contribución">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">28</span>Contribución</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">29</span>Contribución</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La contribución es <em class="acc">técnica, metodológica y comunicativa</em>.</span></h1>
     <div class="trio">
       <div data-step="1"><span class="tag lime">Técnica</span><ul class="mini-list"><li>Pipeline CAD → WebGL documentado.</li><li>Taxonomía operativa para selección y lectura.</li><li>Modos visuales y profiler integrados.</li></ul></div>
@@ -1267,20 +1294,20 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <div data-step="3"><span class="tag lime">Comunicativa</span><ul class="mini-list"><li>Hardware complejo vuelto legible desde la web.</li><li>Relaciones espaciales accesibles sin CAD pesado.</li><li>Base útil para trabajo futuro más ambicioso.</li></ul></div>
     </div>
   </div>
-  <aside class="notes">Triple contribución técnica, metodológica y comunicativa.</aside>
+  <aside class="notes">⏱ 27:55–28:25 · 3 clics — Triple contribución técnica, metodológica y comunicativa.</aside>
 </section>
 
 <!-- ============ 29 · CIERRE ============ -->
 <section class="slide" data-label="Cierre">
   <div class="slide-inner closing">
-    <p class="kicker center" data-reveal style="--d:.15s"><span class="k-num">29</span>Fin de la transmisión</p>
+    <p class="kicker center" data-reveal style="--d:.15s"><span class="k-num">30</span>Preguntas del jurado</p>
     <h1 class="closing-title"><span class="ln" data-scramble style="--d:.32s">Gracias<span class="dot">.</span></span></h1>
     <p class="closing-sub" data-reveal style="--d:.6s">De la complejidad física a la legibilidad interactiva — una arquitectura WebGL trazable para la inspección técnica de ensamblajes complejos.</p>
     <div class="closing-meta" data-reveal style="--d:.82s">
-      <span>Alexander Woodcock Salomón</span><i>·</i><span>TwinSight X500</span><i>·</i><span>Ingeniería Multimedia</span><i>·</i><span>UNAD</span>
+      <span>Alexander Woodcock Salomón</span><i>·</i><span>TwinSight X500</span><i>·</i><span>Ingeniería Multimedia · UNAD</span><i>·</i><span>twinsight.alexwoodcock.me</span>
     </div>
   </div>
-  <aside class="notes">Cierre con impacto y agradecimiento. Invitar a la sesión de preguntas y demostración interactiva.</aside>
+  <aside class="notes">⏱ 28:25–28:30 · 0 clics — Agradecer y abrir la ronda de preguntas. La URL de la demo queda en pantalla para que el jurado pueda probarla.</aside>
 </section>
 
 <!-- ============ B1 · SUS ============ -->
@@ -1806,7 +1833,10 @@ window.__glViewer = (function(){
   let index = 0, animating = false, rollTimer = null, hinted = false, notesOpen = false;
   const revealTimers = new Map();
 
-  document.getElementById('slideTotal').textContent = String(slides.length).padStart(2,'0');
+  /* Las slides principales se numeran 01–30; los backups (B1–B11) quedan fuera del total y del progreso. */
+  const mainCount = slides.filter(s => !/^B\d/.test(s.dataset.label || '')).length;
+  const slideNum = i => i < mainCount ? String(i+1).padStart(2,'0') : (slides[i].dataset.label || '').split(' ')[0];
+  document.getElementById('slideTotal').textContent = String(mainCount).padStart(2,'0');
   const notes = slides.map(s => { const a = s.querySelector('.notes'); return a ? a.textContent.replace(/\s+/g,' ').trim() : ''; });
   const viewerIdx = slides.findIndex(s => s.dataset.label === 'Activo 3D');
   const glViewer = window.__glViewer || { setActive: function(){} };
@@ -1977,14 +2007,14 @@ window.__glViewer = (function(){
   function setCounter(i){
     jumpEl.classList.remove('roll'); void jumpEl.offsetWidth; jumpEl.classList.add('roll');
     clearTimeout(rollTimer);
-    rollTimer = setTimeout(() => jumpEl.value = String(i+1).padStart(2,'0'), 220);
+    rollTimer = setTimeout(() => jumpEl.value = slideNum(i), 220);
   }
   function updateNav(){
     prevBtn.disabled = index === 0;
     nextBtn.disabled = index === slides.length - 1 && !stepsRemain(slides[index]);
   }
   function updateChrome(){
-    barEl.style.transform = 'scaleX(' + (index + 1) / slides.length + ')';
+    barEl.style.transform = 'scaleX(' + Math.min(1, (index + 1) / mainCount) + ')';
     setCounter(index);
     ticks.forEach((t, i) => t.classList.toggle('on', i === index));
     updateNav();
@@ -2063,7 +2093,10 @@ window.__glViewer = (function(){
 
   /* Salto directo a un número de diapositiva */
   function commitJump(){
-    const n = parseInt(jumpEl.value, 10);
+    const v = jumpEl.value.trim().toUpperCase();
+    const bi = slides.findIndex(s => (s.dataset.label || '').split(' ')[0].toUpperCase() === v);
+    if (/^B\d+$/.test(v) && bi >= 0) { go(bi); return; }
+    const n = parseInt(v, 10);
     if (!isNaN(n) && n >= 1 && n <= slides.length) go(n - 1);
   }
   jumpEl.addEventListener('keydown', e => {
@@ -2071,14 +2104,14 @@ window.__glViewer = (function(){
     if (e.key === 'Enter'){ commitJump(); jumpEl.blur(); }
     else if (e.key === 'Escape'){ jumpEl.blur(); }
   });
-  jumpEl.addEventListener('blur', () => { jumpEl.value = String(index+1).padStart(2,'0'); });
+  jumpEl.addEventListener('blur', () => { jumpEl.value = slideNum(index); });
 
   addEventListener('keydown', e => {
     if (e.target.closest('button,input,a,select,textarea')) return;
     if (['ArrowRight',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
     else if (['ArrowLeft','PageUp','Backspace'].includes(e.key)){ e.preventDefault(); prev(); }
     else if (e.key === 'Home'){ go(0); }
-    else if (e.key === 'End'){ go(slides.length - 1); }
+    else if (e.key === 'End'){ go(mainCount - 1); }
     else if (e.key === 'n' || e.key === 'N'){ toggleNotes(); }
     else if (e.key === 'f' || e.key === 'F'){ toggleFullscreen(); }
     else if (e.key === 'Escape' && notesOpen){ toggleNotes(); }

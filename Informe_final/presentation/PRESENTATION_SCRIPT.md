@@ -27,15 +27,7 @@ problema real → teoría que lo explica → alcance honesto → método → dec
 
 ## 2. Numeración única
 
-La numeración de este guion, de `SPEAKER_CARDS.md` y de `PRESENTATION_OUTLINE.md` es la **posición en el deck** (contador inferior del HTML, 01–30). El número pequeño que aparece en la esquina de cada slide (kicker) va una unidad por detrás en casi todo el deck:
-
-| Posición (este guion) | Kicker visible | Slide |
-|---|---|---|
-| 1 | 00 | Portada |
-| 2–9 | 01–08 | Problema → Pipeline |
-| 10 | 09 | Activo 3D |
-| 11–29 | 10–28 | Geometría → Contribución |
-| 30 | 29 | Cierre |
+La numeración de este guion, de `SPEAKER_CARDS.md` y de `PRESENTATION_OUTLINE.md` es la **posición en el deck**. Coincide con el número visible de cada slide (kicker) y con el contador superior derecho ("NN / 30"). Los backups se numeran B1–B11 fuera del total; para saltar a uno, escribir su código (por ejemplo `B3`) en el contador y pulsar Enter.
 
 ---
 
@@ -92,6 +84,19 @@ Antes de pronunciar la primera palabra:
 
 Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
+### Checklist técnico (30 min antes)
+
+| # | Verificación | Por qué |
+|---|---|---|
+| 1 | Abrir `index_final.html` directamente (doble clic) en **Chrome** o Edge, con zoom del navegador al 100 % (`Ctrl+0`). | El deck escala su contenido según la resolución; el zoom del navegador altera ese cálculo. |
+| 2 | Conectar el proyector en modo **duplicar** y comprobar la resolución (ideal 1920×1080). Pulsar `F` para pantalla completa. | A 1920×1080 el texto se amplía ~25 %; a 1366×768 o 1280×720 se ajusta para no desbordar. |
+| 3 | Confirmar conexión a internet. | La build pública de la demo en vivo y las tipografías del deck se cargan desde la red. |
+| 4 | Recorrer una vez las slides 10 (visor 3D) y 19 (video de respaldo) y volver al inicio con `Inicio`. | Deja el modelo 3D y los videos en caché; el visor además se precarga solo al abrir el deck. |
+| 5 | Abrir la build pública en **otra ventana**, esperar la carga completa y dejar el dron en estado inicial (Realistic, sin selección, sin explode ni corte). | Es la demo en vivo de la slide 19. |
+| 6 | Desactivar notificaciones, actualizaciones automáticas y ahorro de energía; conectar el cargador. | Evita interrupciones y caídas de rendimiento de la GPU. |
+| 7 | **No abrir las notas (`N`) durante la exposición**: se muestran sobre la misma pantalla que ve el jurado. Usar `SPEAKER_CARDS.md` impreso o en el teléfono. | Las notas del deck son para ensayo. |
+| 8 | Tener un cronómetro visible (teléfono) con las marcas de la tabla de tarjetas. | El deck no muestra tiempo transcurrido. |
+
 ---
 
 ## 6. Guion principal — slide por slide
@@ -107,9 +112,9 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 > Buenos días. Mi nombre es Alexander Woodcock Salomón y presento TwinSight X500: un prototipo de visualización 3D interactiva para inspección técnica del dron Holybro X500 V2, trabajo de grado de Ingeniería Multimedia en la UNAD. [mirar jurado]
 >
-> Dos términos atraviesan toda la defensa. **CAD** son los modelos de diseño asistido por computador: útiles para ingeniería, pero no preparados para consultarse en un navegador. **WebGL** es la tecnología que renderiza 3D dentro del navegador, sin instalar nada. [pausa]
+> Dos términos clave. **CAD** son los modelos de diseño asistido por computador: útiles en ingeniería, pero no pensados para el navegador. **WebGL** es la tecnología que renderiza 3D dentro del navegador, sin instalar nada. [pausa]
 >
-> La propuesta: convertir un ensamblaje complejo, disperso en planos, manuales y CAD pesado, en una experiencia web explorable, seleccionable y explicable. La demo pública está en la dirección que ven en pantalla.
+> La propuesta: convertir un ensamblaje complejo, disperso en planos, manuales y CAD pesado, en una experiencia web explorable, seleccionable y explicable. Recorreré el problema, el método, la construcción, la evidencia y sus límites.
 
 **Transición:**
 > Para entender por qué esto importa, primero hay que ver el problema.
@@ -125,11 +130,11 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 **Guion oral:**
 
-> Empiezo con algo importante: la documentación técnica tradicional no es un error.
+> Piensen en una tarea concreta: ubicar un motor del dron y entender cómo se une a su montura, usando un manual en PDF. La documentación técnica tradicional no es un error; el problema es otro.
 >
 > [click 1 — Documentación] Planos, manuales y referencias nombran piezas y muestran pasos, pero la lectura queda repartida en soportes separados. [señalar]
 >
-> [click 2 — Fricción] El problema aparece cuando el usuario debe reconstruir mentalmente profundidad, ubicación y ensamblaje a partir de vistas planas. A ese esfuerzo lo llamo **reconstrucción espacial**. En un hardware complejo como el X500 —estructural, energético, electrónico y de control— esa reconstrucción ocurre sobre un sistema completo, no sobre una pieza aislada. [pausa larga]
+> [click 2 — Fricción] El problema aparece cuando el usuario debe reconstruir mentalmente profundidad, ubicación y ensamblaje a partir de vistas planas. A ese esfuerzo lo llamo **reconstrucción espacial**, y en un hardware complejo como el X500 ocurre sobre un sistema completo, no sobre una pieza aislada. [pausa larga]
 >
 > [click 3 — Respuesta] La respuesta que propongo es una capa 3D web que permite ubicar, seleccionar, aislar y relacionar piezas sin abrir herramientas CAD.
 >
@@ -221,13 +226,13 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 **Guion oral:**
 
-> El objetivo general fue desarrollar un prototipo web 3D interactivo en Unity Web para exploración técnica, inspección y análisis visual de hardware complejo. Cuatro objetivos específicos lo vuelven verificable.
+> La pregunta que guía la tesis está en pantalla: qué diferencias descriptivas de desempeño y carga percibida aparecen entre un visor 3D web y un soporte 2D, y bajo qué condiciones es viable en el navegador. Para responderla, cuatro objetivos específicos.
 >
 > [click 1 — OE1] OE1: un pipeline que lleve el CAD a un presupuesto geométrico compatible con WebGL, preservando legibilidad.
 >
 > [click 2 — OE2] OE2: materiales y modos visuales en URP, procurando un frame time de 33,33 milisegundos o menos, es decir, 30 FPS.
 >
-> [click 3 — OE3] OE3: el prototipo interactivo, con órbita, selección, ficha contextual, explosionado, corte y modos analíticos.
+> [click 3 — OE3] OE3: el prototipo interactivo, con selección, ficha contextual, explosionado, corte y modos analíticos.
 >
 > [click 4 — OE4] OE4: evaluar formativamente tareas y carga percibida frente a un soporte 2D, y la usabilidad del 3D con SUS. [pausa]
 >
@@ -508,12 +513,12 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 19 — Demo: de dron completo a pieza, relación y modo visual
 
-**Tiempo:** 17:45 – 19:25 · **Pasos:** 2
+**Tiempo:** 17:45 – 19:20 · **Pasos:** 2
 **Modo principal: demo en vivo** en la build pública (ventana ya abierta, caché cargada, dron en estado inicial). **Respaldo:** el video `vid_01_demo_compilado.mp4` (88 s) de esta slide, con exactamente el mismo recorrido. No arranca solo: espera en pausa en 0:00 y se reproduce con un clic sobre él.
 
 **Procedimiento:**
 1. [click 1 — ruta] Revelar la ruta en pantalla y decir: *"Voy a hacerlo en vivo sobre la build pública."*
-2. Pasar a la ventana de la app (Alt+Tab) y seguir la ruta con las marcas de tiempo como referencia de ritmo (≤ 1:40).
+2. Pasar a la ventana de la app (Alt+Tab) y seguir la ruta con las marcas de tiempo como referencia de ritmo (≤ 1:35).
 3. Volver al deck (Alt+Tab), [click 2 — contingencia] y cerrar.
 4. **Regla de corte:** si la build tarda más de 10 s en responder o se congela, volver al deck sin comentarlo, hacer clic sobre el video (arranca en 0:00) y narrar el mismo texto sobre él.
 
@@ -540,7 +545,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 20 — El profiler interno vuelve trazable el rendimiento por escenario y dispositivo
 
-**Tiempo:** 19:25 – 20:25 · **Pasos:** 2
+**Tiempo:** 19:20 – 20:20 · **Pasos:** 2
 **Visual:** lista de trazabilidad + extracto literal del JSON exportado por `WebGLProfiler` (sesión thermal_studio, escritorio, 4 jun 2026).
 
 **Guion oral:**
@@ -562,7 +567,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 21 — El rendimiento es viable, pero no universal en todo móvil
 
-**Tiempo:** 20:25 – 21:25 · **Pasos:** 5
+**Tiempo:** 20:20 – 21:20 · **Pasos:** 5
 **Visual:** barras de FPS (Escritorio 59,8 · iOS 58,7 · Redmi Note 10S 26,5 · Android límite inferior 17,6) con línea de 30 FPS + tres lecturas + recuadro.
 
 **Guion oral:**
@@ -586,7 +591,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 22 — SUS de 91,88: recepción favorable del visor interactivo 3D
 
-**Tiempo:** 21:25 – 22:25 · **Pasos:** 4
+**Tiempo:** 21:20 – 22:20 · **Pasos:** 4
 **Visual:** SUS 91,88 (mediana 95 · DE 11,24 · n=12) · Rango 60–100 · Referencia 68 + recuadro "Lectura correcta".
 
 **Guion oral:**
@@ -610,14 +615,14 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 23 — En la muestra, el visor 3D se asoció con menor carga de trabajo percibida
 
-**Tiempo:** 22:25 – 23:30 · **Pasos:** 5 (1 cifra 3D, 2 cifra 2D, 3 diferencia, 4 tabla de tiempos, 5 nota T4)
+**Tiempo:** 22:20 – 23:25 · **Pasos:** 5 (1 cifra 3D, 2 cifra 2D, 3 diferencia, 4 tabla de tiempos, 5 nota T4)
 **Visual:** NASA-TLX 8,69 vs 19,89 + tabla T1–T3 + nota sobre T4.
 
 **Guion oral:**
 
 > NASA-TLX Raw sí se aplicó en ambas condiciones. [click 1 — 3D] En el visor 3D, la carga de trabajo percibida promedió **8,69**. [click 2 — 2D] En el soporte 2D, **19,89**. [click 3 — diferencia] La diferencia pareada media fue de 11,19 puntos, y en los doce casos la carga fue menor en 3D. [pausa]
 >
-> [click 4 — tiempos] En tiempos, las tres tareas cronometradas fueron más cortas en 3D: en total, 20,58 segundos frente a 54 en 2D. [señalar tabla]
+> [click 4 — tiempos] ¿Recuerdan la tarea del motor? Ubicarlo tomó 5,75 segundos en 3D frente a 13 en 2D, y las tres tareas cronometradas sumaron 20,58 frente a 54. [señalar tabla]
 >
 > [click 5 — Nota] T4 fue exploratoria guiada y no se cronometró; por eso no aparece aquí. Y NASA-TLX mide carga de trabajo percibida, no carga cognitiva de forma directa.
 >
@@ -632,7 +637,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 24 — Think-Aloud explica comprensión espacial y fricciones residuales
 
-**Tiempo:** 23:30 – 24:30 · **Pasos:** 4
+**Tiempo:** 23:25 – 24:25 · **Pasos:** 4
 **Visual:** barras (lima: comprensión espacial 11/12, percepción de claridad 8/12 · ámbar: navegación y control 10/12, iconos procedurales 6/12) + dos listas.
 
 **Guion oral:**
@@ -654,7 +659,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 25 — La discusión acota el resultado: efecto techo, muestra pequeña y compatibilidad limitada
 
-**Tiempo:** 24:30 – 25:40 · **Pasos:** 2
+**Tiempo:** 24:25 – 25:35 · **Pasos:** 2
 **Visual:** dos columnas: "Lo que sí soporta" / "Lo que no debe afirmarse".
 
 **Guion oral:**
@@ -676,7 +681,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 26 — Las conclusiones cierran cada objetivo con evidencia trazable
 
-**Tiempo:** 25:40 – 26:45 · **Pasos:** 4
+**Tiempo:** 25:35 – 26:40 · **Pasos:** 4
 **Visual:** tabla OE → resultado → evidencia.
 
 **Guion oral:**
@@ -690,6 +695,8 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 > [click 3 — OE3] OE3: la build está publicada y accesible por URL, con selección, ficha contextual, Inspect, Analyze, Studio y Thermal.
 >
 > [click 4 — OE4] OE4: SUS de 91,88; NASA-TLX de 8,69 frente a 19,89; tiempos T1 a T3 menores en 3D; y Think-Aloud explicando el patrón. [mirar jurado]
+>
+> Respondiendo a la pregunta de investigación: en esta muestra, el visor 3D se asoció con menor tiempo y menor carga percibida, y es viable en escritorio y funcional, con límites, en móvil.
 
 **Transición:**
 > Las limitaciones son parte de las conclusiones, no su negación.
@@ -698,7 +705,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 27 — Las limitaciones son alcance declarado, no fallas ocultas
 
-**Tiempo:** 26:45 – 27:30 · **Pasos:** 5
+**Tiempo:** 26:40 – 27:25 · **Pasos:** 5
 **Visual:** cuatro tarjetas + recuadro "Rigor metodológico".
 
 **Guion oral:**
@@ -712,7 +719,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 28 — El trabajo futuro es una ruta de madurez, no una lista de deseos
 
-**Tiempo:** 27:30 – 28:00 · **Pasos:** 6
+**Tiempo:** 27:25 – 27:55 · **Pasos:** 6
 **Visual:** escalera Visual Product Twin → Digital Shadow → Digital Twin + tres columnas (Fases 0–1, 2–3, 4–5, Fig. 80 del informe).
 
 **Guion oral:**
@@ -725,11 +732,11 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 29 — La contribución es técnica, metodológica y comunicativa
 
-**Tiempo:** 28:00 – 28:25 · **Pasos:** 3
+**Tiempo:** 27:55 – 28:25 · **Pasos:** 3
 
 **Guion oral:**
 
-> La contribución tiene tres dimensiones. [click 1 — Técnica] Técnica: un pipeline CAD a WebGL documentado y trazable, con taxonomía, modos visuales y profiler. [click 2 — Metodológica] Metodológica: evaluación formativa triangulada, con comparación intra-sujeto 3D frente a 2D. [click 3 — Comunicativa] Comunicativa: hardware complejo legible desde la web, delimitado como visual product twin.
+> Empecé con la distancia entre la información disponible y la comprensión espacial. Esta tesis muestra que esa distancia se puede acortar desde el navegador. La contribución tiene tres dimensiones. [click 1 — Técnica] Técnica: un pipeline CAD a WebGL documentado y trazable, con taxonomía, modos visuales y profiler. [click 2 — Metodológica] Metodológica: evaluación formativa triangulada, con comparación intra-sujeto 3D frente a 2D. [click 3 — Comunicativa] Comunicativa: hardware complejo legible desde la web, delimitado como visual product twin.
 
 **No decir:** "visual product twin es una categoría validada" — el informe la propone como categoría operativa.
 

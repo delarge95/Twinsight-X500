@@ -45,7 +45,7 @@ Este archivo contiene toda la información metodológica, técnica, de usabilida
 ---
 
 ## 4. Clasificación y Taxonomía del Sistema (Normalización)
-*   **Piezas Canónicas Semánticas:** **28 categorías/piezas** representadas en el catálogo de la base de datos de la app.
+*   **Piezas Canónicas Semánticas:** **28 piezas canónicas** (assets `DronePartData`) representadas en el catálogo de fichas de la app.
 *   **Anchors de Escena:** **30 anchors** en la jerarquía (las 28 piezas + `x500v2_fastener_group` + `x500v2_misc_group`).
 *   **Renderers/Colliders Finales:** **257 elementos** auditados en la escena final.
 *   **Assets Generados en Unity:** **257 assets** bajo la ruta `Assets/Core/Data/X500V2Generated`.
@@ -120,4 +120,4 @@ Todas las mediciones se realizaron con la caché del navegador previamente carga
 *   **Fase 2 (Medio plazo):** Telemetría histórica o simulada (reproducción de estados en CSV/JSON en línea de tiempo) - Nivel **Digital Shadow**.
 *   **Fase 3 (Medio plazo):** Live digital shadow (MQTT, WebSocket, REST, MAVLink, ROS).
 *   **Fase 4 (Largo plazo):** Modo servicio y checklists interactivos de mantenimiento guiado.
-*   **Fase 5 (Largo plazo):** Digital twin operacional completo (FEA en servidor, simulaciones interactivos "what-if" en tiempo real).
+*   **Fase 5 (Largo plazo):** Digital twin operacional: modelos calibrados, simulaciones "what-if", predicción de umbrales y decisiones human-in-the-loop, solo con datos históricos confiables.

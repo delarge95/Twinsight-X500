@@ -5,7 +5,7 @@
 **Fecha:** 2026-09-29.
 **Duración meta:** 28:30 min + 1:30 min de margen = 30:00 total.
 **Fuente canónica:** `awoodcocks.pdf` (informe final).
-**Numeración:** posición en el deck (contador inferior del HTML). El kicker visible de cada slide va una unidad por detrás (ver tabla en `PRESENTATION_SCRIPT.md` §2).
+**Numeración:** posición en el deck; coincide con el número visible de cada slide y con el contador "NN / 30". Backups: B1–B11 (escribir el código en el contador para saltar).
 
 ---
 
@@ -19,12 +19,12 @@ Estas tarjetas son la versión oral comprimida del guion maestro. Si el tiempo s
 
 | Slide | Tiempo | Clics | **Tesis oral — lo que debe quedar claro** | Evidencia visible en pantalla | Riesgo crítico a evitar |
 |---|---|---|---|---|---|
-| **1** | 0:00–0:45 | 0 | "TwinSight X500 convierte un ensamblaje disperso en planos, manuales y CAD pesado en una experiencia web explorable. CAD y WebGL, definidos desde el inicio." | Título, ficha del proyecto con URL de la demo, captura del visor. | Abrir con "es un gemelo digital". |
-| **2** | 0:45–1:45 | 4 | "El problema no es falta de información: es la distancia entre la información disponible y la comprensión espacial del sistema." | Filas Documentación → Fricción → Respuesta + Idea clave. | Caricaturizar el 2D como inútil. |
+| **1** | 0:00–0:45 | 0 | "TwinSight X500 convierte un ensamblaje disperso en planos, manuales y CAD pesado en una experiencia web explorable. Definir CAD y WebGL; anunciar la ruta: problema, método, construcción, evidencia, límites." | Título, ficha del proyecto con URL de la demo, captura del visor. | Abrir con "es un gemelo digital". |
+| **2** | 0:45–1:45 | 4 | "Ejemplo ancla: ubicar un motor y su montura con un PDF. El problema no es falta de información: es la distancia entre la información y la comprensión espacial." | Filas Documentación → Fricción → Respuesta + Idea clave. | Caricaturizar el 2D como inútil. |
 | **3** | 1:45–2:55 | 4 | "La carga cognitiva explica por qué la forma de presentar importa. La tesis la usa como marco, no la mide." | Intrínseca / Extrínseca / Germana + Límite declarado. | Decir que NASA-TLX mide carga intrínseca o germana. |
 | **4** | 2:55–4:05 | 4 | "La interfaz es un artefacto cognitivo (Hutchins). Aplica jerarquía visual (Norman), agrupación (Gestalt), visibilidad del estado y reconocimiento antes que memoria (Nielsen)." | Tabla: principio / en la app / en este deck. | Presentar los principios como evidencia empírica · citar autores fuera de la bibliografía del informe. |
 | **5** | 4:05–5:15 | 2 | "TwinSight es un visual product twin: sin telemetría, sin sincronización física, sin FEA. Promete hacer legible el dron, no operarlo." | Columna de exclusiones (clic 1) y columna de alcance (clic 2). | "Gemelo digital completo" o "Thermal calcula temperatura real". |
-| **6** | 5:15–6:10 | 4 | "Cuatro objetivos verificables: pipeline, materiales y rendimiento, prototipo, evaluación. Se evaluó un artefacto construido." | Tarjetas OE1–OE4. | Decir que se "aseguró" 30 FPS en todo dispositivo (el objetivo dice "procurando"). |
+| **6** | 5:15–6:10 | 4 | "Pregunta: diferencias de desempeño y carga percibida 3D vs 2D, y viabilidad en el navegador. Cuatro objetivos para responderla. Se evaluó un artefacto construido." | Pregunta de investigación + tarjetas OE1–OE4. | Decir que se "aseguró" 30 FPS en todo dispositivo (el objetivo dice "procurando"). |
 | **7** | 6:10–7:15 | 7 | "Ciclo DSRM de Peffers en seis fases, rigor de Hevner. Evaluación formativa y descriptiva: eso es rigor." | Seis cajas del ciclo + marco DSR + formativa/descriptiva. | "Se probó causalidad". |
 | **8** | 7:15–8:35 | 6 | "Cinco capas: KPIs del profiler, SUS solo 3D, tareas (completitud T1–T4, tiempos T1–T3), Think-Aloud, NASA-TLX por condición." | Diagrama de triangulación + lista de capas. | Mezclar SUS con la comparación 3D/2D · llamar "telemetría" al profiler. |
 | **9** | 8:35–9:50 | 8 | "El pipeline traduce CAD de manufactura a runtime: de más de 6,5 millones a 95 617 triángulos, conservando la jerarquía seleccionable." | Flujo MoI3D/STEPper → Blender → Retopo → Bake (normal/AO) → FBX → WebGL. | "Optimizar fue solo bajar polígonos". |
@@ -37,18 +37,18 @@ Estas tarjetas son la versión oral comprimida del guion maestro. Si el tiempo s
 | **16** | 15:25–16:25 | 6 | "Cada modo responde una pregunta: Realistic reconoce, X-Ray muestra lo interno, Solid la forma, Thermal jerarquías relativas. Blueprint es preset." | Cuatro modos + clip X-Ray → Thermal → Solid. | Prometer que los shaders simulan física. |
 | **17** | 16:25–17:15 | 2 | "Thermal es heurístico: modelo reducido por componentes; los °C son la escala del modelo, no medición. No es FEA." | Límite declarado + escala Estructura / ESC-electrónica / Motores-batería. | Leer los °C como temperatura real · "Thermal diagnostica". |
 | **18** | 17:15–17:45 | 5 | "Observen tres cosas: selección, relación y modo visual." | Tres capacidades + ruta + captura. | Improvisar el recorrido. |
-| **19** | 17:45–19:25 | 2 | "Demo EN VIVO: selección → Isolate → ficha · Power · Explode · Cut · X-Ray → Thermal → Solid (≤ 1:40)." | Ruta con marcas de tiempo; video de respaldo en pausa (clic para reproducir). | Pasar de 10 s sin respuesta de la build: volver al deck y reproducir el video sin comentarlo. |
-| **20** | 19:25–20:25 | 2 | "El profiler exporta cada sesión con build, dispositivo, navegador y caché. Extracto real: 59,8 FPS, 16,7 ms, 229 054 triángulos." | Lista de trazabilidad + JSON literal del WebGLProfiler. | Decir que el profiler sustituye pruebas reales. |
-| **21** | 20:25–21:25 | 5 | "Seis configuraciones medidas: escritorio e iPhone ≈60 FPS; Redmi 26,5 funcional bajo la meta; Adreno 610 17,6. No es universal." | Barras con línea de 30 FPS + tres lecturas. | "Los entornos documentados son dos" (solo aplica a las sesiones con usuarios). |
-| **22** | 21:25–22:25 | 4 | "SUS 91,88 solo en 3D (mediana 95, DE 11,24, rango 60–100). El 68 es referencia histórica, no umbral." | SUS · Rango · Referencia 68 + lectura correcta. | Usar SUS para comparar 3D con 2D. |
-| **23** | 22:25–23:30 | 5 | "NASA-TLX Raw 8,69 frente a 19,89; Δ 11,19; menor en los 12 casos. T1–T3: 20,58 s frente a 54 s. T4 no cronometrada. Descriptivo." | Cifras 3D/2D + tabla de tiempos + nota T4. | Lenguaje causal ("redujo") · mezclar T4. |
-| **24** | 23:30–24:30 | 4 | "Apoyo: comprensión espacial 11/12, claridad 8/12. Fricción: navegación y control 10/12, iconos 6, piezas pequeñas 2." | Barras lima/ámbar + dos listas. | Presentar "navegación y control" como fortaleza. |
-| **25** | 24:30–25:40 | 2 | "Sí soporta: tiempo, carga, SUS y orientación. No afirma: éxito superior (efecto techo 96/96), causalidad, móvil universal, Thermal físico." | Dos columnas: sí soporta / no debe afirmarse. | Definir efecto techo con los tiempos (es la completitud). |
-| **26** | 25:40–26:45 | 4 | "OE1 6,5M → 95 617 · OE2 frame time en presupuesto en escritorio, móvil funcional no universal · OE3 build pública · OE4 SUS 91,88 / NASA 8,69 vs 19,89." | Tabla OE → resultado → evidencia. | Omitir el matiz móvil de OE2. |
-| **27** | 26:45–27:30 | 5 | "Modelo único, n=12, PC como adaptación, cables fuera del MVP. Límites declarados, no fallas ocultas." | Cuatro tarjetas + rigor metodológico. | Disculparse por las limitaciones. |
-| **28** | 27:30–28:00 | 6 | "Escalera de madurez en fases 0–5: validación y twin manifest → telemetría histórica y en vivo → modo servicio y twin operacional." | Escalera + columnas Fases 0–1 / 2–3 / 4–5. | Prometer el twin operacional como próxima versión. |
-| **29** | 28:00–28:25 | 3 | "Técnica, metodológica y comunicativa: hardware complejo legible desde la web, delimitado como visual product twin." | Tres columnas de contribución. | "Categoría validada" (el informe la propone). |
-| **30** | 28:25–28:30 | 0 | "Muchas gracias. Quedo atento a sus preguntas." | Cierre. | Alargar el cierre. |
+| **19** | 17:45–19:20 | 2 | "Demo EN VIVO: selección → Isolate → ficha · Power · Explode · Cut · X-Ray → Thermal → Solid (≤ 1:35)." | Ruta con marcas de tiempo; video de respaldo en pausa (clic para reproducir). | Pasar de 10 s sin respuesta de la build: volver al deck y reproducir el video sin comentarlo. |
+| **20** | 19:20–20:20 | 2 | "El profiler exporta cada sesión con build, dispositivo, navegador y caché. Extracto real: 59,8 FPS, 16,7 ms, 229 054 triángulos." | Lista de trazabilidad + JSON literal del WebGLProfiler. | Decir que el profiler sustituye pruebas reales. |
+| **21** | 20:20–21:20 | 5 | "Seis configuraciones medidas: escritorio e iPhone ≈60 FPS; Redmi 26,5 funcional bajo la meta; Adreno 610 17,6. No es universal." | Barras con línea de 30 FPS + tres lecturas. | "Los entornos documentados son dos" (solo aplica a las sesiones con usuarios). |
+| **22** | 21:20–22:20 | 4 | "SUS 91,88 solo en 3D (mediana 95, DE 11,24, rango 60–100). El 68 es referencia histórica, no umbral." | SUS · Rango · Referencia 68 + lectura correcta. | Usar SUS para comparar 3D con 2D. |
+| **23** | 22:20–23:25 | 5 | "NASA-TLX Raw 8,69 frente a 19,89; Δ 11,19; menor en los 12 casos. Callback: el motor, 5,75 s frente a 13 s; T1–T3, 20,58 s frente a 54 s. T4 no cronometrada." | Cifras 3D/2D + tabla de tiempos + nota T4. | Lenguaje causal ("redujo") · mezclar T4. |
+| **24** | 23:25–24:25 | 4 | "Apoyo: comprensión espacial 11/12, claridad 8/12. Fricción: navegación y control 10/12, iconos 6, piezas pequeñas 2." | Barras lima/ámbar + dos listas. | Presentar "navegación y control" como fortaleza. |
+| **25** | 24:25–25:35 | 2 | "Sí soporta: tiempo, carga, SUS y orientación. No afirma: éxito superior (efecto techo 96/96), causalidad, móvil universal, Thermal físico." | Dos columnas: sí soporta / no debe afirmarse. | Definir efecto techo con los tiempos (es la completitud). |
+| **26** | 25:35–26:40 | 4 | "OE1 6,5M → 95 617 · OE2 escritorio en presupuesto, móvil funcional no universal · OE3 build pública · OE4 SUS 91,88 / NASA 8,69 vs 19,89. Responder la pregunta de investigación." | Tabla OE → resultado → evidencia. | Omitir el matiz móvil de OE2. |
+| **27** | 26:40–27:25 | 5 | "Modelo único, n=12, PC como adaptación, cables fuera del MVP. Límites declarados, no fallas ocultas." | Cuatro tarjetas + rigor metodológico. | Disculparse por las limitaciones. |
+| **28** | 27:25–27:55 | 6 | "Escalera de madurez en fases 0–5: validación y twin manifest → telemetría histórica y en vivo → modo servicio y twin operacional." | Escalera + columnas Fases 0–1 / 2–3 / 4–5. | Prometer el twin operacional como próxima versión. |
+| **29** | 27:55–28:25 | 3 | "Callback: la distancia entre información y comprensión se puede acortar desde el navegador. Contribución técnica, metodológica y comunicativa." | Tres columnas de contribución. | "Categoría validada" (el informe la propone). |
+| **30** | 28:25–28:30 | 0 | "Muchas gracias. Quedo atento a sus preguntas." (la URL de la demo queda en pantalla) | "Preguntas del jurado" + URL de la demo. | Alargar el cierre. |
 
 ---
 
