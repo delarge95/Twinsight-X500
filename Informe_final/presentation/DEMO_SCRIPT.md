@@ -13,6 +13,23 @@ Este documento se ensaya junto con `PRESENTATION_SCRIPT.md`. La evidencia por sl
 
 ---
 
+## Rol de este guion (actualizado 2026-09-29)
+
+- **Durante la exposición (slide 19)** la demo es **en vivo** en la build pública, con la ruta corta de abajo (≤ 1:40) y la narración de `PRESENTATION_SCRIPT.md`.
+- **Respaldo:** si la build no responde en 10 s o se congela, volver al deck y hacer clic sobre el video `assets/video/vid_01_demo_compilado.mp4` (88 s, mismo recorrido), que espera en pausa en 0:00.
+- **Este guion de 5 minutos** es la demo extendida para la ronda de preguntas si el jurado pide profundizar.
+
+### Ruta corta de la demo en vivo (slide 19)
+
+Preparar antes: build pública abierta en otra ventana, caché cargada, dron completo en estado inicial. Recorrido, en este orden:
+
+1. Seleccionar el soporte de riel y batería → `Isolate` → abrir la ficha inferior.
+2. `Inspect` → control de energía (Starting · Idle · Flying).
+3. `Analyze` → Explode → Cut.
+4. `Studio` → X-Ray → Thermal → Solid.
+
+---
+
 ## Preparacion pre-demo
 
 ### Checklist tecnico
@@ -109,11 +126,11 @@ Este documento se ensaya junto con `PRESENTATION_SCRIPT.md`. La evidencia por sl
 
 **Accion:** Cambiar entorno o preset si aplica.
 
-> "Los presets de entorno visibles se muestran solo si aparecen en la build evaluada; Blueprint no se promete como tarjeta directa si no esta publicado."
+> "Ademas de las tarjetas de modo, Studio publica presets: Studio, Studio Light y Blueprint, que convierte la escena en una lectura de planos y siluetas."
 
 **Accion:** Mostrar Thermal solo como lectura heuristica.
 
-> "Thermal no es FEA ni una medicion fisica calibrada. Es una lupa visual por componentes para comunicar tendencias relativas de temperatura."
+> "Thermal no es FEA ni una medicion fisica calibrada. Es un modelo reducido por componentes, alimentado por el control de energia; la leyenda en grados es la escala de ese modelo heuristico, no una medicion."
 
 ---
 
@@ -131,8 +148,8 @@ Este documento se ensaya junto con `PRESENTATION_SCRIPT.md`. La evidencia por sl
 
 | Riesgo | Respuesta |
 |--------|-----------|
-| Carga lenta | Usar capturas o video grabado del flujo real. |
-| WebGL falla | Presentar Play Mode o respaldo visual. |
+| Carga lenta | Volver a la slide 19 y reproducir el video de respaldo (clic sobre él). |
+| WebGL falla | Volver a la slide 19 y reproducir el video de respaldo. |
 | FPS inestable | No improvisar resultados; citar solo la tabla de rendimiento del capitulo 5/anexos y explicar que el dispositivo de la demo puede variar. |
 | Fastener ambiguo | Mostrar que el sistema lo reporta para revision y no lo asigna por suposicion. |
 
@@ -141,13 +158,13 @@ Este documento se ensaya junto con `PRESENTATION_SCRIPT.md`. La evidencia por sl
 ## Frases seguras
 
 - "La app distingue entre pieza madre, subpieza, hotspot y fastener."
-- "Los presets visibles se muestran solo si estan publicados; Blueprint, Wireframe y Ghosted no se prometen como alcance visible si no aparecen en la build evaluada."
+- "Blueprint se publica como preset de Studio; Wireframe y Ghosted estan implementados pero ocultos, y no se prometen como alcance visible."
 - "Thermal es heuristico, no FEA."
 - "Los fasteners se muestran solo cuando su asignacion visible esta trazada; si hay ambiguedad, se reporta como limite o revision."
 - "Las metricas se citan solo si estan en el capitulo 5, anexos de validacion o profiler actual."
 
 ---
 
-*Demo Version: 2.1*
-*Last Updated: 2026-06-10*
+*Demo Version: 2.2*
+*Last Updated: 2026-09-29*
 *Project: TwinSight X500*

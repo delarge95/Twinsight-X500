@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TwinSight X500 — Defensa de Tesis</title>
+<meta name="theme-color" content="#07080A">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='9' y='9' width='14' height='14' fill='%23C8F53F'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#07080A; --ink:#EDEEE8; --ink-2:#9BA0A6; --ink-3:#767C85;
+  --line:rgba(237,238,232,.09); --line-weak:rgba(237,238,232,.045);
+  --lime:#C8F53F; --lime-dim:rgba(200,245,63,.12);
+  --amber:#FFB224; --amber-dim:rgba(255,178,36,.10);
+  --red:#FF5C5C;
+  --display:'Clash Display','Space Grotesk',sans-serif;
+  --sans:'Space Grotesk',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --ease-expo:cubic-bezier(.16,1,.3,1);
+  --pad-x:clamp(32px,5.5vw,90px);
+}
+
+/* ============ BASE ============ */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--lime);color:#07080A}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible{outline:1px solid var(--lime);outline-offset:4px}
+img,svg{display:block;max-width:100%}
+.notes{display:none}
+
+/* Contención global de grids */
+.cover-grid>*,.duo>*,.duo-cols>*,.trio>*,.quad>*,.eval-grid>*,.scope-col,.rows>*{min-width:0}
+.ri-desc,.slide-body,.callout p,.trio p,.quad p,.metric p{overflow-wrap:break-word}
+
+/* Grid técnico de fondo */
+.grid-bg{
+  position:fixed;inset:-72px 0 0 -72px;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--line-weak) 1px,transparent 1px),linear-gradient(90deg,var(--line-weak) 1px,transparent 1px);
+  background-size:72px 72px;
+  -webkit-mask-image:radial-gradient(ellipse 85% 70% at 50% 44%,#000,transparent 72%);
+          mask-image:radial-gradient(ellipse 85% 70% at 50% 44%,#000,transparent 72%);
+  animation:gridDrift 110s linear infinite;
+}
+@keyframes gridDrift{to{background-position:72px 72px}}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:linear-gradient(180deg,rgba(200,245,63,.025),transparent 24%)}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.04;background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>")}
+
+/* Efectos de transición */
+.pulse{position:fixed;inset:0;z-index:44;pointer-events:none;opacity:0;background:radial-gradient(ellipse 62% 46% at 50% 50%,rgba(200,245,63,.09),transparent 70%)}
+.pulse.go{animation:pulseFx .95s var(--ease)}
+@keyframes pulseFx{0%{opacity:0}22%{opacity:1}100%{opacity:0}}
+.grid-flash{
+  position:fixed;inset:-72px 0 0 -72px;z-index:1;pointer-events:none;opacity:0;
+  background-image:linear-gradient(rgba(200,245,63,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(200,245,63,.055) 1px,transparent 1px);
+  background-size:72px 72px;
+  -webkit-mask-image:radial-gradient(ellipse 85% 70% at 50% 44%,#000,transparent 72%);
+          mask-image:radial-gradient(ellipse 85% 70% at 50% 44%,#000,transparent 72%);
+}
+.grid-flash.go{animation:gfFx .85s var(--ease)}
+@keyframes gfFx{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+
+/* ============ CHROME ============ */
+.progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:50}
+.progress-bar{height:100%;background:var(--lime);transform-origin:left;transform:scaleX(0);transition:transform .9s var(--ease-expo);box-shadow:0 0 12px rgba(200,245,63,.35)}
+.chrome{position:fixed;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:16px clamp(20px,3.8vw,44px);pointer-events:none}
+.chrome>*{pointer-events:auto}
+.chrome-top{top:0}.chrome-bottom{bottom:0}
+.brand{display:flex;align-items:center;gap:11px;font:500 11.5px var(--mono);letter-spacing:.28em;color:var(--ink)}
+.brand-mark{width:7px;height:7px;background:var(--lime);transform:rotate(45deg);flex:none}
+.counter{font:400 12px var(--mono);letter-spacing:.18em;color:var(--ink-3);display:flex;align-items:baseline;gap:8px}
+.counter-roll{display:inline-block;overflow:hidden;line-height:1.2}
+.counter-num{display:inline-block;color:var(--ink-2)}
+.counter-num.roll{animation:roll .5s var(--ease)}
+.counter-jump{width:2.4ch;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--ink-2);font:400 12px var(--mono);letter-spacing:.18em;text-align:center;padding:0 0 1px;transition:border-color .3s var(--ease),color .3s;cursor:text}
+.counter-jump:hover{color:var(--ink)}
+.counter-jump:focus{outline:none;border-bottom-color:var(--lime);color:var(--lime)}
+@keyframes roll{0%{transform:translateY(0);opacity:1}44%{transform:translateY(-.95em);opacity:0}52%{transform:translateY(.95em);opacity:0}100%{transform:translateY(0);opacity:1}}
+.readout{display:flex;align-items:center;gap:10px;font:400 10.5px var(--mono);letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.readout-dot{width:5px;height:5px;background:var(--lime);flex:none;animation:blink 2.6s var(--ease) infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.hint{display:flex;align-items:center;gap:10px;font:400 10.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.hint.gone{opacity:0;transform:translateX(-8px);pointer-events:none}
+kbd{border:1px solid var(--line);border-radius:4px;padding:3px 7px;font:inherit;font-size:10px;color:var(--ink-2);background:rgba(255,255,255,.03)}
+.hint .sep{color:var(--ink-3)}
+.hint-mob{display:none}
+.nav-btns{display:flex;gap:12px}
+.nav-btn{width:42px;height:42px;position:relative;border:1px solid var(--line);color:var(--ink-2);border-radius:2px;display:grid;place-items:center;transition:border-color .35s var(--ease),color .35s,background .35s,opacity .35s}
+.nav-btn::before{content:"";position:absolute;top:-1px;left:-1px;width:9px;height:9px;border-top:1px solid var(--lime);border-left:1px solid var(--lime);transition:width .4s var(--ease),height .4s var(--ease)}
+.nav-btn svg{transition:transform .35s var(--ease)}
+.nav-btn:hover{border-color:rgba(200,245,63,.4);color:var(--ink);background:var(--lime-dim)}
+.nav-btn:hover::before{width:calc(100% + 2px);height:calc(100% + 2px)}
+.nav-btn:hover .i-next{transform:translateX(3px)}
+.nav-btn:hover .i-prev{transform:translateX(-3px)}
+.nav-btn:disabled{opacity:.22;pointer-events:none}
+
+/* Índice lateral compacto */
+.ticks{position:fixed;right:clamp(10px,1.8vw,26px);top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:5px;align-items:flex-end;max-height:74vh;overflow-y:auto;scrollbar-width:none}
+.ticks::-webkit-scrollbar{display:none}
+.tick{width:22px;height:8px;display:flex;align-items:center;justify-content:flex-end}
+.tick i{display:block;height:2px;width:9px;background:var(--ink-3);transition:width .4s var(--ease),background .4s}
+.tick:hover i{width:15px;background:var(--ink-2)}
+.tick.on i{width:22px;background:var(--lime);box-shadow:0 0 6px rgba(200,245,63,.45)}
+.sweep{position:fixed;left:0;right:0;top:0;height:1px;z-index:45;opacity:0;pointer-events:none;background:linear-gradient(90deg,transparent,var(--lime) 28%,var(--lime) 72%,transparent)}
+.sweep.up{animation:sweepUp .85s var(--ease-expo)}
+.sweep.down{animation:sweepDown .85s var(--ease-expo)}
+@keyframes sweepUp{0%{top:104%;opacity:0}18%{opacity:.55}100%{top:-4%;opacity:0}}
+@keyframes sweepDown{0%{top:-4%;opacity:0}18%{opacity:.55}100%{top:104%;opacity:0}}
+
+/* Previsualización miniatura al pasar el mouse por el índice lateral */
+.tick-prev{position:fixed;right:clamp(34px,3.6vw,56px);width:224px;z-index:70;overflow:hidden;pointer-events:none;border:1px solid var(--line);border-radius:8px;background:#0B0C10;box-shadow:0 18px 50px -18px rgba(0,0,0,.85);opacity:0;transform:translateX(8px);transition:opacity .25s var(--ease),transform .25s var(--ease)}
+.tick-prev.show{opacity:1;transform:none}
+.tick-prev .tp-inner{position:absolute;top:0;left:0;width:100vw;height:100vh;transform-origin:0 0;pointer-events:none}
+.tick-prev .tp-inner .slide{visibility:visible;opacity:1;pointer-events:none !important}
+.tick-prev [data-reveal],.tick-prev .ln,.tick-prev [data-step]{transition:none !important}
+.tick-prev .tp-tag{position:absolute;left:8px;bottom:6px;z-index:3;font:500 9px var(--mono);letter-spacing:.16em;color:var(--lime);text-transform:uppercase;background:rgba(7,8,10,.82);padding:3px 7px;border-radius:4px;border:1px solid rgba(200,245,63,.25);white-space:nowrap}
+@media (max-width:900px){.tick-prev{display:none}}
+.notes-drawer{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(14px);width:min(720px,calc(100vw - 40px));z-index:55;padding:16px 20px;border:1px solid var(--line);border-radius:12px;background:rgba(11,12,15,.96);backdrop-filter:blur(12px);opacity:0;pointer-events:none;transition:opacity .4s var(--ease),transform .4s var(--ease)}
+.notes-drawer.open{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.notes-drawer .nd-label{display:block;font:500 10px var(--mono);letter-spacing:.22em;color:var(--lime);text-transform:uppercase;margin-bottom:6px}
+.notes-drawer p{font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+
+/* ============ MOTOR DE SLIDES + PASOS ============ */
+.deck{position:fixed;inset:0;z-index:10}
+.slide{
+  position:absolute;inset:0;display:flex;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
+  visibility:hidden;opacity:0;pointer-events:none;
+  transform:translateY(var(--enter-y,46px)) skewY(var(--skew-in,1.3deg)) scale(.985);
+  filter:blur(16px);
+  transition:transform .9s var(--ease-expo),opacity .9s var(--ease-expo),filter .9s var(--ease-expo),visibility 0s linear .9s;
+}
+.slide::-webkit-scrollbar{display:none}
+.slide.active{visibility:visible;opacity:1;pointer-events:auto;transform:none;filter:blur(0);transition-delay:0s}
+.slide.leaving{visibility:visible;transform:translateY(var(--exit-y,-46px)) skewY(var(--skew-out,-1.3deg)) scale(.985);transition-delay:0s}
+.slide.reset,.slide.snap{transition:none !important}
+.slide.reset [data-reveal],.slide.reset .ln,.slide.reset [data-step]{transition:none !important}
+.slide.snap [data-step]{transition:none !important}
+
+/* Contenedor interno: AMPLIO, ESPACIOSO Y AIROSO */
+.slide-inner{
+  margin:auto;
+  width:min(1280px,100%);
+  max-width:1280px;
+  box-sizing:border-box;
+  padding:clamp(58px,7.5vh,84px) var(--pad-x) clamp(64px,8.5vh,92px);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:0;
+}
+
+[data-reveal]{opacity:0;transform:translateY(24px);filter:blur(8px);transition:opacity .9s var(--ease) var(--d,.2s),transform .9s var(--ease) var(--d,.2s),filter .9s var(--ease) var(--d,.2s)}
+.slide.active [data-reveal]{opacity:1;transform:none;filter:none}
+[data-reveal="media"]{opacity:0;transform:translateY(26px) scale(.97);clip-path:inset(10% 6% 10% 6%);filter:none;transition:opacity 1.15s var(--ease) var(--d,.5s),transform 1.15s var(--ease-expo) var(--d,.5s),clip-path 1.15s var(--ease-expo) var(--d,.5s)}
+.slide.active [data-reveal="media"]{opacity:1;transform:none;clip-path:inset(0 0 0 0)}
+.slide.leaving [data-reveal]{opacity:1;transform:none;filter:none;transition-duration:0s;transition-delay:0s}
+
+[data-step]{opacity:0;visibility:hidden;transform:translateY(14px);filter:blur(5px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease),visibility 0s linear .55s}
+[data-step].shown{opacity:1;visibility:visible;transform:none;filter:none;transition-delay:0s,0s,0s,0s}
+svg [data-step]{transform:none;filter:none}
+.stagger>li{opacity:0;transform:translateY(8px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+[data-step].shown .stagger>li{opacity:1;transform:none;transition-delay:calc(50ms + var(--i,0)*60ms)}
+
+/* Máscara de títulos */
+h1{overflow:hidden;padding:.08em 0 .22em}
+.ln{display:block;transform:translateY(115%);transition:transform 1.05s var(--ease-expo) var(--d,.25s)}
+.slide.active .ln{transform:none}
+.slide.leaving .ln{transform:none;transition-duration:0s;transition-delay:0s}
+
+/* ============ TIPOGRAFÍA (LEGIBLE, CLARA Y PROMINENTE) ============ */
+.kicker{display:inline-flex;align-items:center;gap:10px;font:500 clamp(11px,0.95vw,12px)/1.3 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--ink-3)}
+.kicker::before{content:"[";color:var(--lime);opacity:.55}
+.kicker::after{content:"]";color:var(--lime);opacity:.55}
+.kicker .k-num{color:var(--lime)}
+.kicker.center{justify-content:center}
+.kicker.amber::before,.kicker.amber::after{color:var(--amber)}
+.kicker.amber .k-num{color:var(--amber)}
+em.acc{font-style:normal;color:var(--lime)}
+em.acc-amber{font-style:normal;color:var(--amber)}
+.slide-title{font-family:var(--display);font-weight:500;font-size:clamp(26px,2.9vw,40px);line-height:1.16;letter-spacing:-.01em;max-width:36ch;margin-top:clamp(6px,1.2vh,14px)}
+.slide-body{font-size:clamp(15px,1.3vw,17.5px);font-weight:300;line-height:1.65;color:var(--ink-2);max-width:62ch;margin-top:clamp(6px,1vh,12px)}
+.s-head{display:flex;align-items:center;margin-bottom:clamp(4px,0.8vh,8px)}
+.figcap{margin-top:clamp(10px,1.4vh,16px);font:400 12px var(--mono);letter-spacing:.06em;color:var(--ink-3)}
+.mono-path{font-family:var(--mono);font-size:13px;color:var(--ink-3);overflow-wrap:anywhere}
+
+/* ============ COMPONENTES ============ */
+.rows{margin-top:clamp(12px,2vh,24px)}
+.row-item{display:grid;grid-template-columns:48px minmax(130px,clamp(160px,16vw,200px)) 1fr;gap:clamp(14px,2vw,26px);padding:clamp(10px,1.4vh,16px) 0;border-top:1px solid var(--line);align-items:baseline}
+.row-item:last-of-type{border-bottom:1px solid var(--line)}
+.ri-idx{font:500 10.5px var(--mono);letter-spacing:.14em;color:var(--lime)}
+.ri-term{font:600 clamp(16px,1.35vw,18.5px) var(--sans);color:var(--ink)}
+.ri-desc{font-size:clamp(14px,1.15vw,16px);font-weight:300;line-height:1.6;color:var(--ink-2)}
+.row-item.slim{grid-template-columns:clamp(140px,15vw,185px) 1fr;align-items:start}
+.ri-tagcell{padding-top:2px;display:flex;flex-wrap:wrap;gap:8px}
+
+.tag{display:inline-flex;align-items:center;height:25px;padding:0 10px;border:1px solid var(--line);border-radius:3px;font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
+.tag.lime{color:var(--lime);border-color:rgba(200,245,63,.35)}
+.tag.amber{color:var(--amber);border-color:rgba(255,178,36,.35)}
+.tag.red{color:var(--red);border-color:rgba(255,92,92,.35)}
+
+.callout{margin-top:clamp(12px,1.8vh,22px);padding:clamp(12px,1.5vh,18px) clamp(18px,2.2vw,28px);border:1px solid;border-radius:8px;display:flex;flex-direction:column;gap:6px;max-width:980px}
+.callout p{font-size:clamp(14px,1.1vw,15.5px);line-height:1.55;color:var(--ink-2)}
+.callout .tag{align-self:flex-start}
+.callout.key{border-color:rgba(200,245,63,.28);background:rgba(200,245,63,.05)}
+.callout.limit{border-color:rgba(255,178,36,.28);background:rgba(255,178,36,.05)}
+
+/* Tablas */
+.tscroll{overflow-x:auto;scrollbar-width:none;margin-top:clamp(12px,2vh,24px)}
+.tscroll::-webkit-scrollbar{display:none}
+.tscroll table{width:100%;min-width:620px;table-layout:fixed;border-collapse:collapse}
+.tscroll th{font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:0 16px 10px;border-bottom:1px solid var(--line)}
+.tscroll td{padding:clamp(10px,1.4vh,16px) 16px;border-bottom:1px solid var(--line-weak);font-size:clamp(14px,1.1vw,15.5px);line-height:1.55;color:var(--ink-2);vertical-align:top;overflow-wrap:anywhere}
+.tscroll td:first-child{font-weight:600;color:var(--ink)}
+.tscroll th.r,.tscroll td.r{text-align:right}
+.tscroll .mono{font-family:var(--mono);font-size:13.5px}
+.tscroll .lime{color:var(--lime)}
+.tscroll .amber{color:var(--amber)}
+.t-mayer th:nth-child(1){width:22%}.t-mayer th:nth-child(2){width:44%}.t-mayer th:nth-child(3){width:34%}
+.t-obj th:nth-child(1){width:22%}.t-obj th:nth-child(2){width:40%}.t-obj th:nth-child(3){width:38%}
+.t-tareas th:nth-child(1){width:46%}.t-tareas th:nth-child(2){width:27%}.t-tareas th:nth-child(3){width:27%}
+.t-perf th:nth-child(1){width:34%}.t-perf th:nth-child(2){width:16%}.t-perf th:nth-child(3){width:16%}.t-perf th:nth-child(4){width:34%}
+
+.scope{display:grid;grid-template-columns:1fr 1fr;margin-top:clamp(12px,2vh,24px);border-top:1px solid var(--line)}
+.scope-col{padding:clamp(12px,1.8vh,22px) clamp(18px,2.5vw,44px) 0 0}
+.scope-col + .scope-col{border-left:1px solid var(--line);padding-left:clamp(18px,2.5vw,44px);padding-right:0}
+.scope-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.scope-head h3{font:600 clamp(17px,1.35vw,20px) var(--sans)}
+.scope-head .tag{margin-left:auto}
+.mark{font:600 15px var(--mono)}
+.mark.ok{color:var(--lime)}
+.mark.no{color:var(--red)}
+.scope-list{list-style:none}
+.scope-list li{position:relative;padding:clamp(6px,0.9vh,9px) 0 clamp(6px,0.9vh,9px) 26px;font-size:clamp(14px,1.15vw,15.5px);line-height:1.55;color:var(--ink-2)}
+.scope-list li::before{content:"";position:absolute;left:0;top:1.1em;width:11px;height:1.5px;background:var(--lime)}
+.scope-col.out li{color:var(--ink-3)}
+.scope-col.out li::before{content:"×";width:auto;height:auto;background:none;color:var(--red);font:600 13px var(--mono);top:.3em}
+
+/* Grid 2x2 para Objetivos (Slide 06) */
+.obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,28px);margin-top:clamp(12px,2vh,24px)}
+.obj-card{display:grid;grid-template-columns:clamp(46px,4.5vw,60px) 1fr;gap:clamp(12px,1.6vw,20px);padding:clamp(10px,1.4vh,16px) 0;border-top:1px solid var(--line);align-items:start}
+.obj-num{font-family:var(--display);font-size:clamp(32px,3.4vw,44px);line-height:1;font-weight:500;color:transparent;-webkit-text-stroke:1px rgba(237,238,232,.3);transition:color .5s var(--ease),-webkit-text-stroke-color .5s}
+@supports not (-webkit-text-stroke:1px black){.obj-num{color:rgba(237,238,232,.3)}}
+.obj-card:hover .obj-num{color:var(--lime);-webkit-text-stroke-color:var(--lime)}
+.obj-head{display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+.obj-head h3{font:600 clamp(15.5px,1.2vw,18px) var(--sans)}
+.obj-card p{font-size:clamp(13.5px,1.05vw,15px);font-weight:300;line-height:1.5;color:var(--ink-2)}
+
+.flow-wrap{border:1px solid var(--line);border-radius:10px;padding:clamp(8px,1.2vh,14px) clamp(14px,2vw,24px);margin:clamp(10px,1.6vh,20px) 0;background:rgba(255,255,255,.015)}
+.flow-wrap svg{width:100%;height:auto;max-height:clamp(60px,8.5vh,85px)}
+
+.duo-cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,3.5vw,64px);margin-top:clamp(12px,1.8vh,22px)}
+.duo-cols>div{border-top:1px solid var(--line);padding-top:clamp(10px,1.4vh,18px)}
+.duo-cols h3{font:600 clamp(16px,1.3vw,19px) var(--sans);margin:8px 0 6px}
+.duo-cols p{font-size:clamp(14px,1.1vw,15.5px);line-height:1.6;color:var(--ink-2)}
+.duo-cols .callout{margin-top:12px}
+
+.eval-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,3.5vw,60px);margin-top:clamp(12px,1.8vh,22px);align-items:center}
+.svg-panel{border:1px solid var(--line);border-radius:10px;padding:clamp(8px,1.3vh,16px) clamp(12px,1.6vw,20px);background:rgba(255,255,255,.015)}
+.svg-panel svg{width:100%;height:auto;max-height:clamp(180px,26vh,260px);display:block}
+.eval-list ul{list-style:none;margin-top:4px}
+.eval-list li{padding:clamp(7px,1vh,12px) 0;border-top:1px solid var(--line);font-size:clamp(14px,1.1vw,15.5px);line-height:1.55;color:var(--ink-2)}
+.eval-list li:first-child{border-top:none}
+.eval-list strong{color:var(--ink);font-weight:600}
+.eval-head h3{font:600 clamp(16px,1.3vw,19px) var(--sans);margin:6px 0 4px}
+
+.m-value{font-family:var(--display);font-weight:500;font-size:clamp(44px,5.2vw,74px);line-height:1;letter-spacing:-.01em;margin:clamp(8px,1.2vh,14px) 0 clamp(4px,0.6vh,8px)}
+.m-value.lime{color:var(--lime)}
+.m-value.amber{color:var(--amber)}
+.m-value .m-suffix{font-family:var(--mono);font-size:.3em;color:var(--lime);margin-left:.1em;letter-spacing:0;font-weight:500}
+.metric h3{font:600 clamp(15px,1.2vw,17.5px) var(--sans);margin-top:4px}
+.metric p{font-size:clamp(13px,1.05vw,14.5px);line-height:1.5;color:var(--ink-3);max-width:34ch}
+.band{display:grid;grid-template-columns:repeat(3,1fr);margin-top:clamp(12px,2vh,24px);border-top:1px solid var(--line)}
+.band .metric{padding:clamp(12px,1.8vh,22px) clamp(16px,2vw,36px) 0;border-left:1px solid var(--line)}
+.band .metric:first-child{border-left:none;padding-left:0}
+.band2{display:grid;grid-template-columns:repeat(2,1fr);margin-top:clamp(12px,2vh,24px);border-top:1px solid var(--line)}
+.band2 .metric{padding:clamp(12px,1.8vh,22px) clamp(16px,2vw,36px) 0;border-left:1px solid var(--line)}
+.band2 .metric:first-child{border-left:none;padding-left:0}
+.duo{display:grid;grid-template-columns:1fr 1fr;margin-top:clamp(12px,2vh,24px)}
+.duo>div{padding:4px clamp(18px,2.5vw,48px);min-width:0}
+.duo>div:first-child{padding-left:0;border-right:1px solid var(--line)}
+.duo>div:last-child{padding-right:0}
+.duo .m-value{font-size:clamp(46px,5.4vw,76px)}
+.mini-list{list-style:none;margin-top:clamp(6px,1vh,12px)}
+.mini-list li{position:relative;padding:clamp(4px,0.7vh,8px) 0 clamp(4px,0.7vh,8px) 22px;font-size:clamp(13.5px,1.05vw,15px);line-height:1.55;color:var(--ink-2)}
+.mini-list li::before{content:"";position:absolute;left:0;top:1em;width:10px;height:1px;background:var(--lime)}
+
+.stack{margin-top:clamp(12px,2vh,24px)}
+.layer{display:grid;grid-template-columns:clamp(95px,9.5vw,120px) 1fr;gap:clamp(12px,1.6vw,22px);align-items:center;padding:clamp(8px,1.2vh,14px) 0;border-top:1px solid var(--line)}
+.layer:last-of-type{border-bottom:1px solid var(--line)}
+.layer-tag{font:500 11px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3)}
+.layer-tag.lime{color:var(--lime)}
+.layer-tag.amber{color:var(--amber)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;padding:5px 11px;border:1px solid var(--line);border-radius:5px;font:400 clamp(12px,0.95vw,13px) var(--mono);color:var(--ink-2);background:rgba(255,255,255,.02)}
+.chip.lime{border-color:rgba(200,245,63,.4);color:var(--lime)}
+.chip.amber{border-color:rgba(255,178,36,.4);color:var(--amber)}
+.chip.hl{border-color:rgba(200,245,63,.55);color:var(--lime);font-weight:600;background:rgba(200,245,63,.06)}
+
+.slot{position:relative;border:1px solid var(--line);border-radius:14px;background:#0B0C10;overflow:hidden}
+.slot::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line-weak) 1px,transparent 1px),linear-gradient(90deg,var(--line-weak) 1px,transparent 1px);background-size:32px 32px;opacity:.55}
+.slot-hero{min-height:min(44vh,380px);max-height:400px}
+.slot-tall{min-height:min(34vh,300px);max-height:320px}
+.slot-short{min-height:min(16vh,140px);max-height:150px}
+.slot-tag{position:absolute;top:12px;left:12px;z-index:3;padding:4px 9px;border:1px solid rgba(200,245,63,.35);border-radius:3px;background:rgba(7,8,10,.7);font:500 10px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--lime)}
+.slot-mid{position:absolute;inset:0;display:grid;place-items:center;z-index:2;text-align:center;padding:16px}
+.slot-mid span{font:500 11px var(--mono);letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase;line-height:1.8}
+.slot-note{position:absolute;left:12px;right:12px;bottom:12px;z-index:3;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:rgba(7,8,10,.84);font-size:12.5px;line-height:1.45;color:var(--ink-2)}
+.corner{position:absolute;width:14px;height:14px;z-index:4;opacity:0;transition:opacity .6s var(--ease) calc(var(--d,.5s) + .45s),transform .45s var(--ease)}
+.slide.active .corner{opacity:1}
+.corner.tl{top:10px;left:10px;border-top:1px solid var(--lime);border-left:1px solid var(--lime)}
+.corner.tr{top:10px;right:10px;border-top:1px solid var(--lime);border-right:1px solid var(--lime)}
+.corner.bl{bottom:10px;left:10px;border-bottom:1px solid var(--lime);border-left:1px solid var(--lime)}
+.corner.br{bottom:10px;right:10px;border-bottom:1px solid var(--lime);border-right:1px solid var(--lime)}
+.slot:hover .corner.tl{transform:translate(-4px,-4px)}
+.slot:hover .corner.tr{transform:translate(4px,-4px)}
+.slot:hover .corner.bl{transform:translate(-4px,4px)}
+.slot:hover .corner.br{transform:translate(4px,4px)}
+
+/* Media real dentro de slots */
+.slot-media{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.slot-media.contain{object-fit:contain;padding:14px}
+.slot > .slot-tag,.slot > .slot-mid,.slot > .slot-note{z-index:3}
+.slot-band{min-height:clamp(170px,23vh,230px);max-height:240px}
+
+/* Frames de móvil — ratio vertical 9:19.5 para animaciones de pantalla táctil */
+.phone-row{display:flex;gap:clamp(18px,2.6vw,40px);justify-content:center;align-items:center;margin-top:clamp(10px,1.6vh,20px);flex-wrap:wrap}
+.phone{position:relative;height:clamp(480px,58vh,620px);width:auto;aspect-ratio:9/19.5;border:1px solid var(--line);border-radius:clamp(22px,2.4vw,30px);background:#0B0C10;overflow:hidden;flex:none;box-shadow:0 26px 60px -34px rgba(0,0,0,.9)}
+.phone::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line-weak) 1px,transparent 1px),linear-gradient(90deg,var(--line-weak) 1px,transparent 1px);background-size:26px 26px;opacity:.5;z-index:0}
+.phone::after{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);width:56px;height:14px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid var(--line);z-index:4}
+.phone .ph-screen{position:absolute;inset:0;display:grid;place-items:center;padding:30px 10px 42px;z-index:1}
+.phone .ph-screen img,.phone .ph-screen video{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:cover;border-radius:10px}
+.phone .ph-empty{font:500 9.5px var(--mono);letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;text-align:center;line-height:2}
+.phone .ph-empty b{display:block;color:var(--ink-2);font-weight:500}
+.phone .ph-tag{position:absolute;left:10px;right:10px;bottom:10px;z-index:4;padding:6px 8px;border:1px solid rgba(200,245,63,.3);border-radius:6px;background:rgba(7,8,10,.86);font:500 8.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--lime);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phone-lg{height:clamp(520px,64vh,680px);width:auto;aspect-ratio:9/19.5}
+
+/* Layouts de alta verticalidad para videos con bloques laterales */
+.ia-grid{display:grid;grid-template-columns:1fr auto auto 1fr;gap:clamp(16px,2.2vw,36px);align-items:center;margin-top:clamp(10px,1.6vh,20px)}
+.ia-col{border-top:1px solid var(--line);padding-top:clamp(14px,2vh,24px);display:flex;flex-direction:column;justify-content:center}
+.ia-col .mini-list{margin-top:14px}
+.ia-col .mini-list li{font-size:clamp(13.5px,1.08vw,15.5px);line-height:1.6}
+
+.studio-wrap{display:grid;grid-template-columns:1fr auto;gap:clamp(24px,3.5vw,56px);align-items:center;margin-top:clamp(10px,1.6vh,20px)}
+.studio-quad{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.6vw,24px);margin-bottom:clamp(12px,1.8vh,20px)}
+.studio-quad>div{border-top:1px solid var(--line);padding-top:clamp(10px,1.4vh,16px)}
+.studio-quad h3{font:600 clamp(14.5px,1.1vw,16.5px) var(--sans);margin:6px 0 4px}
+.studio-quad p{font-size:clamp(13px,1vw,14.2px);line-height:1.5;color:var(--ink-2)}
+
+.b11-wrap{display:grid;grid-template-columns:1fr auto;gap:clamp(24px,3.5vw,56px);align-items:center;margin-top:clamp(10px,1.6vh,20px)}
+.b11-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,24px);margin-bottom:clamp(12px,1.6vh,18px)}
+.b11-trio>div{border-top:1px solid var(--line);padding-top:clamp(10px,1.4vh,16px)}
+.b11-trio h3{font:600 clamp(14.5px,1.1vw,16.5px) var(--sans);margin:6px 0 4px}
+.b11-trio p{font-size:clamp(13px,1vw,14.2px);line-height:1.5;color:var(--ink-2)}
+
+/* Visor 3D interactivo */
+.gl-wrap{display:grid;grid-template-columns:1.22fr .78fr;gap:clamp(20px,3vw,48px);margin-top:clamp(12px,2vh,24px);align-items:stretch}
+.demo-wrap{display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,3vw,48px);margin-top:clamp(12px,2vh,24px);align-items:center}
+.gl-host{position:relative;border:1px solid var(--line);border-radius:14px;background:radial-gradient(ellipse at 50% 40%,#12141B,#07080A 74%);overflow:hidden;min-height:clamp(300px,46vh,520px)}
+.gl-host canvas{position:absolute;inset:0;width:100% !important;height:100% !important;display:block;touch-action:none;cursor:grab;z-index:2}
+.gl-host canvas:active{cursor:grabbing}
+.gl-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;transition:opacity .9s var(--ease);z-index:1}
+.gl-host.ready .gl-poster{opacity:0;pointer-events:none}
+.gl-spin{position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border:2px solid var(--line);border-top-color:var(--lime);border-radius:50%;animation:spin 1s linear infinite;z-index:1;transition:opacity .5s}
+.gl-host.ready .gl-spin,.gl-host.error .gl-spin{opacity:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gl-status{position:absolute;top:12px;left:12px;z-index:5;padding:4px 9px;border:1px solid rgba(200,245,63,.35);border-radius:3px;background:rgba(7,8,10,.7);font:500 10px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--lime)}
+.gl-toolbar{position:absolute;top:12px;right:12px;z-index:5;display:flex;gap:8px}
+.gl-btn{padding:6px 11px;border:1px solid var(--line);border-radius:5px;background:rgba(7,8,10,.72);font:500 10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);transition:color .3s,border-color .3s,background .3s;backdrop-filter:blur(6px)}
+.gl-btn:hover{color:var(--ink);border-color:rgba(200,245,63,.4)}
+.gl-btn.on{color:var(--lime);border-color:rgba(200,245,63,.5);background:rgba(200,245,63,.08)}
+.gl-hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:5;padding:6px 14px;border:1px solid var(--line);border-radius:99px;background:rgba(7,8,10,.8);font:400 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;backdrop-filter:blur(6px)}
+.gl-fallback{position:absolute;inset:0;display:grid;place-items:center;z-index:2;padding:24px;text-align:center;font:500 11px var(--mono);letter-spacing:.16em;color:var(--ink-3);text-transform:uppercase;line-height:2}
+
+/* Franja visual de cierre */
+.closing-visual{margin:clamp(14px,2.4vh,26px) auto 0;width:min(860px,92%);max-height:clamp(150px,22vh,220px);position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.closing-visual img{width:100%;height:100%;object-fit:cover;opacity:.85}
+.closing-visual::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,8,10,.25),transparent 30%,transparent 70%,rgba(7,8,10,.4))}
+
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.5vw,40px);margin-top:clamp(12px,2vh,24px)}
+.trio>div{border-top:1px solid var(--line);padding-top:clamp(10px,1.4vh,18px)}
+.trio h3{font:600 clamp(15.5px,1.2vw,18px) var(--sans);margin:8px 0 6px}
+.trio p{font-size:clamp(13.5px,1.05vw,15px);line-height:1.55;color:var(--ink-2)}
+.trio .m-value{font-size:clamp(38px,4.5vw,60px)}
+.quad{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,2vw,30px);margin-top:clamp(12px,2vh,24px)}
+.quad>div{border-top:1px solid var(--line);padding-top:clamp(10px,1.4vh,18px)}
+.quad h3{font:600 clamp(14.5px,1.1vw,16.5px) var(--sans);margin:6px 0 4px}
+.quad p{font-size:clamp(13px,1vw,14.2px);line-height:1.5;color:var(--ink-2)}
+.quad .sub{font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--amber);text-transform:uppercase;margin-top:8px;display:block}
+
+/* ============ PORTADA & CIERRE ============ */
+.cover-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,4.5vw,72px);align-items:center}
+.cover-visual{position:relative;min-height:min(50vh,520px);display:grid;place-items:center;margin:0;overflow:visible}
+.cover-visual img{width:150%;max-width:none;transform:none;filter:contrast(1.05) saturate(1.06) brightness(.98);display:block;pointer-events:none}
+.cover-visual figcaption{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font:400 10.5px var(--mono);letter-spacing:.18em;color:var(--ink-3);text-transform:uppercase;white-space:nowrap;opacity:.8}
+
+/* Imágenes fundidas con el fondo (sin marco) */
+.melt{margin:clamp(10px,1.6vh,18px) auto 0;display:flex;flex-direction:column;align-items:center}
+.melt img{max-width:100%;filter:contrast(1.04) saturate(1.05);
+  -webkit-mask-image:radial-gradient(80% 76% at 50% 50%,#000 42%,transparent 75%);
+          mask-image:radial-gradient(80% 76% at 50% 50%,#000 42%,transparent 75%)}
+.melt .figcap{margin-top:6px;text-align:center;max-width:70ch}
+.cover-title{font-size:clamp(42px,5.5vw,82px);line-height:1.04;font-weight:600;margin-top:clamp(10px,1.6vh,22px)}
+.cover-rule{width:min(300px,55%);height:1px;margin:clamp(12px,2vh,24px) 0;background:linear-gradient(90deg,var(--lime),transparent);transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--ease) .7s}
+.slide.active .cover-rule{transform:scaleX(1)}
+.cover-claim{font-size:clamp(17px,1.8vw,22px);line-height:1.45;font-weight:400;color:var(--ink)}
+.cover-claim strong{color:var(--lime);font-weight:500}
+.spec{margin-top:clamp(12px,2vh,24px);border-top:1px solid var(--line)}
+.spec>div{display:grid;grid-template-columns:clamp(120px,13vw,160px) 1fr;gap:14px;padding:clamp(6px,0.9vh,10px) 0;border-bottom:1px solid var(--line-weak)}
+.spec dt{font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);padding-top:2px}
+.spec dd{font-size:clamp(13.5px,1.05vw,15px);color:var(--ink-2)}
+.spec dd b{color:var(--ink);font-weight:500;font-family:var(--mono)}
+.closing{text-align:center}
+.closing-title{font-size:clamp(56px,9.5vw,130px);line-height:1;font-weight:600;margin:clamp(10px,1.8vh,22px) 0 0}
+.closing-title .dot{color:var(--lime)}
+.closing-sub{margin-top:clamp(12px,1.8vh,22px);font-size:clamp(16px,1.6vw,20px);font-weight:300;color:var(--ink-2);max-width:54ch;margin-inline:auto}
+.closing-meta{margin-top:clamp(16px,2.8vh,32px);font:400 clamp(11px,0.95vw,12px) var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.closing-meta i{font-style:normal;color:var(--lime)}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1100px){
+  .cover-grid{grid-template-columns:1fr}
+  .slot-hero{min-height:260px;max-height:280px}
+  .eval-grid{grid-template-columns:1fr}
+  .obj-grid{grid-template-columns:1fr}
+  .gl-wrap{grid-template-columns:1fr}
+  .demo-wrap{grid-template-columns:1fr;justify-items:center}
+  .gl-host{min-height:min(42vh,360px)}
+}
+@media (max-width:900px){
+  .ticks,.readout{display:none}
+  .chrome{padding:14px 20px}
+  .scope,.duo,.duo-cols,.trio,.quad{grid-template-columns:1fr}
+  .scope-col + .scope-col{border-left:none;border-top:1px solid var(--line);padding-left:0;margin-top:10px}
+  .duo>div:first-child{border-right:none;padding-right:0}
+  .duo>div:last-child{padding-left:0;border-top:1px solid var(--line);margin-top:14px;padding-top:16px}
+  .band,.band2{grid-template-columns:1fr}
+  .band .metric,.band2 .metric{border-left:none;padding-left:0;border-top:1px solid var(--line);padding-top:16px}
+  .band .metric:first-child,.band2 .metric:first-child{border-top:none}
+  .row-item{grid-template-columns:1fr;gap:6px}
+  .row-item.slim{grid-template-columns:1fr}
+  .obj-card{grid-template-columns:1fr;gap:8px}
+  .layer{grid-template-columns:1fr;gap:10px;align-items:start}
+  .slot-tall{min-height:180px;max-height:200px}
+  .hint-desk{display:none}
+  .hint-mob{display:flex;align-items:center;gap:8px}
+  .slide-inner{padding:60px var(--pad-x) 72px}
+}
+@media (max-width:760px){
+  .t-mayer th:nth-child(3),.t-mayer td:nth-child(3){display:none}
+  .t-mayer th:nth-child(1){width:32%}.t-mayer th:nth-child(2){width:68%}
+}
+@media (max-height:760px){
+  .slide-inner{padding:50px var(--pad-x) 58px}
+  .slide-title{font-size:clamp(22px,2.4vw,32px)}
+  .m-value,.band .m-value,.band2 .m-value{font-size:clamp(36px,4vw,56px)}
+  .duo .m-value{font-size:clamp(38px,4.2vw,58px)}
+  .row-item,.layer,.obj-card{padding:8px 0}
+  .slot-hero{min-height:min(38vh,280px);max-height:300px}
+  .gl-host{min-height:min(40vh,320px)}
+  .phone{height:clamp(380px,50vh,460px)}
+  .ia-grid{grid-template-columns:1fr 1fr;gap:16px}
+  .studio-wrap{grid-template-columns:1fr;justify-items:center}
+  .b11-wrap{grid-template-columns:1fr;justify-items:center}
+}
+@media (max-height:640px){.ticks{display:none}}
+</style>
+</head>
+<body>
+
+<div class="grid-bg" aria-hidden="true"></div>
+<div class="grid-flash" id="gridFlash" aria-hidden="true"></div>
+<div class="pulse" id="pulse" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="sweep" id="sweep" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+
+<header class="chrome chrome-top">
+  <div class="brand"><span class="brand-mark"></span>TWINSIGHT X500</div>
+  <div class="counter" aria-live="polite">
+    <span class="counter-roll"><input id="slideJump" class="counter-jump" type="text" inputmode="numeric" maxlength="3" aria-label="Ir al número de diapositiva" value="01"></span>
+    <span>/</span><span id="slideTotal">41</span>
+  </div>
+</header>
+
+<main class="deck" id="deck">
+
+<!-- ============ 01 · PORTADA ============ -->
+<section class="slide" data-label="Portada">
+  <div class="slide-inner">
+    <div class="cover-grid">
+      <div>
+        <p class="kicker" data-reveal style="--d:.12s"><span class="k-num">00</span>Defensa de grado — Ingeniería Multimedia</p>
+        <h1 class="cover-title"><span class="ln" data-scramble style="--d:.3s">TwinSight <em class="acc">X500</em></span></h1>
+        <div class="cover-rule" aria-hidden="true"></div>
+        <p class="cover-claim" data-reveal style="--d:.58s">Convierte un ensamblaje complejo en una <strong>experiencia WebGL inspeccionable</strong>.</p>
+        <p class="slide-body" data-reveal style="--d:.7s">El aporte no es replicar el estado operacional del dron: es volver legibles sus piezas, relaciones y modos de lectura visual desde el navegador.</p>
+        <dl class="spec">
+          <div data-reveal style="--d:.8s"><dt>Autor</dt><dd><b>Alexander Woodcock Salomón</b></dd></div>
+          <div data-reveal style="--d:.87s"><dt>Proyecto</dt><dd><b>TwinSight X500</b></dd></div>
+          <div data-reveal style="--d:.94s"><dt>Institución</dt><dd>Universidad Nacional Abierta y a Distancia (UNAD)</dd></div>
+          <div data-reveal style="--d:1.01s"><dt>Caso de estudio</dt><dd>Holybro X500 V2</dd></div>
+          <div data-reveal style="--d:1.08s"><dt>Artefacto</dt><dd>Prototipo Unity WebGL para visualización e inspección técnica</dd></div>
+          <div data-reveal style="--d:1.15s"><dt>Demo</dt><dd>twinsight.alexwoodcock.me</dd></div>
+        </dl>
+      </div>
+      <figure class="cover-visual" data-reveal style="--d:.5s">
+        <img src="assets/img/ui04_hero_f.png" alt="Interfaz TwinSight X500 — vista UI04 del visor interactivo">
+        <figcaption>Holybro X500 V2 · visor TwinSight</figcaption>
+      </figure>
+    </div>
+  </div>
+  <aside class="notes">Apertura. No es digital twin operacional; es experiencia web 3D para inspección técnica del Holybro X500 V2.</aside>
+</section>
+
+<!-- ============ 02 · PROBLEMA ============ -->
+<section class="slide" data-label="Problema">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">01</span>Problema</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El reto central es comprender <em class="acc">relaciones</em>, no solo ver piezas.</span></h1>
+    <div class="rows">
+      <div class="row-item" data-step="1"><span class="ri-idx">01</span><h3 class="ri-term">Documentación</h3><p class="ri-desc">Planos, manuales y referencias técnicas contienen información útil, pero la lectura está distribuida en soportes separados.</p></div>
+      <div class="row-item" data-step="2"><span class="ri-idx">02</span><h3 class="ri-term">Fricción</h3><p class="ri-desc">El usuario debe reconstruir mentalmente profundidad, ubicación y ensamblaje a partir de vistas planas y desarticuladas.</p></div>
+      <div class="row-item" data-step="3"><span class="ri-idx">03</span><h3 class="ri-term">Respuesta</h3><p class="ri-desc">Una capa 3D web permite ubicar, seleccionar, aislar y relacionar piezas sin abrir herramientas CAD pesadas.</p></div>
+    </div>
+    <div class="callout key" data-step="4"><span class="tag lime">Idea clave</span><p>El problema no es ausencia de datos: es la distancia entre los datos disponibles y la comprensión espacial operativa.</p></div>
+  </div>
+  <aside class="notes">Problema: información fragmentada, reconstrucción espacial exigida al usuario.</aside>
+</section>
+
+<!-- ============ 03 · MARCO TEÓRICO I ============ -->
+<section class="slide" data-label="Marco Teórico I">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">02</span>Marco teórico I</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La <em class="acc">carga cognitiva</em> explica por qué la forma de presentar importa.</span></h1>
+    <div class="rows">
+      <div class="row-item slim" data-step="1">
+        <div class="ri-tagcell"><span class="tag">Intrínseca</span></div>
+        <p class="ri-desc">Complejidad propia del contenido. Un dron multicomponente es complejo aunque la interfaz sea óptima.</p>
+      </div>
+      <div class="row-item slim" data-step="2">
+        <div class="ri-tagcell"><span class="tag amber">Extrínseca</span></div>
+        <p class="ri-desc">Cómo se presenta la información. Saltar entre planos, tablas y vistas no conectadas aumenta el esfuerzo innecesario.</p>
+      </div>
+      <div class="row-item slim" data-step="3">
+        <div class="ri-tagcell"><span class="tag lime">Germana</span></div>
+        <p class="ri-desc">Esfuerzo útil que construye esquemas: entender función, ubicación y relación de una pieza con el ensamblaje.</p>
+      </div>
+    </div>
+    <div class="callout limit" data-step="4"><span class="tag amber">Límite declarado</span><p>Esta tesis no mide las tres cargas directamente. Las usa como marco teórico para justificar una interfaz 3D guiada que reduce la reconstrucción espacial innecesaria.</p></div>
+  </div>
+  <aside class="notes">Memoria de trabajo es limitada (Sweller et al. 2019). Tres tipos: intrínseca = complejidad del contenido; extrínseca = cómo se presenta; germana = esfuerzo útil que construye esquemas. La tesis no mide las tres directamente; las usa como marco de diseño.</aside>
+</section>
+
+<!-- ============ 04 · MARCO TEÓRICO II ============ -->
+<section class="slide" data-label="Marco Teórico II">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">03</span>Marco teórico II</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La interfaz traduce la teoría en <em class="acc">jerarquía, agrupación, estado y reconocimiento</em>.</span></h1>
+    <div class="tscroll">
+      <table class="t-mayer">
+        <thead><tr><th>Principio (informe)</th><th>En la app</th><th>En este deck</th></tr></thead>
+        <tbody>
+          <tr data-step="1"><td>Jerarquía visual · Norman</td><td>Hero, barra inferior de modos y ficha inferior separan navegación, acción y detalle.</td><td>Una afirmación por slide; el título es la tesis.</td></tr>
+          <tr data-step="2"><td>Agrupación · Gestalt</td><td>Controles agrupados por modo; categorías cromáticas por subsistema.</td><td>Lima = evidencia · ámbar = límite declarado.</td></tr>
+          <tr data-step="3"><td>Visibilidad del estado · Nielsen</td><td>Contorno de selección, modo activo resaltado, leyenda de Thermal.</td><td>Revelado por pasos y contador de slide.</td></tr>
+          <tr data-step="4"><td>Reconocimiento antes que memoria · Nielsen</td><td>Hotspots, fichas por pieza y onboarding procedural.</td><td>Cada término se define antes de usarlo.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">Principios de interfaz que cita el informe (marco teórico y Tabla 11): jerarquía visual (Norman, 2013), agrupación por proximidad y similitud (Gestalt: Wertheimer, Köhler), visibilidad del estado y reconocimiento antes que memoria (Nielsen, 1994). Marco unificador: cognición distribuida (Hutchins, 1995) — la interfaz funciona como artefacto cognitivo que externaliza la rotación mental.</aside>
+</section>
+
+<!-- ============ 05 · ALCANCE ============ -->
+<section class="slide" data-label="Alcance">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">04</span>Alcance</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La tesis responde con un <em class="acc">visual product twin</em>, no con un digital twin operacional.</span></h1>
+    <div class="scope">
+      <div class="scope-col" data-step="2">
+        <div class="scope-head"><span class="mark ok">+</span><h3>Visual Product Twin</h3><span class="tag lime">Alcance</span></div>
+        <ul class="scope-list stagger">
+          <li style="--i:0">Visualización 3D WebGL navegable en tiempo real.</li>
+          <li style="--i:1">Selección, aislamiento e inspección de componentes técnicos.</li>
+          <li style="--i:2">Modos de representación visual y lectura contextual.</li>
+          <li style="--i:3">Taxonomía estructural del dron Holybro X500 V2.</li>
+          <li style="--i:4">Profiler integrado para trazabilidad de rendimiento.</li>
+          <li style="--i:5">Evaluación formativa descriptiva con usuarios reales.</li>
+        </ul>
+      </div>
+      <div class="scope-col out" data-step="1">
+        <div class="scope-head"><span class="mark no">×</span><h3>Digital Twin Operacional</h3><span class="tag red">Exclusiones</span></div>
+        <ul class="scope-list stagger">
+          <li style="--i:0">Telemetría en tiempo real desde el dron físico.</li>
+          <li style="--i:1">Sincronización de variables de estado operacional activo.</li>
+          <li style="--i:2">Simulación FEA calibrada o solvers estructurales en runtime.</li>
+          <li style="--i:3">Integración con sistemas PLM, CMMS, SCADA o redes IoT.</li>
+          <li style="--i:4">Mantenimiento predictivo o análisis de fatiga.</li>
+          <li style="--i:5">Diagnóstico y control del hardware físico desde la web.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Aclarar alcance con contundencia desde el inicio: Visual Product Twin vs Digital Twin Operacional.</aside>
+</section>
+
+<!-- ============ 06 · OBJETIVOS ============ -->
+<section class="slide" data-label="Objetivos">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">05</span>Objetivos</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Los objetivos definen el contrato: <em class="acc">construir y evaluar</em> un artefacto interactivo.</span></h1>
+    <div class="obj-grid">
+      <div class="obj-card" data-step="1"><span class="obj-num">01</span><div><div class="obj-head"><span class="tag">OE1</span><h3>Pipeline de optimización CAD</h3></div><p>Diseñar un pipeline 3D que reduzca modelos CAD a presupuesto WebGL (6,5M a 95 617 tri), preservando legibilidad formal y piezas.</p></div></div>
+      <div class="obj-card" data-step="2"><span class="obj-num">02</span><div><div class="obj-head"><span class="tag">OE2</span><h3>Materiales, modos y rendimiento</h3></div><p>Integrar en Unity URP renderizado realista y herramientas de inspección, procurando frame time &le; 33,33 ms (&ge; 30 FPS).</p></div></div>
+      <div class="obj-card" data-step="3"><span class="obj-num">03</span><div><div class="obj-head"><span class="tag">OE3</span><h3>Prototipo interactivo WebGL</h3></div><p>Implementar la app web en Unity (C# / WebAssembly) con órbita, selección, bottom sheet, vista explosionada, corte y modos analíticos.</p></div></div>
+      <div class="obj-card" data-step="4"><span class="obj-num">04</span><div><div class="obj-head"><span class="tag">OE4</span><h3>Evaluación con usuarios</h3></div><p>Evaluar formativamente tareas y carga percibida (3D vs. 2D con NASA-TLX Raw y Think-Aloud), y estimar usabilidad global con SUS.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">Objetivos como contrato verificable. No se evaluó una idea abstracta: se evaluó un artefacto construido y medible.</aside>
+</section>
+
+<!-- ============ 07 · METODOLOGÍA ============ -->
+<section class="slide" data-label="Metodología">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">06</span>Metodología</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La metodología usa <em class="acc">DSR</em> con validación formativa descriptiva.</span></h1>
+    <div class="flow-wrap" data-reveal="media" style="--d:.4s">
+      <svg viewBox="0 0 960 92" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ciclo DSR">
+        <defs><marker id="ma" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#C8F53F"/></marker></defs>
+        <g><rect x="0" y="18" width="138" height="56" rx="7" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/><text x="69" y="42" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="12.5" font-weight="600">Problema</text><text x="69" y="58" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">brecha práctica</text></g>
+        <g data-step="1"><line x1="140" y1="46" x2="152" y2="46" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#ma)"/><rect x="156" y="18" width="138" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="225" y="42" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="12.5">Objetivos</text><text x="225" y="58" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">contrato verificable</text></g>
+        <g data-step="2"><line x1="296" y1="46" x2="308" y2="46" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#ma)"/><rect x="312" y="18" width="138" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="381" y="42" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="12.5">Diseño</text><text x="381" y="58" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">desarrollo</text></g>
+        <g data-step="3"><line x1="452" y1="46" x2="464" y2="46" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#ma)"/><rect x="468" y="18" width="138" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="537" y="42" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="12.5">Demostración</text><text x="537" y="58" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">artefacto WebGL</text></g>
+        <g data-step="4"><line x1="608" y1="46" x2="620" y2="46" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#ma)"/><rect x="624" y="18" width="138" height="56" rx="7" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/><text x="693" y="42" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="12.5" font-weight="600">Evaluación</text><text x="693" y="58" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">formativa</text></g>
+        <g data-step="5"><line x1="764" y1="46" x2="776" y2="46" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#ma)"/><rect x="780" y="18" width="138" height="56" rx="7" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/><text x="849" y="42" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="12.5" font-weight="600">Comunicación</text><text x="849" y="58" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">resultados</text></g>
+      </svg>
+    </div>
+    <div class="duo-cols">
+      <div data-step="6">
+        <span class="tag lime">Investigación aplicada · Mixta</span>
+        <h3>Marco DSR (Peffers / Hevner)</h3>
+        <p>Producción de conocimiento mediante diseño, construcción y evaluación rigurosa de un artefacto interactivo que resuelve una brecha técnica real.</p>
+      </div>
+      <div data-step="7">
+        <span class="tag">Rigor metodológico · n = 12</span>
+        <h3>Formativa y descriptiva</h3>
+        <p>Formativa para aprender del prototipo y refinar la interacción. Descriptiva para reportar patrones observados con honestidad, sin inferencia poblacional.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">DSRM (Peffers et al., 2007) en 6 fases continuas. Evaluación formativa y descriptiva con muestra de 12 participantes.</aside>
+</section>
+
+<!-- ============ 08 · EVALUACIÓN ============ -->
+<section class="slide" data-label="Evaluación">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">07</span>Evaluación</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Ninguna métrica mide todo: la evaluación <em class="acc">triangula</em> cinco capas de evidencia.</span></h1>
+    <div class="eval-grid">
+      <div class="svg-panel" data-reveal="media" style="--d:.4s">
+        <svg viewBox="0 0 540 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Triangulación">
+          <defs>
+            <marker id="ta" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#C8F53F"/></marker>
+            <marker id="tam" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#FFB224"/></marker>
+          </defs>
+          <g data-step="1"><rect x="24" y="26" width="152" height="58" rx="8" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)" stroke-width="1.2"/><text x="100" y="51" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="12.5" font-weight="600">KPIs técnicos</text><text x="100" y="67" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">FPS · frame time</text></g>
+          <g data-step="2"><rect x="364" y="26" width="152" height="58" rx="8" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)" stroke-width="1.2"/><text x="440" y="51" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="12.5" font-weight="600">SUS</text><text x="440" y="67" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">usabilidad percibida</text></g>
+          <g data-step="3"><rect x="24" y="316" width="152" height="58" rx="8" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)" stroke-width="1.2"/><text x="100" y="341" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="12.5" font-weight="600">Tareas</text><text x="100" y="357" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">tiempos · éxito</text></g>
+          <g data-step="4"><rect x="194" y="316" width="152" height="58" rx="8" fill="rgba(255,178,36,.05)" stroke="#FFB224" stroke-width="1.2"/><text x="270" y="341" text-anchor="middle" fill="#FFB224" font-family="JetBrains Mono,monospace" font-size="12.5" font-weight="600">Think-Aloud</text><text x="270" y="357" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">cualitativo</text></g>
+          <g data-step="5"><rect x="364" y="316" width="152" height="58" rx="8" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)" stroke-width="1.2"/><text x="440" y="341" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="12.5" font-weight="600">NASA-TLX Raw</text><text x="440" y="357" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">comparación 3D / 2D</text></g>
+          <g data-step="6">
+            <ellipse cx="270" cy="200" rx="92" ry="42" fill="rgba(200,245,63,.07)" stroke="#C8F53F" stroke-width="1.5"/>
+            <text x="270" y="197" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">Triangulación</text>
+            <text x="270" y="215" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="10">lectura descriptiva</text>
+            <line x1="112" y1="88" x2="206" y2="166" stroke="#C8F53F" stroke-width="1.2" opacity=".8" marker-end="url(#ta)"/>
+            <line x1="428" y1="88" x2="334" y2="166" stroke="#C8F53F" stroke-width="1.2" opacity=".8" marker-end="url(#ta)"/>
+            <line x1="112" y1="312" x2="206" y2="234" stroke="#C8F53F" stroke-width="1.2" opacity=".8" marker-end="url(#ta)"/>
+            <line x1="428" y1="312" x2="334" y2="234" stroke="#C8F53F" stroke-width="1.2" opacity=".8" marker-end="url(#ta)"/>
+            <line x1="270" y1="312" x2="270" y2="250" stroke="#FFB224" stroke-width="1.2" opacity=".8" marker-end="url(#tam)"/>
+          </g>
+        </svg>
+      </div>
+      <div class="eval-list">
+        <div class="eval-head" data-step="6"><span class="tag lime">Método de triangulación</span><h3>Evidencia integrada</h3></div>
+        <ul>
+          <li data-step="1"><strong>Datos técnicos</strong> — FPS, frame time y memoria del profiler interno.</li>
+          <li data-step="2"><strong>Usabilidad percibida</strong> — escala estandarizada SUS (solo 3D).</li>
+          <li data-step="3"><strong>Métricas de tarea</strong> — tiempos T1–T3 y completitud T1–T4.</li>
+          <li data-step="4"><strong>Protocolo cualitativo</strong> — codificación de categorías Think-Aloud.</li>
+          <li data-step="5"><strong>Carga de trabajo</strong> — índice multidimensional NASA-TLX Raw (3D vs 2D).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Instrumentos y triangulación. Rendimiento técnico, conducta en tareas, percepción subjetiva y comentarios cualitativos se interpretan en conjunto.</aside>
+</section>
+
+<!-- ============ 09 · PIPELINE ============ -->
+<section class="slide" data-label="Pipeline">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">08</span>Pipeline</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">De 6,5 millones a 95 617 triángulos: la traducción de activos CAD para <em class="acc">WebGL</em>.</span></h1>
+    <div class="flow-wrap" data-reveal="media" style="--d:.4s">
+      <svg viewBox="0 0 960 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline CAD a WebGL">
+        <defs><marker id="pa" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#C8F53F"/></marker></defs>
+        <g><rect x="0" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.3)" stroke-width="1.2"/><text x="59" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="600">CAD</text><text x="59" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">STEP</text></g>
+        <g data-step="1"><line x1="120" y1="50" x2="128" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="132" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="191" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">MoI3D</text><text x="191" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">STEPper</text></g>
+        <g data-step="2"><line x1="252" y1="50" x2="260" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="264" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="323" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Blender</text><text x="323" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">limpieza</text></g>
+        <g data-step="3"><line x1="384" y1="50" x2="392" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="396" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="455" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Retopo</text><text x="455" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">proxies</text></g>
+        <g data-step="4"><line x1="516" y1="50" x2="524" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="528" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="587" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Bake</text><text x="587" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">normal · AO</text></g>
+        <g data-step="5"><line x1="648" y1="50" x2="656" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="660" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="719" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">FBX</text><text x="719" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">→ Unity</text></g>
+        <g data-step="6"><line x1="780" y1="50" x2="788" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="792" y="19" width="118" height="62" rx="7" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.4"/><text x="851" y="45" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="600">WebGL</text><text x="851" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">runtime</text></g>
+      </svg>
+    </div>
+    <div class="duo-cols">
+      <div data-step="7"><span class="tag">Criterio de reducción</span><h3>Por qué optimizar</h3><p>El CAD original no estaba listo para render en tiempo real: mallas complejas con caras internas ocultas, tornillería duplicada y redundancias topológicas.</p></div>
+      <div data-step="8"><span class="tag lime">Preservación semántica</span><h3>Qué se conserva</h3><p>La optimización mantiene la estructura jerárquica para selección y desglose interactivo, preservando silueta y lectura funcional.</p><div class="callout key"><span class="tag lime">Principio</span><p>No se simplifica por simplificar: se preserva la coherencia para inspección técnica en web.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">Pipeline CAD → WebGL. Traducción técnica para mantener rendimiento y jerarquía seleccionable.</aside>
+</section>
+
+<!-- ============ 10 · ACTIVO 3D INTERACTIVO ============ -->
+<section class="slide" data-label="Activo 3D">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">09</span>Activo 3D</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La escena runtime exportada es <em class="acc">explorable</em>: rota, acerca y alterna la lectura técnica.</span></h1>
+    <div class="gl-wrap">
+      <div class="gl-host" id="glHost" data-3d data-reveal="media" style="--d:.4s">
+        <img class="gl-poster" src="assets/img/hero01.jpg" alt="" aria-hidden="true">
+        <div class="gl-spin" aria-hidden="true"></div>
+        <span class="gl-status" id="glStatus">GLB · cargando…</span>
+        <div class="gl-toolbar">
+          <button class="gl-btn on" id="glBtnAuto" type="button">Auto</button>
+          <button class="gl-btn" id="glBtnWire" type="button">Wireframe</button>
+          <button class="gl-btn" id="glBtnReset" type="button">Reset</button>
+        </div>
+        <div class="gl-hint">Arrastra para rotar · rueda o pinch para zoom</div>
+      </div>
+      <div>
+        <ul class="mini-list" data-step="1">
+          <li>Geometría real de la build: <strong style="color:var(--ink)">x500v2_runtime_low</strong> — 252 mallas, ~229 000 triángulos.</li>
+          <li>Normal maps bake del pipeline; lectura técnica con modo wireframe.</li>
+          <li>Jerarquía de piezas preservada para selección y desglose interactivo.</li>
+          <li>Visor de respaldo en three.js + GLTF — independiente de Unity.</li>
+        </ul>
+        <div class="callout key" data-step="2"><span class="tag lime">Por qué aquí</span><p>Esto es la escena runtime instanciada, no el activo base: por eso su conteo (~229 000) difiere de los 95 617 triángulos del activo optimizado (ver Geometría y B6).</p></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Visor 3D de la escena runtime exportada (252 mallas, ~229 000 triángulos): rotación libre, zoom y wireframe. Puente hacia Geometría: esta es la cifra runtime; el activo base optimizado es de 95 617 triángulos.</aside>
+</section>
+
+<!-- ============ 10 · GEOMETRÍA ============ -->
+<section class="slide" data-label="Geometría">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">10</span>Geometría</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La reducción geométrica se lee como <em class="acc">presupuesto de activo</em>, no como conteo runtime.</span></h1>
+    <div class="duo">
+      <div data-step="1">
+        <span class="tag lime">Activo base</span>
+        <div class="m-value lime"><span data-count="95617">0</span></div>
+        <h3 style="font:600 clamp(15px,1.2vw,17.5px) var(--sans)">Triángulos del activo</h3>
+        <p class="slide-body" style="margin-top:4px">Modelo base optimizado exportado del pipeline: retopología y bake de mapas.</p>
+        <ul class="mini-list"><li>Mide el activo base y sus masters principales.</li><li>Trazabilidad directa desde las piezas CAD originales.</li></ul>
+      </div>
+      <div data-step="2">
+        <span class="tag amber">Escena runtime</span>
+        <div class="m-value amber"><span data-count="229054">0</span></div>
+        <h3 style="font:600 clamp(15px,1.2vw,17.5px) var(--sans)">Triángulos estimados en ejecución</h3>
+        <p class="slide-body" style="margin-top:4px">Conteo del profiler interno sobre la escena instrumentada en las pruebas.</p>
+        <ul class="mini-list"><li>Incluye instancias, proxies, assets de apoyo y renderers adicionales.</li><li>252 renderers activos en la escena medida.</li></ul>
+      </div>
+    </div>
+    <div class="callout limit" data-step="3"><span class="tag amber">Criterio de interpretación</span><p>Las cifras no son equivalentes ni se contradicen: una mide el costo del activo; la otra, la complejidad de la escena en ejecución.</p></div>
+  </div>
+  <aside class="notes">No comparar 95 617 y 229 054 como la misma métrica. Una es el activo base optimizado (masters principales); la otra es el conteo runtime estimado por el profiler, con instancias, proxies, assets de apoyo y renderers adicionales.</aside>
+</section>
+
+<!-- ============ 11 · ARQUITECTURA ============ -->
+<section class="slide" data-label="Arquitectura">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">11</span>Arquitectura</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La arquitectura separa <em class="acc">UI, orquestación, servicios de escena y datos</em>.</span></h1>
+    <div class="stack">
+      <div class="layer" data-step="1"><span class="layer-tag lime">UI</span><div class="chips"><span class="chip">UIManager</span><span class="chip">UIDetailsSheet</span><span class="chip">HotspotManager</span><span class="chip">Hero · Explore · Inspect · Analyze · Studio</span></div></div>
+      <div class="layer" data-step="2"><span class="layer-tag">Core</span><div class="chips"><span class="chip">EventBus</span><span class="chip">AppStateMachine</span><span class="chip">SelectionManager</span><span class="chip">ViewModeManager</span></div></div>
+      <div class="layer" data-step="3"><span class="layer-tag">Scene</span><div class="chips"><span class="chip">ExplodedViewManager</span><span class="chip">CrossSectionManager</span><span class="chip">PartVisibilityManager</span><span class="chip">ThermalSimulationManager</span><span class="chip hl">WebGLProfiler — JSON / CSV</span></div></div>
+      <div class="layer" data-step="4"><span class="layer-tag lime">Data</span><div class="chips"><span class="chip lime">DronePartData</span><span class="chip lime">PartCatalogManager</span><span class="chip lime">ExplodablePart</span><span class="chip lime">Shader Materials (URP)</span></div></div>
+    </div>
+  </div>
+  <aside class="notes">Arquitectura en cuatro capas (Fig. 47 del informe): presentación (UIManager, UIDetailsSheet, HotspotManager), orquestación (EventBus publish/subscribe, AppStateMachine, SelectionManager, ViewModeManager), servicios de escena (explode, corte, visibilidad, térmico y profiler interno) y datos (DronePartData, catálogo). La UI publica un evento y no conoce a sus receptores.</aside>
+</section>
+
+<!-- ============ 12 · TAXONOMÍA ============ -->
+<section class="slide" data-label="Taxonomía">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">12</span>Taxonomía</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La taxonomía permite seleccionar <em class="acc">piezas madre, subpiezas, hotspots y fasteners</em>.</span></h1>
+    <div class="band">
+      <div class="metric" data-step="1"><span class="tag">Piezas canónicas</span><div class="m-value"><span data-count="28">0</span></div><p>Entidades semánticas principales con asset DronePartData.</p></div>
+      <div class="metric" data-step="2"><span class="tag">Anchors de escena</span><div class="m-value"><span data-count="30">0</span></div><p>28 piezas base más grupos técnicos de fasteners y misceláneos.</p></div>
+      <div class="metric" data-step="3"><span class="tag lime">Renderers y colliders</span><div class="m-value lime"><span data-count="257">0</span></div><p>Elementos de malla y colisionadores auditados en runtime.</p></div>
+    </div>
+    <div class="trio">
+      <div data-step="4"><span class="tag">Hotspots</span><h3>Señalización</h3><p>Puntos de anclaje para dirigir la exploración a zonas relevantes del ensamblaje.</p></div>
+      <div data-step="5"><span class="tag">Fasteners</span><h3>Ensamblaje</h3><p>Elementos de sujeción tratados como parte de una relación de ensamblaje, no como ruido aislado.</p></div>
+      <div data-step="6"><span class="tag lime">Bottom sheet</span><h3>Lectura contextual</h3><p>Traduce selección geométrica a ficha técnica comprensible para inspección.</p></div>
+    </div>
+    <figure class="melt" data-step="7">
+      <img src="assets/img/ui02.jpg" alt="Hotspots de selección sobre el ensamblaje del dron en el visor" style="max-height:clamp(170px,22vh,230px)">
+      <figcaption class="figcap">Hotspots «select a part» sobre el ensamblaje — la taxonomía dirige la lectura visual.</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">Taxonomía como estructura operativa: 28 piezas canónicas (DronePartData), 30 anchors de escena (28 + fastener_group + misc_group) y 257 renderers/colliders auditados. Cuatro niveles de selección: pieza madre, subpieza, hotspot y fastener.</aside>
+</section>
+
+<!-- ============ 13 · FLUJO PÚBLICO ============ -->
+<section class="slide" data-label="Flujo público">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">13</span>Flujo público</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El flujo de usuario revela la complejidad del dron de forma <em class="acc">progresiva</em>.</span></h1>
+    <div class="flow-wrap" data-reveal="media" style="--d:.4s">
+      <svg viewBox="0 0 960 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flujo de usuario">
+        <defs><marker id="fa" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#C8F53F"/></marker></defs>
+        <g><rect x="0" y="32" width="130" height="56" rx="7" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/><text x="65" y="56" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="600">Hero</text><text x="65" y="72" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">orientación</text></g>
+        <g data-step="1"><line x1="132" y1="60" x2="142" y2="60" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="146" y="32" width="130" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="211" y="56" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Explore</text><text x="211" y="72" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">órbita / zoom</text></g>
+        <g data-step="2"><line x1="278" y1="60" x2="288" y2="60" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="292" y="32" width="130" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="357" y="56" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Selección</text><text x="357" y="72" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">click en pieza</text></g>
+        <g data-step="3"><line x1="424" y1="60" x2="434" y2="60" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="438" y="32" width="140" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="508" y="56" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Bottom Sheet</text><text x="508" y="72" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">ficha contextual</text></g>
+        <g data-step="4">
+          <line x1="580" y1="60" x2="600" y2="60" stroke="#C8F53F" stroke-width="1.4"/>
+          <line x1="600" y1="60" x2="600" y2="16" stroke="#C8F53F" stroke-width="1.4"/>
+          <line x1="600" y1="60" x2="600" y2="104" stroke="#C8F53F" stroke-width="1.4"/>
+          <line x1="600" y1="16" x2="616" y2="16" stroke="#C8F53F" stroke-width="1.4" marker-end="url(#fa)"/>
+          <line x1="600" y1="60" x2="616" y2="60" stroke="#C8F53F" stroke-width="1.4" marker-end="url(#fa)"/>
+          <line x1="600" y1="104" x2="616" y2="104" stroke="#C8F53F" stroke-width="1.4" marker-end="url(#fa)"/>
+          <rect x="620" y="2" width="100" height="30" rx="6" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/>
+          <text x="670" y="22" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600">Inspect</text>
+          <rect x="620" y="45" width="100" height="30" rx="6" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/>
+          <text x="670" y="65" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="10">Analyze</text>
+          <rect x="620" y="88" width="100" height="30" rx="6" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/>
+          <text x="670" y="108" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="10">Studio</text>
+        </g>
+      </svg>
+    </div>
+    <div class="duo-cols">
+      <div data-step="5"><span class="tag">Progresión de navegación</span><h3>Revelado por etapas</h3><p>El flujo reparte la complejidad en etapas lógicas, revelando opciones analíticas solo después de interactuar con el dron en Explore.</p></div>
+      <div data-step="6"><span class="tag lime">Filtros activos</span><h3>Ruido excluido</h3><p>Se excluyeron intencionalmente paneles de depuración y mediciones internas del recorrido básico para evitar el desborde cognitivo.</p></div>
+    </div>
+    <figure class="melt" data-step="7">
+      <img src="assets/img/ui01.jpg" alt="Captura del flujo público: selección de pieza, herramientas Analyze y navegación Inspect · Analyze · Studio" style="max-height:clamp(190px,25vh,270px)">
+      <figcaption class="figcap">Selección de pieza → herramientas Analyze (Cut · Explode · Filter) → navegación Inspect / Analyze / Studio.</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">Flujo público y visible: Hero → Explore → Selección → Bottom Sheet → Herramientas.</aside>
+</section>
+
+<!-- ============ 14 · INSPECT & ANALYZE ============ -->
+<section class="slide" data-label="Inspect · Analyze">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">14</span>Inspect · Analyze</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Inspect y Analyze eliminan el ruido visual para hacer <em class="acc">legible el ensamblaje</em>.</span></h1>
+    <div class="ia-grid">
+      <div class="ia-col" data-step="1">
+        <span class="tag lime">Inspect</span>
+        <ul class="mini-list">
+          <li>Aísla la pieza seleccionada y conserva contexto mínimo útil.</li>
+          <li>Convierte una selección de malla en una lectura técnica contextual.</li>
+          <li>Responde: ¿qué pieza es y dónde está ubicada?</li>
+        </ul>
+      </div>
+      <figure class="phone" data-step="2">
+        <div class="ph-screen"><video src="assets/video/anim_01_inspect.mp4" loop muted playsinline preload="auto"></video></div>
+        <figcaption class="ph-tag">Inspect · selección, aislamiento y ficha</figcaption>
+      </figure>
+      <figure class="phone" data-step="4">
+        <div class="ph-screen"><video src="assets/video/anim_02_explode.mp4" loop muted playsinline preload="auto"></video></div>
+        <figcaption class="ph-tag">Analyze · vista explosionada</figcaption>
+      </figure>
+      <div class="ia-col" data-step="3">
+        <span class="tag">Analyze</span>
+        <ul class="mini-list">
+          <li>Exploded view y corte transversal hacen visibles relaciones internas.</li>
+          <li>Los filtros por categoría reducen ruido material y jerárquico.</li>
+          <li>Responde: ¿cómo se conecta con las demás piezas?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Inspect / Analyze. Herramientas analíticas para reducir carga extrínseca.</aside>
+</section>
+
+<!-- ============ 15 · STUDIO ============ -->
+<section class="slide" data-label="Studio">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">15</span>Studio</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Los shaders son herramientas de <em class="acc">inspección técnica</em>, no filtros estéticos.</span></h1>
+    <div class="studio-wrap">
+      <div class="studio-content">
+        <div class="studio-quad">
+          <div data-step="1"><span class="tag">Realistic</span><h3>Orientación</h3><p>Lectura general del ensamblaje completo.</p></div>
+          <div data-step="2"><span class="tag lime">X-Ray</span><h3>Lectura interna</h3><p>Visibilidad de componentes internos ocultos.</p></div>
+          <div data-step="3"><span class="tag">Solid</span><h3>Relación geométrica</h3><p>Color plano y contorno para leer forma y silueta.</p></div>
+          <div data-step="4"><span class="tag amber">Thermal</span><h3>Interés relativo</h3><p>Jerarquías de atención visual por componente.</p></div>
+        </div>
+        <div data-step="5" style="border-top:1px solid var(--line);padding-top:clamp(12px,1.6vh,18px)">
+          <ul class="mini-list">
+            <li>Cada modo responde una pregunta distinta sobre el mismo ensamblaje.</li>
+            <li>Los shaders no son un adorno; son una estrategia de lectura técnica.</li>
+          </ul>
+        </div>
+      </div>
+      <figure class="phone" data-step="6">
+        <div class="ph-screen"><video src="assets/video/anim_03_studio_shaders.mp4" loop muted playsinline preload="auto"></video></div>
+        <figcaption class="ph-tag">Studio · X-Ray → Thermal → Solid</figcaption>
+      </figure>
+    </div>
+  </div>
+  <aside class="notes">Studio y modos visuales. El valor multimedia radica en la capacidad de inspección técnica visual.</aside>
+</section>
+
+<!-- ============ 16 · THERMAL ============ -->
+<section class="slide" data-label="Thermal">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">16</span>Thermal</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Thermal es una visualización <em class="acc-amber">heurística</em>, no una simulación FEA calibrada.</span></h1>
+    <div class="duo-cols">
+      <div data-step="1">
+        <span class="tag amber">Límite declarado</span>
+        <ul class="mini-list">
+          <li>Comunica jerarquías relativas de interés visual entre componentes.</li>
+          <li>No usa sensores, telemetría ni datos térmicos físicos del dron.</li>
+          <li>Su función es exploratoria y comunicativa, no diagnóstica.</li>
+          <li>La leyenda en °C es la escala del modelo heurístico por componentes, no una medición.</li>
+        </ul>
+      </div>
+      <div data-step="2" class="svg-panel">
+        <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escala heurística">
+          <defs><linearGradient id="therm" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#9BA0A6"/><stop offset="50%" stop-color="#FFB224"/><stop offset="100%" stop-color="#FF5C5C"/></linearGradient></defs>
+          <text x="250" y="20" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="11">Lectura heurística relativa</text>
+          <rect x="40" y="40" width="420" height="24" rx="5" fill="url(#therm)" opacity=".8"/>
+          <text x="40" y="84" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="10">Baja</text>
+          <text x="460" y="84" fill="#FF5C5C" font-family="JetBrains Mono,monospace" font-size="10" text-anchor="end">Alta</text>
+          <rect x="40" y="100" width="130" height="36" rx="6" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="105" y="123" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="10">Estructura</text>
+          <rect x="185" y="100" width="130" height="36" rx="6" fill="rgba(255,178,36,.05)" stroke="#FFB224" stroke-width="1"/><text x="250" y="123" text-anchor="middle" fill="#FFB224" font-family="JetBrains Mono,monospace" font-size="10">ESC / electrónica</text>
+          <rect x="330" y="100" width="130" height="36" rx="6" fill="rgba(255,92,92,.05)" stroke="#FF5C5C" stroke-width="1"/><text x="395" y="123" text-anchor="middle" fill="#FF5C5C" font-family="JetBrains Mono,monospace" font-size="10">Motores / batería</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Thermal con límites explícitos. Modelo reducido por componentes (lumped) con factor de carga del dron y tiempos comprimidos; la leyenda en °C es escala del modelo heurístico. No recibe telemetría, no es FEA ni temperatura real. Jerarquía (Fig. 13): alta = motores y batería; media = ESC, controladora y electrónica; baja = estructura y hélices.</aside>
+</section>
+
+<!-- ============ 17 · DEMO (3 CAPACIDADES) ============ -->
+<section class="slide" data-label="Demo capacidades">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">17</span>Demo</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La demo debe probar <em class="acc">tres capacidades</em>, no navegar improvisadamente.</span></h1>
+    <div class="trio">
+      <div class="metric" data-step="1"><span class="obj-num">01</span><h3 style="margin-top:10px">Selección</h3><p>Pasar del dron completo a una pieza concreta con su ficha contextual.</p></div>
+      <div class="metric" data-step="2"><span class="obj-num">02</span><h3 style="margin-top:10px">Relación</h3><p>Mantener contexto entre pieza y ensamblaje sin perder legibilidad.</p></div>
+      <div class="metric" data-step="3"><span class="obj-num">03</span><h3 style="margin-top:10px">Modo visual</h3><p>Cambiar la lectura del modelo sin cambiar el alcance del sistema.</p></div>
+    </div>
+    <div class="callout key" data-step="4"><span class="tag lime">Ruta de demo en vivo</span><p>Selección → Aislamiento → Bottom sheet → Inspect → Analyze → Studio</p></div>
+    <figure class="melt" data-step="5">
+      <img src="assets/img/app_02.jpg" alt="Prototipo TwinSight: dron ensamblado con herramientas Analyze visibles" style="max-height:clamp(180px,24vh,260px)">
+      <figcaption class="figcap">El prototipo que se demostrará: dron completo, selección y herramientas Analyze.</figcaption>
+    </figure>
+  </div>
+  <aside class="notes">Tres capacidades concretas a probar en demo: Selección, Relación y Modo visual.</aside>
+</section>
+
+<!-- ============ 18 · DEMO VIDEO ============ -->
+<section class="slide" data-label="Demo video">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">18</span>Demo</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Demo: de dron completo a pieza, relación y <em class="acc">modo visual</em>.</span></h1>
+    <div class="demo-wrap">
+      <figure class="phone phone-lg" data-reveal="media" style="--d:.4s">
+        <div class="ph-screen"><video src="assets/video/vid_01_demo_compilado.mp4" data-manual muted playsinline preload="auto"></video></div>
+        <figcaption class="ph-tag">Respaldo · clic para reproducir</figcaption>
+      </figure>
+      <div>
+        <div data-step="1"><span class="tag lime">Ruta de demo en vivo</span>
+          <ul class="mini-list" style="margin-top:10px">
+            <li>0:00 · Selección de pieza → aislamiento → ficha en bottom sheet.</li>
+            <li>0:17 · Inspect: energía / carga del dron (Starting · Idle · Flying).</li>
+            <li>0:34 · Analyze: vista explosionada y corte transversal.</li>
+            <li>1:08 · Studio: X-Ray → Thermal → Solid.</li>
+          </ul>
+        </div>
+        <div class="callout limit" data-step="2"><span class="tag amber">Contingencia</span><p>La demo se hace en vivo en la build pública. Si no responde, se narra este video del mismo recorrido.</p></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">DEMO EN VIVO (principal): pasar a la ventana de la build ya abierta y en estado inicial; recorrido en ≤ 1:40 con los mismos pasos y marcas del video. RESPALDO: si la build tarda > 10 s o se congela, volver a esta slide y hacer clic en el video (espera en pausa en 0:00): 0:00 selección → Isolate → ficha; 0:17 Power; 0:34 Explode; 0:56 Cut; 1:08 X-Ray → 1:16 Thermal → 1:22 Solid.</aside>
+</section>
+
+<!-- ============ 19 · PROFILER ============ -->
+<section class="slide" data-label="Profiler">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">19</span>Profiler</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El profiler interno vuelve <em class="acc">trazable</em> el rendimiento por escenario y dispositivo.</span></h1>
+    <div class="duo-cols">
+      <div data-step="1">
+        <ul class="mini-list">
+          <li>Cada medición se vincula a build, dispositivo, navegador, resolución y condición de caché.</li>
+          <li>La trazabilidad permite comparar escenarios sin inventar equivalencias técnicas.</li>
+          <li>El profiler exporta datos verificables en formatos abiertos JSON / CSV.</li>
+        </ul>
+      </div>
+      <figure class="slot slot-tall" data-step="2">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <span class="slot-tag">Export JSON · WebGLProfiler</span>
+        <div class="slot-mid" style="padding:36px 18px 76px"><pre style="margin:0;text-align:left;font:500 clamp(11px,.95vw,13px)/1.55 var(--mono);color:var(--ink-2);white-space:pre">"scenario": "thermal_studio",
+"deviceModel": "Chrome 141.0.0.0",
+"averageFps": <span style="color:var(--lime)">59.8</span>,
+"averageFrameMs": <span style="color:var(--lime)">16.7</span>,
+"peakReservedMemoryMb": 413,
+"rendererCount": 252,
+"estimatedTriangleCount": <span style="color:var(--amber)">229054</span></pre></div>
+        <figcaption class="slot-note">Sesión real · 4 jun 2026 · escritorio GTX 980 Ti · Telemetria/Mediciones_WebGL</figcaption>
+      </figure>
+    </div>
+  </div>
+  <aside class="notes">Profiler y trazabilidad. Extracto literal de la exportación JSON del WebGLProfiler (sesión thermal_studio, escritorio, 4 jun 2026; Tabla 18 del informe). El mismo archivo contiene el conteo runtime 229 054 y 252 renderers.</aside>
+</section>
+
+<!-- ============ 20 · RENDIMIENTO ============ -->
+<section class="slide" data-label="Rendimiento">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">20</span>Rendimiento</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El rendimiento es <em class="acc">viable</em>, pero no universal en todo móvil.</span></h1>
+    <div class="duo-cols">
+      <div class="svg-panel" data-step="1">
+        <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="FPS por dispositivo">
+          <text x="10" y="22" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="11" letter-spacing="1">FPS PROMEDIO POR DISPOSITIVO</text>
+          <line x1="80" y1="50" x2="460" y2="50" stroke="rgba(237,238,232,.08)" stroke-width="1"/>
+          <line x1="80" y1="155" x2="460" y2="155" stroke="rgba(237,238,232,.08)" stroke-width="1"/>
+          <line x1="80" y1="260" x2="460" y2="260" stroke="rgba(237,238,232,.15)" stroke-width="1"/>
+          <text x="70" y="54" text-anchor="end" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="11">60</text>
+          <text x="70" y="159" text-anchor="end" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="11">30</text>
+          <text x="70" y="264" text-anchor="end" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="11">0</text>
+          <line x1="80" y1="155" x2="460" y2="155" stroke="#FF5C5C" stroke-width="1.2" stroke-dasharray="5,4"/>
+          <text x="465" y="159" fill="#FF5C5C" font-family="JetBrains Mono,monospace" font-size="10">30 fps</text>
+          <g><rect x="100" y="51" width="60" height="209" rx="4" fill="#C8F53F" opacity=".85"/><text x="130" y="42" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">59.8</text><text x="130" y="282" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="11">Escritorio</text></g>
+          <g><rect x="190" y="55" width="60" height="205" rx="4" fill="#C8F53F" opacity=".6"/><text x="220" y="46" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">58.7</text><text x="220" y="282" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="11">iOS Premium</text></g>
+          <g><rect x="280" y="167" width="60" height="93" rx="4" fill="#FFB224" opacity=".8"/><text x="310" y="158" text-anchor="middle" fill="#FFB224" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">26.5</text><text x="310" y="282" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="11">Redmi Note 10S</text></g>
+          <g><rect x="370" y="198" width="60" height="62" rx="4" fill="#FF5C5C" opacity=".8"/><text x="400" y="189" text-anchor="middle" fill="#FF5C5C" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">17.6</text><text x="400" y="282" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="11">Android Lím.</text></g>
+        </svg>
+      </div>
+      <div>
+        <div data-step="2"><span class="tag">Escritorio / iOS</span><h3 style="font:600 clamp(16px,1.3vw,18.5px) var(--sans);margin:8px 0 4px">Estable</h3><p class="slide-body" style="margin-top:0">≈16,7–17 ms por cuadro (~60 FPS), muy por debajo del presupuesto de 33,33 ms (30 FPS).</p></div>
+        <div data-step="3" style="margin-top:16px"><span class="tag amber">Gama media</span><h3 style="font:600 clamp(16px,1.3vw,18.5px) var(--sans);margin:8px 0 4px">Funcional, bajo la meta</h3><p class="slide-body" style="margin-top:0">Redmi Note 10S: 26,5 FPS. Funcional en el flujo principal, con picos perceptibles.</p></div>
+        <div data-step="4" style="margin-top:16px"><span class="tag red">Gama baja</span><h3 style="font:600 clamp(16px,1.3vw,18.5px) var(--sans);margin:8px 0 4px">Límite operativo</h3><p class="slide-body" style="margin-top:0">Android Adreno 610: 17,6 FPS. Navegable, pero por debajo de la meta de 30 FPS.</p></div>
+      </div>
+    </div>
+    <div class="callout limit" data-step="5"><span class="tag amber">Compatibilidad declarada</span><p>La compatibilidad está acotada a los entornos documentados, sin promesas de uniformidad universal en móvil.</p></div>
+  </div>
+  <aside class="notes">Rendimiento viable pero no universal en todo móvil. Se midieron seis configuraciones (Tabla 16); se muestran cuatro representativas. Escritorio e iPhone 17 Pro ≈60 FPS; Redmi Note 10S 26,5 FPS (funcional, bajo la meta); Adreno 610 17,6 FPS (límite inferior). Las sesiones con usuarios usaron solo dos entornos: este PC y el Redmi.</aside>
+</section>
+
+<!-- ============ 21 · USABILIDAD SUS ============ -->
+<section class="slide" data-label="Usabilidad SUS">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">21</span>Usabilidad</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">SUS de <em class="acc">91,88</em>: recepción favorable del visor interactivo 3D.</span></h1>
+    <div class="band">
+      <div class="metric" data-step="1"><span class="tag lime">SUS · Prototipo 3D</span><div class="m-value lime"><span data-count="91.88" data-decimals="2">0</span></div><h3>Usabilidad</h3><p>Mediana 95,00 · DE 11,24 (n=12)</p></div>
+      <div class="metric" data-step="2"><span class="tag">Rango</span><div class="m-value">60–100</div><h3>Dispersión</h3><p>Mínimo 60 · máximo 100 en los 12 participantes</p></div>
+      <div class="metric" data-step="3"><span class="tag amber">Referencia</span><div class="m-value amber"><span data-count="68">0</span></div><h3>Media histórica</h3><p>Punto de comparación contextual, no umbral de aprobación</p></div>
+    </div>
+    <div class="callout key" data-step="4"><span class="tag lime">Lectura correcta</span><p>SUS se aplicó solo al prototipo 3D: describe una usabilidad percibida favorable en esta muestra, no una comparación 3D frente a 2D.</p></div>
+  </div>
+  <aside class="notes">SUS aplicado exclusivamente al prototipo 3D: media 91,88, mediana 95, DE 11,24, mínimo 60, máximo 100, n=12. La referencia 68 es la media histórica del instrumento (Bangor et al.), no un umbral. La comparación 3D vs 2D se hace en la slide siguiente con NASA-TLX Raw y tiempos.</aside>
+</section>
+
+<!-- ============ 22 · NASA-TLX ============ -->
+<section class="slide" data-label="NASA-TLX">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">22</span>NASA-TLX Raw</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">En la muestra, el visor 3D se asoció con menor <em class="acc">carga de trabajo percibida</em>.</span></h1>
+    <div class="duo-cols">
+      <div>
+        <div style="display:flex;gap:32px;align-items:baseline">
+          <div data-step="1"><span class="tag lime">Condición 3D</span><div class="m-value lime"><span data-count="8.69" data-decimals="2">0</span></div><h3 style="font:600 16px var(--sans)">3D Raw</h3></div>
+          <div data-step="2"><span class="tag amber">Condición 2D</span><div class="m-value amber"><span data-count="19.89" data-decimals="2">0</span></div><h3 style="font:600 16px var(--sans)">2D Raw</h3></div>
+        </div>
+        <ul class="mini-list" data-step="3" style="margin-top:14px">
+          <li>Diferencia pareada media: <strong style="color:var(--ink)">11,19 puntos</strong> a favor del visor 3D.</li>
+          <li>El valor fue menor en la condición 3D en los 12 casos individuales evaluados.</li>
+        </ul>
+        <div class="callout limit" data-step="5" style="margin-top:14px"><span class="tag amber">Nota</span><p>T4: exploratoria guiada, no cronometrada. NASA-TLX Raw mide carga de trabajo percibida (workload) — no equivale a una medición fisiológica directa de carga cognitiva.</p></div>
+      </div>
+      <div data-step="4" class="tscroll" style="margin-top:0">
+        <table class="t-tareas">
+          <thead><tr><th>Tarea</th><th class="r">3D</th><th class="r">2D</th></tr></thead>
+          <tbody>
+            <tr><td>T1 · Ubicación / Identificación</td><td class="r mono lime">5,75 s</td><td class="r mono amber">13,00 s</td></tr>
+            <tr><td>T2 · Interpretación funcional</td><td class="r mono lime">3,50 s</td><td class="r mono amber">18,00 s</td></tr>
+            <tr><td>T3 · Relación espacial</td><td class="r mono lime">11,33 s</td><td class="r mono amber">23,00 s</td></tr>
+            <tr><td style="font-weight:600">Total T1–T3</td><td class="r mono lime" style="font-weight:600">20,58 s</td><td class="r mono amber" style="font-weight:600">54,00 s</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Menor carga percibida en 3D. Diferencia pareada de 11,19 puntos consistente en los 12 participantes.</aside>
+</section>
+
+<!-- ============ 23 · VALIDACIÓN CUALITATIVA ============ -->
+<section class="slide" data-label="Validación cualitativa">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">23</span>Validación cualitativa</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Think-Aloud explica comprensión espacial y <em class="acc-amber">fricciones residuales</em>.</span></h1>
+    <div class="eval-grid">
+      <div class="svg-panel" data-step="1">
+        <svg viewBox="0 0 500 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Frecuencia de categorías">
+          <text x="10" y="16" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9" letter-spacing="1">FRECUENCIA DE CATEGORÍAS</text>
+          <line x1="160" y1="24" x2="460" y2="24" stroke="rgba(237,238,232,.08)" stroke-dasharray="3,3"/>
+          <line x1="310" y1="24" x2="310" y2="155" stroke="rgba(237,238,232,.08)" stroke-dasharray="3,3"/>
+          <line x1="460" y1="24" x2="460" y2="155" stroke="rgba(237,238,232,.08)" stroke-dasharray="3,3"/>
+          <text x="460" y="18" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="8">12</text>
+          <text x="310" y="18" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="8">6</text>
+          <text x="10" y="48" fill="#EDEEE8" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600">Comprensión espacial</text>
+          <rect x="160" y="36" width="275" height="16" rx="3" fill="#C8F53F" opacity=".85"/>
+          <text x="442" y="48" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600">11/12</text>
+          <text x="10" y="82" fill="#EDEEE8" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="600">Percepción de claridad</text>
+          <rect x="160" y="70" width="200" height="16" rx="3" fill="#C8F53F" opacity=".6"/>
+          <text x="367" y="82" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600">8/12</text>
+          <text x="10" y="116" fill="#9BA0A6" font-family="Space Grotesk,sans-serif" font-size="11">Navegación y control</text>
+          <rect x="160" y="104" width="250" height="16" rx="3" fill="#FFB224" opacity=".8"/>
+          <text x="417" y="116" fill="#FFB224" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600">10/12</text>
+          <text x="10" y="150" fill="#9BA0A6" font-family="Space Grotesk,sans-serif" font-size="11">Iconos procedurales</text>
+          <rect x="160" y="138" width="150" height="16" rx="3" fill="#FFB224" opacity=".5"/>
+          <text x="317" y="150" fill="#FFB224" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600">6/12</text>
+        </svg>
+        <p class="figcap">Lima: apoyo a la comprensión · ámbar: fricciones (Tabla 27 del informe).</p>
+      </div>
+      <div>
+        <div data-step="2">
+          <span class="tag lime">Coincide con lo cuantitativo</span>
+          <ul class="mini-list">
+            <li>Comprensión espacial (11/12): relación motor, montura, tornillería y conjunto.</li>
+            <li>Percepción de claridad (8/12): explode, Thermal, X-Ray, Blueprint y aislamiento.</li>
+          </ul>
+        </div>
+        <div data-step="3" style="margin-top:16px;border-top:1px solid var(--line);padding-top:12px">
+          <span class="tag amber">Fricciones detectadas</span>
+          <ul class="mini-list">
+            <li>Navegación y control (10/12): órbita, pan y sensibilidad táctil en móvil.</li>
+            <li>Iconos procedurales (6/12): estados o lectura poco evidentes.</li>
+            <li>Selección de piezas pequeñas o parcialmente ocultas (2/12).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="figcap" data-step="4">Rigor académico: identificar fricciones residuales orienta el trabajo futuro y refuerza la transparencia de la evaluación formativa.</p>
+  </div>
+  <aside class="notes">Think-Aloud complementa los números (Tabla 27). Apoyo: comprensión espacial 11/12 y percepción de claridad 8/12. Fricción: navegación y control 10/12 (órbita, pan, sensibilidad táctil), iconos procedurales 6 participantes, piezas pequeñas 2/12. Las fricciones demuestran una evaluación real y honesta.</aside>
+</section>
+
+<!-- ============ 24 · DISCUSIÓN ============ -->
+<section class="slide" data-label="Discusión">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">24</span>Discusión</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La discusión acota el resultado: efecto techo, muestra pequeña y <em class="acc-amber">compatibilidad limitada</em>.</span></h1>
+    <div class="scope">
+      <div class="scope-col" data-step="1">
+        <div class="scope-head"><span class="mark ok">+</span><h3>Lo que sí soporta</h3><span class="tag lime">Evidencia</span></div>
+        <ul class="scope-list">
+          <li>Menor tiempo medio en T1–T3 para la condición 3D.</li>
+          <li>Menor workload percibido con NASA-TLX Raw.</li>
+          <li>Recepción favorable del prototipo 3D con SUS alto (91,88).</li>
+          <li>Mejor orientación espacial en verbalizaciones cualitativas.</li>
+        </ul>
+      </div>
+      <div class="scope-col out" data-step="2">
+        <div class="scope-head"><span class="mark no">×</span><h3>Lo que no debe afirmarse</h3><span class="tag amber">Límite</span></div>
+        <ul class="scope-list">
+          <li>Generalización poblacional o causalidad fuerte.</li>
+          <li>Compatibilidad móvil universal.</li>
+          <li>Thermal como simulación física o FEA.</li>
+          <li>Superioridad absoluta en éxito (efecto techo 12/12).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Discusión con límites explícitos. Saber qué se puede afirmar y qué no demuestra madurez investigativa.</aside>
+</section>
+
+<!-- ============ 25 · CONCLUSIONES ============ -->
+<section class="slide" data-label="Conclusiones">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">25</span>Conclusiones</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Las conclusiones cierran cada objetivo con <em class="acc">evidencia trazable</em>.</span></h1>
+    <div class="tscroll">
+      <table class="t-obj">
+        <thead><tr><th>Objetivo</th><th>Resultado operativo</th><th>Evidencia en el entorno</th></tr></thead>
+        <tbody>
+          <tr data-step="1"><td>OE1 · Pipeline 3D</td><td>Optimización de mallas CAD: de 6,5M a 95 617 triángulos en activo base.</td><td>Filtros, retopología y bake documentados. Diagramas de flujo.</td></tr>
+          <tr data-step="2"><td>OE2 · Materiales / modos</td><td>URP Shaders con frame time &lt;33,33 ms en desktop; en móvil funcional, no universal. 5 modos visuales.</td><td>Build estable en entornos probados. Presets y shaders en escena.</td></tr>
+          <tr data-step="3"><td>OE3 · Prototipo</td><td>Visor web 3D público y funcional con fichas de datos, Inspect, Analyze, Studio y Thermal.</td><td>Build WebGL pública funcional, URL de acceso y capturas de flujo.</td></tr>
+          <tr data-step="4"><td>OE4 · Evaluación</td><td>SUS medio 91,88, NASA-TLX 8,69 (3D) vs. 19,89 (2D), tiempos consistentemente menores.</td><td>Tareas cronometradas (20,58 s vs 54 s), SUS, NASA y Think-Aloud.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">Las conclusiones responden directamente a los 4 objetivos específicos del proyecto.</aside>
+</section>
+
+<!-- ============ 26 · LIMITACIONES ============ -->
+<section class="slide" data-label="Limitaciones">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">26</span>Limitaciones</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Las limitaciones son <em class="acc-amber">alcance declarado</em>, no fallas ocultas.</span></h1>
+    <div class="quad">
+      <div data-step="1"><span class="tag amber">Modelo único</span><span class="sub">Holybro X500 V2</span><p>La arquitectura está preparada para generalizarse, pero la compatibilidad con otros drones no se ha validado.</p></div>
+      <div data-step="2"><span class="tag amber">Muestra n = 12</span><span class="sub">Tamaño acotado</span><p>Suficiente para validación formativa y descriptiva, pero insuficiente para inferencia estadística poblacional.</p></div>
+      <div data-step="3"><span class="tag amber">Adaptación PC</span><span class="sub">UI de escritorio</span><p>El diseño es mobile-first; la versión de escritorio es una adaptación funcional, no una UI nativa optimizada.</p></div>
+      <div data-step="4"><span class="tag amber">Cables / electrónica</span><span class="sub">Hardware rígido</span><p>Se omitió el cableado interno flexible y conectores menores por restricciones de tiempo y complejidad geométrica.</p></div>
+    </div>
+    <div class="callout limit" data-step="5"><span class="tag amber">Rigor metodológico</span><p>Declarar los límites del prototipo define con precisión el espacio de validez de las afirmaciones del proyecto.</p></div>
+  </div>
+  <aside class="notes">Las limitaciones no son fallas ocultas; son límites de diseño declarados con rigor.</aside>
+</section>
+
+<!-- ============ 27 · TRABAJO FUTURO ============ -->
+<section class="slide" data-label="Trabajo futuro">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">27</span>Trabajo futuro</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El trabajo futuro es una <em class="acc">ruta de madurez</em>, no una lista de deseos.</span></h1>
+    <div class="flow-wrap" data-reveal="media" style="--d:.4s">
+      <svg viewBox="0 0 960 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escalera de madurez">
+        <defs><marker id="tf" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#C8F53F"/></marker></defs>
+        <g><rect x="0" y="32" width="200" height="52" rx="7" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.4"/><text x="100" y="54" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="12" font-weight="600">Visual Product Twin</text><text x="100" y="70" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">TwinSight X500 · actual</text></g>
+        <g data-step="1"><line x1="202" y1="58" x2="226" y2="46" stroke="#C8F53F" stroke-width="1.4" opacity=".6" marker-end="url(#tf)"/><rect x="230" y="20" width="200" height="52" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="330" y="42" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="12">Digital Shadow</text><text x="330" y="58" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">telemetría histórica</text></g>
+        <g data-step="2"><line x1="432" y1="46" x2="456" y2="34" stroke="#C8F53F" stroke-width="1.4" opacity=".6" marker-end="url(#tf)"/><rect x="460" y="8" width="200" height="52" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="560" y="30" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="12">Digital Twin</text><text x="560" y="46" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">operacional · calibrado</text></g>
+        <g data-step="3"><rect x="680" y="32" width="270" height="52" rx="7" fill="none" stroke="rgba(237,238,232,.12)" stroke-dasharray="4,4"/><text x="815" y="54" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="11">Fases 0 → 5 · roadmap</text><text x="815" y="70" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">detalle a continuación</text></g>
+      </svg>
+    </div>
+    <div class="trio">
+      <div data-step="4"><span class="tag">Fases 0–1 · Corto plazo</span><ul class="mini-list"><li>Validación con muestra cercana a 30 y mejoras de interacción móvil.</li><li>Twin manifest por componente (independiente de Unity).</li></ul></div>
+      <div data-step="5"><span class="tag">Fases 2–3 · Medio plazo</span><ul class="mini-list"><li>Telemetría histórica: digital shadow de reproducción.</li><li>Live digital shadow (MQTT, REST, MAVLink, WoT).</li></ul></div>
+      <div data-step="6"><span class="tag lime">Fases 4–5 · Largo plazo</span><ul class="mini-list"><li>Modo servicio y mantenimiento guiado.</li><li>Digital twin operacional con modelos calibrados.</li></ul></div>
+    </div>
+  </div>
+  <aside class="notes">Ruta de madurez del informe (Fig. 80): Fase 0 ampliación del VPT, 1 twin manifest, 2 telemetría histórica (shadow de reproducción), 3 live digital shadow, 4 modo servicio, 5 digital twin operacional (modelos calibrados, what-if, human-in-the-loop).</aside>
+</section>
+
+<!-- ============ 28 · CONTRIBUCIÓN ============ -->
+<section class="slide" data-label="Contribución">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">28</span>Contribución</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La contribución es <em class="acc">técnica, metodológica y comunicativa</em>.</span></h1>
+    <div class="trio">
+      <div data-step="1"><span class="tag lime">Técnica</span><ul class="mini-list"><li>Pipeline CAD → WebGL documentado.</li><li>Taxonomía operativa para selección y lectura.</li><li>Modos visuales y profiler integrados.</li></ul></div>
+      <div data-step="2"><span class="tag">Metodológica</span><ul class="mini-list"><li>DSR aplicado a un artefacto real.</li><li>Triangulación de KPIs, tareas e instrumentos UX.</li><li>Comparación intra-sujeto 3D vs 2D con orden AB/BA.</li></ul></div>
+      <div data-step="3"><span class="tag lime">Comunicativa</span><ul class="mini-list"><li>Hardware complejo vuelto legible desde la web.</li><li>Relaciones espaciales accesibles sin CAD pesado.</li><li>Base útil para trabajo futuro más ambicioso.</li></ul></div>
+    </div>
+  </div>
+  <aside class="notes">Triple contribución técnica, metodológica y comunicativa.</aside>
+</section>
+
+<!-- ============ 29 · CIERRE ============ -->
+<section class="slide" data-label="Cierre">
+  <div class="slide-inner closing">
+    <p class="kicker center" data-reveal style="--d:.15s"><span class="k-num">29</span>Fin de la transmisión</p>
+    <h1 class="closing-title"><span class="ln" data-scramble style="--d:.32s">Gracias<span class="dot">.</span></span></h1>
+    <p class="closing-sub" data-reveal style="--d:.6s">De la complejidad física a la legibilidad interactiva — una arquitectura WebGL trazable para la inspección técnica de ensamblajes complejos.</p>
+    <div class="closing-meta" data-reveal style="--d:.82s">
+      <span>Alexander Woodcock Salomón</span><i>·</i><span>TwinSight X500</span><i>·</i><span>Ingeniería Multimedia</span><i>·</i><span>UNAD</span>
+    </div>
+  </div>
+  <aside class="notes">Cierre con impacto y agradecimiento. Invitar a la sesión de preguntas y demostración interactiva.</aside>
+</section>
+
+<!-- ============ B1 · SUS ============ -->
+<section class="slide" data-label="B1 SUS">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B1</span>Backup — SUS</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Fórmula e interpretación de <em class="acc">SUS</em>.</span></h1>
+    <div class="callout key" data-step="1">
+      <span class="tag lime">Fórmula</span>
+      <p style="font-family:var(--mono);font-size:clamp(13px,1.05vw,15px);color:var(--ink)">SUS = (Σ contribuciones por ítem) × 2,5<br>Ítems impares: (X − 1) · Ítems pares: (5 − X)</p>
+    </div>
+    <div class="rows">
+      <div class="row-item" data-step="2"><span class="ri-idx">01</span><h3 class="ri-term">Aplicación</h3><p class="ri-desc">Aplicado exclusivamente al prototipo 3D, no como comparación 3D vs 2D.</p></div>
+      <div class="row-item" data-step="3"><span class="ri-idx">02</span><h3 class="ri-term">Resultados</h3><p class="ri-desc">Media: 91,88 · Mediana: 95,00 · DE: 11,24 · Mín: 60 · Máx: 100.</p></div>
+      <div class="row-item" data-step="4"><span class="ri-idx">03</span><h3 class="ri-term">Referencia</h3><p class="ri-desc">Bangor et al.: media histórica ~68. No es umbral absoluto de aprobación sino marco contextual.</p></div>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: SUS aplicado exclusivamente al prototipo 3D.</aside>
+</section>
+
+<!-- ============ B2 · NASA-TLX RAW ============ -->
+<section class="slide" data-label="B2 NASA-TLX">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B2</span>Backup — NASA-TLX Raw</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Fórmula y dimensión <em class="acc-amber">rendimiento invertido</em>.</span></h1>
+    <div class="callout key" data-step="1">
+      <span class="tag lime">Fórmula</span>
+      <p style="font-family:var(--mono);font-size:clamp(13px,1.05vw,15px);color:var(--ink)">NASA-TLX Raw = (DM + DF + DT + E + FR + RE) / 6<br>RE (rendimiento): 0 = desempeño perfecto · 100 = deficiente</p>
+    </div>
+    <div class="rows">
+      <div class="row-item" data-step="2"><span class="ri-idx">01</span><h3 class="ri-term">Resultados</h3><p class="ri-desc">Promedio 3D: 8,69 · Promedio 2D: 19,89 · Diferencia pareada media: 11,19 puntos.</p></div>
+      <div class="row-item" data-step="3"><span class="ri-idx">02</span><h3 class="ri-term">Consistencia</h3><p class="ri-desc">El valor fue menor en la condición 3D en los 12 casos individuales evaluados.</p></div>
+      <div class="row-item" data-step="4"><span class="ri-idx">03</span><h3 class="ri-term">Interpretación</h3><p class="ri-desc">Raw evita ponderación pareada — lectura formativa rápida. No existe redline universal (Hart 2006).</p></div>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: dimensiones NASA-TLX Raw (DM, DF, DT, E, FR, RE).</aside>
+</section>
+
+<!-- ============ B3 · DISEÑO COMPARATIVO ============ -->
+<section class="slide" data-label="B3 Diseño comparativo">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B3</span>Backup — Diseño comparativo</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Variables de control y orden <em class="acc">AB/BA</em>.</span></h1>
+    <div class="rows">
+      <div class="row-item" data-step="1"><span class="ri-idx">01</span><h3 class="ri-term">Muestra</h3><p class="ri-desc">12 participantes · muestra no probabilística intencional · mayo–junio 2026.</p></div>
+      <div class="row-item" data-step="2"><span class="ri-idx">02</span><h3 class="ri-term">Balanceo</h3><p class="ri-desc">Códigos impares → AB (3D primero). Códigos pares → BA (2D primero).</p></div>
+      <div class="row-item" data-step="3"><span class="ri-idx">03</span><h3 class="ri-term">Variables de control</h3><p class="ri-desc">Código anónimo, perfil agregado, experiencia, orden, dispositivo, SO, navegador, resolución, build, caché.</p></div>
+      <div class="row-item" data-step="4"><span class="ri-idx">04</span><h3 class="ri-term">Condición 2D</h3><p class="ri-desc">Paquete documental fijo con información equivalente en planos y manuales.</p></div>
+      <div class="row-item" data-step="5"><span class="ri-idx">05</span><h3 class="ri-term">T4</h3><p class="ri-desc">Exploratoria guiada, no cronometrada — sin cierre temporal comparable.</p></div>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: diseño experimental intra-sujeto con balanceo AB/BA.</aside>
+</section>
+
+<!-- ============ B4 · RENDIMIENTO WEBGL ============ -->
+<section class="slide" data-label="B4 Rendimiento WebGL">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B4</span>Backup — Rendimiento WebGL</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Rendimiento por <em class="acc">dispositivo y escenario</em>.</span></h1>
+    <div class="tscroll">
+      <table class="t-perf">
+        <thead><tr><th>Dispositivo</th><th class="r">FPS promedio</th><th class="r">Frame time (ms)</th><th>Notas</th></tr></thead>
+        <tbody>
+          <tr data-step="1"><td>Escritorio (i7-5820K / GTX 980 Ti)</td><td class="r mono lime">59.8</td><td class="r mono">16.7</td><td>Chrome 141 · caché cargada</td></tr>
+          <tr data-step="2"><td>Redmi Note 10S (Mali-G76)</td><td class="r mono amber">26.5</td><td class="r mono">40.3</td><td>MIUI Global 14.0.11 · Chrome 148</td></tr>
+          <tr data-step="3"><td>iPhone 17 Pro (A19 Pro)</td><td class="r mono lime">58.7</td><td class="r mono">17.0</td><td>iOS · Safari</td></tr>
+          <tr data-step="4"><td>Android límite inferior (Adreno 610)</td><td class="r mono amber">17.6</td><td class="r mono">61.4</td><td>Android 12 · Chrome 114 · bajo 30 FPS</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout limit" data-step="5"><span class="tag amber">Nota</span><p>Todas las mediciones con caché cargada. Compatibilidad declarada por caso, no universal.</p></div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: matriz completa de rendimiento WebGL.</aside>
+</section>
+
+<!-- ============ B5 · PROFILER ============ -->
+<section class="slide" data-label="B5 Profiler">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B5</span>Backup — Profiler</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Profiler interno: <em class="acc">JSON / CSV</em> por escenario.</span></h1>
+    <div class="rows">
+      <div class="row-item" data-step="1"><span class="ri-idx">01</span><h3 class="ri-term">Exportación</h3><p class="ri-desc">El profiler exporta datos por escenario: FPS, frame time, memoria, draw calls.</p></div>
+      <div class="row-item" data-step="2"><span class="ri-idx">02</span><h3 class="ri-term">Reproducibilidad</h3><p class="ri-desc">Reproducible bajo condiciones declaradas: build, dispositivo, navegador, resolución, caché.</p></div>
+      <div class="row-item" data-step="3"><span class="ri-idx">03</span><h3 class="ri-term">Alcance</h3><p class="ri-desc">No implica mismo FPS en todo equipo — la reproducibilidad es del protocolo de medición, no del valor absoluto.</p></div>
+      <div class="row-item" data-step="4"><span class="ri-idx">04</span><h3 class="ri-term">Ruta</h3><p class="ri-desc"><span class="mono-path">Telemetria/Mediciones_WebGL/</span></p></div>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: metodología de medición del profiler nativo.</aside>
+</section>
+
+<!-- ============ B6 · 95 617 vs 229 054 ============ -->
+<section class="slide" data-label="B6 Geometría">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B6</span>Backup — 95 617 vs 229 054</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Las dos cifras <em class="acc">no son equivalentes</em>.</span></h1>
+    <div class="duo">
+      <div data-step="1">
+        <span class="tag lime">Activo base</span>
+        <div class="m-value lime"><span data-count="95617">0</span></div>
+        <h3 style="font:600 clamp(15px,1.2vw,17.5px) var(--sans)">Triángulos del activo</h3>
+        <p class="slide-body" style="margin-top:4px">Mide el modelo base y sus masters principales después del pipeline de optimización geométrica.</p>
+      </div>
+      <div data-step="2">
+        <span class="tag amber">Escena runtime</span>
+        <div class="m-value amber"><span data-count="229054">0</span></div>
+        <h3 style="font:600 clamp(15px,1.2vw,17.5px) var(--sans)">Triángulos en ejecución</h3>
+        <p class="slide-body" style="margin-top:4px">Estimado por el profiler: instancias + proxies + assets de apoyo + renderers adicionales (252 renderers).</p>
+      </div>
+    </div>
+    <div class="callout limit" data-step="3"><span class="tag amber">Precaución</span><p>No decir "se redujo de 229 054 a 95 617" — ambas cifras miden niveles distintos de la arquitectura.</p></div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: activo base vs escena runtime.</aside>
+</section>
+
+<!-- ============ B7 · ARQUITECTURA EXPANDIDA ============ -->
+<section class="slide" data-label="B7 Arquitectura">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B7</span>Backup — Arquitectura</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Capas de la arquitectura <em class="acc">TwinSight</em>.</span></h1>
+    <div class="stack">
+      <div class="layer" data-step="1"><span class="layer-tag lime">UI</span><div class="chips"><span class="chip">UIManager</span><span class="chip">UIModeController</span><span class="chip">UIDetailsSheet</span><span class="chip">HotspotManager</span><span class="chip">OnboardingController</span></div></div>
+      <div class="layer" data-step="2"><span class="layer-tag">Core</span><div class="chips"><span class="chip">EventBus</span><span class="chip">AppStateMachine</span><span class="chip">SelectionManager</span><span class="chip">ViewModeManager</span><span class="chip">InputManager</span><span class="chip">OrbitCameraController</span></div></div>
+      <div class="layer" data-step="3"><span class="layer-tag">Scene</span><div class="chips"><span class="chip">ExplodedViewManager</span><span class="chip">CrossSectionManager</span><span class="chip">PartVisibilityManager</span><span class="chip">PartCatalogManager</span><span class="chip">ThermalSimulationManager</span><span class="chip">ImportedDroneRuntimeBinder</span></div></div>
+      <div class="layer" data-step="4"><span class="layer-tag lime">Data</span><div class="chips"><span class="chip lime">DronePartData</span><span class="chip lime">ExplodablePart</span><span class="chip lime">FastenerMetadata</span><span class="chip lime">Shader Materials (URP)</span></div></div>
+      <div class="layer" data-step="5"><span class="layer-tag amber">Measurement</span><div class="chips"><span class="chip amber">WebGLProfiler</span><span class="chip amber">Exportación JSON / CSV</span><span class="chip amber">Telemetria/Mediciones_WebGL</span></div></div>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: arquitectura técnica detallada de Unity WebGL.</aside>
+</section>
+
+<!-- ============ B8 · THERMAL ============ -->
+<section class="slide" data-label="B8 Thermal">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B8</span>Backup — Thermal</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Thermal: <em class="acc-amber">heurístico relativo</em>, no FEA.</span></h1>
+    <div class="scope">
+      <div class="scope-col" data-step="1">
+        <div class="scope-head"><span class="mark ok">+</span><h3>Lo que hace</h3><span class="tag lime">Sí</span></div>
+        <ul class="scope-list">
+          <li>Comunica zonas de interés relativas por componente.</li>
+          <li>Usa jerarquías de interpretación dentro del prototipo.</li>
+          <li>Permite lectura visual exploratoria diferencial.</li>
+        </ul>
+      </div>
+      <div class="scope-col out" data-step="2">
+        <div class="scope-head"><span class="mark no">×</span><h3>Lo que no hace</h3><span class="tag red">No</span></div>
+        <ul class="scope-list">
+          <li>No recibe sensores ni telemetría.</li>
+          <li>No calcula temperatura real.</li>
+          <li>No ejecuta FEA ni solver físico.</li>
+          <li>No diagnostica fallas térmicas.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: límites precisos del modo Thermal.</aside>
+</section>
+
+<!-- ============ B9 · LIMITACIONES METODOLÓGICAS ============ -->
+<section class="slide" data-label="B9 Límites metodológicos">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B9</span>Backup — Límites metodológicos</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Límites <em class="acc-amber">declarados</em> de la tesis.</span></h1>
+    <div class="duo-cols">
+      <div data-step="1">
+        <ul class="mini-list">
+          <li>n = 12 · muestra no probabilística · sin inferencia poblacional.</li>
+          <li>T4 exploratoria no cronometrada.</li>
+          <li>SUS aplicado exclusivamente al prototipo 3D.</li>
+          <li>Efecto techo en completitud (12/12 en ambas condiciones).</li>
+          <li>Sin pretest/postest — no mide aprendizaje longitudinal.</li>
+        </ul>
+      </div>
+      <div data-step="2">
+        <ul class="mini-list">
+          <li>Thermal heurístico, no simulación FEA calibrada.</li>
+          <li>Compatibilidad móvil acotada por dispositivo probado.</li>
+          <li>Desktop como adaptación funcional, no UI nativa de escritorio.</li>
+          <li>Sin telemetría real ni sincronización con dron físico.</li>
+          <li>Mediciones con caché cargada — no evalúa primera carga fría.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: límites metodológicos y técnicos declarados.</aside>
+</section>
+
+<!-- ============ B10 · TRABAJO FUTURO ============ -->
+<section class="slide" data-label="B10 Trabajo futuro">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B10</span>Backup — Trabajo futuro</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Fases futuras por <em class="acc">prioridad</em>.</span></h1>
+    <div class="trio">
+      <div data-step="1"><span class="tag">Fases 0–1</span><ul class="mini-list"><li>Muestra cercana a 30 y nuevos dispositivos.</li><li>Navegación móvil, iconos y selección de piezas pequeñas.</li><li>Twin manifest JSON por pieza, independiente de Unity.</li></ul></div>
+      <div data-step="2"><span class="tag amber">Fases 2–3</span><ul class="mini-list"><li>Telemetry playback CSV/JSON por pieza.</li><li>Live digital shadow con frecuencia definida.</li><li>Control de rendimiento WebGL con datos en vivo.</li></ul></div>
+      <div data-step="3"><span class="tag lime">Fases 4–5</span><ul class="mini-list"><li>Modo servicio: síntomas, checklists y reportes.</li><li>Modelos calibrados y simulación what-if.</li><li>Digital twin operacional con decisión human-in-the-loop.</li></ul></div>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: roadmap técnico detallado.</aside>
+</section>
+
+<!-- ============ B11 · MOBILE UX ============ -->
+<section class="slide" data-label="B11 Mobile UX">
+  <div class="slide-inner">
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B11</span>Backup — Mobile UX</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Las microinteracciones móviles responden a los límites de pantalla táctil y <em class="acc">rendimiento</em>.</span></h1>
+    <div class="b11-wrap">
+      <div class="b11-content">
+        <div class="b11-trio">
+          <div data-step="1"><span class="tag">Touch</span><h3>Gestos</h3><p>Tap para seleccionar, doble toque para aislar sin abrir el panel, pinch para zoom y arrastre vertical de la ficha.</p></div>
+          <div data-step="2"><span class="tag amber">Adaptación</span><h3>Bottom sheet</h3><p>El panel bloquea su área táctil para no mover el dron por accidente; zoom y órbita con sensibilidad reducida.</p></div>
+          <div data-step="3"><span class="tag lime">Rendimiento</span><h3>Móvil real</h3><p>Redmi Note 10S de las pruebas: 26,5 FPS, funcional en el flujo principal con picos perceptibles.</p></div>
+        </div>
+        <figure class="melt" data-step="4" style="margin-top:clamp(8px,1.2vh,16px);align-items:flex-start">
+          <img src="assets/img/ui_analyze.png" alt="Interfaz del prototipo: herramientas Analyze sobre el modelo del dron" style="max-height:clamp(140px,18vh,190px)">
+          <figcaption class="figcap" style="text-align:left">Herramientas Analyze (Cut · Explode · Filter) — misma UI táctil en móvil.</figcaption>
+        </figure>
+      </div>
+      <figure class="phone" data-step="5">
+        <div class="ph-screen"><video src="assets/video/anim_04_microinteracciones.mp4" loop muted playsinline preload="auto"></video></div>
+        <figcaption class="ph-tag">Microinteracciones · pantalla móvil</figcaption>
+      </figure>
+    </div>
+  </div>
+  <aside class="notes">Respuestas de respaldo y Q&A: gestos y ajustes móviles surgidos de la prueba formativa previa (Tabla 20 y Figura 74 del informe); rendimiento del Redmi según Tabla 16.</aside>
+</section>
+
+</main>
+
+<nav class="ticks" id="ticks" aria-label="Índice de diapositivas"></nav>
+
+<footer class="chrome chrome-bottom">
+  <div class="readout" aria-hidden="true">
+    <span class="readout-dot"></span>
+    <span id="secReadout">SYS://01_PORTADA</span>
+  </div>
+  <div class="hint" id="hint">
+    <span class="hint-desk"><kbd>←</kbd><kbd>→</kbd><span style="margin-left:4px">avanzar</span><span class="sep">·</span><kbd>N</kbd><span style="margin-left:4px">notas</span><span class="sep">·</span><kbd>F</kbd><span style="margin-left:4px">pantalla completa</span></span>
+    <span class="hint-mob"><span>toca para avanzar</span></span>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" id="prevBtn" aria-label="Anterior">
+      <svg class="i-prev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </button>
+    <button class="nav-btn" id="nextBtn" aria-label="Siguiente">
+      <svg class="i-next" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+  </div>
+</footer>
+
+<div class="notes-drawer" id="notesDrawer" aria-hidden="true">
+  <span class="nd-label">Notas del presentador</span>
+  <p id="notesText"></p>
+</div>
+
+<script src="assets/vendor/three.min.js"></script>
+<script src="assets/vendor/GLTFLoader.js"></script>
+<script src="assets/model/drone_glb_datauri.js"></script>
+<script>
+/* ===== Visor 3D del activo (three.js) — orbitar · zoom · wireframe · autorrotación ===== */
+window.__glViewer = (function(){
+  const host = document.getElementById('glHost');
+  if (!host) return { setActive: function(){} };
+  const statusEl = document.getElementById('glStatus');
+  const btnAuto  = document.getElementById('glBtnAuto');
+  const btnWire  = document.getElementById('glBtnWire');
+  const btnReset = document.getElementById('glBtnReset');
+
+  /* Colores técnicos por familia de material (el FBX no trae base color) */
+  const MAT_STYLES = [
+    { re: /carbon_fiber/i,  color: 0x24272e, rough: 0.42, metal: 0.25 },
+    { re: /plastic_blue/i,  color: 0x2f6f96, rough: 0.38, metal: 0.15 },
+    { re: /plastic_black/i, color: 0x17181d, rough: 0.50, metal: 0.10 },
+    { re: /alum/i,          color: 0x262a31, rough: 0.35, metal: 0.60 },
+    { re: /steel/i,         color: 0x848b94, rough: 0.30, metal: 0.85 },
+    { re: /rubber_black/i,  color: 0x121317, rough: 0.90, metal: 0.00 },
+    { re: /rubber/i,        color: 0x1a1b1f, rough: 0.85, metal: 0.00 },
+    { re: /gray63/i,        color: 0x71767d, rough: 0.45, metal: 0.30 },
+    { re: /electronics/i,   color: 0x1d3b2f, rough: 0.55, metal: 0.20 }
+  ];
+
+  let renderer = null, scene, camera, model = null, pivot = new THREE.Group();
+  let active = false, rafId = null, ready = false;
+  let auto = true, wire = false;
+  const DEF = { theta: 0.62, phi: 1.22, radius: 4.3 };
+  const cur = Object.assign({}, DEF), tgt = Object.assign({}, DEF);
+  const pointers = new Map();
+  let lastPinch = 0, dragging = false;
+
+  function fmtTri(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  function init(){
+    if (!window.THREE){ fail('visor 3D no disponible'); return false; }
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    host.insertBefore(renderer.domElement, host.firstChild);
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    scene.add(new THREE.HemisphereLight(0xdfe6ee, 0x0a0b0e, 0.75));
+    const key = new THREE.DirectionalLight(0xffffff, 0.85); key.position.set(3, 4, 2); scene.add(key);
+    const rim = new THREE.DirectionalLight(0x9db54a, 0.3); rim.position.set(-4, 2, -3); scene.add(rim);
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(1.55, 1.58, 72),
+      new THREE.MeshBasicMaterial({ color: 0xC8F53F, transparent: true, opacity: 0.16, side: THREE.DoubleSide })
+    );
+    ring.rotation.x = -Math.PI / 2; ring.position.y = -1.28; scene.add(ring);
+    scene.add(pivot);
+    bindInput();
+    resize();
+    loadModel();
+    return true;
+  }
+
+  function fail(msg){
+    host.classList.add('error');
+    if (statusEl) statusEl.textContent = msg;
+    const f = document.createElement('div');
+    f.className = 'gl-fallback';
+    f.textContent = 'Vista previa no disponible — usa el render y la build pública';
+    host.appendChild(f);
+  }
+
+  function loadModel(){
+    if (!window.THREE || !THREE.GLTFLoader){ procedural(); return; }
+    const loader = new THREE.GLTFLoader();
+    const onScene = function(g){
+      setModel(g.scene);
+      try { renderer.compile(scene, camera); } catch(_){}
+      host.classList.add('ready');
+      if (statusEl) statusEl.textContent = 'GLB · ' + fmtTri(triCount) + ' tri';
+    };
+    if (window.__DRONE_GLB && typeof fetch === 'function'){
+      fetch(window.__DRONE_GLB)
+        .then(function(r){ return r.arrayBuffer(); })
+        .then(function(buf){ loader.parse(buf, '', onScene, procedural); })
+        .catch(procedural);
+    } else {
+      loader.load('assets/model/x500v2_runtime_low.glb', onScene, undefined, procedural);
+    }
+  }
+
+  let triCount = 0;
+  function setModel(obj){
+    triCount = 0;
+    obj.updateMatrixWorld(true);
+    obj.traverse(function(o){
+      if (o.isMesh && o.material){
+        (Array.isArray(o.material) ? o.material : [o.material]).forEach(function(m){
+          const st = MAT_STYLES.find(function(s){ return s.re.test(m.name || ''); });
+          if (st){ m.color = new THREE.Color(st.color); m.roughness = st.rough; m.metalness = st.metal; }
+          m.wireframe = wire;
+        });
+      }
+    });
+    const box = new THREE.Box3().setFromObject(obj);
+    const size = box.getSize(new THREE.Vector3()), center = box.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const s = 2.2 / maxDim;
+    obj.position.sub(center);
+    const wrap = new THREE.Group();
+    wrap.add(obj); wrap.scale.setScalar(s);
+    obj.traverse(function(o){
+      if (o.isMesh){
+        const g = o.geometry;
+        triCount += Math.round((g.index ? g.index.count : (g.attributes.position ? g.attributes.position.count : 0)) / 3);
+      }
+    });
+    model = wrap; pivot.add(wrap); ready = true;
+  }
+
+  function procedural(){
+    const mat = new THREE.MeshStandardMaterial({ color: 0x2b2f37, roughness: 0.55, metalness: 0.35 });
+    const acc = new THREE.MeshStandardMaterial({ color: 0x3f7d9e, roughness: 0.4, metalness: 0.45 });
+    const dark = new THREE.MeshStandardMaterial({ color: 0x14161a, roughness: 0.7, metalness: 0.1 });
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.28, 1.15), mat));
+    const top = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.16, 0.8), dark); top.position.y = 0.24; g.add(top);
+    const gimbal = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.3, 0.5), dark); gimbal.position.set(0, -0.34, 0.35); g.add(gimbal);
+    for (let i = 0; i < 4; i++){
+      const sx = i < 2 ? 1 : -1, sz = i % 2 ? 1 : -1;
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.09, 0.09), mat);
+      arm.position.set(sx * 0.85, 0.02, sz * 0.55);
+      arm.rotation.y = sx * sz * -0.72;
+      g.add(arm);
+      const motor = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.22, 20), acc);
+      motor.position.set(sx * 1.32, 0.16, sz * 1.06); g.add(motor);
+      const prop = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.016, 28), dark);
+      prop.position.set(sx * 1.32, 0.3, sz * 1.06); g.add(prop);
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.0, 10), dark);
+      leg.position.set(sx * 0.62, -0.62, sz * 0.42);
+      leg.rotation.z = sx * 0.28; leg.rotation.x = sz * -0.2;
+      g.add(leg);
+    }
+    triCount = 0;
+    g.traverse(function(o){ if (o.isMesh) triCount += Math.round(o.geometry.attributes.position.count / 3); });
+    setModelStandin(g);
+    host.classList.add('ready');
+    if (statusEl) statusEl.textContent = 'Proxy · ' + fmtTri(triCount) + ' tri';
+  }
+  function setModelStandin(g){
+    const wrap = new THREE.Group(); wrap.add(g); wrap.scale.setScalar(1);
+    model = wrap; pivot.add(wrap); ready = true;
+  }
+
+  function bindInput(){
+    const cv = renderer.domElement;
+    cv.addEventListener('pointerdown', function(e){
+      cv.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      dragging = true;
+      if (pointers.size === 2){
+        const p = Array.from(pointers.values());
+        lastPinch = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+      }
+    });
+    cv.addEventListener('pointermove', function(e){
+      if (!pointers.has(e.pointerId)) return;
+      const prev = pointers.get(e.pointerId);
+      const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size === 1){
+        tgt.theta -= dx * 0.0052;
+        tgt.phi = Math.min(Math.PI - 0.35, Math.max(0.18, tgt.phi - dy * 0.0045));
+      } else if (pointers.size === 2){
+        const p = Array.from(pointers.values());
+        const d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+        if (lastPinch > 0) tgt.radius = Math.min(9, Math.max(2.4, tgt.radius * (lastPinch / d)));
+        lastPinch = d;
+      }
+    });
+    function up(e){ pointers.delete(e.pointerId); if (!pointers.size) dragging = false; lastPinch = 0; }
+    cv.addEventListener('pointerup', up);
+    cv.addEventListener('pointercancel', up);
+    cv.addEventListener('wheel', function(e){
+      e.preventDefault();
+      tgt.radius = Math.min(9, Math.max(2.4, tgt.radius * (1 + e.deltaY * 0.0011)));
+    }, { passive: false });
+  }
+
+  function resize(){
+    if (!renderer) return;
+    const w = host.clientWidth || 1, h = host.clientHeight || 1;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+
+  function frame(){
+    rafId = null;
+    if (!active) return;
+    if (auto && !dragging && ready) tgt.theta += 0.0022;
+    cur.theta += (tgt.theta - cur.theta) * 0.12;
+    cur.phi   += (tgt.phi   - cur.phi)   * 0.12;
+    cur.radius+= (tgt.radius- cur.radius)* 0.12;
+    camera.position.set(
+      cur.radius * Math.sin(cur.phi) * Math.sin(cur.theta),
+      cur.radius * Math.cos(cur.phi),
+      cur.radius * Math.sin(cur.phi) * Math.cos(cur.theta)
+    );
+    camera.lookAt(0, -0.1, 0);
+    renderer.render(scene, camera);
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function setActive(on){
+    const was = active;
+    active = on;
+    if (on && !renderer){ if (!init()) return; }
+    if (on){
+      resize();
+      if (!rafId) rafId = requestAnimationFrame(frame);
+    } else if (was && rafId){
+      cancelAnimationFrame(rafId); rafId = null;
+    }
+  }
+
+  if (btnAuto) btnAuto.addEventListener('click', function(){
+    auto = !auto;
+    btnAuto.classList.toggle('on', auto);
+    if (auto && active && !rafId) rafId = requestAnimationFrame(frame);
+  });
+  if (btnWire) btnWire.addEventListener('click', function(){
+    wire = !wire;
+    btnWire.classList.toggle('on', wire);
+    if (model) model.traverse(function(o){
+      if (o.isMesh) (Array.isArray(o.material) ? o.material : [o.material]).forEach(function(m){ m.wireframe = wire; });
+    });
+  });
+  if (btnReset) btnReset.addEventListener('click', function(){
+    Object.assign(tgt, DEF);
+  });
+  addEventListener('resize', function(){ if (active) resize(); });
+
+  /* Precarga en segundo plano: crea el renderer y parsea el GLB poco después de abrir el deck,
+     para que la slide del visor aparezca lista. El bucle de render solo corre con la slide activa. */
+  function prewarm(){ if (!renderer) init(); }
+  if (document.readyState === 'complete') setTimeout(prewarm, 1200);
+  else window.addEventListener('load', function(){ setTimeout(prewarm, 1200); });
+
+  return { setActive: setActive };
+})();
+</script>
+
+<script>
+(function(){
+  const slides   = Array.from(document.querySelectorAll('.slide'));
+  const jumpEl   = document.getElementById('slideJump');
+  const barEl    = document.getElementById('progressBar');
+  const ticksEl  = document.getElementById('ticks');
+  const hintEl   = document.getElementById('hint');
+  const prevBtn  = document.getElementById('prevBtn');
+  const nextBtn  = document.getElementById('nextBtn');
+  const sweepEl  = document.getElementById('sweep');
+  const readEl   = document.getElementById('secReadout');
+  const drawer   = document.getElementById('notesDrawer');
+  const notesTxt = document.getElementById('notesText');
+  const pulseEl  = document.getElementById('pulse');
+  const gFlashEl = document.getElementById('gridFlash');
+  const DUR = 950;
+
+  let index = 0, animating = false, rollTimer = null, hinted = false, notesOpen = false;
+  const revealTimers = new Map();
+
+  document.getElementById('slideTotal').textContent = String(slides.length).padStart(2,'0');
+  const notes = slides.map(s => { const a = s.querySelector('.notes'); return a ? a.textContent.replace(/\s+/g,' ').trim() : ''; });
+  const viewerIdx = slides.findIndex(s => s.dataset.label === 'Activo 3D');
+  const glViewer = window.__glViewer || { setActive: function(){} };
+
+  /* ---------- Decode ANAGRAMA (robusto, sin carreras de RAF) ---------- */
+  function scrambleIn(el, dur, forced){
+    if (forced !== undefined){ el.textContent = forced; }
+    if (el._scrambleRaf){ cancelAnimationFrame(el._scrambleRaf); el._scrambleRaf = null; }
+    const nodes = [];
+    (function collect(n){
+      Array.from(n.childNodes).forEach(c => {
+        if (c.nodeType === 3 && c.nodeValue.trim()) nodes.push({ node: c, text: c.nodeValue });
+        else if (c.nodeType === 1) collect(c);
+      });
+    })(el);
+    if (!nodes.length) return;
+    const total = nodes.reduce((a,x) => a + x.text.length, 0);
+    dur = dur || Math.min(600 + total * 12, 1400);
+    const t0 = performance.now();
+    function frame(t){
+      const p = Math.min((t - t0) / dur, 1);
+      nodes.forEach(({ node, text }) => {
+        const res = Math.floor(p * text.length);
+        const restOrig = text.slice(res);
+        const pool = restOrig.replace(/\s/g,'').split('');
+        for (let i = pool.length - 1; i > 0; i--){
+          const j = (Math.random() * (i + 1)) | 0;
+          const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+        }
+        let k = 0, out = text.slice(0, res);
+        for (const c of restOrig){ out += (/\s/.test(c)) ? c : pool[k++]; }
+        node.nodeValue = out;
+      });
+      if (p < 1) {
+        el._scrambleRaf = requestAnimationFrame(frame);
+      } else {
+        nodes.forEach(({ node, text }) => node.nodeValue = text);
+        el._scrambleRaf = null;
+      }
+    }
+    el._scrambleRaf = requestAnimationFrame(frame);
+  }
+
+  /* ---------- Cifras ---------- */
+  function fmt(v, dec){
+    if (dec) return v.toFixed(dec).replace('.', ',');
+    return Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+  function animateCount(el){
+    const end = parseFloat(el.dataset.count), dec = +(el.dataset.decimals || 0);
+    if (isNaN(end)) return;
+    const t0 = performance.now(), dur = 1600;
+    (function frame(t){
+      const p = Math.min((t - t0) / dur, 1);
+      const e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+      el.textContent = fmt(end * e, dec);
+      if (p < 1) requestAnimationFrame(frame); else el.textContent = fmt(end, dec);
+    })(t0);
+  }
+  function runCounters(root){ root.querySelectorAll('[data-count]').forEach(animateCount); }
+
+  /* ---------- Índice lateral ---------- */
+  const prevBox = document.createElement('div');
+  prevBox.className = 'tick-prev';
+  prevBox.setAttribute('aria-hidden', 'true');
+  prevBox.innerHTML = '<div class="tp-inner"></div><span class="tp-tag"></span>';
+  document.body.appendChild(prevBox);
+  const prevInner = prevBox.querySelector('.tp-inner');
+  const prevTag   = prevBox.querySelector('.tp-tag');
+  const prevCache = new Map();
+  function showPreview(i, tick){
+    let clone = prevCache.get(i);
+    if (!clone){
+      clone = slides[i].cloneNode(true);
+      clone.classList.add('active', 'snap');
+      clone.classList.remove('leaving', 'reset');
+      clone.querySelectorAll('[data-step]').forEach(el => el.classList.add('shown'));
+      prevCache.set(i, clone);
+    }
+    prevInner.innerHTML = '';
+    prevInner.appendChild(clone);
+    const f = 224 / innerWidth;
+    prevInner.style.transform = 'scale(' + f + ')';
+    prevBox.style.height = Math.round(innerHeight * f) + 'px';
+    prevTag.textContent = String(i+1).padStart(2,'0') + ' · ' + (slides[i].dataset.label || '');
+    const r = tick.getBoundingClientRect();
+    prevBox.style.top = Math.min(Math.max(10, r.top + r.height/2 - prevBox.offsetHeight/2), innerHeight - prevBox.offsetHeight - 12) + 'px';
+    prevBox.classList.add('show');
+  }
+  function hidePreview(){ prevBox.classList.remove('show'); }
+  slides.forEach((s, i) => {
+    const label = s.dataset.label || ('Diapositiva ' + (i+1));
+    const b = document.createElement('button');
+    b.className = 'tick';
+    b.setAttribute('aria-label', label);
+    b.title = label;
+    b.innerHTML = '<i></i>';
+    b.addEventListener('click', () => { hidePreview(); go(i); });
+    b.addEventListener('mouseenter', () => showPreview(i, b));
+    b.addEventListener('mouseleave', hidePreview);
+    b.addEventListener('focus', () => showPreview(i, b));
+    b.addEventListener('blur', hidePreview);
+    ticksEl.appendChild(b);
+  });
+  const ticks = Array.from(ticksEl.children);
+
+  /* ---------- Pasos ---------- */
+  function stepGroups(slide){
+    const map = new Map();
+    slide.querySelectorAll('[data-step]').forEach(el => {
+      const n = +el.dataset.step;
+      if (!map.has(n)) map.set(n, []);
+      map.get(n).push(el);
+    });
+    return Array.from(map.entries()).sort((a,b) => a[0] - b[0]);
+  }
+  function stepsRemain(slide){
+    return stepGroups(slide).some(([,els]) => !els[0].classList.contains('shown'));
+  }
+  function setSteps(slide, shown){
+    slide.classList.add('snap');
+    slide.querySelectorAll('[data-step]').forEach(el => el.classList.toggle('shown', shown));
+    void slide.offsetWidth;
+    slide.classList.remove('snap');
+    if (shown) { runCounters(slide); }
+  }
+  function revealStep(){
+    const g = stepGroups(slides[index]).find(([, els]) => !els[0].classList.contains('shown'));
+    if (!g) return false;
+    g[1].forEach(el => {
+      el.classList.add('shown');
+      runCounters(el);
+      el.querySelectorAll('video').forEach(v => { try { v.currentTime = 0; v.play().catch(()=>{}); }catch(_){} });
+    });
+    updateNav();
+    return true;
+  }
+  function hideStep(){
+    const gs = stepGroups(slides[index]).filter(([, els]) => els[0].classList.contains('shown'));
+    if (!gs.length) return false;
+    const [, els] = gs[gs.length - 1];
+    els.forEach(el => el.classList.remove('shown'));
+    updateNav();
+    return true;
+  }
+
+  /* ---------- Cronograma de revelados ---------- */
+  function delayOf(el){
+    const n = parseFloat(getComputedStyle(el).getPropertyValue('--d'));
+    return isNaN(n) ? .2 : n;
+  }
+  function scheduleReveals(slide){
+    (revealTimers.get(slide) || []).forEach(clearTimeout);
+    const t = [];
+    slide.querySelectorAll('[data-scramble]').forEach(el => {
+      if (el.closest('[data-step]')) return;
+      t.push(setTimeout(() => scrambleIn(el), delayOf(el) * 1000 + 90));
+    });
+    t.push(setTimeout(() => {
+      slide.querySelectorAll('[data-count]').forEach(el => {
+        if (!el.closest('[data-step]')) animateCount(el);
+      });
+    }, 480));
+    revealTimers.set(slide, t);
+  }
+
+  /* ---------- Chrome ---------- */
+  function setCounter(i){
+    jumpEl.classList.remove('roll'); void jumpEl.offsetWidth; jumpEl.classList.add('roll');
+    clearTimeout(rollTimer);
+    rollTimer = setTimeout(() => jumpEl.value = String(i+1).padStart(2,'0'), 220);
+  }
+  function updateNav(){
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === slides.length - 1 && !stepsRemain(slides[index]);
+  }
+  function updateChrome(){
+    barEl.style.transform = 'scaleX(' + (index + 1) / slides.length + ')';
+    setCounter(index);
+    ticks.forEach((t, i) => t.classList.toggle('on', i === index));
+    updateNav();
+    const rawLabel = (slides[index].dataset.label || 'SEC').toUpperCase().replace(/\s+/g, '_');
+    scrambleIn(readEl, 420, 'SYS://' + String(index + 1).padStart(2,'0') + '_' + rawLabel);
+  }
+
+  /* ---------- Coreografía de transición ---------- */
+  function fx(dir){
+    sweepEl.classList.remove('up','down'); void sweepEl.offsetWidth;
+    sweepEl.classList.add(dir > 0 ? 'up' : 'down');
+    pulseEl.classList.remove('go'); void pulseEl.offsetWidth; pulseEl.classList.add('go');
+    gFlashEl.classList.remove('go'); void gFlashEl.offsetWidth; gFlashEl.classList.add('go');
+  }
+
+  /* ---------- Notas ---------- */
+  function showNotes(i){ notesTxt.textContent = notes[i] || 'Sin notas para esta diapositiva.'; }
+  function toggleNotes(){
+    notesOpen = !notesOpen;
+    drawer.classList.toggle('open', notesOpen);
+    drawer.setAttribute('aria-hidden', String(!notesOpen));
+    if (notesOpen) showNotes(index);
+  }
+  function toggleFullscreen(){
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  /* ---------- Núcleo ---------- */
+  function go(target){
+    if (animating || target === index || target < 0 || target >= slides.length) return;
+    animating = true;
+    const dir = target > index ? 1 : -1;
+    const cur = slides[index], nxt = slides[target];
+    (revealTimers.get(cur) || []).forEach(clearTimeout);
+    cur.style.setProperty('--exit-y',   (-46 * dir) + 'px');
+    cur.style.setProperty('--skew-out', (-1.3 * dir) + 'deg');
+    nxt.style.setProperty('--enter-y',  ( 46 * dir) + 'px');
+    nxt.style.setProperty('--skew-in',  ( 1.3 * dir) + 'deg');
+    cur.classList.remove('active');
+    cur.classList.add('leaving');
+    cur.querySelectorAll('video').forEach(v => { try { v.pause(); }catch(_){} });
+    setSteps(nxt, dir < 0);
+    void nxt.offsetWidth;
+    nxt.classList.add('active');
+    nxt.querySelectorAll('video').forEach(v => {
+      if (v.hasAttribute('data-manual')) { try { v.pause(); v.currentTime = 0; }catch(_){} return; }
+      if (!v.closest('[data-step]') || v.closest('[data-step].shown')) {
+        try { v.currentTime = 0; v.play().catch(()=>{}); }catch(_){}
+      }
+    });
+    index = target;
+    updateChrome();
+    scheduleReveals(nxt);
+    fx(dir);
+    glViewer.setActive(index === viewerIdx);
+    if (notesOpen) showNotes(index);
+    if (!hinted){ hinted = true; setTimeout(() => hintEl.classList.add('gone'), 600); }
+    setTimeout(() => {
+      cur.classList.remove('leaving');
+      cur.classList.add('reset');
+      void cur.offsetWidth;
+      cur.classList.remove('reset');
+      animating = false;
+    }, DUR);
+  }
+
+  const next = () => { if (!revealStep()) go(index + 1); };
+  const prev = () => { if (!hideStep())  go(index - 1); };
+
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+
+  /* Salto directo a un número de diapositiva */
+  function commitJump(){
+    const n = parseInt(jumpEl.value, 10);
+    if (!isNaN(n) && n >= 1 && n <= slides.length) go(n - 1);
+  }
+  jumpEl.addEventListener('keydown', e => {
+    e.stopPropagation();
+    if (e.key === 'Enter'){ commitJump(); jumpEl.blur(); }
+    else if (e.key === 'Escape'){ jumpEl.blur(); }
+  });
+  jumpEl.addEventListener('blur', () => { jumpEl.value = String(index+1).padStart(2,'0'); });
+
+  addEventListener('keydown', e => {
+    if (e.target.closest('button,input,a,select,textarea')) return;
+    if (['ArrowRight',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
+    else if (['ArrowLeft','PageUp','Backspace'].includes(e.key)){ e.preventDefault(); prev(); }
+    else if (e.key === 'Home'){ go(0); }
+    else if (e.key === 'End'){ go(slides.length - 1); }
+    else if (e.key === 'n' || e.key === 'N'){ toggleNotes(); }
+    else if (e.key === 'f' || e.key === 'F'){ toggleFullscreen(); }
+    else if (e.key === 'Escape' && notesOpen){ toggleNotes(); }
+  });
+
+  document.getElementById('deck').addEventListener('click', e => {
+    const vid = e.target.closest('video');
+    if (vid) {
+      if (vid.paused) { vid.play().catch(()=>{}); } else { vid.pause(); }
+      return;
+    }
+    if (e.target.closest('a,button,input,canvas,.gl-host')) return;
+    next();
+  });
+
+  let tx = 0, ty = 0, tIn3d = false;
+  const deck = document.getElementById('deck');
+  deck.addEventListener('touchstart', e => {
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+    tIn3d = !!(e.target.closest && e.target.closest('[data-3d]'));
+  }, {passive:true});
+  deck.addEventListener('touchend', e => {
+    if (tIn3d){ tIn3d = false; return; }
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4){ dx < 0 ? next() : prev(); }
+  }, {passive:true});
+
+  updateChrome();
+  setTimeout(() => {
+    slides[0].classList.add('active');
+    scheduleReveals(slides[0]);
+  }, 120);
+})();
+</script>
+
+</body>
+</html>
