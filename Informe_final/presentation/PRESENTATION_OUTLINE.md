@@ -58,12 +58,12 @@ Cada diapositiva tiene **una sola afirmación defendible**. El visual actúa com
 | Bloque | Slides | Tiempo | Función |
 |---|---|---|---|
 | Apertura y problema | 1–2 | 1:45 | Identidad, términos base y necesidad |
-| Marco teórico y alcance | 3–5 | 3:30 | Fundar el argumento y delimitar el sistema |
-| Objetivos, método e instrumentos | 6–8 | 3:20 | Establecer cómo se evalúa antes de mostrar resultados |
-| Implementación técnica | 9–17 | 8:40 | Demostrar criterio de ingeniería multimedia |
-| Demo | 18–19 | 2:05 | Probar las capacidades con una secuencia controlada (video de 88 s) |
+| Marco teórico y alcance | 3–5 | 3:25 | Fundar el argumento y delimitar el sistema |
+| Objetivos, método e instrumentos | 6–8 | 2:55 | Establecer cómo se evalúa antes de mostrar resultados |
+| Implementación técnica | 9–17 | 8:00 | Demostrar criterio de ingeniería multimedia |
+| Demo | 18–19 | 3:20 | Demo en vivo en dos tramos: landing WebGL (scrollytelling) y app Unity; video de respaldo de 88 s |
 | Resultados y discusión | 20–25 | 6:15 | Interpretar datos, no solo mostrarlos |
-| Conclusiones y cierre | 26–30 | 2:55 | Objetivos, límites, trabajo futuro, contribución |
+| Conclusiones y cierre | 26–30 | 2:50 | Objetivos, límites, trabajo futuro, contribución |
 | **Total** | **30** | **28:30** | + 1:30 de margen = 30:00 |
 
 ---
@@ -74,23 +74,23 @@ Cada diapositiva tiene **una sola afirmación defendible**. El visual actúa com
 |---:|:---:|---|---|:---:|---|---|
 | **1** | 01 | TwinSight X500 | 0:45 | 0 | Identidad y propuesta; definición de CAD y WebGL | Ficha del proyecto con URL de demo + captura del visor |
 | **2** | 02 | El reto central es comprender relaciones, no solo ver piezas | 1:00 | 4 | La documentación plana exige reconstrucción espacial | Documentación → Fricción → Respuesta + Idea clave |
-| **3** | 03 | La carga cognitiva explica por qué la forma de presentar importa | 1:10 | 4 | Marco teórico que justifica la interfaz guiada | Intrínseca / Extrínseca / Germana + Límite declarado |
+| **3** | 03 | La carga cognitiva explica por qué la forma de presentar importa | 1:05 | 4 | Marco teórico que justifica la interfaz guiada | Intrínseca / Extrínseca / Germana + Límite declarado |
 | **4** | 04 | La interfaz traduce la teoría en jerarquía, agrupación, estado y reconocimiento | 1:10 | 4 | Principios de interfaz citados en el informe guían app y deck | Norman · Gestalt · Nielsen (×2), con Hutchins como marco |
 | **5** | 05 | La tesis responde con un visual product twin, no con un digital twin operacional | 1:10 | 2 | Alcance preciso contra la sobrepromesa | Exclusiones DT (clic 1) · Alcance VPT (clic 2) |
 | **6** | 06 | Los objetivos definen el contrato: construir y evaluar | 0:55 | 4 | La pregunta de investigación y los OE que la responden | Pregunta de investigación + tarjetas OE1–OE4 (OE2 "procurando" ≤ 33,33 ms) |
-| **7** | 07 | La metodología usa DSR con validación formativa descriptiva | 1:05 | 7 | Método apropiado para un prototipo formativo | Ciclo DSRM (Peffers) + Hevner + n = 12 |
-| **8** | 08 | Ninguna métrica mide todo: la evaluación triangula cinco capas | 1:20 | 6 | Cinco capas, ninguna cierra sola | KPIs (profiler) / SUS solo 3D / tareas T1–T4 (tiempos T1–T3) / Think-Aloud / NASA-TLX |
-| **9** | 09 | De 6,5 millones a 95 617 triángulos: la traducción de activos CAD para WebGL | 1:15 | 8 | La preparación 3D es aporte técnico central | Flujo MoI3D/STEPper → Blender → Retopo → Bake normal/AO → FBX → WebGL |
-| **10** | 10 | La escena runtime exportada es explorable | 0:30 | 2 | El resultado es real y manipulable | Visor three.js del GLB (252 mallas, ~229 000 tri) |
+| **7** | 07 | La metodología usa DSR con validación formativa descriptiva | 0:50 | 7 | Método apropiado para un prototipo formativo | Ciclo DSRM (Peffers) + Hevner + n = 12 |
+| **8** | 08 | Ninguna métrica mide todo: la evaluación triangula cinco capas | 1:10 | 6 | Cinco capas, ninguna cierra sola | KPIs (profiler) / SUS solo 3D / tareas T1–T4 (tiempos T1–T3) / Think-Aloud / NASA-TLX |
+| **9** | 09 | De 6,5 millones a 95 617 triángulos: la traducción de activos CAD para WebGL | 1:10 | 8 | La preparación 3D es aporte técnico central | Flujo MoI3D/STEPper → Blender → Retopo → Bake normal/AO → FBX → WebGL |
+| **10** | 10 | La escena runtime exportada es explorable | 0:25 | 2 | El resultado es real y manipulable | Visor three.js del GLB (252 mallas, ~229 000 tri) |
 | **11** | 11 | La reducción geométrica se lee como presupuesto de activo, no como conteo runtime | 0:55 | 3 | 95 617 y 229 054 no son equivalentes | Activo base (masters) vs. conteo estimado por profiler |
-| **12** | 12 | La arquitectura separa UI, orquestación, servicios de escena y datos | 1:10 | 4 | No es un visor aislado: capas coordinadas | Clases reales (Fig. 47): UIManager, EventBus, AppStateMachine, managers, DronePartData |
-| **13** | 13 | La taxonomía permite seleccionar piezas madre, subpiezas, hotspots y fasteners | 1:00 | 7 | La interacción depende de estructura semántica | 28 piezas / 30 anchors / 257 renderers + hotspots, fasteners, bottom sheet |
-| **14** | 14 | El flujo de usuario revela la complejidad del dron de forma progresiva | 1:00 | 7 | El alcance visible está cerrado | Hero → Explore → Selección → Bottom Sheet → herramientas |
-| **15** | 15 | Inspect y Analyze eliminan el ruido visual para hacer legible el ensamblaje | 1:00 | 4 | Las herramientas reducen carga extrínseca | Columna Inspect → clip → columna Analyze → clip Explode |
-| **16** | 16 | Los shaders son herramientas de inspección técnica, no filtros estéticos | 1:00 | 6 | Los modos son lecturas técnicas | Realistic / X-Ray / Solid / Thermal (+ Blueprint como preset) + clip |
+| **12** | 12 | La arquitectura separa UI, orquestación, servicios de escena y datos | 1:05 | 4 | No es un visor aislado: capas coordinadas | Clases reales (Fig. 47): UIManager, EventBus, AppStateMachine, managers, DronePartData |
+| **13** | 13 | La taxonomía permite seleccionar piezas madre, subpiezas, hotspots y fasteners | 0:55 | 7 | La interacción depende de estructura semántica | 28 piezas / 30 anchors / 257 renderers + hotspots, fasteners, bottom sheet |
+| **14** | 14 | El flujo de usuario revela la complejidad del dron de forma progresiva | 0:50 | 7 | El alcance visible está cerrado | Hero → Explore → Selección → Bottom Sheet → herramientas |
+| **15** | 15 | Inspect y Analyze eliminan el ruido visual para hacer legible el ensamblaje | 0:55 | 4 | Las herramientas reducen carga extrínseca | Columna Inspect → clip → columna Analyze → clip Explode |
+| **16** | 16 | Los shaders son herramientas de inspección técnica, no filtros estéticos | 0:55 | 6 | Los modos son lecturas técnicas | Realistic / X-Ray / Solid / Thermal (+ Blueprint como preset) + clip |
 | **17** | 17 | Thermal es una visualización heurística, no una simulación FEA calibrada | 0:50 | 2 | Límite técnico declarado | Límite + escala Estructura / ESC-electrónica / Motores-batería (Fig. 13) |
-| **18** | 18 | La demo debe probar tres capacidades, no navegar improvisadamente | 0:30 | 5 | El jurado observa con criterios | Selección / Relación / Modo visual + ruta |
-| **19** | 19 | Demo: de dron completo a pieza, relación y modo visual | 1:35 | 2 | La app realiza lo que el argumento promete | **Demo en vivo** en la build pública; respaldo: `vid_01_demo_compilado.mp4` (88 s, en pausa hasta clic) |
+| **18** | 18 | La demo debe probar tres capacidades, no navegar improvisadamente | 0:20 | 5 | El jurado observa con criterios | Selección / Relación / Modo visual + ruta |
+| **19** | 19 | Demo: de dron completo a pieza, relación y modo visual | 3:00 | 2 | La app realiza lo que el argumento promete | **Demo en vivo (3:00):** landing WebGL (ensamblaje, 6 capítulos, mini app) + app Unity desde «Abrir visor»; respaldo del tramo de la app: `vid_01_demo_compilado.mp4` (88 s) |
 | **20** | 20 | El profiler interno vuelve trazable el rendimiento por escenario y dispositivo | 1:00 | 2 | Métricas ancladas a exportaciones reales | Extracto JSON literal del WebGLProfiler (4 jun 2026) |
 | **21** | 21 | El rendimiento es viable, pero no universal en todo móvil | 1:00 | 5 | Lectura técnica honesta | Escritorio 59,8 · iPhone 17 Pro 58,7 · Redmi 26,5 · Adreno 610 17,6 FPS |
 | **22** | 22 | SUS de 91,88: recepción favorable del visor interactivo 3D | 1:00 | 4 | SUS solo 3D, no comparación | 91,88 (mediana 95, DE 11,24) · rango 60–100 · referencia 68 |
@@ -98,7 +98,7 @@ Cada diapositiva tiene **una sola afirmación defendible**. El visual actúa com
 | **24** | 24 | Think-Aloud explica comprensión espacial y fricciones residuales | 1:00 | 4 | La triangulación cualitativa da textura | Apoyo: 11/12, 8/12 · Fricción: navegación 10/12, iconos 6/12, piezas pequeñas 2/12 |
 | **25** | 25 | La discusión acota el resultado: efecto techo, muestra pequeña y compatibilidad limitada | 1:10 | 2 | Se sabe qué demuestra el trabajo y qué no | Sí soporta / no debe afirmarse (efecto techo = completitud 96/96) |
 | **26** | 26 | Las conclusiones cierran cada objetivo con evidencia trazable | 1:05 | 4 | Cada OE tiene resultado asociado | Tabla OE → resultado → evidencia |
-| **27** | 27 | Las limitaciones son alcance declarado, no fallas ocultas | 0:45 | 5 | Cada límite es decisión documentada | Modelo único / n=12 / PC como adaptación / cables |
+| **27** | 27 | Las limitaciones son alcance declarado, no fallas ocultas | 0:40 | 5 | Cada límite es decisión documentada | Modelo único / n=12 / PC como adaptación / cables |
 | **28** | 28 | El trabajo futuro es una ruta de madurez, no una lista de deseos | 0:30 | 6 | El roadmap parte de lo existente | Escalera + Fases 0–1 / 2–3 / 4–5 (Fig. 80) |
 | **29** | 29 | La contribución es técnica, metodológica y comunicativa | 0:30 | 3 | Triple aporte | Tres columnas |
 | **30** | 30 | Gracias. | 0:05 | 0 | Apertura a preguntas | "Preguntas del jurado" + URL de la demo |

@@ -92,7 +92,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 | 2 | Conectar el proyector en modo **duplicar** y comprobar la resolución (ideal 1920×1080). Pulsar `F` para pantalla completa. | A 1920×1080 el texto se amplía ~25 %; a 1366×768 o 1280×720 se ajusta para no desbordar. |
 | 3 | Confirmar conexión a internet. | La build pública de la demo en vivo y las tipografías del deck se cargan desde la red. |
 | 4 | Recorrer una vez las slides 10 (visor 3D) y 19 (video de respaldo) y volver al inicio con `Inicio`. | Deja el modelo 3D y los videos en caché; el visor además se precarga solo al abrir el deck. |
-| 5 | Abrir la build pública en **otra ventana**, esperar la carga completa y dejar el dron en estado inicial (Realistic, sin selección, sin explode ni corte). | Es la demo en vivo de la slide 19. |
+| 5 | Abrir la **landing pública** (twinsight.alexwoodcock.me) en **otra ventana**, dejarla al inicio de la sección 03 con el dron sin ensamblar, y abrir una vez «Abrir visor» para dejar la build de Unity en caché (luego cerrarla). | Es la demo en vivo de la slide 19 (landing + app). |
 | 6 | Desactivar notificaciones, actualizaciones automáticas y ahorro de energía; conectar el cargador. | Evita interrupciones y caídas de rendimiento de la GPU. |
 | 7 | **No abrir las notas (`N`) durante la exposición**: se muestran sobre la misma pantalla que ve el jurado. Usar `SPEAKER_CARDS.md` impreso o en el teléfono. | Las notas del deck son para ensayo. |
 | 8 | Tener un cronómetro visible (teléfono) con las marcas de la tabla de tarjetas. | El deck no muestra tiempo transcurrido. |
@@ -149,7 +149,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 3 — La carga cognitiva explica por qué la forma de presentar importa
 
-**Tiempo:** 1:45 – 2:55 · **Pasos:** 4
+**Tiempo:** 1:45 – 2:50 · **Pasos:** 4
 **Visual:** tres filas (Intrínseca / Extrínseca / Germana) + recuadro "Límite declarado".
 
 **Guion oral:**
@@ -173,7 +173,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 4 — La interfaz traduce la teoría en jerarquía, agrupación, estado y reconocimiento
 
-**Tiempo:** 2:55 – 4:05 · **Pasos:** 4
+**Tiempo:** 2:50 – 4:00 · **Pasos:** 4
 **Visual:** tabla de cuatro principios citados en el informe, con columnas "En la app" y "En este deck".
 
 **Guion oral:**
@@ -197,7 +197,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 5 — La tesis responde con un visual product twin, no con un digital twin operacional
 
-**Tiempo:** 4:05 – 5:15 · **Pasos:** 2 (1 = exclusiones, 2 = alcance)
+**Tiempo:** 4:00 – 5:10 · **Pasos:** 2 (1 = exclusiones, 2 = alcance)
 **Visual:** dos columnas: "Digital Twin Operacional — Exclusiones" y "Visual Product Twin — Alcance".
 
 **Guion oral:**
@@ -221,7 +221,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 6 — Los objetivos definen el contrato: construir y evaluar
 
-**Tiempo:** 5:15 – 6:10 · **Pasos:** 4
+**Tiempo:** 5:10 – 6:05 · **Pasos:** 4
 **Visual:** cuatro tarjetas OE1–OE4.
 
 **Guion oral:**
@@ -247,7 +247,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 7 — La metodología usa DSR con validación formativa descriptiva
 
-**Tiempo:** 6:10 – 7:15 · **Pasos:** 7 (1–5 fases del ciclo, 6 marco DSR, 7 formativa/descriptiva)
+**Tiempo:** 6:05 – 6:55 · **Pasos:** 7 (1–5 fases del ciclo, 6 marco DSR, 7 formativa/descriptiva)
 **Visual:** ciclo DSRM en seis cajas + dos columnas.
 
 **Guion oral:**
@@ -269,7 +269,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 8 — Ninguna métrica mide todo: la evaluación triangula cinco capas
 
-**Tiempo:** 7:15 – 8:35 · **Pasos:** 6 (una capa por paso + triangulación)
+**Tiempo:** 6:55 – 8:05 · **Pasos:** 6 (una capa por paso + triangulación)
 **Visual:** diagrama de triangulación + lista de cinco capas.
 
 **Guion oral:**
@@ -297,7 +297,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 9 — De 6,5 millones a 95 617 triángulos: la traducción de activos CAD para WebGL
 
-**Tiempo:** 8:35 – 9:50 · **Pasos:** 8 (1–6 etapas del flujo, 7 por qué optimizar, 8 qué se conserva)
+**Tiempo:** 8:05 – 9:15 · **Pasos:** 8 (1–6 etapas del flujo, 7 por qué optimizar, 8 qué se conserva)
 **Visual:** flujo CAD → MoI3D/STEPper → Blender → Retopo/proxies → Bake → FBX → WebGL + dos columnas.
 
 **Guion oral:**
@@ -319,7 +319,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 10 — La escena runtime exportada es explorable
 
-**Tiempo:** 9:50 – 10:20 · **Pasos:** 2
+**Tiempo:** 9:15 – 9:40 · **Pasos:** 2
 **Visual:** visor three.js con el GLB de la build (etiqueta "GLB · 229 070 tri"), botones Auto / Wireframe / Reset.
 
 **Guion oral:**
@@ -339,7 +339,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 11 — La reducción geométrica se lee como presupuesto de activo, no como conteo runtime
 
-**Tiempo:** 10:20 – 11:15 · **Pasos:** 3
+**Tiempo:** 9:40 – 10:35 · **Pasos:** 3
 **Visual:** dos cifras (95 617 activo base · 229 054 escena runtime) + criterio de interpretación.
 
 **Guion oral:**
@@ -361,7 +361,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 12 — La arquitectura separa UI, orquestación, servicios de escena y datos
 
-**Tiempo:** 11:15 – 12:25 · **Pasos:** 4
+**Tiempo:** 10:35 – 11:40 · **Pasos:** 4
 **Visual:** cuatro capas con clases reales del código (Fig. 47 del informe).
 
 **Guion oral:**
@@ -387,7 +387,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 13 — La taxonomía permite seleccionar piezas madre, subpiezas, hotspots y fasteners
 
-**Tiempo:** 12:25 – 13:25 · **Pasos:** 7
+**Tiempo:** 11:40 – 12:35 · **Pasos:** 7
 **Visual:** cifras 28 / 30 / 257 + tarjetas Hotspots, Fasteners, Bottom sheet + captura de hotspots.
 
 **Guion oral:**
@@ -409,7 +409,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 14 — El flujo de usuario revela la complejidad del dron de forma progresiva
 
-**Tiempo:** 13:25 – 14:25 · **Pasos:** 7
+**Tiempo:** 12:35 – 13:25 · **Pasos:** 7
 **Visual:** flujo Hero → Explore → Selección → Bottom Sheet → Inspect/Analyze/Studio + dos columnas + captura.
 
 **Guion oral:**
@@ -431,7 +431,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 15 — Inspect y Analyze eliminan el ruido visual para hacer legible el ensamblaje
 
-**Tiempo:** 14:25 – 15:25 · **Pasos:** 4 (1 Inspect, 2 video Inspect, 3 Analyze, 4 video Explode)
+**Tiempo:** 13:25 – 14:20 · **Pasos:** 4 (1 Inspect, 2 video Inspect, 3 Analyze, 4 video Explode)
 **Visual:** dos columnas y dos clips de la build en móvil.
 
 **Guion oral:**
@@ -453,7 +453,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 16 — Los shaders son herramientas de inspección técnica, no filtros estéticos
 
-**Tiempo:** 15:25 – 16:25 · **Pasos:** 6 (1–4 modos, 5 síntesis, 6 video)
+**Tiempo:** 14:20 – 15:15 · **Pasos:** 6 (1–4 modos, 5 síntesis, 6 video)
 **Visual:** Realistic / X-Ray / Solid / Thermal + clip de Studio (X-Ray → Thermal → Solid).
 
 **Guion oral:**
@@ -475,7 +475,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 17 — Thermal es una visualización heurística, no una simulación FEA calibrada
 
-**Tiempo:** 16:25 – 17:15 · **Pasos:** 2
+**Tiempo:** 15:15 – 16:05 · **Pasos:** 2
 **Visual:** lista "Límite declarado" + escala relativa (Estructura / ESC-electrónica / Motores-batería).
 
 **Guion oral:**
@@ -497,7 +497,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 18 — La demo debe probar tres capacidades, no navegar improvisadamente
 
-**Tiempo:** 17:15 – 17:45 · **Pasos:** 5
+**Tiempo:** 16:05 – 16:25 · **Pasos:** 5
 **Visual:** tres capacidades + ruta de demo + captura del prototipo.
 
 **Guion oral:**
@@ -513,39 +513,40 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 19 — Demo: de dron completo a pieza, relación y modo visual
 
-**Tiempo:** 17:45 – 19:20 · **Pasos:** 2
-**Modo principal: demo en vivo** en la build pública (ventana ya abierta, caché cargada, dron en estado inicial). **Respaldo:** el video `vid_01_demo_compilado.mp4` (88 s) de esta slide, con exactamente el mismo recorrido. No arranca solo: espera en pausa en 0:00 y se reproduce con un clic sobre él.
+**Tiempo:** 16:25 – 19:25 · **Pasos:** 2
+**Modo principal: demo en vivo en dos tramos.** (1) La **landing pública** (WebGL puro, sin Unity), ya abierta en otra ventana y posicionada al inicio de la sección 03, con el dron aún sin ensamblar. (2) La **app Unity**, que se abre desde el botón «Abrir visor» de la propia landing. **Respaldo:** el video `vid_01_demo_compilado.mp4` (88 s) de esta slide cubre el tramo de la app; espera en pausa en 0:00 y se reproduce con un clic.
 
 **Procedimiento:**
-1. [click 1 — ruta] Revelar la ruta en pantalla y decir: *"Voy a hacerlo en vivo sobre la build pública."*
-2. Pasar a la ventana de la app (Alt+Tab) y seguir la ruta con las marcas de tiempo como referencia de ritmo (≤ 1:35).
-3. Volver al deck (Alt+Tab), [click 2 — contingencia] y cerrar.
-4. **Regla de corte:** si la build tarda más de 10 s en responder o se congela, volver al deck sin comentarlo, hacer clic sobre el video (arranca en 0:00) y narrar el mismo texto sobre él.
+1. [click 1 — ruta] Revelar la ruta y pasar a la ventana de la landing (Alt+Tab).
+2. **0:00–1:10 · Landing.** Pasar el cursor sobre las partículas hasta que el dron se ensamble (~13 s); luego hacer scroll a ritmo constante por los seis capítulos (~7 s cada uno) y, en la mini app final, activar «Explosionar» y desactivarlo.
+3. **1:10–2:50 · App Unity.** Subir al inicio y pulsar «Abrir visor»; recorrer selección → Isolate → ficha → Power → Explode → Cut → X-Ray → Thermal → Solid.
+4. Volver al deck (Alt+Tab), [click 2 — contingencia] y cerrar.
+5. **Regla de corte:** si la app Unity tarda más de 10 s en responder o se congela, volver al deck sin comentarlo, hacer clic sobre el video (arranca en 0:00) y narrar el mismo recorrido. Si falla la landing, saltar directo a la app.
 
-**Guion oral (idéntico en vivo o sobre el video):**
+**Guion oral:**
 
-> [click 1 — ruta] Voy a hacerlo en vivo sobre la build pública. [Alt+Tab]
+> [click 1 — ruta] Lo muestro en vivo. [Alt+Tab a la landing]
 >
-> **[0:00]** Selecciono una pieza: el soporte de riel y batería. Activo Isolate: queda aislada, y la ficha inferior muestra identificación, especificaciones y ensamblaje. Dato y forma en el mismo plano. [señalar ficha]
+> **[0:00]** Esta es la landing pública: WebGL puro, sin Unity. El dron no aparece hecho: lo ensambla la interacción. Paso el cursor y las partículas encuentran su lugar, vértice por vértice. [pausa]
 >
-> **[0:17]** En Inspect, el control de energía cambia el estado de carga del dron: arranque, reposo, vuelo. Es la variable que alimenta la lectura térmica.
+> **[0:15]** Con el scroll, la misma escena cuenta la tesis: de CAD a tiempo real, la taxonomía que resalta los motores, los rayos X, la vista explosionada, la lectura térmica heurística y los resultados de la evaluación. **[1:00]** Al final queda una mini app: puedo orbitar y explosionar el modelo.
 >
-> **[0:34]** En Analyze, la vista explosionada separa el ensamblaje; la relación entre piezas sigue siendo legible. **[0:56]** El corte transversal abre el interior sin modificar la malla.
+> **[1:10]** Desde aquí abro el visor completo en Unity. [«Abrir visor»] Selecciono el soporte de riel y batería; Isolate lo aísla y la ficha muestra identificación, especificaciones y ensamblaje. Dato y forma en el mismo plano. [señalar ficha]
 >
-> **[1:08]** En Studio, X-Ray muestra lo interno; **[1:16]** Thermal, la jerarquía relativa; **[1:22]** Solid, la forma limpia. El mismo objeto, tres lecturas, el mismo alcance.
+> **[1:40]** En Inspect, el control de energía cambia el estado de carga: arranque, reposo, vuelo. **[1:55]** En Analyze, la vista explosionada y el corte transversal abren el interior sin modificar la malla. **[2:20]** En Studio, X-Ray muestra lo interno; Thermal, la jerarquía relativa; Solid, la forma limpia.
 >
-> [Alt+Tab al deck] [click 2 — contingencia] La pregunta ya no es si se ve bien, sino bajo qué condiciones técnicas corre y qué evidencia produjo con usuarios.
+> **[2:45]** Dos tecnologías, un mismo objeto: WebGL directo para contar, Unity para inspeccionar. [Alt+Tab al deck] [click 2 — contingencia] La pregunta ya no es si se ve bien, sino bajo qué condiciones corre y qué evidencia produjo con usuarios.
 
 **Plan de contingencia (único, igual en deck, tarjetas y `DEMO_SCRIPT.md`):**
-> Demo en vivo como principal. Si la build no responde en 10 s o se congela, se narra el video de esta slide, que registra el mismo recorrido.
+> Demo en vivo como principal. Si la app Unity no responde en 10 s o se congela, se narra el video de esta slide, que registra el mismo recorrido de la app. Si falla la landing, se salta directamente a la app.
 
-**No decir:** "la demo reemplaza la validación" · "esto prueba compatibilidad universal" · improvisar un recorrido distinto · comentar el fallo si se pasa al video
+**No decir:** "la demo reemplaza la validación" · "la landing es otra versión de la app" (es una capa de divulgación en WebGL puro) · improvisar un recorrido distinto · comentar el fallo si se pasa al video
 
 ---
 
 ### SLIDE 20 — El profiler interno vuelve trazable el rendimiento por escenario y dispositivo
 
-**Tiempo:** 19:20 – 20:20 · **Pasos:** 2
+**Tiempo:** 19:25 – 20:25 · **Pasos:** 2
 **Visual:** lista de trazabilidad + extracto literal del JSON exportado por `WebGLProfiler` (sesión thermal_studio, escritorio, 4 jun 2026).
 
 **Guion oral:**
@@ -567,7 +568,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 21 — El rendimiento es viable, pero no universal en todo móvil
 
-**Tiempo:** 20:20 – 21:20 · **Pasos:** 5
+**Tiempo:** 20:25 – 21:25 · **Pasos:** 5
 **Visual:** barras de FPS (Escritorio 59,8 · iOS 58,7 · Redmi Note 10S 26,5 · Android límite inferior 17,6) con línea de 30 FPS + tres lecturas + recuadro.
 
 **Guion oral:**
@@ -591,7 +592,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 22 — SUS de 91,88: recepción favorable del visor interactivo 3D
 
-**Tiempo:** 21:20 – 22:20 · **Pasos:** 4
+**Tiempo:** 21:25 – 22:25 · **Pasos:** 4
 **Visual:** SUS 91,88 (mediana 95 · DE 11,24 · n=12) · Rango 60–100 · Referencia 68 + recuadro "Lectura correcta".
 
 **Guion oral:**
@@ -615,7 +616,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 23 — En la muestra, el visor 3D se asoció con menor carga de trabajo percibida
 
-**Tiempo:** 22:20 – 23:25 · **Pasos:** 5 (1 cifra 3D, 2 cifra 2D, 3 diferencia, 4 tabla de tiempos, 5 nota T4)
+**Tiempo:** 22:25 – 23:30 · **Pasos:** 5 (1 cifra 3D, 2 cifra 2D, 3 diferencia, 4 tabla de tiempos, 5 nota T4)
 **Visual:** NASA-TLX 8,69 vs 19,89 + tabla T1–T3 + nota sobre T4.
 
 **Guion oral:**
@@ -637,7 +638,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 24 — Think-Aloud explica comprensión espacial y fricciones residuales
 
-**Tiempo:** 23:25 – 24:25 · **Pasos:** 4
+**Tiempo:** 23:30 – 24:30 · **Pasos:** 4
 **Visual:** barras (lima: comprensión espacial 11/12, percepción de claridad 8/12 · ámbar: navegación y control 10/12, iconos procedurales 6/12) + dos listas.
 
 **Guion oral:**
@@ -659,7 +660,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 25 — La discusión acota el resultado: efecto techo, muestra pequeña y compatibilidad limitada
 
-**Tiempo:** 24:25 – 25:35 · **Pasos:** 2
+**Tiempo:** 24:30 – 25:40 · **Pasos:** 2
 **Visual:** dos columnas: "Lo que sí soporta" / "Lo que no debe afirmarse".
 
 **Guion oral:**
@@ -681,7 +682,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 26 — Las conclusiones cierran cada objetivo con evidencia trazable
 
-**Tiempo:** 25:35 – 26:40 · **Pasos:** 4
+**Tiempo:** 25:40 – 26:45 · **Pasos:** 4
 **Visual:** tabla OE → resultado → evidencia.
 
 **Guion oral:**
@@ -705,7 +706,7 @@ Si hay nervios: **no acelerar**. La primera pausa comunica control.
 
 ### SLIDE 27 — Las limitaciones son alcance declarado, no fallas ocultas
 
-**Tiempo:** 26:40 – 27:25 · **Pasos:** 5
+**Tiempo:** 26:45 – 27:25 · **Pasos:** 5
 **Visual:** cuatro tarjetas + recuadro "Rigor metodológico".
 
 **Guion oral:**

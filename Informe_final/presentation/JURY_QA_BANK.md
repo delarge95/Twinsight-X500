@@ -676,7 +676,7 @@ Porque la demo en vivo es la evidencia mas convincente de que la build funciona;
 
 Respuesta ampliada:
 
-La demo se hace en la build publica siguiendo una ruta fija (seleccion → Isolate → ficha → Power → Explode → Cut → X-Ray → Thermal → Solid) en 1:35 como maximo. El video de la slide 19 registra exactamente esa ruta en la build real; si la app no responde en 10 s, se reproduce con un clic y se narra igual. Ninguno de los dos reemplaza la evidencia tecnica: muestran el flujo.
+La demo dura 3:00 y tiene dos tramos: la landing publica en WebGL puro (ensamblaje interactivo, seis capitulos de scrollytelling y mini app) y, desde su boton "Abrir visor", la app Unity con una ruta fija (seleccion → Isolate → ficha → Power → Explode → Cut → X-Ray → Thermal → Solid). El video de la slide 19 registra ese tramo de la app en la build real; si la app no responde en 10 s, se reproduce con un clic y se narra igual. Ninguno de los dos reemplaza la evidencia tecnica: muestran el flujo.
 
 Evidencia:
 

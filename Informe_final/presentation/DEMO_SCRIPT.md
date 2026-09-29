@@ -15,13 +15,13 @@ Este documento se ensaya junto con `PRESENTATION_SCRIPT.md`. La evidencia por sl
 
 ## Rol de este guion (actualizado 2026-09-29)
 
-- **Durante la exposición (slide 19)** la demo es **en vivo** en la build pública, con la ruta corta de abajo (≤ 1:35) y la narración de `PRESENTATION_SCRIPT.md`.
+- **Durante la exposición (slide 19)** la demo es **en vivo** y dura 3:00: primero la **landing pública** (WebGL puro: ensamblaje con el cursor, seis capítulos de scrollytelling y mini app, ~1:10) y luego, desde su botón «Abrir visor», la **app Unity** con la ruta corta de abajo (~1:40). Narración en `PRESENTATION_SCRIPT.md`.
 - **Respaldo:** si la build no responde en 10 s o se congela, volver al deck y hacer clic sobre el video `assets/video/vid_01_demo_compilado.mp4` (88 s, mismo recorrido), que espera en pausa en 0:00.
 - **Este guion de 5 minutos** es la demo extendida para la ronda de preguntas si el jurado pide profundizar.
 
 ### Ruta corta de la demo en vivo (slide 19)
 
-Preparar antes: build pública abierta en otra ventana, caché cargada, dron completo en estado inicial. Recorrido, en este orden:
+Preparar antes: landing abierta en otra ventana, al inicio de la sección 03 con el dron sin ensamblar; abrir una vez «Abrir visor» para cachear la build y cerrarla. Tramo de la app, en este orden:
 
 1. Seleccionar el soporte de riel y batería → `Isolate` → abrir la ficha inferior.
 2. `Inspect` → control de energía (Starting · Idle · Flying).
