@@ -17,7 +17,7 @@ Esta guia no debe llevarte a sobre-explicar durante la sustentacion. Sirve para 
 
 ## 1. Problema, brecha y propuesta
 
-Slides: 1-4.
+Slides: 1-5.
 
 **Que debes poder explicar**
 
@@ -56,7 +56,7 @@ Respuesta: no reemplaza la lectura tecnica experta; reduce friccion de ubicacion
 
 ## 2. Objetivos y cierre por evidencia
 
-Slide: 5.
+Slide: 6 (y 25).
 
 **Que debes poder explicar**
 
@@ -90,7 +90,7 @@ Respuesta: OE3 (prototipo interactivo) quedaria mas expuesto oralmente, pero no 
 
 ## 3. Metodologia DSR y diseno comparativo
 
-Slides: 6-7.
+Slides: 7-8.
 
 **Que debes poder explicar**
 
@@ -124,7 +124,7 @@ Respuesta: por escala formativa y control operativo de la sesion. La alternancia
 
 ## 4. Pipeline CAD, optimizacion y taxonomia
 
-Slides: 8-9.
+Slides: 9-11 y 13.
 
 **Que debes poder explicar**
 
@@ -158,7 +158,7 @@ Respuesta: no. Son capas distintas. 95.617 describe el activo base optimizado; 2
 
 ## 5. Arquitectura, UI y microinteracciones
 
-Slides: 10-12.
+Slides: 12 y 14.
 
 **Que debes poder explicar**
 
@@ -192,7 +192,7 @@ Respuesta: porque alcance implementado y alcance publicado no son lo mismo. Lo d
 
 ## 6. Modos visuales, Analyze y Thermal
 
-Slides: 13-15.
+Slides: 15-17.
 
 **Que debes poder explicar**
 
@@ -204,7 +204,7 @@ No son filtros bonitos. Son lentes para hacer preguntas diferentes sobre el dron
 
 **Explicacion tecnica**
 
-Thermal debe explicarse como sistema heuristico relativo. No hay sensores, telemetria, solucion FEA ni temperatura real. La visualizacion usa jerarquias o pesos de interpretacion para comunicar zonas relativas de interes. Blueprint solo se muestra si aparece en la build evaluada; si no, se trata como preset/lectura no principal o capacidad no publicada.
+Thermal es un modelo fisico simplificado por componentes: las fuentes se calientan segun la carga del dron, el calor pasa entre piezas en contacto segun area, longitud y conductividad del material, y el aire las enfria. No hay sensores ni telemetria, no resuelve elementos finitos y no esta calibrado: el tiempo va acelerado y las conductividades estan escaladas. Blueprint solo se muestra si aparece en la build evaluada; si no, se trata como preset/lectura no principal o capacidad no publicada.
 
 **Evidencia directa**
 
@@ -223,11 +223,11 @@ Thermal debe explicarse como sistema heuristico relativo. No hay sensores, telem
 
 "Si Thermal no es fisico, por que incluirlo?"
 
-Respuesta: porque su proposito no es diagnostico termico real, sino lectura visual exploratoria. Ayuda a comunicar una jerarquia relativa dentro del prototipo y queda explicitamente limitada para no sobreprometer.
+Respuesta: tiene base fisica, pero simplificada. Sirve para entender por donde viaja el calor segun la carga y los materiales; diagnosticar exigiria calibrarlo con mediciones.
 
 ## 7. Demo y evidencia funcional
 
-Slides: 16-17.
+Slide: 18.
 
 **Que debes poder explicar**
 
@@ -256,7 +256,7 @@ Respuesta: no, si se tienen artefactos de respaldo: capturas, video/GIF, build d
 
 ## 8. Rendimiento, profiler y compatibilidad
 
-Slides: 18-19.
+Slides: 19-20.
 
 **Que debes poder explicar**
 
@@ -289,7 +289,7 @@ Respuesta: porque el objetivo reportado es comportamiento operativo de la build 
 
 ## 9. Evaluacion con usuarios: tareas, SUS, NASA-TLX Raw
 
-Slides: 20-21.
+Slides: 21-22.
 
 **Que debes poder explicar**
 
@@ -324,7 +324,7 @@ Respuesta: no se dice que fue mejor en exito, porque hubo efecto techo. Se dice 
 
 ## 10. Think-Aloud, triangulacion y discusion
 
-Slide: 22.
+Slides: 23-24.
 
 **Que debes poder explicar**
 
@@ -357,7 +357,7 @@ Respuesta: puede existir sesgo de cortesia o contexto moderado; por eso el infor
 
 ## 11. Conclusiones, limites y futuro
 
-Slides: 23-24.
+Slides: 25-28.
 
 **Que debes poder explicar**
 
@@ -369,7 +369,7 @@ El proyecto logro que el dron se pueda entender mejor desde una experiencia web 
 
 **Explicacion tecnica**
 
-Limites: muestra no probabilistica, n=12, sin inferencia estadistica, T4 exploratoria no cronometrada, thermal heuristico, compatibilidad movil acotada, sin telemetria real, sin mantenimiento predictivo, sin FEA termico real. Trabajo futuro: twin manifest, telemetria historica, live digital shadow, modo de servicio, documentacion bilingue, mejoras de rendimiento y accesibilidad.
+Limites: muestra no probabilistica, n=12, sin inferencia estadistica, T4 exploratoria no cronometrada, Thermal sin calibrar, compatibilidad movil acotada, sin telemetria real, sin mantenimiento predictivo, sin FEA termico real. Trabajo futuro: twin manifest, telemetria historica, live digital shadow, modo de servicio, documentacion bilingue, mejoras de rendimiento y accesibilidad.
 
 **Evidencia directa**
 
@@ -392,7 +392,7 @@ Respuesta: se exigiria mayor control experimental, muestra mas robusta, hipotesi
 | Por que no usar SUS para comparar 3D y 2D? | SUS evalua usabilidad global de un sistema; aqui se aplico al prototipo 3D. La comparacion 3D/2D se apoya en tareas y NASA-TLX Raw. |
 | NASA-TLX prueba carga cognitiva? | No directamente. Mide carga de trabajo percibida. Se interpreta junto a teoria de carga cognitiva, sin igualarlas. |
 | El promedio 68 de SUS es aprobacion? | No. Es referencia historica/descriptiva; no umbral absoluto. |
-| Thermal puede usarse para diagnostico? | No. Es heuristico relativo, no FEA ni sensorica real. |
+| Thermal puede usarse para diagnostico? | No. Es un modelo fisico simplificado y sin calibrar; no es FEA ni usa sensores. |
 | Blueprint es visible? | Solo se muestra si aparece en la build evaluada. No se promete como tarjeta directa si no esta publicado. |
 | Por que WebGL y no app nativa? | Por acceso web, distribucion y pertinencia multimedia; el costo es optimizar y declarar limites de rendimiento. |
 | El repo contradice el informe? | La defensa debe tomar el informe como fuente autoritativa; README y docs deben no sobreprometer funciones ocultas. |

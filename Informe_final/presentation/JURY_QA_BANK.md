@@ -517,11 +517,11 @@ Evitar:
 
 Respuesta corta:
 
-Se manejan con taxonomia, proxies y reconstruccion modular limitada, especialmente para tornillos.
+En la escena, cada sujetador es un proxy liviano; cuando alguien inspecciona un tornillo, la app lo arma en detalle con cinco piezas base.
 
 Respuesta ampliada:
 
-Los fasteners repetitivos pueden ser muy costosos geometricamente. El proyecto diferencia fastener group, proxies, casos originales y reconstruccion modular de tornillos. No todos los sujetadores se convierten en detalle modular final; la asignacion a piezas madre requiere manifest y revision cuando hay ambiguedad.
+Los fasteners repetitivos pueden ser muy costosos geometricamente: en la importacion con STEPper que se conserva en el proyecto sumaban 425 208 triangulos (79 % del archivo); en la escena final, los proxies suman 14 408. El tornillo detallado se arma con tres cabezas, una vuelta de rosca y una punta; la vuelta se repite segun largo / paso de rosca (`FastenerBuilder.cs`). El proyecto diferencia fastener group, proxies, casos originales y reconstruccion modular de tornillos. No todos los sujetadores se convierten en detalle modular final; la asignacion a piezas madre requiere manifest y revision cuando hay ambiguedad.
 
 Evidencia:
 
@@ -634,7 +634,7 @@ Evitar:
 
 Respuesta corta:
 
-Publico defendible: Hero, Explore, seleccion, bottom sheet, Inspect, Analyze, Studio, explode, cut, filtros y Thermal heuristico.
+Publico defendible: Hero, Explore, seleccion, bottom sheet, Inspect, Analyze, Studio, explode, cut, filtros y Thermal (modelo termico simplificado por componentes).
 
 Respuesta ampliada:
 
@@ -681,7 +681,7 @@ La demo dura 3:00 y tiene dos tramos: la landing publica en WebGL puro (ensambla
 Evidencia:
 
 - `Informe_final/presentation/DEMO_SCRIPT.md`
-- `Informe_final/presentation/PRESENTATION_SCRIPT.md`, slide 19
+- `Informe_final/presentation/PRESENTATION_SCRIPT.md`, slide 18
 
 Evitar:
 
@@ -692,7 +692,7 @@ Evitar:
 
 Respuesta corta:
 
-Volver a la slide 19 y reproducir el video del mismo recorrido, sin hacer troubleshooting en pantalla.
+Volver a la slide 18 y reproducir el video del mismo recorrido, sin hacer troubleshooting en pantalla.
 
 Respuesta ampliada:
 
@@ -712,16 +712,17 @@ Evitar:
 
 Respuesta corta:
 
-Tiene validez como visualizacion heuristica, no como modelo fisico calibrado.
+Tiene base fisica, pero no esta calibrado. Es un modelo simplificado por componentes que sirve para explicar como viaja el calor, no para medirlo.
 
 Respuesta ampliada:
 
-Thermal apoya lectura relativa por componentes y comunicacion tecnica. No es FEA, no usa telemetria real y no debe usarse para diagnostico fisico. Su evolucion futura podria incluir calibracion experimental, sensores o simulacion fisica.
+Cada pieza es un nodo con temperatura. Las fuentes (motores, ESC, bateria, controladora) tienden a una temperatura de equilibrio que depende de la carga del dron, con un calentamiento exponencial (1 − e^(−Δt/τ)). Entre piezas en contacto, el calor pasa como ΔT = (Tj − Ti)·Ĝ·Δt, con Ĝ = s·A/L: area de contacto sobre longitud del camino, igual que en la conduccion de Fourier, y un factor por material derivado de conductividades reales. El aire enfria cada pieza segun su exposicion. Lo que lo separa de una simulacion real: un punto por pieza en lugar de una malla, tiempo acelerado, conductividades escaladas y ninguna calibracion con mediciones. Por eso no es FEA ni sirve para diagnosticar. Llevarlo a simulacion real exigiria malla, unidades SI, condiciones de borde y validacion experimental.
 
 Evidencia:
 
-- `Informe_final/chapters/01_introduccion.tex`
-- `Informe_final/chapters/06_conclusiones.tex`
+- Informe final, "Modelo matematico operativo del subsistema termico" (pp. 136-138); Fig. 66-67.
+- `desarrollo/unity_project/Assets/Scripts/Core/Thermal/ThermalSimulationManager.cs`
+- Backup B8.
 
 Evitar:
 
@@ -870,11 +871,11 @@ Evitar:
 
 Respuesta corta:
 
-Porque el subsistema es un modelo reducido por componentes que calcula una temperatura por nodo; la escala en °C es la de ese modelo heuristico, no una medicion.
+Porque el modelo calcula una temperatura para cada pieza a partir de la carga del dron, la conduccion entre piezas y el enfriamiento por aire. Esa es la temperatura que muestra la leyenda. No esta calibrada ni medida, asi que describe el modelo y no el dron real.
 
 Respuesta ampliada:
 
-ThermalSimulationManager toma el factor de carga del dron (control de energia), interpola entre temperatura ambiente, de hover y pico, y aproxima el acoplamiento entre piezas con una logica tipo Fourier sobre un grafo de contactos. Los tiempos de calentamiento estan comprimidos a proposito para que la lectura sea interactiva. Por eso el informe lo llama simulacion termica hibrida y heuristica: no es FEA, no usa sensores y sus grados no son temperatura real calibrada.
+ThermalSimulationManager toma el factor de carga del dron (control de energia), interpola entre temperatura ambiente, de hover y pico, y aproxima el acoplamiento entre piezas con una logica tipo Fourier sobre un grafo de contactos. Los tiempos de calentamiento estan comprimidos a proposito para que la lectura sea interactiva. Las conductividades de cada material se derivan de valores reales (cobre ~390, aluminio ~167, acero ~16, fibra de carbono ~2,5, FR4 ~0,3 W/m·K) y se comprimen a una escala relativa (1,8 a 0,18) para que las piezas no se igualen en un solo cuadro. El informe lo llama simulacion termica hibrida: no es FEA, no usa sensores y sus grados no estan calibrados.
 
 Evidencia:
 
@@ -926,4 +927,47 @@ Respuesta:
 
 Respuesta:
 
-> El proyecto tuvo limites claros: muestra pequena, compatibilidad movil acotada, desktop como adaptacion funcional, T4 no cronometrada y Thermal heuristico. Lo importante es que esos limites estan declarados y no se presentan como resultados cerrados.
+> El proyecto tuvo limites claros: muestra pequena, compatibilidad movil acotada, desktop como adaptacion funcional, T4 no cronometrada y Thermal sin calibrar. Lo importante es que esos limites estan declarados y no se presentan como resultados cerrados.
+
+### Q47. Por que dice que el CAD "no tiene" triangulos?
+
+Respuesta corta:
+
+Porque un STEP describe superficies con ecuaciones (NURBS, cilindros, planos). Los triangulos aparecen al teselar, es decir, al convertir esas superficies en malla para poder dibujarlas.
+
+Respuesta ampliada:
+
+La cantidad de triangulos depende de la herramienta y de la tolerancia de teselacion. Por eso el informe reporta tres cifras para el mismo CAD: 6 717 499 (importacion directa), 6 864 586 (MoI3D) y 6 525 748 (STEPper). El pipeline parte de esas mallas y llega a un activo de 95 617.
+
+Evidencia:
+
+- Informe final, Tabla 28.
+
+Evitar:
+
+- "El CAD tenia 6,5 millones de triangulos."
+
+### Q48. De donde salen las cifras de tornilleria (425 208 y 14 408)?
+
+Respuesta corta:
+
+Las medi sobre los archivos del proyecto con Blender: la importacion con STEPper (`blender_files/welded/stepper.fbx`) y la escena exportada final (`x500v2_runtime_low_final.fbx`).
+
+Respuesta ampliada:
+
+En la primera, 160 sujetadores suman 425 208 triangulos, el 79 % de ese archivo. En la segunda, 161 proxies suman 14 408 (88 triangulos o menos cada uno). El informe documenta el sistema (20 familias, 168 instancias, 9 reconciliaciones; cinco piezas base) pero no esas cifras: las agregue para la presentacion. La diferencia entre 160, 161 y 168 viene de que cada fuente cuenta sobre un archivo distinto.
+
+Evidencia:
+
+- `DEFENSE_EVIDENCE_MAP.md`, claims numericos.
+- Informe final, Tabla 8, Figs. 28-30.
+
+Evitar:
+
+- Presentar esas cifras como resultado del informe.
+
+### Q49. Los modos Inspect, Analyze y Studio aparecen solo al seleccionar una pieza?
+
+Respuesta corta:
+
+No. La barra inferior con los tres modos esta siempre visible desde Explore. Lo que aparece al tocar una pieza es la ficha (bottom sheet).

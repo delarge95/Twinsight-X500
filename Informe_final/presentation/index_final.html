@@ -217,6 +217,8 @@ em.acc-amber{font-style:normal;color:var(--amber)}
 .tscroll{overflow-x:auto;scrollbar-width:none;margin-top:clamp(12px,2vh,24px)}
 .tscroll::-webkit-scrollbar{display:none}
 .tscroll table{width:100%;min-width:620px;table-layout:fixed;border-collapse:collapse}
+.tscroll table.t-tareas{min-width:0}
+.t-tareas th:first-child,.t-tareas td:first-child{width:56%}
 .tscroll th{font:500 11px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:0 16px 10px;border-bottom:1px solid var(--line)}
 .tscroll td{padding:clamp(10px,1.4vh,16px) 16px;border-bottom:1px solid var(--line-weak);font-size:clamp(14px,1.1vw,15.5px);line-height:1.55;color:var(--ink-2);vertical-align:top;overflow-wrap:anywhere}
 .tscroll td:first-child{font-weight:600;color:var(--ink)}
@@ -510,7 +512,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
   <div class="brand"><span class="brand-mark"></span>TWINSIGHT X500</div>
   <div class="counter" aria-live="polite">
     <span class="counter-roll"><input id="slideJump" class="counter-jump" type="text" inputmode="numeric" maxlength="3" aria-label="Ir al número de diapositiva" value="01"></span>
-    <span>/</span><span id="slideTotal">30</span>
+    <span>/</span><span id="slideTotal">29</span>
   </div>
 </header>
 
@@ -525,7 +527,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
         <h1 class="cover-title"><span class="ln" data-scramble style="--d:.3s">TwinSight <em class="acc">X500</em></span></h1>
         <div class="cover-rule" aria-hidden="true"></div>
         <p class="cover-claim" data-reveal style="--d:.58s">Convierte un ensamblaje complejo en una <strong>experiencia WebGL inspeccionable</strong>.</p>
-        <p class="slide-body" data-reveal style="--d:.7s">El aporte no es replicar el estado operacional del dron: es volver legibles sus piezas, relaciones y modos de lectura visual desde el navegador.</p>
+        <p class="slide-body" data-reveal style="--d:.7s">Hace legibles las piezas del dron, cómo se relacionan y cómo se leen, directamente en el navegador. No replica su estado de vuelo.</p>
         <dl class="spec">
           <div data-reveal style="--d:.8s"><dt>Autor</dt><dd><b>Alexander Woodcock Salomón</b></dd></div>
           <div data-reveal style="--d:.87s"><dt>Proyecto</dt><dd><b>TwinSight X500</b></dd></div>
@@ -541,22 +543,22 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </figure>
     </div>
   </div>
-  <aside class="notes">⏱ 0:00–0:45 · 0 clics — Apertura. No es digital twin operacional; es experiencia web 3D para inspección técnica del Holybro X500 V2.</aside>
+  <aside class="notes">⏱ 0:00–0:40 · 0 clics — Apertura. Presentar el proyecto y definir CAD y WebGL. Es una app web para inspeccionar el Holybro X500 V2; no se conecta al dron real.</aside>
 </section>
 
 <!-- ============ 02 · PROBLEMA ============ -->
 <section class="slide" data-label="Problema">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">02</span>Problema</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El reto central es comprender <em class="acc">relaciones</em>, no solo ver piezas.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El reto es entender cómo se <em class="acc">relacionan</em> las piezas del dron.</span></h1>
     <div class="rows">
       <div class="row-item" data-step="1"><span class="ri-idx">01</span><h3 class="ri-term">Documentación</h3><p class="ri-desc">Planos, manuales y referencias técnicas contienen información útil, pero la lectura está distribuida en soportes separados.</p></div>
       <div class="row-item" data-step="2"><span class="ri-idx">02</span><h3 class="ri-term">Fricción</h3><p class="ri-desc">El usuario debe reconstruir mentalmente profundidad, ubicación y ensamblaje a partir de vistas planas y desarticuladas.</p></div>
       <div class="row-item" data-step="3"><span class="ri-idx">03</span><h3 class="ri-term">Respuesta</h3><p class="ri-desc">Una capa 3D web permite ubicar, seleccionar, aislar y relacionar piezas sin abrir herramientas CAD pesadas.</p></div>
     </div>
-    <div class="callout key" data-step="4"><span class="tag lime">Idea clave</span><p>El problema no es ausencia de datos: es la distancia entre los datos disponibles y la comprensión espacial operativa.</p></div>
+    <div class="callout key" data-step="4"><span class="tag lime">Idea clave</span><p>Los datos existen. Lo que falta es un puente entre esos datos y la comprensión espacial del conjunto.</p></div>
   </div>
-  <aside class="notes">⏱ 0:45–1:45 · 4 clics — Problema: información fragmentada, reconstrucción espacial exigida al usuario.</aside>
+  <aside class="notes">⏱ 0:40–1:40 · 4 clics — La información existe pero está repartida; el usuario reconstruye el objeto en la cabeza a partir de vistas planas (reconstrucción espacial). La respuesta: un visor 3D web para ubicar, aislar y relacionar piezas.</aside>
 </section>
 
 <!-- ============ 03 · MARCO TEÓRICO I ============ -->
@@ -580,7 +582,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout limit" data-step="4"><span class="tag amber">Límite declarado</span><p>Esta tesis no mide las tres cargas directamente. Las usa como marco teórico para justificar una interfaz 3D guiada que reduce la reconstrucción espacial innecesaria.</p></div>
   </div>
-  <aside class="notes">⏱ 1:45–2:50 · 4 clics — Memoria de trabajo es limitada (Sweller et al. 2019). Tres tipos: intrínseca = complejidad del contenido; extrínseca = cómo se presenta; germana = esfuerzo útil que construye esquemas. La tesis no mide las tres directamente; las usa como marco de diseño.</aside>
+  <aside class="notes">⏱ 1:40–2:40 · 4 clics — Memoria de trabajo es limitada (Sweller et al. 2019). Tres tipos: intrínseca = complejidad del contenido; extrínseca = cómo se presenta; germana = esfuerzo útil que construye esquemas. La tesis no mide las tres directamente; las usa como marco de diseño.</aside>
 </section>
 
 <!-- ============ 04 · MARCO TEÓRICO II ============ -->
@@ -600,7 +602,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </table>
     </div>
   </div>
-  <aside class="notes">⏱ 2:50–4:00 · 4 clics — Principios de interfaz que cita el informe (marco teórico y Tabla 11): jerarquía visual (Norman, 2013), agrupación por proximidad y similitud (Gestalt: Wertheimer, Köhler), visibilidad del estado y reconocimiento antes que memoria (Nielsen, 1994). Marco unificador: cognición distribuida (Hutchins, 1995) — la interfaz funciona como artefacto cognitivo que externaliza la rotación mental.</aside>
+  <aside class="notes">⏱ 2:40–3:45 · 4 clics — Principios de interfaz que cita el informe (marco teórico y Tabla 11): jerarquía visual (Norman, 2013), agrupación por proximidad y similitud (Gestalt: Wertheimer, Köhler), visibilidad del estado y reconocimiento antes que memoria (Nielsen, 1994). Marco unificador: cognición distribuida (Hutchins, 1995) — la interfaz funciona como artefacto cognitivo que externaliza la rotación mental.</aside>
 </section>
 
 <!-- ============ 05 · ALCANCE ============ -->
@@ -633,7 +635,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">⏱ 4:00–5:10 · 2 clics — Aclarar alcance con contundencia desde el inicio: Visual Product Twin vs Digital Twin Operacional.</aside>
+  <aside class="notes">⏱ 3:45–4:45 · 2 clics — Aclarar alcance con contundencia desde el inicio: Visual Product Twin vs Digital Twin Operacional.</aside>
 </section>
 
 <!-- ============ 06 · OBJETIVOS ============ -->
@@ -643,13 +645,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Los objetivos definen el contrato: <em class="acc">construir y evaluar</em> un artefacto interactivo.</span></h1>
     <p class="slide-body" data-reveal style="--d:.5s;margin:0 0 clamp(14px,2vh,22px);max-width:78ch"><strong style="color:var(--ink)">Pregunta de investigación:</strong> ¿qué diferencias descriptivas de desempeño y carga de trabajo percibida aparecen entre un visor 3D web y un soporte 2D, y bajo qué condiciones es viable en el navegador?</p>
     <div class="obj-grid">
-      <div class="obj-card" data-step="1"><span class="obj-num">01</span><div><div class="obj-head"><span class="tag">OE1</span><h3>Pipeline de optimización CAD</h3></div><p>Diseñar un pipeline 3D que reduzca modelos CAD a presupuesto WebGL (6,5M a 95 617 tri), preservando legibilidad formal y piezas.</p></div></div>
+      <div class="obj-card" data-step="1"><span class="obj-num">01</span><div><div class="obj-head"><span class="tag">OE1</span><h3>Pipeline de optimización CAD</h3></div><p>Diseñar un pipeline que lleve el CAD, una vez teselado (~6,5 M de triángulos), a un activo WebGL de 95 617, sin perder forma ni piezas.</p></div></div>
       <div class="obj-card" data-step="2"><span class="obj-num">02</span><div><div class="obj-head"><span class="tag">OE2</span><h3>Materiales, modos y rendimiento</h3></div><p>Integrar en Unity URP renderizado realista y herramientas de inspección, procurando frame time &le; 33,33 ms (&ge; 30 FPS).</p></div></div>
       <div class="obj-card" data-step="3"><span class="obj-num">03</span><div><div class="obj-head"><span class="tag">OE3</span><h3>Prototipo interactivo WebGL</h3></div><p>Implementar la app web en Unity (C# / WebAssembly) con órbita, selección, bottom sheet, vista explosionada, corte y modos analíticos.</p></div></div>
       <div class="obj-card" data-step="4"><span class="obj-num">04</span><div><div class="obj-head"><span class="tag">OE4</span><h3>Evaluación con usuarios</h3></div><p>Evaluar formativamente tareas y carga percibida (3D vs. 2D con NASA-TLX Raw y Think-Aloud), y estimar usabilidad global con SUS.</p></div></div>
     </div>
   </div>
-  <aside class="notes">⏱ 5:10–6:05 · 4 clics — Objetivos como contrato verificable. No se evaluó una idea abstracta: se evaluó un artefacto construido y medible.</aside>
+  <aside class="notes">⏱ 4:45–5:35 · 4 clics — Objetivos como contrato verificable. No se evaluó una idea abstracta: se evaluó un artefacto construido y medible.</aside>
 </section>
 
 <!-- ============ 07 · METODOLOGÍA ============ -->
@@ -681,7 +683,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">⏱ 6:05–6:55 · 7 clics — DSRM (Peffers et al., 2007) en 6 fases continuas. Evaluación formativa y descriptiva con muestra de 12 participantes.</aside>
+  <aside class="notes">⏱ 5:35–6:20 · 7 clics — DSRM (Peffers et al., 2007) en 6 fases continuas. Evaluación formativa y descriptiva con muestra de 12 participantes.</aside>
 </section>
 
 <!-- ============ 08 · EVALUACIÓN ============ -->
@@ -725,19 +727,19 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">⏱ 6:55–8:05 · 6 clics — Instrumentos y triangulación. Rendimiento técnico, conducta en tareas, percepción subjetiva y comentarios cualitativos se interpretan en conjunto.</aside>
+  <aside class="notes">⏱ 6:20–7:25 · 6 clics — Instrumentos y triangulación. Rendimiento técnico, conducta en tareas, percepción subjetiva y comentarios cualitativos se interpretan en conjunto.</aside>
 </section>
 
 <!-- ============ 09 · PIPELINE ============ -->
 <section class="slide" data-label="Pipeline">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">09</span>Pipeline</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">De 6,5 millones a 95 617 triángulos: la traducción de activos CAD para <em class="acc">WebGL</em>.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Al teselar el CAD aparecieron 6,5 millones de triángulos; el activo para <em class="acc">WebGL</em> usa 95 617.</span></h1>
     <div class="flow-wrap" data-reveal="media" style="--d:.4s">
       <svg viewBox="0 0 960 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline CAD a WebGL">
         <defs><marker id="pa" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#C8F53F"/></marker></defs>
-        <g><rect x="0" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.3)" stroke-width="1.2"/><text x="59" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="600">CAD</text><text x="59" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">STEP</text></g>
-        <g data-step="1"><line x1="120" y1="50" x2="128" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="132" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="191" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">MoI3D</text><text x="191" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">STEPper</text></g>
+        <g><rect x="0" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.3)" stroke-width="1.2"/><text x="59" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="600">CAD</text><text x="59" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">STEP · superficies</text></g>
+        <g data-step="1"><line x1="120" y1="50" x2="128" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="132" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="191" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">MoI3D · STEPper</text><text x="191" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">teselación</text></g>
         <g data-step="2"><line x1="252" y1="50" x2="260" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="264" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="323" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Blender</text><text x="323" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">limpieza</text></g>
         <g data-step="3"><line x1="384" y1="50" x2="392" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="396" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="455" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Retopo</text><text x="455" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">proxies</text></g>
         <g data-step="4"><line x1="516" y1="50" x2="524" y2="50" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#pa)"/><rect x="528" y="19" width="118" height="62" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="587" y="45" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Bake</text><text x="587" y="62" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">normal · AO</text></g>
@@ -746,11 +748,11 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </svg>
     </div>
     <div class="duo-cols">
-      <div data-step="7"><span class="tag">Criterio de reducción</span><h3>Por qué optimizar</h3><p>El CAD original no estaba listo para render en tiempo real: mallas complejas con caras internas ocultas, tornillería duplicada y redundancias topológicas.</p></div>
-      <div data-step="8"><span class="tag lime">Preservación semántica</span><h3>Qué se conserva</h3><p>La optimización mantiene la estructura jerárquica para selección y desglose interactivo, preservando silueta y lectura funcional.</p><div class="callout key"><span class="tag lime">Principio</span><p>No se simplifica por simplificar: se preserva la coherencia para inspección técnica en web.</p></div></div>
+      <div data-step="7"><span class="tag">Criterio de reducción</span><h3>Por qué optimizar</h3><p>Un STEP describe superficies matemáticas y no tiene triángulos. Al teselarlo salen mallas densas, con caras internas, vértices duplicados y tornillería repetida.</p></div>
+      <div data-step="8"><span class="tag lime">Preservación semántica</span><h3>Qué se conserva</h3><p>Cada pieza conserva su nombre y su lugar en la jerarquía, así que se puede seleccionar, aislar y separar. La silueta se mantiene.</p><div class="callout key"><span class="tag lime">Cifras por ruta</span><p>Importación directa 6 717 499 · MoI3D 6 864 586 · STEPper 6 525 748 triángulos (Tabla 28).</p></div></div>
     </div>
   </div>
-  <aside class="notes">⏱ 8:05–9:15 · 8 clics — Pipeline CAD → WebGL. Traducción técnica para mantener rendimiento y jerarquía seleccionable.</aside>
+  <aside class="notes">⏱ 7:25–8:40 · 8 clics — Un STEP no tiene triángulos: describe superficies. Al teselarlo salen 6,7 M (directo), 6,9 M (MoI3D) o 6,5 M (STEPper) de triángulos (Tabla 28). Limpieza, retopología, proxies y bake llevan el activo a 95 617 conservando cada pieza como entidad seleccionable.</aside>
 </section>
 
 <!-- ============ 10 · ACTIVO 3D INTERACTIVO ============ -->
@@ -781,14 +783,14 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">⏱ 9:15–9:40 · 2 clics — Visor 3D de la escena runtime exportada (252 mallas, ~229 000 triángulos): rotación libre, zoom y wireframe. Puente hacia Geometría: esta es la cifra runtime; el activo base optimizado es de 95 617 triángulos.</aside>
+  <aside class="notes">⏱ 8:40–9:05 · 2 clics — Visor 3D de la escena runtime exportada (252 mallas, ~229 000 triángulos): rotación libre, zoom y wireframe. Puente hacia Geometría: esta es la cifra runtime; el activo base optimizado es de 95 617 triángulos.</aside>
 </section>
 
 <!-- ============ 10 · GEOMETRÍA ============ -->
 <section class="slide" data-label="Geometría">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">11</span>Geometría</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La reducción geométrica se lee como <em class="acc">presupuesto de activo</em>, no como conteo runtime.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">95 617 y 229 054 triángulos miden <em class="acc">dos cosas distintas</em>.</span></h1>
     <div class="duo">
       <div data-step="1">
         <span class="tag lime">Activo base</span>
@@ -805,87 +807,84 @@ em.acc-amber{font-style:normal;color:var(--amber)}
         <ul class="mini-list"><li>Incluye instancias, proxies, assets de apoyo y renderers adicionales.</li><li>252 renderers activos en la escena medida.</li></ul>
       </div>
     </div>
-    <div class="callout limit" data-step="3"><span class="tag amber">Criterio de interpretación</span><p>Las cifras no son equivalentes ni se contradicen: una mide el costo del activo; la otra, la complejidad de la escena en ejecución.</p></div>
+    <div class="callout limit" data-step="3"><span class="tag amber">Cómo leerlas</span><p>La primera mide el modelo que sale del pipeline. La segunda cuenta todo lo que dibuja la escena mientras corre, con instancias y proxies incluidos.</p></div>
   </div>
-  <aside class="notes">⏱ 9:40–10:35 · 3 clics — No comparar 95 617 y 229 054 como la misma métrica. Una es el activo base optimizado (masters principales); la otra es el conteo runtime estimado por el profiler, con instancias, proxies, assets de apoyo y renderers adicionales.</aside>
+  <aside class="notes">⏱ 9:05–9:50 · 3 clics — 95 617 = activo base del pipeline (cada pieza distinta una vez). 229 054 = conteo del profiler con la escena corriendo (instancias, proxies de tornillería, apoyo; 252 renderers). No se restan ni se comparan.</aside>
 </section>
 
 <!-- ============ 11 · ARQUITECTURA ============ -->
 <section class="slide" data-label="Arquitectura">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">12</span>Arquitectura</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La arquitectura separa <em class="acc">UI, orquestación, servicios de escena y datos</em>.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Los módulos se hablan por un <em class="acc">bus de eventos</em>: quien avisa no sabe quién escucha.</span></h1>
     <div class="stack">
       <div class="layer" data-step="1"><span class="layer-tag lime">UI</span><div class="chips"><span class="chip">UIManager</span><span class="chip">UIDetailsSheet</span><span class="chip">HotspotManager</span><span class="chip">Hero · Explore · Inspect · Analyze · Studio</span></div></div>
       <div class="layer" data-step="2"><span class="layer-tag">Core</span><div class="chips"><span class="chip">EventBus</span><span class="chip">AppStateMachine</span><span class="chip">SelectionManager</span><span class="chip">ViewModeManager</span></div></div>
       <div class="layer" data-step="3"><span class="layer-tag">Scene</span><div class="chips"><span class="chip">ExplodedViewManager</span><span class="chip">CrossSectionManager</span><span class="chip">PartVisibilityManager</span><span class="chip">ThermalSimulationManager</span><span class="chip hl">WebGLProfiler — JSON / CSV</span></div></div>
       <div class="layer" data-step="4"><span class="layer-tag lime">Data</span><div class="chips"><span class="chip lime">DronePartData</span><span class="chip lime">PartCatalogManager</span><span class="chip lime">ExplodablePart</span><span class="chip lime">Shader Materials (URP)</span></div></div>
     </div>
+    <div class="callout key" data-step="5"><span class="tag lime">Ejemplo real · tocar una pieza</span><p>SelectionManager publica <strong style="color:var(--ink)">PartSelectedEvent</strong>. UIManager abre la ficha, HotspotManager limpia el resaltado y, si es un tornillo, FastenerInspectionManager arma su versión detallada.</p></div>
   </div>
-  <aside class="notes">⏱ 10:35–11:40 · 4 clics — Arquitectura en cuatro capas (Fig. 47 del informe): presentación (UIManager, UIDetailsSheet, HotspotManager), orquestación (EventBus publish/subscribe, AppStateMachine, SelectionManager, ViewModeManager), servicios de escena (explode, corte, visibilidad, térmico y profiler interno) y datos (DronePartData, catálogo). La UI publica un evento y no conoce a sus receptores.</aside>
+  <aside class="notes">⏱ 9:50–11:00 · 5 clics — Cuatro grupos (Fig. 47): interfaz, coordinación (EventBus publish/subscribe + AppStateMachine), servicios de escena y datos. Ejemplo verificado en código: SelectionManager publica PartSelectedEvent; UIManager, HotspotManager y FastenerInspectionManager están suscritos y reaccionan sin que el emisor los conozca.</aside>
 </section>
 
 <!-- ============ 12 · TAXONOMÍA ============ -->
 <section class="slide" data-label="Taxonomía">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">13</span>Taxonomía</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La taxonomía permite seleccionar <em class="acc">piezas madre, subpiezas, hotspots y fasteners</em>.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La taxonomía le dice a la app <em class="acc">qué tocó el usuario</em>; la tornillería exigió un sistema propio.</span></h1>
     <div class="band">
       <div class="metric" data-step="1"><span class="tag">Piezas canónicas</span><div class="m-value"><span data-count="28">0</span></div><p>Entidades semánticas principales con asset DronePartData.</p></div>
       <div class="metric" data-step="2"><span class="tag">Anchors de escena</span><div class="m-value"><span data-count="30">0</span></div><p>28 piezas base más grupos técnicos de fasteners y misceláneos.</p></div>
       <div class="metric" data-step="3"><span class="tag lime">Renderers y colliders</span><div class="m-value lime"><span data-count="257">0</span></div><p>Elementos de malla y colisionadores auditados en runtime.</p></div>
     </div>
     <div class="trio">
-      <div data-step="4"><span class="tag">Hotspots</span><h3>Señalización</h3><p>Puntos de anclaje para dirigir la exploración a zonas relevantes del ensamblaje.</p></div>
-      <div data-step="5"><span class="tag">Fasteners</span><h3>Ensamblaje</h3><p>Elementos de sujeción tratados como parte de una relación de ensamblaje, no como ruido aislado.</p></div>
-      <div data-step="6"><span class="tag lime">Bottom sheet</span><h3>Lectura contextual</h3><p>Traduce selección geométrica a ficha técnica comprensible para inspección.</p></div>
+      <div data-step="4"><span class="tag">Hotspots</span><h3>Puntos de entrada</h3><p>Marcas sobre el modelo que señalan grupos de piezas. Un toque selecciona el grupo sin apuntar a una pieza diminuta.</p></div>
+      <div data-step="5"><span class="tag amber">Tornillería</span><h3>El mayor peso</h3><p>En la importación con STEPper, los tornillos, tuercas y separadores sumaban 425 208 triángulos: el 79 % del archivo.</p></div>
+      <div data-step="6"><span class="tag lime">Tornillo modular</span><h3>5 piezas base</h3><p>En escena, cada sujetador es un proxy de 88 triángulos o menos (14 408 en total). Al inspeccionar un tornillo, la app lo arma con cabeza, vueltas de rosca y punta.</p></div>
     </div>
     <figure class="melt" data-step="7">
-      <img src="assets/img/ui02.jpg" alt="Hotspots de selección sobre el ensamblaje del dron en el visor" style="max-height:clamp(170px,22vh,230px)">
-      <figcaption class="figcap">Hotspots «select a part» sobre el ensamblaje — la taxonomía dirige la lectura visual.</figcaption>
+      <img src="assets/img/fasteners_modular.jpg" alt="Piezas base del tornillo modular: tres cabezas, una vuelta de rosca y una punta, junto a un tornillo armado con ellas" style="max-height:clamp(120px,16vh,170px);border-radius:8px">
+      <figcaption class="figcap">Tres cabezas, una vuelta de rosca y una punta. La vuelta se repite según largo ÷ paso de rosca (Figs. 28–29).</figcaption>
     </figure>
   </div>
-  <aside class="notes">⏱ 11:40–12:35 · 7 clics — Taxonomía como estructura operativa: 28 piezas canónicas (DronePartData), 30 anchors de escena (28 + fastener_group + misc_group) y 257 renderers/colliders auditados. Cuatro niveles de selección: pieza madre, subpieza, hotspot y fastener.</aside>
+  <aside class="notes">⏱ 11:00–12:30 · 7 clics — 28 piezas con DronePartData, 30 anchors (28 + fastener_group + misc_group), 257 renderers/colliders. BOM = lista de materiales industrial; la taxonomía se le parece pero sirve para navegar. Tornillería: 425 208 triángulos en stepper.fbx (79 % del archivo) → 14 408 en proxies de la escena final (medido en los FBX del proyecto; ver P9). FastenerBuilder arma el tornillo detallado al inspeccionarlo: 3 cabezas + vuelta de rosca + punta; vueltas = largo ÷ paso.</aside>
 </section>
 
 <!-- ============ 13 · FLUJO PÚBLICO ============ -->
 <section class="slide" data-label="Flujo público">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">14</span>Flujo público</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El flujo de usuario revela la complejidad del dron de forma <em class="acc">progresiva</em>.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El detalle aparece cuando el usuario lo pide; los <em class="acc">modos</em> están siempre a mano.</span></h1>
     <div class="flow-wrap" data-reveal="media" style="--d:.4s">
-      <svg viewBox="0 0 960 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flujo de usuario">
+      <svg viewBox="0 0 780 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flujo de usuario" style="max-height:clamp(96px,14vh,132px)">
         <defs><marker id="fa" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#C8F53F"/></marker></defs>
-        <g><rect x="0" y="32" width="130" height="56" rx="7" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/><text x="65" y="56" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="600">Hero</text><text x="65" y="72" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">orientación</text></g>
-        <g data-step="1"><line x1="132" y1="60" x2="142" y2="60" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="146" y="32" width="130" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="211" y="56" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Explore</text><text x="211" y="72" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">órbita / zoom</text></g>
-        <g data-step="2"><line x1="278" y1="60" x2="288" y2="60" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="292" y="32" width="130" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="357" y="56" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Selección</text><text x="357" y="72" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">click en pieza</text></g>
-        <g data-step="3"><line x1="424" y1="60" x2="434" y2="60" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="438" y="32" width="140" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="508" y="56" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Bottom Sheet</text><text x="508" y="72" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">ficha contextual</text></g>
+        <g><rect x="0" y="6" width="170" height="56" rx="7" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/><text x="85" y="30" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="600">Hero</text><text x="85" y="46" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">pantalla de entrada</text></g>
+        <g data-step="1"><line x1="172" y1="34" x2="190" y2="34" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="196" y="6" width="170" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="281" y="30" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Explore</text><text x="281" y="46" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">órbita · zoom · hotspots</text></g>
+        <g data-step="2"><line x1="368" y1="34" x2="386" y2="34" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="392" y="6" width="170" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="477" y="30" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Selección</text><text x="477" y="46" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">toque en una pieza</text></g>
+        <g data-step="3"><line x1="564" y1="34" x2="582" y2="34" stroke="#C8F53F" stroke-width="1.4" opacity=".75" marker-end="url(#fa)"/><rect x="588" y="6" width="190" height="56" rx="7" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="683" y="30" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11.5">Ficha (bottom sheet)</text><text x="683" y="46" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">datos de la pieza</text></g>
         <g data-step="4">
-          <line x1="580" y1="60" x2="600" y2="60" stroke="#C8F53F" stroke-width="1.4"/>
-          <line x1="600" y1="60" x2="600" y2="16" stroke="#C8F53F" stroke-width="1.4"/>
-          <line x1="600" y1="60" x2="600" y2="104" stroke="#C8F53F" stroke-width="1.4"/>
-          <line x1="600" y1="16" x2="616" y2="16" stroke="#C8F53F" stroke-width="1.4" marker-end="url(#fa)"/>
-          <line x1="600" y1="60" x2="616" y2="60" stroke="#C8F53F" stroke-width="1.4" marker-end="url(#fa)"/>
-          <line x1="600" y1="104" x2="616" y2="104" stroke="#C8F53F" stroke-width="1.4" marker-end="url(#fa)"/>
-          <rect x="620" y="2" width="100" height="30" rx="6" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/>
-          <text x="670" y="22" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600">Inspect</text>
-          <rect x="620" y="45" width="100" height="30" rx="6" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/>
-          <text x="670" y="65" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="10">Analyze</text>
-          <rect x="620" y="88" width="100" height="30" rx="6" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/>
-          <text x="670" y="108" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="10">Studio</text>
+          <rect x="196" y="84" width="582" height="40" rx="8" fill="rgba(200,245,63,.05)" stroke="#C8F53F" stroke-width="1.2"/>
+          <text x="210" y="109" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">BARRA INFERIOR · SIEMPRE VISIBLE</text>
+          <text x="530" y="109" text-anchor="middle" fill="#C8F53F" font-family="JetBrains Mono,monospace" font-size="11" font-weight="600">Inspect</text>
+          <text x="620" y="109" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11">Analyze</text>
+          <text x="710" y="109" text-anchor="middle" fill="#EDEEE8" font-family="JetBrains Mono,monospace" font-size="11">Studio</text>
+          <line x1="281" y1="64" x2="281" y2="82" stroke="rgba(200,245,63,.45)" stroke-width="1.2" stroke-dasharray="3,3"/>
+          <line x1="477" y1="64" x2="477" y2="82" stroke="rgba(200,245,63,.45)" stroke-width="1.2" stroke-dasharray="3,3"/>
+          <line x1="683" y1="64" x2="683" y2="82" stroke="rgba(200,245,63,.45)" stroke-width="1.2" stroke-dasharray="3,3"/>
         </g>
       </svg>
     </div>
     <div class="duo-cols">
-      <div data-step="5"><span class="tag">Progresión de navegación</span><h3>Revelado por etapas</h3><p>El flujo reparte la complejidad en etapas lógicas, revelando opciones analíticas solo después de interactuar con el dron en Explore.</p></div>
-      <div data-step="6"><span class="tag lime">Filtros activos</span><h3>Ruido excluido</h3><p>Se excluyeron intencionalmente paneles de depuración y mediciones internas del recorrido básico para evitar el desborde cognitivo.</p></div>
+      <div data-step="5"><span class="tag">Progresión de navegación</span><h3>Detalle bajo demanda</h3><p>La ficha solo se abre al tocar una pieza. La barra Inspect · Analyze · Studio está fija desde Explore: cambiar de modo nunca exige buscar un menú.</p></div>
+      <div data-step="6"><span class="tag lime">Build pública</span><h3>Sin paneles de prueba</h3><p>Los paneles de depuración y las mediciones internas se quitaron del recorrido público. Siguen en el código para medir.</p></div>
     </div>
     <figure class="melt" data-step="7">
       <img src="assets/img/ui01.jpg" alt="Captura del flujo público: selección de pieza, herramientas Analyze y navegación Inspect · Analyze · Studio" style="max-height:clamp(190px,25vh,270px)">
-      <figcaption class="figcap">Selección de pieza → herramientas Analyze (Cut · Explode · Filter) → navegación Inspect / Analyze / Studio.</figcaption>
+      <figcaption class="figcap">Pieza seleccionada con las herramientas de Analyze (Cut · Explode · Filter) y la barra inferior de modos.</figcaption>
     </figure>
   </div>
-  <aside class="notes">⏱ 12:35–13:25 · 7 clics — Flujo público y visible: Hero → Explore → Selección → Bottom Sheet → Herramientas.</aside>
+  <aside class="notes">⏱ 12:30–13:15 · 7 clics — Hero → Explore → Selección → Ficha (bottom sheet). La barra Inspect · Analyze · Studio está siempre visible; lo que aparece bajo demanda es la ficha. Paneles de depuración fuera de la build pública.</aside>
 </section>
 
 <!-- ============ 14 · INSPECT & ANALYZE ============ -->
@@ -920,26 +919,26 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">⏱ 13:25–14:20 · 4 clics — Inspect / Analyze. Herramientas analíticas para reducir carga extrínseca.</aside>
+  <aside class="notes">⏱ 13:15–14:05 · 4 clics — Inspect / Analyze. Herramientas analíticas para reducir carga extrínseca.</aside>
 </section>
 
 <!-- ============ 15 · STUDIO ============ -->
 <section class="slide" data-label="Studio">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">16</span>Studio</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Los shaders son herramientas de <em class="acc">inspección técnica</em>, no filtros estéticos.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Cada modo de Studio responde <em class="acc">una pregunta distinta</em> sobre el mismo dron.</span></h1>
     <div class="studio-wrap">
       <div class="studio-content">
         <div class="studio-quad">
           <div data-step="1"><span class="tag">Realistic</span><h3>Orientación</h3><p>Lectura general del ensamblaje completo.</p></div>
           <div data-step="2"><span class="tag lime">X-Ray</span><h3>Lectura interna</h3><p>Visibilidad de componentes internos ocultos.</p></div>
           <div data-step="3"><span class="tag">Solid</span><h3>Relación geométrica</h3><p>Color plano y contorno para leer forma y silueta.</p></div>
-          <div data-step="4"><span class="tag amber">Thermal</span><h3>Interés relativo</h3><p>Jerarquías de atención visual por componente.</p></div>
+          <div data-step="4"><span class="tag amber">Thermal</span><h3>Calor estimado</h3><p>Temperatura por pieza según carga, contacto y material.</p></div>
         </div>
         <div data-step="5" style="border-top:1px solid var(--line);padding-top:clamp(12px,1.6vh,18px)">
           <ul class="mini-list">
-            <li>Cada modo responde una pregunta distinta sobre el mismo ensamblaje.</li>
-            <li>Los shaders no son un adorno; son una estrategia de lectura técnica.</li>
+            <li>Un shader es el programa que decide cómo responde la superficie a la luz, el color y la transparencia.</li>
+            <li>Blueprint, la lectura tipo plano, se activa como preset de Studio.</li>
           </ul>
         </div>
       </div>
@@ -949,64 +948,61 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </figure>
     </div>
   </div>
-  <aside class="notes">⏱ 14:20–15:15 · 6 clics — Studio y modos visuales. El valor multimedia radica en la capacidad de inspección técnica visual.</aside>
+  <aside class="notes">⏱ 14:05–14:50 · 6 clics — Cada modo responde una pregunta: Realistic (cómo se ve), X-Ray (qué hay adentro), Solid (forma), Thermal (dónde se acumula el calor). Shader = programa de superficie; preset = combinación guardada (Blueprint).</aside>
 </section>
 
 <!-- ============ 16 · THERMAL ============ -->
 <section class="slide" data-label="Thermal">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">17</span>Thermal</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Thermal es una visualización <em class="acc-amber">heurística</em>, no una simulación FEA calibrada.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Thermal estima el calor con un <em class="acc-amber">modelo físico simplificado</em>, sin llegar a FEA.</span></h1>
     <div class="duo-cols">
       <div data-step="1">
-        <span class="tag amber">Límite declarado</span>
+        <span class="tag lime">Cómo calcula</span>
         <ul class="mini-list">
-          <li>Comunica jerarquías relativas de interés visual entre componentes.</li>
-          <li>No usa sensores, telemetría ni datos térmicos físicos del dron.</li>
-          <li>Su función es exploratoria y comunicativa, no diagnóstica.</li>
-          <li>La leyenda en °C es la escala del modelo heurístico por componentes, no una medición.</li>
+          <li>Cada pieza es un nodo con su propia temperatura.</li>
+          <li>Motores, ESC y batería generan calor según el estado del dron: apagado, arranque, reposo o vuelo.</li>
+          <li>El calor pasa entre piezas en contacto según el área de contacto, la longitud del camino y la conductividad del material.</li>
+          <li>El aire enfría cada pieza según cuánto está expuesta.</li>
         </ul>
       </div>
       <div data-step="2" class="svg-panel">
-        <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escala heurística">
-          <defs><linearGradient id="therm" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#9BA0A6"/><stop offset="50%" stop-color="#FFB224"/><stop offset="100%" stop-color="#FF5C5C"/></linearGradient></defs>
-          <text x="250" y="20" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="11">Lectura heurística relativa</text>
-          <rect x="40" y="40" width="420" height="24" rx="5" fill="url(#therm)" opacity=".8"/>
-          <text x="40" y="84" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="10">Baja</text>
-          <text x="460" y="84" fill="#FF5C5C" font-family="JetBrains Mono,monospace" font-size="10" text-anchor="end">Alta</text>
-          <rect x="40" y="100" width="130" height="36" rx="6" fill="rgba(255,255,255,.02)" stroke="rgba(237,238,232,.22)"/><text x="105" y="123" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="10">Estructura</text>
-          <rect x="185" y="100" width="130" height="36" rx="6" fill="rgba(255,178,36,.05)" stroke="#FFB224" stroke-width="1"/><text x="250" y="123" text-anchor="middle" fill="#FFB224" font-family="JetBrains Mono,monospace" font-size="10">ESC / electrónica</text>
-          <rect x="330" y="100" width="130" height="36" rx="6" fill="rgba(255,92,92,.05)" stroke="#FF5C5C" stroke-width="1"/><text x="395" y="123" text-anchor="middle" fill="#FF5C5C" font-family="JetBrains Mono,monospace" font-size="10">Motores / batería</text>
+        <svg viewBox="0 0 500 196" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Modelo térmico por componentes">
+          <defs>
+            <linearGradient id="therm" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#4A7BD0"/><stop offset="50%" stop-color="#FFB224"/><stop offset="100%" stop-color="#FF5C5C"/></linearGradient>
+            <marker id="tha" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#FFB224"/></marker>
+          </defs>
+          <rect x="4" y="14" width="136" height="54" rx="7" fill="rgba(255,92,92,.06)" stroke="#FF5C5C" stroke-width="1"/>
+          <text x="72" y="37" text-anchor="middle" fill="#FF5C5C" font-family="JetBrains Mono,monospace" font-size="10.5" font-weight="600">Fuente</text>
+          <text x="72" y="54" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="9.5">motor · ESC · LiPo</text>
+          <line x1="142" y1="41" x2="178" y2="41" stroke="#FFB224" stroke-width="1.3" marker-end="url(#tha)"/>
+          <text x="160" y="84" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="10">conducción</text>
+          <text x="160" y="99" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">área / longitud · k</text>
+          <rect x="182" y="14" width="136" height="54" rx="7" fill="rgba(255,178,36,.05)" stroke="#FFB224" stroke-width="1"/>
+          <text x="250" y="37" text-anchor="middle" fill="#FFB224" font-family="JetBrains Mono,monospace" font-size="10.5" font-weight="600">Pieza vecina</text>
+          <text x="250" y="54" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="9.5">brazo · placa · soporte</text>
+          <line x1="320" y1="41" x2="356" y2="41" stroke="#FFB224" stroke-width="1.3" marker-end="url(#tha)"/>
+          <text x="338" y="84" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="10">convección</text>
+          <text x="338" y="99" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="9.5">según exposición</text>
+          <rect x="360" y="14" width="136" height="54" rx="7" fill="rgba(74,123,208,.06)" stroke="#4A7BD0" stroke-width="1"/>
+          <text x="428" y="37" text-anchor="middle" fill="#7FA6E6" font-family="JetBrains Mono,monospace" font-size="10.5" font-weight="600">Aire</text>
+          <text x="428" y="54" text-anchor="middle" fill="#9BA0A6" font-family="JetBrains Mono,monospace" font-size="9.5">temperatura ambiente</text>
+          <rect x="40" y="124" width="420" height="18" rx="5" fill="url(#therm)" opacity=".85"/>
+          <text x="40" y="160" fill="#7FA6E6" font-family="JetBrains Mono,monospace" font-size="9.5">Más frío</text>
+          <text x="460" y="160" fill="#FF5C5C" font-family="JetBrains Mono,monospace" font-size="9.5" text-anchor="end">Más caliente</text>
+          <text x="250" y="184" text-anchor="middle" fill="#767C85" font-family="JetBrains Mono,monospace" font-size="10">Tiempo acelerado · conductividades escaladas · °C del modelo</text>
         </svg>
       </div>
     </div>
+    <div class="callout limit" data-step="2"><span class="tag amber">Límite</span><p>No usa sensores ni resuelve elementos finitos. Sirve para explicar por dónde viaja el calor. Diagnosticar exigiría un modelo calibrado con mediciones.</p></div>
   </div>
-  <aside class="notes">⏱ 15:15–16:05 · 2 clics — Thermal con límites explícitos. Modelo reducido por componentes (lumped) con factor de carga del dron y tiempos comprimidos; la leyenda en °C es escala del modelo heurístico. No recibe telemetría, no es FEA ni temperatura real. Jerarquía (Fig. 13): alta = motores y batería; media = ESC, controladora y electrónica; baja = estructura y hélices.</aside>
-</section>
-
-<!-- ============ 17 · DEMO (3 CAPACIDADES) ============ -->
-<section class="slide" data-label="Demo capacidades">
-  <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">18</span>Demo</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La demo debe probar <em class="acc">tres capacidades</em>, no navegar improvisadamente.</span></h1>
-    <div class="trio">
-      <div class="metric" data-step="1"><span class="obj-num">01</span><h3 style="margin-top:10px">Selección</h3><p>Pasar del dron completo a una pieza concreta con su ficha contextual.</p></div>
-      <div class="metric" data-step="2"><span class="obj-num">02</span><h3 style="margin-top:10px">Relación</h3><p>Mantener contexto entre pieza y ensamblaje sin perder legibilidad.</p></div>
-      <div class="metric" data-step="3"><span class="obj-num">03</span><h3 style="margin-top:10px">Modo visual</h3><p>Cambiar la lectura del modelo sin cambiar el alcance del sistema.</p></div>
-    </div>
-    <div class="callout key" data-step="4"><span class="tag lime">Ruta de demo en vivo</span><p>Landing WebGL → Scrollytelling → Mini app → App Unity: selección · Inspect · Analyze · Studio</p></div>
-    <figure class="melt" data-step="5">
-      <img src="assets/img/app_02.jpg" alt="Prototipo TwinSight: dron ensamblado con herramientas Analyze visibles" style="max-height:clamp(180px,24vh,260px)">
-      <figcaption class="figcap">El prototipo que se demostrará: dron completo, selección y herramientas Analyze.</figcaption>
-    </figure>
-  </div>
-  <aside class="notes">⏱ 16:05–16:25 · 5 clics — Tres capacidades concretas a probar en demo: Selección, Relación y Modo visual.</aside>
+  <aside class="notes">⏱ 14:50–16:00 · 2 clics — Solver por componentes (ThermalSimulationManager, informe pp. 136–138): fuentes que tienden a T_eq según la carga (1 − e^(−Δt/τ)), conducción ΔT = (Tj − Ti)·Ĝ·Δt con Ĝ = s·A/L y escala por material (cobre 1,8 … LiPo 0,18, derivadas de k reales), convección por exposición. Tiempo acelerado, sin calibración SI, sin FEA. Ver B8.</aside>
 </section>
 
 <!-- ============ 18 · DEMO VIDEO ============ -->
 <section class="slide" data-label="Demo video">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">19</span>Demo</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">18</span>Demo</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Demo: de dron completo a pieza, relación y <em class="acc">modo visual</em>.</span></h1>
     <div class="demo-wrap">
       <figure class="phone phone-lg" data-reveal="media" style="--d:.4s">
@@ -1026,13 +1022,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">⏱ 16:25–19:25 · 2 clics — DEMO EN VIVO (principal): landing en otra ventana, al inicio de la sección 03 con el dron sin ensamblar. 0:00 ensamblaje con el cursor · 0:15 scroll por los 6 capítulos (~7 s c/u) · 1:00 mini app (Explosionar) · 1:10 «Abrir visor» → app Unity: selección → Isolate → ficha · 1:40 Power · 1:55 Explode/Cut · 2:20 X-Ray/Thermal/Solid · 2:45 cierre. RESPALDO: si la app no responde en 10 s, volver aquí y hacer clic en el video (tramo de la app, 88 s).</aside>
+  <aside class="notes">⏱ 16:00–19:00 · 2 clics — DEMO EN VIVO (principal): landing en otra ventana, al inicio de la sección 03 con el dron sin ensamblar. 0:00 ensamblaje con el cursor · 0:15 scroll por los 6 capítulos (~7 s c/u) · 1:00 mini app (Explosionar) · 1:10 «Abrir visor» → app Unity: selección → Isolate → ficha · 1:40 Power · 1:55 Explode/Cut · 2:20 X-Ray/Thermal/Solid · 2:45 cierre. RESPALDO: si la app no responde en 10 s, volver aquí y hacer clic en el video (tramo de la app, 88 s).</aside>
 </section>
 
 <!-- ============ 19 · PROFILER ============ -->
 <section class="slide" data-label="Profiler">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">20</span>Profiler</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">19</span>Profiler</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El profiler interno vuelve <em class="acc">trazable</em> el rendimiento por escenario y dispositivo.</span></h1>
     <div class="duo-cols">
       <div data-step="1">
@@ -1056,13 +1052,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </figure>
     </div>
   </div>
-  <aside class="notes">⏱ 19:25–20:25 · 2 clics — Profiler y trazabilidad. Extracto literal de la exportación JSON del WebGLProfiler (sesión thermal_studio, escritorio, 4 jun 2026; Tabla 18 del informe). El mismo archivo contiene el conteo runtime 229 054 y 252 renderers.</aside>
+  <aside class="notes">⏱ 19:00–19:45 · 2 clics — Profiler y trazabilidad. Extracto literal de la exportación JSON del WebGLProfiler (sesión thermal_studio, escritorio, 4 jun 2026; Tabla 18 del informe). El mismo archivo contiene el conteo runtime 229 054 y 252 renderers.</aside>
 </section>
 
 <!-- ============ 20 · RENDIMIENTO ============ -->
 <section class="slide" data-label="Rendimiento">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">21</span>Rendimiento</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">20</span>Rendimiento</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El rendimiento es <em class="acc">viable</em>, pero no universal en todo móvil.</span></h1>
     <div class="duo-cols">
       <div class="svg-panel" data-step="1">
@@ -1090,28 +1086,28 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout limit" data-step="5"><span class="tag amber">Compatibilidad declarada</span><p>La compatibilidad está acotada a los entornos documentados, sin promesas de uniformidad universal en móvil.</p></div>
   </div>
-  <aside class="notes">⏱ 20:25–21:25 · 5 clics — Rendimiento viable pero no universal en todo móvil. Se midieron seis configuraciones (Tabla 16); se muestran cuatro representativas. Escritorio e iPhone 17 Pro ≈60 FPS; Redmi Note 10S 26,5 FPS (funcional, bajo la meta); Adreno 610 17,6 FPS (límite inferior). Las sesiones con usuarios usaron solo dos entornos: este PC y el Redmi.</aside>
+  <aside class="notes">⏱ 19:45–20:40 · 5 clics — Rendimiento viable pero no universal en todo móvil. Se midieron seis configuraciones (Tabla 16); se muestran cuatro representativas. Escritorio e iPhone 17 Pro ≈60 FPS; Redmi Note 10S 26,5 FPS (funcional, bajo la meta); Adreno 610 17,6 FPS (límite inferior). Las sesiones con usuarios usaron solo dos entornos: este PC y el Redmi.</aside>
 </section>
 
 <!-- ============ 21 · USABILIDAD SUS ============ -->
 <section class="slide" data-label="Usabilidad SUS">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">22</span>Usabilidad</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">21</span>Usabilidad</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">SUS de <em class="acc">91,88</em>: recepción favorable del visor interactivo 3D.</span></h1>
     <div class="band">
       <div class="metric" data-step="1"><span class="tag lime">SUS · Prototipo 3D</span><div class="m-value lime"><span data-count="91.88" data-decimals="2">0</span></div><h3>Usabilidad</h3><p>Mediana 95,00 · DE 11,24 (n=12)</p></div>
-      <div class="metric" data-step="2"><span class="tag">Rango</span><div class="m-value">60–100</div><h3>Dispersión</h3><p>Mínimo 60 · máximo 100 en los 12 participantes</p></div>
-      <div class="metric" data-step="3"><span class="tag amber">Referencia</span><div class="m-value amber"><span data-count="68">0</span></div><h3>Media histórica</h3><p>Punto de comparación contextual, no umbral de aprobación</p></div>
+      <div class="metric" data-step="3"><span class="tag">Rango</span><div class="m-value">60–100</div><h3>Dispersión</h3><p>Mínimo 60 · máximo 100 en los 12 participantes</p></div>
+      <div class="metric" data-step="4"><span class="tag amber">Referencia</span><div class="m-value amber"><span data-count="68">0</span></div><h3>Media histórica</h3><p>Punto de comparación contextual, no umbral de aprobación</p></div>
     </div>
-    <div class="callout key" data-step="4"><span class="tag lime">Lectura correcta</span><p>SUS se aplicó solo al prototipo 3D: describe una usabilidad percibida favorable en esta muestra, no una comparación 3D frente a 2D.</p></div>
+    <div class="callout key" data-step="2"><span class="tag lime">Cómo se calcula</span><p>Diez afirmaciones, respondidas de 1 a 5. Las positivas aportan (respuesta − 1); las negativas, (5 − respuesta). La suma va de 0 a 40 y se multiplica por 2,5. Solo se aplicó al visor 3D.</p></div>
   </div>
-  <aside class="notes">⏱ 21:25–22:25 · 4 clics — SUS aplicado exclusivamente al prototipo 3D: media 91,88, mediana 95, DE 11,24, mínimo 60, máximo 100, n=12. La referencia 68 es la media histórica del instrumento (Bangor et al.), no un umbral. La comparación 3D vs 2D se hace en la slide siguiente con NASA-TLX Raw y tiempos.</aside>
+  <aside class="notes">⏱ 20:40–21:55 · 4 clics — SUS solo en 3D: media 91,88, mediana 95, DE 11,24, rango 60–100, n = 12. Cálculo: 10 ítems de 1 a 5; impares (R − 1), pares (5 − R); suma 0–40 × 2,5 = 0–100. 68 = media histórica (Bangor et al.), no umbral.</aside>
 </section>
 
 <!-- ============ 22 · NASA-TLX ============ -->
 <section class="slide" data-label="NASA-TLX">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">23</span>NASA-TLX Raw</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">22</span>NASA-TLX Raw</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">En la muestra, el visor 3D se asoció con menor <em class="acc">carga de trabajo percibida</em>.</span></h1>
     <div class="duo-cols">
       <div>
@@ -1123,7 +1119,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
           <li>Diferencia pareada media: <strong style="color:var(--ink)">11,19 puntos</strong> a favor del visor 3D.</li>
           <li>El valor fue menor en la condición 3D en los 12 casos individuales evaluados.</li>
         </ul>
-        <div class="callout limit" data-step="5" style="margin-top:14px"><span class="tag amber">Nota</span><p>T4: exploratoria guiada, no cronometrada. NASA-TLX Raw mide carga de trabajo percibida (workload) — no equivale a una medición fisiológica directa de carga cognitiva.</p></div>
+        <div class="callout limit" data-step="5" style="margin-top:14px"><span class="tag amber">Cómo se calcula</span><p>Seis escalas de 0 a 100: exigencia mental, física y temporal, desempeño, esfuerzo y frustración. Raw = promedio simple, sin ponderar. En desempeño, 0 es perfecto: así, en las seis, más alto es más carga.</p></div>
       </div>
       <div data-step="4" class="tscroll" style="margin-top:0">
         <table class="t-tareas">
@@ -1138,13 +1134,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
     </div>
   </div>
-  <aside class="notes">⏱ 22:25–23:30 · 5 clics — Menor carga percibida en 3D. Diferencia pareada de 11,19 puntos consistente en los 12 participantes.</aside>
+  <aside class="notes">⏱ 21:55–23:20 · 5 clics — NASA-TLX Raw en ambas condiciones: 8,69 (3D) vs 19,89 (2D), diferencia pareada 11,19, menor en 3D en los 12 casos. Seis escalas 0–100 promediadas sin ponderación pareada (Raw). Desempeño invertido (0 = perfecto) para que más alto sea siempre más carga. T1–T3: 20,58 s vs 54 s; T4 no cronometrada.</aside>
 </section>
 
 <!-- ============ 23 · VALIDACIÓN CUALITATIVA ============ -->
 <section class="slide" data-label="Validación cualitativa">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">24</span>Validación cualitativa</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">23</span>Validación cualitativa</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Think-Aloud explica comprensión espacial y <em class="acc-amber">fricciones residuales</em>.</span></h1>
     <div class="eval-grid">
       <div class="svg-panel" data-step="1">
@@ -1190,13 +1186,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <p class="figcap" data-step="4">Rigor académico: identificar fricciones residuales orienta el trabajo futuro y refuerza la transparencia de la evaluación formativa.</p>
   </div>
-  <aside class="notes">⏱ 23:30–24:30 · 4 clics — Think-Aloud complementa los números (Tabla 27). Apoyo: comprensión espacial 11/12 y percepción de claridad 8/12. Fricción: navegación y control 10/12 (órbita, pan, sensibilidad táctil), iconos procedurales 6 participantes, piezas pequeñas 2/12. Las fricciones demuestran una evaluación real y honesta.</aside>
+  <aside class="notes">⏱ 23:20–24:15 · 4 clics — Think-Aloud complementa los números (Tabla 27). Apoyo: comprensión espacial 11/12 y percepción de claridad 8/12. Fricción: navegación y control 10/12 (órbita, pan, sensibilidad táctil), iconos procedurales 6 participantes, piezas pequeñas 2/12. Las fricciones demuestran una evaluación real y honesta.</aside>
 </section>
 
 <!-- ============ 24 · DISCUSIÓN ============ -->
 <section class="slide" data-label="Discusión">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">25</span>Discusión</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">24</span>Discusión</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La discusión acota el resultado: efecto techo, muestra pequeña y <em class="acc-amber">compatibilidad limitada</em>.</span></h1>
     <div class="scope">
       <div class="scope-col" data-step="1">
@@ -1213,25 +1209,25 @@ em.acc-amber{font-style:normal;color:var(--amber)}
         <ul class="scope-list">
           <li>Generalización poblacional o causalidad fuerte.</li>
           <li>Compatibilidad móvil universal.</li>
-          <li>Thermal como simulación física o FEA.</li>
-          <li>Superioridad absoluta en éxito (efecto techo 12/12).</li>
+          <li>Thermal como diagnóstico térmico o sustituto de FEA.</li>
+          <li>Ventaja en tasa de éxito: 96 de 96 tareas completadas en ambas condiciones (efecto techo).</li>
         </ul>
       </div>
     </div>
   </div>
-  <aside class="notes">⏱ 24:30–25:40 · 2 clics — Discusión con límites explícitos. Saber qué se puede afirmar y qué no demuestra madurez investigativa.</aside>
+  <aside class="notes">⏱ 24:15–25:20 · 2 clics — Sí: menor tiempo, menor carga percibida, SUS alto, mejor descripción espacial. No: ventaja en éxito (96/96 en ambas condiciones = efecto techo), generalización (n = 12), compatibilidad universal, Thermal como diagnóstico.</aside>
 </section>
 
 <!-- ============ 25 · CONCLUSIONES ============ -->
 <section class="slide" data-label="Conclusiones">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">26</span>Conclusiones</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">25</span>Conclusiones</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Las conclusiones cierran cada objetivo con <em class="acc">evidencia trazable</em>.</span></h1>
     <div class="tscroll">
       <table class="t-obj">
         <thead><tr><th>Objetivo</th><th>Resultado operativo</th><th>Evidencia en el entorno</th></tr></thead>
         <tbody>
-          <tr data-step="1"><td>OE1 · Pipeline 3D</td><td>Optimización de mallas CAD: de 6,5M a 95 617 triángulos en activo base.</td><td>Filtros, retopología y bake documentados. Diagramas de flujo.</td></tr>
+          <tr data-step="1"><td>OE1 · Pipeline 3D</td><td>Del CAD teselado (~6,5 M de triángulos) a un activo base de 95 617.</td><td>Filtros, retopología y bake documentados. Diagramas de flujo.</td></tr>
           <tr data-step="2"><td>OE2 · Materiales / modos</td><td>URP Shaders con frame time &lt;33,33 ms en desktop; en móvil funcional, no universal. 5 modos visuales.</td><td>Build estable en entornos probados. Presets y shaders en escena.</td></tr>
           <tr data-step="3"><td>OE3 · Prototipo</td><td>Visor web 3D público y funcional con fichas de datos, Inspect, Analyze, Studio y Thermal.</td><td>Build WebGL pública funcional, URL de acceso y capturas de flujo.</td></tr>
           <tr data-step="4"><td>OE4 · Evaluación</td><td>SUS medio 91,88, NASA-TLX 8,69 (3D) vs. 19,89 (2D), tiempos consistentemente menores.</td><td>Tareas cronometradas (20,58 s vs 54 s), SUS, NASA y Think-Aloud.</td></tr>
@@ -1239,14 +1235,14 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </table>
     </div>
   </div>
-  <aside class="notes">⏱ 25:40–26:45 · 4 clics — Las conclusiones responden directamente a los 4 objetivos específicos del proyecto.</aside>
+  <aside class="notes">⏱ 25:20–26:25 · 4 clics — Las conclusiones responden directamente a los 4 objetivos específicos del proyecto.</aside>
 </section>
 
 <!-- ============ 26 · LIMITACIONES ============ -->
 <section class="slide" data-label="Limitaciones">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">27</span>Limitaciones</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Las limitaciones son <em class="acc-amber">alcance declarado</em>, no fallas ocultas.</span></h1>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">26</span>Limitaciones</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Cuatro límites marcan <em class="acc-amber">dónde valen</em> estos resultados.</span></h1>
     <div class="quad">
       <div data-step="1"><span class="tag amber">Modelo único</span><span class="sub">Holybro X500 V2</span><p>La arquitectura está preparada para generalizarse, pero la compatibilidad con otros drones no se ha validado.</p></div>
       <div data-step="2"><span class="tag amber">Muestra n = 12</span><span class="sub">Tamaño acotado</span><p>Suficiente para validación formativa y descriptiva, pero insuficiente para inferencia estadística poblacional.</p></div>
@@ -1255,14 +1251,14 @@ em.acc-amber{font-style:normal;color:var(--amber)}
     </div>
     <div class="callout limit" data-step="5"><span class="tag amber">Rigor metodológico</span><p>Declarar los límites del prototipo define con precisión el espacio de validez de las afirmaciones del proyecto.</p></div>
   </div>
-  <aside class="notes">⏱ 26:45–27:25 · 5 clics — Las limitaciones no son fallas ocultas; son límites de diseño declarados con rigor.</aside>
+  <aside class="notes">⏱ 26:25–27:05 · 5 clics — Un solo modelo de dron; n = 12; interfaz de escritorio adaptada desde la móvil; cables y electrónica interna fuera del MVP.</aside>
 </section>
 
 <!-- ============ 27 · TRABAJO FUTURO ============ -->
 <section class="slide" data-label="Trabajo futuro">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">28</span>Trabajo futuro</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El trabajo futuro es una <em class="acc">ruta de madurez</em>, no una lista de deseos.</span></h1>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">27</span>Trabajo futuro</p></header>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">El siguiente paso es conectar el modelo a <em class="acc">datos reales</em>, por fases.</span></h1>
     <div class="flow-wrap" data-reveal="media" style="--d:.4s">
       <svg viewBox="0 0 960 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escalera de madurez">
         <defs><marker id="tf" markerWidth="7" markerHeight="7" refX="5.5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#C8F53F"/></marker></defs>
@@ -1278,13 +1274,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <div data-step="6"><span class="tag lime">Fases 4–5 · Largo plazo</span><ul class="mini-list"><li>Modo servicio y mantenimiento guiado.</li><li>Digital twin operacional con modelos calibrados.</li></ul></div>
     </div>
   </div>
-  <aside class="notes">⏱ 27:25–27:55 · 6 clics — Ruta de madurez del informe (Fig. 80): Fase 0 ampliación del VPT, 1 twin manifest, 2 telemetría histórica (shadow de reproducción), 3 live digital shadow, 4 modo servicio, 5 digital twin operacional (modelos calibrados, what-if, human-in-the-loop).</aside>
+  <aside class="notes">⏱ 27:05–27:45 · 6 clics — Ruta del informe (Fig. 80): Fase 0 ampliar validación, 1 twin manifest por pieza, 2 telemetría grabada, 3 digital shadow en vivo, 4 modo servicio, 5 digital twin operacional con modelos calibrados (incluido el térmico).</aside>
 </section>
 
 <!-- ============ 28 · CONTRIBUCIÓN ============ -->
 <section class="slide" data-label="Contribución">
   <div class="slide-inner">
-    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">29</span>Contribución</p></header>
+    <header class="s-head" data-reveal style="--d:.12s"><p class="kicker"><span class="k-num">28</span>Contribución</p></header>
     <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">La contribución es <em class="acc">técnica, metodológica y comunicativa</em>.</span></h1>
     <div class="trio">
       <div data-step="1"><span class="tag lime">Técnica</span><ul class="mini-list"><li>Pipeline CAD → WebGL documentado.</li><li>Taxonomía operativa para selección y lectura.</li><li>Modos visuales y profiler integrados.</li></ul></div>
@@ -1292,13 +1288,13 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       <div data-step="3"><span class="tag lime">Comunicativa</span><ul class="mini-list"><li>Hardware complejo vuelto legible desde la web.</li><li>Relaciones espaciales accesibles sin CAD pesado.</li><li>Base útil para trabajo futuro más ambicioso.</li></ul></div>
     </div>
   </div>
-  <aside class="notes">⏱ 27:55–28:25 · 3 clics — Triple contribución técnica, metodológica y comunicativa.</aside>
+  <aside class="notes">⏱ 27:45–28:25 · 3 clics — Triple contribución técnica, metodológica y comunicativa.</aside>
 </section>
 
 <!-- ============ 29 · CIERRE ============ -->
 <section class="slide" data-label="Cierre">
   <div class="slide-inner closing">
-    <p class="kicker center" data-reveal style="--d:.15s"><span class="k-num">30</span>Preguntas del jurado</p>
+    <p class="kicker center" data-reveal style="--d:.15s"><span class="k-num">29</span>Preguntas del jurado</p>
     <h1 class="closing-title"><span class="ln" data-scramble style="--d:.32s">Gracias<span class="dot">.</span></span></h1>
     <p class="closing-sub" data-reveal style="--d:.6s">De la complejidad física a la legibilidad interactiva — una arquitectura WebGL trazable para la inspección técnica de ensamblajes complejos.</p>
     <div class="closing-meta" data-reveal style="--d:.82s">
@@ -1440,28 +1436,29 @@ em.acc-amber{font-style:normal;color:var(--amber)}
 <section class="slide" data-label="B8 Thermal">
   <div class="slide-inner">
     <header class="s-head" data-reveal style="--d:.12s"><p class="kicker amber"><span class="k-num">B8</span>Backup — Thermal</p></header>
-    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Thermal: <em class="acc-amber">heurístico relativo</em>, no FEA.</span></h1>
+    <h1 class="slide-title"><span class="ln" data-scramble style="--d:.24s">Thermal: el modelo, sus ecuaciones y su <em class="acc-amber">alcance</em>.</span></h1>
     <div class="scope">
       <div class="scope-col" data-step="1">
-        <div class="scope-head"><span class="mark ok">+</span><h3>Lo que hace</h3><span class="tag lime">Sí</span></div>
+        <div class="scope-head"><span class="mark ok">+</span><h3>Lo que calcula</h3><span class="tag lime">Sí</span></div>
         <ul class="scope-list">
-          <li>Comunica zonas de interés relativas por componente.</li>
-          <li>Usa jerarquías de interpretación dentro del prototipo.</li>
-          <li>Permite lectura visual exploratoria diferencial.</li>
+          <li>Fuente: T tiende a T<sub>eq</sub>(carga) con 1 − e<sup>−Δt/τ</sup>.</li>
+          <li>Conducción: ΔT<sub>ij</sub> = (T<sub>j</sub> − T<sub>i</sub>) · Ĝ<sub>ij</sub> · Δt, con Ĝ = s · A / L.</li>
+          <li>Material: cobre 1,8 · aluminio 1,4 · acero 1,0 · fibra de carbono 0,65 · FR4 0,4 · plásticos 0,2 · LiPo 0,18.</li>
+          <li>Convección: (T<sub>amb</sub> − T) · tasa · exposición · Δt.</li>
         </ul>
       </div>
       <div class="scope-col out" data-step="2">
         <div class="scope-head"><span class="mark no">×</span><h3>Lo que no hace</h3><span class="tag red">No</span></div>
         <ul class="scope-list">
           <li>No recibe sensores ni telemetría.</li>
-          <li>No calcula temperatura real.</li>
-          <li>No ejecuta FEA ni solver físico.</li>
+          <li>No resuelve elementos finitos ni usa unidades SI calibradas.</li>
+          <li>Comprime el tiempo para que el cambio se vea en segundos.</li>
           <li>No diagnostica fallas térmicas.</li>
         </ul>
       </div>
     </div>
   </div>
-  <aside class="notes">Respuestas de respaldo y Q&A: límites precisos del modo Thermal.</aside>
+  <aside class="notes">Respaldo Thermal: solver por componentes (ThermalSimulationManager). Las escalas de material se derivan de k reales (Cu 390, Al 167, acero 16,2, CF 2,5, FR4 0,30, LiPo 0,50, nylon 0,28 W/m·K) comprimidas para que las piezas no se igualen en un cuadro; verificadas con WolframAlpha según el informe.</aside>
 </section>
 
 <!-- ============ B9 · LIMITACIONES METODOLÓGICAS ============ -->
@@ -1481,7 +1478,7 @@ em.acc-amber{font-style:normal;color:var(--amber)}
       </div>
       <div data-step="2">
         <ul class="mini-list">
-          <li>Thermal heurístico, no simulación FEA calibrada.</li>
+          <li>Thermal: modelo por componentes simplificado, sin FEA ni calibración.</li>
           <li>Compatibilidad móvil acotada por dispositivo probado.</li>
           <li>Desktop como adaptación funcional, no UI nativa de escritorio.</li>
           <li>Sin telemetría real ni sincronización con dron físico.</li>

@@ -8,7 +8,7 @@
 
 ## Qué contiene esta carpeta
 
-1. **La presentación** (`index_final.html`): 30 slides principales + 11 de respaldo (B1–B11), con visor 3D, videos y diagramas.
+1. **La presentación** (`index_final.html`): 29 slides principales + 11 de respaldo (B1–B11), con visor 3D, videos y diagramas.
 2. **Los materiales orales**, sincronizados entre sí y con el deck: guion, tarjetas, estructura y guion de demo.
 3. **El material de defensa**: banco de preguntas, guía de estudio, atlas bibliográfico y mapa de evidencias.
 
@@ -28,7 +28,7 @@
 |---|---|
 | `→`, `Espacio`, `Av Pág`, clic | Revelar el siguiente paso o avanzar de slide |
 | `←`, `Re Pág` | Ocultar el último paso o retroceder |
-| `Inicio` / `Fin` | Ir a la portada / al cierre (slide 30) |
+| `Inicio` / `Fin` | Ir a la portada / al cierre (slide 29) |
 | `F` | Pantalla completa |
 | `N` | Notas del presentador (tiempo y clics por slide). **Solo para ensayar**: se ven en la misma pantalla que el jurado. |
 | Contador superior derecho | Escribir un número (`12`) o un backup (`B3`) y pulsar `Enter` para saltar |
@@ -46,8 +46,8 @@ La numeración visible de cada slide (01–30) coincide con la de todos los docu
 | `index_final.html` | Deck oficial. |
 | `SPEAKER_CARDS.md` | Una tarjeta por slide: tiempo, clics, tesis oral, evidencia en pantalla y riesgo a evitar. Prioridad si el tiempo aprieta. |
 | `PRESENTATION_SCRIPT.md` | Guion oral completo (28:30): un `[click n]` por cada paso del deck, transiciones, frases a evitar, checklist técnico, preguntas frecuentes y cortes de emergencia. |
-| `PRESENTATION_OUTLINE.md` | Estructura de las 30 slides, bloques de tiempo, backups e inventario de assets. |
-| `DEMO_SCRIPT.md` | Ruta de la demo en vivo (slide 19), respaldo en video y demo extendida para preguntas. |
+| `PRESENTATION_OUTLINE.md` | Estructura de las 29 slides, bloques de tiempo, backups e inventario de assets. |
+| `DEMO_SCRIPT.md` | Ruta de la demo en vivo (slide 18), respaldo en video y demo extendida para preguntas. |
 
 ### Para responder al jurado
 
@@ -72,8 +72,8 @@ La numeración visible de cada slide (01–30) coincide con la de todos los docu
 ## Reglas de oro
 
 1. **Alcance:** TwinSight X500 es un *visual product twin*. No es un gemelo digital operacional, no recibe telemetría ni ejecuta FEA.
-2. **Thermal:** visualización heurística relativa por componentes. La leyenda en °C es la escala del modelo, no una medición.
+2. **Thermal:** modelo físico simplificado por componentes (fuentes según la carga, conducción por área, longitud y material, convección). Tiempo acelerado y sin calibrar: la leyenda en °C es la salida del modelo, no una medición. No es FEA.
 3. **NASA-TLX Raw:** mide carga de trabajo percibida, no las tres cargas de Sweller.
 4. **SUS:** solo del prototipo 3D; no compara 3D con 2D.
 5. **Muestra:** n = 12, no probabilística; lectura formativa y descriptiva, sin inferencia poblacional.
-6. **Demo:** en vivo en la build pública. Si no responde en 10 s, volver a la slide 19 y reproducir el video de respaldo sin comentar el fallo.
+6. **Demo:** en vivo en la build pública. Si no responde en 10 s, volver a la slide 18 y reproducir el video de respaldo sin comentar el fallo.

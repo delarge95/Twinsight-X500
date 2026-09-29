@@ -15,11 +15,11 @@ Este documento se ensaya junto con `PRESENTATION_SCRIPT.md`. La evidencia por sl
 
 ## Rol de este guion (actualizado 2026-09-29)
 
-- **Durante la exposición (slide 19)** la demo es **en vivo** y dura 3:00: primero la **landing pública** (WebGL puro: ensamblaje con el cursor, seis capítulos de scrollytelling y mini app, ~1:10) y luego, desde su botón «Abrir visor», la **app Unity** con la ruta corta de abajo (~1:40). Narración en `PRESENTATION_SCRIPT.md`.
+- **Durante la exposición (slide 18)** la demo es **en vivo** y dura 3:00: primero la **landing pública** (WebGL puro: ensamblaje con el cursor, seis capítulos de scrollytelling y mini app, ~1:10) y luego, desde su botón «Abrir visor», la **app Unity** con la ruta corta de abajo (~1:40). Narración en `PRESENTATION_SCRIPT.md`.
 - **Respaldo:** si la build no responde en 10 s o se congela, volver al deck y hacer clic sobre el video `assets/video/vid_01_demo_compilado.mp4` (88 s, mismo recorrido), que espera en pausa en 0:00.
 - **Este guion de 5 minutos** es la demo extendida para la ronda de preguntas si el jurado pide profundizar.
 
-### Ruta corta de la demo en vivo (slide 19)
+### Ruta corta de la demo en vivo (slide 18)
 
 Preparar antes: landing abierta en otra ventana, al inicio de la sección 03 con el dron sin ensamblar; abrir una vez «Abrir visor» para cachear la build y cerrarla. Tramo de la app, en este orden:
 
@@ -128,9 +128,9 @@ Preparar antes: landing abierta en otra ventana, al inicio de la sección 03 con
 
 > "Ademas de las tarjetas de modo, Studio publica presets: Studio, Studio Light y Blueprint, que convierte la escena en una lectura de planos y siluetas."
 
-**Accion:** Mostrar Thermal solo como lectura heuristica.
+**Accion:** Mostrar Thermal con el dron en vuelo (Power) para que el calor suba en motores, ESC y bateria.
 
-> "Thermal no es FEA ni una medicion fisica calibrada. Es un modelo reducido por componentes, alimentado por el control de energia; la leyenda en grados es la escala de ese modelo heuristico, no una medicion."
+> "Thermal calcula el calor con un modelo fisico simplificado: las fuentes se calientan segun la carga que fija Power, el calor pasa a las piezas en contacto segun area, distancia y material, y el aire las enfria. Va con el tiempo acelerado y sin calibrar, asi que sirve para entender por donde viaja el calor, no para diagnosticar."
 
 ---
 
@@ -148,8 +148,8 @@ Preparar antes: landing abierta en otra ventana, al inicio de la sección 03 con
 
 | Riesgo | Respuesta |
 |--------|-----------|
-| Carga lenta | Volver a la slide 19 y reproducir el video de respaldo (clic sobre él). |
-| WebGL falla | Volver a la slide 19 y reproducir el video de respaldo. |
+| Carga lenta | Volver a la slide 18 y reproducir el video de respaldo (clic sobre él). |
+| WebGL falla | Volver a la slide 18 y reproducir el video de respaldo. |
 | FPS inestable | No improvisar resultados; citar solo la tabla de rendimiento del capitulo 5/anexos y explicar que el dispositivo de la demo puede variar. |
 | Fastener ambiguo | Mostrar que el sistema lo reporta para revision y no lo asigna por suposicion. |
 
@@ -159,7 +159,7 @@ Preparar antes: landing abierta en otra ventana, al inicio de la sección 03 con
 
 - "La app distingue entre pieza madre, subpieza, hotspot y fastener."
 - "Blueprint se publica como preset de Studio; Wireframe y Ghosted estan implementados pero ocultos, y no se prometen como alcance visible."
-- "Thermal es heuristico, no FEA."
+- "Thermal es un modelo fisico simplificado por componentes; no es FEA ni esta calibrado."
 - "Los fasteners se muestran solo cuando su asignacion visible esta trazada; si hay ambiguedad, se reporta como limite o revision."
 - "Las metricas se citan solo si estan en el capitulo 5, anexos de validacion o profiler actual."
 
