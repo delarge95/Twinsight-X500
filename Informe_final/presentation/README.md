@@ -50,6 +50,7 @@ La numeración visible de cada slide (01–30) coincide con la de todos los docu
 | `PRESENTATION_SCRIPT.md` | Guion oral completo (28:30): un `[click n]` por cada paso del deck, transiciones, frases a evitar, checklist técnico, preguntas frecuentes y cortes de emergencia. |
 | `PRESENTATION_OUTLINE.md` | Estructura de las 21 slides, bloques de tiempo, backups e inventario de assets. |
 | `presenter.html` · `presenter_data.js` | Vista del presentador (se abre desde el deck con `S`). `presenter_data.js` se genera con `python tools/build_presenter_data.py` a partir del guion y las tarjetas. |
+| `index_final_3d.html` | Variante del deck con 3D sincronizado en las slides 9 (taxonomía y tornillo modular) y 12 (simulación térmica con los datos de la app). Se genera con `python tools/build_3d_variant.py` a partir de `index_final.html`; usa `assets/js/phaseb.js` y `assets/model/screw_parts_datauri.js`. Si no está lista, se presenta con `index_final.html`. |
 | `DEMO_SCRIPT.md` | Ruta de la demo en vivo (slide 13), respaldo en video y demo extendida para preguntas. |
 
 ### Para responder al jurado
