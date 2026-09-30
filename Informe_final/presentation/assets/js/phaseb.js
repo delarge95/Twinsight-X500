@@ -40,7 +40,9 @@
   .pb-cap b{color:#C8F53F;font-weight:600}
   .pb-legend{position:absolute;right:12px;top:12px;display:grid;gap:5px;font:500 clamp(9.5px,.72vw,11px)/1 'JetBrains Mono',monospace;letter-spacing:.08em;color:#B4B8BE;pointer-events:none;transition:opacity .5s}
   .pb-legend span{display:flex;align-items:center;gap:7px;justify-content:flex-end}
-  .pb-legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .pb-legend i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+  .pb-legend i.ghost{border:1px dashed rgba(237,238,232,.5);box-sizing:border-box}
+  .pb-legend{max-width:52%;text-align:right}
   .pb-labels{position:absolute;inset:0;pointer-events:none}
   .pb-labels span{position:absolute;transform:translate(-50%,-140%);font:500 clamp(9.5px,.72vw,11px)/1.2 'JetBrains Mono',monospace;letter-spacing:.06em;color:#EDEEE8;
     background:rgba(7,8,10,.78);border:1px solid rgba(200,245,63,.35);border-radius:5px;padding:3px 6px;white-space:nowrap;transition:opacity .4s}
@@ -95,12 +97,51 @@
     { name: 'Aviónica', color: 0x3fe0c5, re: /PIXHAWK|gps_m10|GPS|telemetry|GAI-GUANGLIU/i },
     { name: 'Tornillería', color: 0xEDEEE8, re: /^(GB70|LM-|M25-|M3-|NILONG|ZSLM)|_PRIM/i }
   ];
+  /* Pieza canónica de cada malla, con los grupos de PartRenderCategory.cs (las hélices viajan con su brazo
+     y la batería con los rieles, como en la app). */
+  function quad(c){ return (c.z >= 0 ? 'F' : 'B') + (c.x >= 0 ? 'R' : 'L'); }
+  function canonOf(name, c){
+    if (CATS[6].re.test(name)) return 'fastener';
+    if (/^DJ-2216/i.test(name)) return 'motor_' + quad(c);
+    if (/HMX5V|BAN-DJ-DIAN|propeller/i.test(name)) return 'arm_' + quad(c);
+    if (/TOP-PLATE/i.test(name)) return 'top';
+    if (/BOTTOM-PLATE/i.test(name)) return 'bottom';
+    if (/BATTERY|LIPO|PYLONS|TUBE300|JIA-GUAN|HUAN-GUIJIAO|PLATFORM-PLAT|ZHIJIA-CAMERA|GAI-GUANGLIU/i.test(name)) return 'rails';
+    if (/PM06|BM06B|XT60/i.test(name)) return 'power';
+    if (/PIXHAWK/i.test(name)) return 'pixhawk';
+    if (/gps_m10|GPS/i.test(name)) return 'gps';
+    if (/CARBON-FIBER-TUBE|GUAN-CHENG|JIAO-EVA|LIANJIE|MAO-JIAO/i.test(name)) return 'landing';
+    if (/telemetry/i.test(name)) return 'telemetry';
+    return 'misc';
+  }
+  const SHADE = { FL: 1.25, FR: 1.0, BL: 0.78, BR: 0.58 };
+  const CANON_COL = { arm: 0x5b8cff, motor: 0xff6b3d, top: 0x3fe0c5, bottom: 0x2aa6c9, rails: 0xffb224, power: 0xff5ca8,
+                      pixhawk: 0xc07dff, gps: 0x7dff5a, landing: 0x9aa4b5, telemetry: 0x7fd4ff };
+  function canonColor(id, out){
+    const [fam, q] = id.split('_');
+    out.setHex(CANON_COL[fam] || 0x555555);
+    if (q) out.multiplyScalar(SHADE[q] || 1);
+    return out;
+  }
+  const sw = h => '<i style="background:#' + h.toString(16).padStart(6, '0') + '"></i>';
+  const LEG28 = [
+    ['Brazos ×4 · FL FR BL BR', sw(0x5b8cff), 1], ['Motores ×4', sw(0xff6b3d), 1], ['Hélices ×4 · van con su brazo', sw(0x5b8cff), 0.55],
+    ['ESC ×4 · sin malla propia', '<i class="ghost"></i>', 0.45], ['Placa superior', sw(0x3fe0c5), 1], ['Placa inferior', sw(0x2aa6c9), 1],
+    ['Rieles de batería', sw(0xffb224), 1], ['Batería · malla en los rieles', sw(0xffb224), 0.55], ['Tren de aterrizaje', sw(0x9aa4b5), 1],
+    ['Pixhawk 6C', sw(0xc07dff), 1], ['Módulo de potencia', sw(0xff5ca8), 1], ['GPS M10', sw(0x7dff5a), 1], ['Radio de telemetría', sw(0x7fd4ff), 1],
+    ['PDB · placa de plataforma · receptor RC · sin malla propia', '<i class="ghost"></i>', 0.45]
+  ];
+  const LEG30 = [
+    ['28 piezas canónicas', '<i class="ghost"></i>', 0.6], ['+ grupo de tornillería (x500v2_fastener_group)', sw(0xffb224), 1],
+    ['+ grupo de misceláneos (x500v2_misc_group) · sin piezas en esta exportación', '<i class="ghost" style="border-color:#c07dff"></i>', 0.7]
+  ];
+  const legHTML = rows => rows.map(r => '<span style="opacity:' + r[2] + '">' + r[0] + r[1] + '</span>').join('');
   function catOf(name){
     if (CATS[6].re.test(name)) return 6;
     for (let i = 1; i < 6; i++) if (CATS[i].re.test(name)) return i;
     return 0;
   }
-  legend.innerHTML = CATS.map((c, i) => '<span data-c="' + i + '">' + c.name + '<i style="background:#' + c.color.toString(16).padStart(6, '0') + '"></i></span>').join('');
+  legend.innerHTML = legHTML(LEG28);
 
   /* ------------------------------------------------------------------ */
   /* Render compartido (un solo contexto WebGL para las dos slides)       */
@@ -163,7 +204,8 @@
       o.material = tex;
       const wire = new THREE.Mesh(o.geometry, wireMat()); wire.visible = false; o.add(wire);
       const b = new THREE.Box3().setFromObject(o);
-      meshes.push({ mesh: o, cat: cat, tex: tex, th: th, wire: wire, box: b, center: b.getCenter(new THREE.Vector3()), name: o.name });
+      const cen = b.getCenter(new THREE.Vector3());
+      meshes.push({ mesh: o, cat: cat, tex: tex, th: th, wire: wire, box: b, center: cen, name: o.name, canon: canonOf(o.name, cen), baseQ: o.quaternion.clone() });
     });
     buildHotspots();
     buildThermal();
@@ -402,6 +444,7 @@
   let extMode = null;
   function resetDrone(){
     drone.rotation.set(0, 0, 0); drone.visible = true;
+    if (typeof propsReset === 'function') propsReset();
     meshes.forEach(m => { m.mesh.material = m.tex; m.mesh.visible = true; m.tex.opacity = 1; m.tex.depthWrite = true; m.tex.emissive.setRGB(0, 0, 0); m.wire.visible = false; });
     if (screw.ok) screw.grp.visible = false;
   }
@@ -419,6 +462,7 @@
     });
     if (next !== 'tax') hotspots.forEach(h => h.el.classList.remove('on'));
     if (screw.ok) screw.grp.visible = next === 'tax';
+    propsReset();
     if (next === 'th'){ resetThermal(); thRunning = false; thT = 0; }
   }
 
@@ -426,19 +470,22 @@
     if (step !== stepPrev){ stepPrev = step; stepT = 0; }
     stepT += dt;
     /* tinte por subsistema, grupo de tornillería, alambre, fantasma */
-    const tint = step >= 1 && step <= 3 ? (step === 3 ? 0.14 : 0.32) : 0;
-    const fastGlow = step === 2 ? 0.9 + 0.3 * Math.sin(t * 4) : 0;
     const ghost = step >= 5;
+    const fastGlow = 1.1 + 0.35 * Math.sin(t * 4);
     meshes.forEach(m => {
       const mat = m.tex;
-      const col = CATS[m.cat].color;
-      let em = m.cat === 0 ? tint * 0.35 : tint;
-      if (m.cat === 6 && step === 2) em = fastGlow;
-      if (step === 5) em = m.cat === 6 ? 0.8 : 0;
-      if (step >= 6) em = m.cat === 6 ? 0.25 : 0;
-      const tgtCol = em > 0 ? _c.setHex(m.cat === 6 && step >= 5 ? 0xffb224 : col).multiplyScalar(em) : _c.setRGB(0, 0, 0);
+      const isF = m.cat === 6;
+      let em = 0, tgtCol;
+      if (step === 1){ em = isF ? 0 : 0.42; tgtCol = em ? canonColor(m.canon, _c).multiplyScalar(em) : _c.setRGB(0, 0, 0); }
+      else if (step === 2){ em = isF ? fastGlow : 0; tgtCol = em ? _c.setHex(0xffb224).multiplyScalar(em) : _c.setRGB(0, 0, 0); }
+      else if (step === 3){ em = isF ? 0 : 0.12; tgtCol = em ? canonColor(m.canon, _c).multiplyScalar(em) : _c.setRGB(0, 0, 0); }
+      else if (step === 5){ em = isF ? 0.8 : 0; tgtCol = em ? _c.setHex(0xffb224).multiplyScalar(em) : _c.setRGB(0, 0, 0); }
+      else if (step >= 6){ em = isF ? 0.25 : 0; tgtCol = em ? _c.setHex(0xffb224).multiplyScalar(em) : _c.setRGB(0, 0, 0); }
+      else tgtCol = _c.setRGB(0, 0, 0);
       mat.emissive.lerp(tgtCol, Math.min(1, dt * 5));
-      const op = ghost ? (m.cat !== 6 ? (step >= 6 ? 0.05 : 0.2) : (step >= 6 ? 0.05 : 1)) : 1;
+      let op = ghost ? (!isF ? (step >= 6 ? 0.05 : 0.2) : (step >= 6 ? 0.05 : 1)) : 1;
+      if (step === 1 && isF) op = 0.12;                   /* la tornillería no es parte de las 28 */
+      if (step === 2 && !isF) op = 0.2;                  /* las 28 atenuadas: se ven los grupos técnicos */
       mat.opacity = lerp(mat.opacity, op, Math.min(1, dt * 4));
       mat.depthWrite = mat.opacity > 0.9;
       if (m.cat === 6 && step >= 6 && screw.ok && m === screw.prox) mat.opacity = lerp(mat.opacity, 0, Math.min(1, dt * 6));
@@ -446,8 +493,9 @@
       m.wire.visible = wOn || m.wire.material.opacity > 0.01;
       m.wire.material.opacity = lerp(m.wire.material.opacity, wOn ? 0.22 : 0, Math.min(1, dt * 5));
     });
-    legend.style.opacity = step >= 1 && step <= 3 ? 1 : 0;
-    legend.querySelectorAll('span').forEach(s => { s.style.opacity = (step === 2 && s.dataset.c !== '6') ? 0.35 : 1; });
+    legend.style.opacity = step >= 1 && step <= 2 ? 1 : 0;
+    const want = step === 2 ? 'L30' : 'L28';
+    if (legend.dataset.v !== want){ legend.dataset.v = want; legend.innerHTML = legHTML(step === 2 ? LEG30 : LEG28); }
     hotspots.forEach((h, i) => {
       const on = step === 4;
       h.el.classList.toggle('on', on);
@@ -496,12 +544,17 @@
       const ang = step >= 7 ? 0 : t * 0.08;
       wantPos.copy(tg).add(off.applyAxisAngle(new THREE.Vector3(0, 1, 0), ang).multiplyScalar(r));
     } else {
-      orbitPose(0.6 + t * 0.06, step === 4 ? 1.02 : 1.12, 5.4, target);
+      const th0 = 0.6 + t * 0.06;
+      orbitPose(th0, step === 4 ? 1.02 : 1.12, 5.4, target);
+      if (step === 1 || step === 2){                      /* deja espacio a la leyenda: el dron se corre a la izquierda */
+        const k = 0.95, rx = Math.cos(th0), rz = -Math.sin(th0);
+        wantPos.x += rx * k; wantPos.z += rz * k; wantLook.x += rx * k; wantLook.z += rz * k;
+      }
     }
     const caps = [
-      '<b>28</b> piezas · <b>7</b> subsistemas en el modelo real',
-      'Subsistemas por color · <b>28</b> piezas con ficha',
-      'Grupo de tornillería · <b>30</b> anclas en escena',
+      '<b>28</b> piezas con ficha · cada una es una entidad de la app',
+      '<b>28</b> piezas canónicas · cada motor, brazo, hélice y ESC cuenta por separado · sin tornillería',
+      '<b>30</b> anclas = 28 piezas + grupo de tornillería + grupo de misceláneos',
       '<b>257</b> elementos que se dibujan o se tocan',
       'Hotspots · un toque selecciona el grupo',
       'Tornillería · <b>425 208 → 14 408</b> triángulos',
@@ -511,6 +564,43 @@
     setCap(hostTax, caps[Math.min(step, caps.length - 1)]);
   }
 
+  /* Hélices del modo térmico: giran según el estado (arranque, reposo, vuelo); a alta velocidad, disco de desenfoque */
+  let props = null, rpmTh = 0;
+  function propsInit(){
+    if (props) return props;
+    const cv = document.createElement('canvas'); cv.width = cv.height = 256; const x = cv.getContext('2d');
+    const g = x.createRadialGradient(128, 128, 12, 128, 128, 128);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.14, 'rgba(255,255,255,.55)'); g.addColorStop(0.9, 'rgba(255,255,255,.35)');
+    g.addColorStop(0.96, 'rgba(255,255,255,.6)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    const tex = new THREE.CanvasTexture(cv);
+    props = meshes.filter(m => /propeller/i.test(m.name)).map(m => {
+      const pb = new THREE.Box3().setFromBufferAttribute(m.mesh.geometry.attributes.position);
+      const R = Math.max(pb.max.x, -pb.min.x, pb.max.z, -pb.min.z);
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(R * 1.02, 64), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
+      disc.rotation.x = -Math.PI / 2; disc.visible = false; m.mesh.add(disc);
+      m.th.transparent = true;
+      return { m: m, disc: disc, ang: 0, dir: Math.sign(m.mesh.position.x * m.mesh.position.y) || 1 };
+    });
+    return props;
+  }
+  function propsReset(){ if (!props) return; props.forEach(p => { p.m.mesh.quaternion.copy(p.m.baseQ); p.disc.visible = false; p.m.th.opacity = 1; }); rpmTh = 0; }
+  const _qY = new THREE.Quaternion(), _axY = new THREE.Vector3(0, 1, 0);
+  function spinProps(dt, target){
+    propsInit();
+    rpmTh += (target - rpmTh) * Math.min(1, dt * 1.6);                 /* los motores aceleran y frenan con inercia */
+    const omega = rpmTh < 0.3 ? (rpmTh / 0.3) * 20 : 20 + (rpmTh - 0.3) * 55;
+    const blur = Math.max(0, Math.min(1, (rpmTh - 0.18) / 0.3));
+    props.forEach(p => {
+      p.ang += omega * dt * p.dir;
+      p.m.mesh.quaternion.copy(p.m.baseQ).multiply(_qY.setFromAxisAngle(_axY, p.ang));
+      p.m.th.opacity = 1 - 0.85 * blur;
+      p.disc.visible = blur > 0.01;
+      p.disc.material.opacity = 0.55 * blur;
+      p.disc.material.color.copy(p.m.th.color);
+    });
+  }
+
   function updateTh(dt, step){
     if (step >= 1 && !thRunning){ thRunning = true; thT = 0; }
     if (step < 1 && thRunning){ thRunning = false; resetThermal(); }
@@ -518,6 +608,7 @@
     if (thRunning){
       thT += dt;
       const st = loadAt(thT);
+      spinProps(dt, st.load <= 0.1 ? 0.18 : st.load <= IDLE_LOAD ? 0.28 : st.load <= HOVER_LOAD ? 0.85 : 1.0);
       const sub = 4, h = (dt * ACCEL) / sub;
       for (let i = 0; i < sub; i++) stepThermal(h, st.load);
       const avg = re => { const g = meshes.filter(m => re.test(m.name)); return g.length ? g.reduce((a, m) => a + m.node.T, 0) / g.length : AMB; };
@@ -525,6 +616,7 @@
         ' °C</b><br>Batería <b>' + avg(/x500v2_battery/).toFixed(0) + ' °C</b><br>Brazos <b>' + avg(/HMX5V|BAN-DJ-DIAN/).toFixed(0) + ' °C</b><br><span style="color:#767C85">+' + Math.round(thT * ACCEL) + ' s simulados</span>';
       if (hud.innerHTML !== html) hud.innerHTML = html;
     } else {
+      if (props) spinProps(dt, 0);
       const html = '<span class="st">Apagado</span><br>Todo a ' + AMB + ' °C';
       if (hud.innerHTML !== html) hud.innerHTML = html;
     }
