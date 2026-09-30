@@ -681,7 +681,7 @@ La demo dura 3:00 y tiene dos tramos: la landing publica en WebGL puro (ensambla
 Evidencia:
 
 - `Informe_final/presentation/DEMO_SCRIPT.md`
-- `Informe_final/presentation/PRESENTATION_SCRIPT.md`, slide 18
+- `Informe_final/presentation/PRESENTATION_SCRIPT.md`, slide 13
 
 Evitar:
 
@@ -692,7 +692,7 @@ Evitar:
 
 Respuesta corta:
 
-Volver a la slide 18 y reproducir el video del mismo recorrido, sin hacer troubleshooting en pantalla.
+Volver a la slide 13 y reproducir el video del mismo recorrido, sin hacer troubleshooting en pantalla.
 
 Respuesta ampliada:
 

@@ -15,11 +15,11 @@ Este documento se ensaya junto con `PRESENTATION_SCRIPT.md`. La evidencia por sl
 
 ## Rol de este guion (actualizado 2026-09-29)
 
-- **Durante la exposición (slide 18)** la demo es **en vivo** y dura 3:00: primero la **landing pública** (WebGL puro: ensamblaje con el cursor, seis capítulos de scrollytelling y mini app, ~1:10) y luego, desde su botón «Abrir visor», la **app Unity** con la ruta corta de abajo (~1:40). Narración en `PRESENTATION_SCRIPT.md`.
+- **Durante la exposición (slide 13)** la demo es **en vivo** y dura 3:00: primero la **landing pública** (WebGL puro: ensamblaje con el cursor, seis capítulos de scrollytelling y mini app, ~1:10) y luego, desde su botón «Abrir visor», la **app Unity** con la ruta corta de abajo (~1:40). Narración en `PRESENTATION_SCRIPT.md`.
 - **Respaldo:** si la build no responde en 10 s o se congela, volver al deck y hacer clic sobre el video `assets/video/vid_01_demo_compilado.mp4` (88 s, mismo recorrido), que espera en pausa en 0:00.
 - **Este guion de 5 minutos** es la demo extendida para la ronda de preguntas si el jurado pide profundizar.
 
-### Ruta corta de la demo en vivo (slide 18)
+### Ruta corta de la demo en vivo (slide 13)
 
 Preparar antes: landing abierta en otra ventana, al inicio de la sección 03 con el dron sin ensamblar; abrir una vez «Abrir visor» para cachear la build y cerrarla. Tramo de la app, en este orden:
 
@@ -148,8 +148,8 @@ Preparar antes: landing abierta en otra ventana, al inicio de la sección 03 con
 
 | Riesgo | Respuesta |
 |--------|-----------|
-| Carga lenta | Volver a la slide 18 y reproducir el video de respaldo (clic sobre él). |
-| WebGL falla | Volver a la slide 18 y reproducir el video de respaldo. |
+| Carga lenta | Volver a la slide 13 y reproducir el video de respaldo (clic sobre él). |
+| WebGL falla | Volver a la slide 13 y reproducir el video de respaldo. |
 | FPS inestable | No improvisar resultados; citar solo la tabla de rendimiento del capitulo 5/anexos y explicar que el dispositivo de la demo puede variar. |
 | Fastener ambiguo | Mostrar que el sistema lo reporta para revision y no lo asigna por suposicion. |
 

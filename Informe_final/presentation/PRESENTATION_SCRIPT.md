@@ -1,10 +1,10 @@
 # PRESENTATION_SCRIPT.md
 # Guion maestro de sustentación — TwinSight X500
 
-**Estado:** canónico para la defensa. Sincronizado con `index_final.html` (29 slides principales + B1–B11).
+**Estado:** canónico para la defensa. Sincronizado con `index_final.html` (pantalla de espera + 21 slides principales + B1–B15).
 **Fecha de actualización:** 2026-09-29.
-**Duración objetivo:** 28:30 de exposición + 1:30 de margen = 30:00. Guion calibrado a ~135 palabras por minuto.
-**Fuente autoritativa:** `awoodcocks.pdf` (informe final) y sus anexos. Las cifras de tornillería de la slide 13 salen de los archivos del proyecto (ver P9).
+**Duración objetivo:** 22:00 de exposición según el guion (~135 palabras por minuto). Con el ritmo medido en ensayo (~33 % más lento) queda cerca de 29–30 min.
+**Fuente autoritativa:** `awoodcocks.pdf` (informe final) y sus anexos. Las cifras de tornillería de la slide 9 salen de los archivos del proyecto (ver P9).
 **Uso complementario:** ensayar con `SPEAKER_CARDS.md`.
 
 ---
@@ -27,7 +27,7 @@ problema → teoría → alcance → método → cómo se construyó → demo �
 
 ## 2. Numeración
 
-El número de cada slide en este guion es su posición en el deck. Coincide con el número visible (kicker) y con el contador de arriba a la derecha ("NN / 29"). Los backups van aparte, B1–B11. Para saltar a uno, escribe su código (por ejemplo `B3`) en el contador y pulsa Enter.
+El número de cada slide en este guion es su posición en el deck. Coincide con el número visible (kicker) y con el contador de arriba a la derecha ("NN / 21"). Antes de la slide 1 está la pantalla de espera (slide 0), que no cuenta: → la cierra y **P** la vuelve a abrir. Los backups van aparte, B1–B15. Para saltar a uno, escribe su código (por ejemplo `B3`) en el contador y pulsa Enter.
 
 ---
 
@@ -40,17 +40,17 @@ Ningún término se usa como argumento antes de explicarlo.
 | CAD, WebGL | Slide 1 | Modelos de ingeniería / 3D dentro del navegador |
 | Reconstrucción espacial | Slide 2 | Armar en la cabeza el objeto a partir de vistas planas |
 | Carga cognitiva | Slide 3 | Memoria de trabajo limitada; tres tipos de carga |
-| Digital twin, digital shadow, visual product twin | Slide 5 | Según cuánto dato real reciben del objeto físico |
-| FEA | Slide 5 | Simulación por elementos finitos |
-| DSR, evaluación formativa | Slide 7 | Investigar construyendo y evaluando un artefacto |
-| SUS, NASA-TLX, Think-Aloud | Slide 8 (qué miden) · slides 21–22 (cómo se calculan) | |
-| Teselación, triángulo, runtime | Slide 9 | El CAD no tiene triángulos hasta que se exporta |
-| Bus de eventos | Slide 12 | Un módulo avisa; los que están suscritos reaccionan |
-| Taxonomía, hotspot, fastener, BOM, proxy | Slide 13 | |
-| Bottom sheet | Slide 14 | La ficha que sube desde abajo |
-| Shader, preset | Slide 16 | |
-| Modelo térmico por componentes | Slide 17 | Fuentes de calor, conducción, convección |
-| Efecto techo | Slide 24 | Todos completan todo: el éxito deja de distinguir |
+| Digital twin, digital shadow, visual product twin | Slide 4 | Según cuánto dato real reciben del objeto físico |
+| FEA | Slide 4 | Simulación por elementos finitos |
+| DSR, evaluación formativa | Slide 5 | Investigar construyendo y evaluando un artefacto |
+| SUS, NASA-TLX, Think-Aloud | Slide 6 (qué son) · slides 15–16 (cómo se calculan) | |
+| Teselación, triángulo | Slide 7 | El CAD no tiene triángulos hasta que se exporta |
+| Bus de eventos | Slide 8 | Un módulo avisa; los que están suscritos reaccionan |
+| Taxonomía, hotspot, fastener, proxy | Slide 9 | |
+| Bottom sheet | Slide 10 | La ficha que sube desde abajo |
+| Inspect, Analyze, Studio | Slide 11 | Tres preguntas: qué es, cómo se conecta, qué hay adentro |
+| Modelo térmico por componentes | Slide 12 | Fuentes de calor, conducción, convección |
+| Efecto techo | Slide 18 | Todos completan todo: el éxito deja de distinguir |
 
 ---
 
@@ -72,7 +72,7 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 ## 5. Antes de empezar
 
 1. De pie, mirando al jurado, no a la pantalla.
-2. Deck en la slide 1. La landing abierta en otra ventana, lista para la demo de la slide 18. El video de esa slide es el respaldo.
+2. Deck abierto en la pantalla de espera (slide 0), proyectándose mientras el jurado se acomoda. Al empezar, → la cierra y entra la slide 1. La landing abierta en otra ventana, lista para la demo de la slide 13. El video de esa slide es el respaldo.
 3. Tres ideas que tienen que quedar:
    - Ver las piezas no alcanza: lo difícil es entender cómo se relacionan.
    - El trabajo junta teoría, un pipeline 3D, una app web y una evaluación con doce personas.
@@ -85,8 +85,8 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 | 1 | Abrir `index_final.html` con doble clic en **Chrome** o Edge, con zoom del navegador al 100 % (`Ctrl+0`). | El deck ajusta su tamaño a la resolución; el zoom del navegador altera ese cálculo. |
 | 2 | Proyector en modo **duplicar**, idealmente a 1920×1080. `F` para pantalla completa. | A 1920×1080 el texto crece ~25 %; a resoluciones menores se ajusta solo. |
 | 3 | Confirmar conexión a internet. | La landing y la app de la demo se cargan desde la red. |
-| 4 | Pasar una vez por las slides 10 (visor 3D) y 18 (video) y volver con `Inicio`. | Deja el modelo y los videos en caché. |
-| 5 | Abrir la **landing** (twinsight.alexwoodcock.me) en **otra ventana**, al inicio de la sección 03 con el dron sin ensamblar. Abrir una vez «Abrir visor» para dejar la app en caché y cerrarla. | Es la demo de la slide 18. |
+| 4 | Pasar una vez por las slides 11 (capturas) y 13 (video), volver con `Inicio` y pulsar **P** para dejar puesta la pantalla de espera. | Deja los videos en caché. |
+| 5 | Abrir la **landing** (twinsight.alexwoodcock.me) en **otra ventana**, al inicio de la sección 03 con el dron sin ensamblar. Abrir una vez «Abrir visor» para dejar la app en caché y cerrarla. | Es la demo de la slide 13. |
 | 6 | Desactivar notificaciones, actualizaciones y ahorro de energía. Cargador conectado. | Evita interrupciones y caídas de rendimiento. |
 | 7 | **No abrir las notas (`N`) durante la exposición**: se ven en la misma pantalla que el jurado. Usar `SPEAKER_CARDS.md` impreso o en el teléfono. | Las notas son para ensayar. |
 | 8 | Cronómetro visible con las marcas de las tarjetas. | El deck no muestra el tiempo. |
@@ -136,7 +136,7 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ### SLIDE 3 — Carga cognitiva
 
-**Tiempo:** 1:40 – 2:40 · **Pasos:** 4
+**Tiempo:** 1:40 – 2:55 · **Pasos:** 4
 
 > La teoría de la carga cognitiva parte de algo simple: la memoria de trabajo es limitada. Sweller distingue tres tipos de carga.
 >
@@ -147,38 +147,19 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 > [click 3 — Germana] Y la germana es el esfuerzo que vale la pena: entender para qué sirve una pieza y dónde encaja.
 >
 > [click 4 — Límite declarado] Aclaro algo desde ya. La tesis no mide estos tres tipos de carga. Los usa para justificar decisiones de diseño. Lo que sí se mide más adelante, con NASA-TLX, es la carga de trabajo que cada persona percibe.
+>
+> Con esa idea diseñé la interfaz: que la app haga parte del trabajo mental. Girar el dron con el dedo reemplaza el giro que antes se hacía en la cabeza, y la ficha de cada pieza funciona como memoria externa.
 
 **Transición:**
-> Esa teoría se traduce en reglas concretas de interfaz.
+> Antes de seguir, conviene dejar claro qué es TwinSight y qué no.
 
 **No decir:** "NASA-TLX mide la carga intrínseca" · "el 3D elimina la carga cognitiva"
 
 ---
 
-### SLIDE 4 — Principios de interfaz
+### SLIDE 4 — Alcance
 
-**Tiempo:** 2:40 – 3:45 · **Pasos:** 4
-
-> La otra base es la cognición distribuida, de Hutchins: una buena herramienta piensa con nosotros. Girar el dron con el dedo reemplaza el giro que antes se hacía en la cabeza, y la ficha funciona como memoria externa. Apliqué cuatro principios que cita el informe, en la app y en esta presentación.
->
-> [click 1 — Jerarquía visual] Jerarquía visual, de Norman: la pantalla de entrada, la barra de modos y la ficha tienen cada una su lugar. Aquí, el título de cada slide es la idea principal.
->
-> [click 2 — Agrupación] Agrupación, de la Gestalt: lo que va junto se ve junto. Los controles se agrupan por modo. En el deck, el verde marca evidencia y el ámbar, límites.
->
-> [click 3 — Visibilidad del estado] Visibilidad del estado, de Nielsen: siempre se ve qué pieza está seleccionada y en qué modo estás.
->
-> [click 4 — Reconocimiento] Y reconocer antes que recordar, también de Nielsen. Nadie memoriza nombres de piezas: las marcas y las fichas los muestran.
-
-**Transición:**
-> Con esas bases, conviene dejar claro qué es TwinSight y qué no.
-
-**No decir:** "estos principios prueban los resultados" · autores que no estén en la bibliografía
-
----
-
-### SLIDE 5 — Alcance
-
-**Tiempo:** 3:45 – 4:45 · **Pasos:** 2
+**Tiempo:** 2:55 – 3:55 · **Pasos:** 2
 
 > Esta slide es importante porque evita malentendidos. [mirar jurado]
 >
@@ -195,57 +176,30 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 6 — Objetivos
+### SLIDE 5 — Objetivos
 
-**Tiempo:** 4:45 – 5:35 · **Pasos:** 4
+**Tiempo:** 3:55 – 4:50 · **Pasos:** 4
 
 > La pregunta de investigación está arriba: qué diferencias aparecen en desempeño y en carga percibida entre un visor 3D web y la documentación 2D, y si ese visor puede funcionar bien en un navegador.
 >
 > [click 1 — OE1] El primer objetivo fue técnico: llevar el CAD a un modelo liviano sin perder forma ni piezas. [click 2 — OE2] El segundo, lograr buenos materiales y modos visuales manteniendo al menos 30 cuadros por segundo. [click 3 — OE3] El tercero, construir la app con selección, ficha, vista explosionada y corte. [click 4 — OE4] Y el cuarto, probarla con personas y compararla con la documentación 2D.
 
+> El método fue Design Science Research: investigar construyendo un artefacto y evaluándolo. La evaluación fue formativa, con doce personas, así que describe lo que pasó en esa muestra sin generalizar.
+
 **Transición:**
-> Para responder esa pregunta, el método tenía que incluir construir y evaluar.
+> Para evaluarlo usé cinco fuentes.
 
 **No decir:** "la evaluación generaliza a la población" · "30 FPS en todos los dispositivos"
 
 ---
 
-### SLIDE 7 — Metodología
+### SLIDE 6 — Evaluación en cinco capas
 
-**Tiempo:** 5:35 – 6:20 · **Pasos:** 7
+**Tiempo:** 4:50 – 5:25 · **Pasos:** 6
 
-> Usé Design Science Research, que es la forma de investigar en ingeniería construyendo algo y evaluándolo. Seguí el ciclo de Peffers, que arranca en el problema. [señalar primera caja]
+> Ninguna medida sola cuenta la historia completa. [click 1 — KPIs técnicos] El rendimiento de la app, [click 2 — SUS] el cuestionario de usabilidad SUS, [click 3 — Tareas] cuatro tareas cronometradas, [click 4 — Think-Aloud] lo que las personas decían en voz alta [click 5 — NASA-TLX Raw] y el cuestionario de carga NASA-TLX, en 3D y en 2D.
 >
-> [click 1 — Objetivos] Definí objetivos que se pudieran verificar, [click 2 — Diseño] diseñé y desarrollé la app, [click 3 — Demostración] la publiqué en la web, [click 4 — Evaluación] la evalué con usuarios [click 5 — Comunicación] y documenté todo en el informe.
->
-> [click 6 — Marco DSR] El enfoque es mixto, con más peso cualitativo.
->
-> [click 7 — Formativa y descriptiva] La evaluación fue formativa, es decir, pensada para aprender del prototipo y mejorarlo. Y descriptiva: con doce participantes reporto lo que pasó en esa muestra, sin sacar conclusiones sobre toda la población. [mirar jurado]
-
-**Transición:**
-> La evaluación combinó cinco fuentes distintas.
-
-**No decir:** "se probó causalidad" · "la muestra representa a la población"
-
----
-
-### SLIDE 8 — Evaluación en cinco capas
-
-**Tiempo:** 6:20 – 7:25 · **Pasos:** 6
-
-> Ninguna medida sola cuenta la historia completa, así que usé cinco.
->
-> [click 1 — KPIs técnicos] Primero, el rendimiento de la app: cuadros por segundo, tiempo por cuadro y memoria. Los registra un medidor que construí dentro de la propia app.
->
-> [click 2 — SUS] Segundo, SUS, un cuestionario estándar de usabilidad. Se aplicó solo al visor 3D.
->
-> [click 3 — Tareas] Tercero, cuatro tareas concretas, como ubicar una pieza. Medí si se completaban y, en las tres primeras, cuánto tardaban.
->
-> [click 4 — Think-Aloud] Cuarto, Think-Aloud: la persona piensa en voz alta mientras resuelve, y después clasifico lo que dijo.
->
-> [click 5 — NASA-TLX Raw] Y quinto, NASA-TLX, un cuestionario de carga de trabajo percibida, que sí se aplicó en 3D y en 2D. Cómo se calculan SUS y NASA-TLX lo explico cuando lleguemos a los resultados.
->
-> [click 6 — Triangulación] Cuando las cinco apuntan en la misma dirección, el resultado es más confiable que cualquiera por separado.
+> [click 6 — Triangulación] Cuando las cinco apuntan en la misma dirección, el resultado pesa más.
 
 **Transición:**
 > Antes de los resultados, cómo se construyó. Empiezo por el modelo 3D.
@@ -254,9 +208,9 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 9 — Del CAD al activo WebGL
+### SLIDE 7 — Del CAD al activo WebGL
 
-**Tiempo:** 7:25 – 8:40 · **Pasos:** 8
+**Tiempo:** 5:25 – 6:40 · **Pasos:** 8
 
 > Un archivo CAD, como el STEP del fabricante, no tiene triángulos. Describe superficies con ecuaciones: un cilindro es un radio y una altura. Para dibujarlo hay que convertir esas superficies en triángulos, y eso se llama **teselar**. Según la herramienta, el dron dio entre 6,5 y 6,9 millones de triángulos. Imposible de mover en un celular. [señalar título]
 >
@@ -267,59 +221,19 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 > [click 8 — Qué se conserva] Cuidé que cada pieza siguiera siendo una pieza, con su nombre y su lugar. Si no, después no se podría seleccionar nada. El resultado: 95 617 triángulos. [mirar jurado]
 
 **Transición:**
-> [avanzar] Ese modelo se puede girar aquí mismo.
+> Ahora, cómo está organizada la app por dentro.
 
 **No decir:** "el CAD tenía 6,5 millones de triángulos" (los tuvo al teselarlo) · "optimizar es solo bajar polígonos"
 
 ---
 
-### SLIDE 10 — El modelo, en vivo
+### SLIDE 8 — Arquitectura
 
-**Tiempo:** 8:40 – 9:05 · **Pasos:** 2
+**Tiempo:** 6:40 – 7:30 · **Pasos:** 1
 
-> Esta es la escena exportada de la app, corriendo dentro de la presentación. [arrastrar para girar · pulsar Wireframe]
+> La app está dividida en cuatro grupos: interfaz, coordinación, servicios que modifican el modelo y datos de cada pieza. Lo que los une es un **bus de eventos**, que funciona como un tablero de avisos. [señalar EventBus]
 >
-> [click 1 — ficha técnica] Son 252 mallas y unos 229 000 triángulos. [click 2 — Por qué aquí] Y sí, no es el número de la slide anterior. Tiene explicación.
-
-**Transición:**
-> [avanzar]
-
-**No decir:** "esto es el activo de 95 617 triángulos"
-
----
-
-### SLIDE 11 — Dos cifras, dos medidas
-
-**Tiempo:** 9:05 – 9:50 · **Pasos:** 3
-
-> [click 1 — Activo base] 95 617 es el modelo que sale del pipeline: cada pieza distinta, una vez, ya optimizada.
->
-> [click 2 — Escena runtime] 229 054 es lo que cuenta el medidor de la app mientras corre. Ahí entran todas las copias de las piezas repetidas, los proxies de la tornillería y los elementos de apoyo de la escena. Por eso aparecen 252 objetos dibujándose. Es lo que acaban de girar.
->
-> [click 3 — Cómo leerlas] Una mide el modelo y la otra mide la escena en funcionamiento. No se restan ni se comparan entre sí, y el informe presenta cada una junto a su fuente. [pausa]
-
-**Transición:**
-> Ahora, cómo está organizada la app por dentro.
-
-**No decir:** "se redujo de 229 054 a 95 617" · "las dos miden lo mismo"
-
----
-
-### SLIDE 12 — Arquitectura
-
-**Tiempo:** 9:50 – 11:00 · **Pasos:** 5
-
-> La app tiene cuatro grupos de módulos con tareas distintas.
->
-> [click 1 — UI] La interfaz: lo que el usuario toca. La ficha, las marcas sobre el modelo y los modos.
->
-> [click 2 — Core] La coordinación, donde está el **EventBus**, un bus de eventos. Funciona como un tablero de avisos: un módulo publica "pasó esto" y los interesados reaccionan, sin que el primero sepa quiénes son. Una máquina de estados controla en qué pantalla está la app.
->
-> [click 3 — Scene] Los servicios que modifican el modelo: separar piezas, cortar, ocultar, calcular el calor, y el medidor de rendimiento.
->
-> [click 4 — Data] Y los datos de cada pieza: nombre, función, especificaciones.
->
-> [click 5 — Ejemplo real] Un ejemplo real. Cuando tocas una pieza, el módulo de selección publica un solo aviso. La interfaz abre la ficha, las marcas se reacomodan y, si es un tornillo, otro módulo arma su versión detallada. El que avisó no conoce a ninguno. Por eso agregar una función no obliga a tocar lo que ya funciona. [mirar jurado]
+> [click 1 — Ejemplo real] Un ejemplo. Cuando tocas una pieza, el módulo de selección publica un solo aviso. La interfaz abre la ficha, las marcas se reacomodan y, si es un tornillo, otro módulo arma su versión detallada. El que avisó no conoce a ninguno. Por eso agregar una función no obliga a tocar lo que ya funciona. [mirar jurado]
 
 **Transición:**
 > Para que ese aviso diga qué pieza se tocó, la app necesita una clasificación.
@@ -328,15 +242,13 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 13 — Taxonomía y tornillería
+### SLIDE 9 — Taxonomía y tornillería
 
-**Tiempo:** 11:00 – 12:30 · **Pasos:** 7
+**Tiempo:** 7:30 – 8:45 · **Pasos:** 7
 
 > La taxonomía es la clasificación que le dice a la app qué tocó el usuario y qué mostrar.
 >
 > [click 1 — 28] Hay 28 piezas principales, cada una con su ficha. [click 2 — 30] En la escena son 30 anclas: esas 28, más un grupo de tornillería y otro de piezas menores. [click 3 — 257] La auditoría contó 257 elementos que se dibujan o se pueden tocar.
->
-> Parece una **BOM**, la lista de materiales que usa la industria para fabricar: cada pieza con su referencia y cantidad. Esta, en cambio, está pensada para navegar el modelo.
 >
 > [click 4 — Hotspots] Los **hotspots** son marcas sobre el modelo: con un toque seleccionas un grupo sin apuntarle a una pieza diminuta.
 >
@@ -347,13 +259,13 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 **Transición:**
 > Con esa estructura, veamos cómo la recorre el usuario.
 
-**No decir:** "la taxonomía es una BOM" · "28 categorías" (son 28 piezas) · "todos los fasteners son modulares" (el sistema modular es solo para tornillos)
+**Si preguntan por la BOM** (lista de materiales industrial): la taxonomía se le parece, pero está pensada para navegar, no para fabricar. **No decir:** "28 categorías" (son 28 piezas) · "todos los fasteners son modulares" (el sistema modular es solo para tornillos)
 
 ---
 
-### SLIDE 14 — Flujo de uso
+### SLIDE 10 — Flujo de uso
 
-**Tiempo:** 12:30 – 13:15 · **Pasos:** 7
+**Tiempo:** 8:45 – 9:30 · **Pasos:** 7
 
 > La app arranca en una pantalla de entrada. [click 1 — Explore] Luego, en Explore, giras y acercas el dron. [click 2 — Selección] Tocas una pieza [click 3 — Ficha] y sube la ficha con sus datos, lo que en diseño de interfaces se llama **bottom sheet**.
 >
@@ -370,41 +282,23 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 15 — Inspect y Analyze
+### SLIDE 11 — La app en el móvil
 
-**Tiempo:** 13:15 – 14:05 · **Pasos:** 4
+**Tiempo:** 9:30 – 10:00 · **Pasos:** 3
+**En pantalla:** tres capturas de la build en el Redmi Note 10S.
 
-> [click 1 — Inspect] Inspect responde qué es una pieza y dónde está. La aísla, atenúa el resto y muestra su ficha. [click 2 — video] Así se ve en el celular.
->
-> [click 3 — Analyze] Analyze responde cómo se conecta con las demás. Tiene la vista explosionada, el corte y los filtros por tipo de pieza. [click 4 — video] En la vista explosionada las piezas se separan, pero cada una mantiene la dirección en la que está montada, así que se sigue entendiendo el conjunto.
->
-> Lo que hacen las dos es quitarle al usuario trabajo de imaginación: qué hay detrás de esta placa, qué está atornillado a qué. [mirar jurado]
+> Así se ve en un celular. [click 1 — Inspect] Inspect responde qué es una pieza y dónde está: la aísla y abre su ficha. [click 2 — Analyze] Analyze responde cómo se conecta: separa las piezas y corta el modelo. [click 3 — Studio] Y Studio cambia la forma de mirarlo: rayos X, calor o solo la forma.
 
 **Transición:**
-> Studio cambia la forma en que se ve la superficie.
+> El modo térmico merece su propia explicación.
 
-**No decir:** "Explode es un ensamblaje físicamente exacto" · "Analyze diagnostica"
+**No decir:** "Explode es un ensamblaje físicamente exacto" · "los shaders simulan física"
 
 ---
 
-### SLIDE 16 — Studio
+### SLIDE 12 — Thermal
 
-**Tiempo:** 14:05 – 14:50 · **Pasos:** 6
-
-> Studio agrupa los modos visuales. Cada uno responde una pregunta distinta. [click 1 — Realistic] Realistic: ¿cómo se ve el objeto real? [click 2 — X-Ray] X-Ray: ¿qué hay adentro? [click 3 — Solid] Solid: ¿qué forma tiene cada pieza, sin distracciones de material? [click 4 — Thermal] Thermal: ¿dónde se acumula el calor? Ese lo explico aparte.
->
-> [click 5 — definiciones] Técnicamente, cada modo es un **shader**, el programa que decide cómo una superficie responde a la luz, al color y a la transparencia. Un **preset** es una combinación guardada, como Blueprint, la vista tipo plano. [click 6 — video] Aquí van X-Ray, Thermal y Solid en la app real.
-
-**Transición:**
-> Thermal merece su propia explicación.
-
-**No decir:** "los shaders simulan física" · "cada color es una medición"
-
----
-
-### SLIDE 17 — Thermal
-
-**Tiempo:** 14:50 – 16:00 · **Pasos:** 2
+**Tiempo:** 10:00 – 11:10 · **Pasos:** 2
 
 > Thermal muestra cómo se distribuye el calor en el dron, calculado con un modelo físico simplificado.
 >
@@ -419,9 +313,9 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 18 — Demo en vivo
+### SLIDE 13 — Demo en vivo
 
-**Tiempo:** 16:00 – 19:00 · **Pasos:** 2
+**Tiempo:** 11:10 – 14:10 · **Pasos:** 2
 **Modo principal: demo en vivo en dos tramos.** (1) La **landing** (WebGL puro, sin Unity), abierta en otra ventana al inicio de la sección 03, con el dron sin ensamblar. (2) La **app Unity**, que se abre desde «Abrir visor» en la landing. **Respaldo:** el video de esta slide (88 s), en pausa en 0:00; se reproduce con un clic.
 
 **Procedimiento:**
@@ -452,28 +346,11 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 19 — El medidor interno
+### SLIDE 14 — Rendimiento por dispositivo
 
-**Tiempo:** 19:00 – 19:45 · **Pasos:** 2
+**Tiempo:** 14:10 – 15:10 · **Pasos:** 5
 
-> Para no hablar de rendimiento a ojo, la app trae un medidor propio, un profiler. Mientras corre, registra cuántos cuadros por segundo logra, cuánto tarda cada cuadro y cuánta memoria usa.
->
-> [click 1 — trazabilidad] Cada medición guarda también en qué equipo, navegador y resolución se tomó. En la web eso importa mucho, porque la misma app rinde distinto según el teléfono.
->
-> [click 2 — export JSON] Esto es un fragmento real de un archivo exportado: el modo Thermal en el computador de pruebas, a 59,8 cuadros por segundo. [señalar] En el mismo archivo están los 229 054 triángulos de hace un rato.
-
-**Transición:**
-> Así rindió en cuatro equipos.
-
-**No decir:** "el profiler reemplaza las pruebas en dispositivos" · "telemetría"
-
----
-
-### SLIDE 20 — Rendimiento por dispositivo
-
-**Tiempo:** 19:45 – 20:40 · **Pasos:** 5
-
-> Probé seis configuraciones y aquí están cuatro. [click 1 — gráfico] La línea roja es la meta: 30 cuadros por segundo, que es el mínimo para que el movimiento se sienta fluido. [señalar]
+> La app trae su propio medidor de rendimiento, que anota cuántos cuadros por segundo logra y en qué equipo se midió. Probé seis configuraciones y aquí están cuatro. [click 1 — gráfico] La línea roja es la meta: 30 cuadros por segundo, que es el mínimo para que el movimiento se sienta fluido. [señalar]
 >
 > [click 2 — Escritorio / iOS] En el computador de escritorio y en un iPhone 17 Pro va cerca de 60. Sobra margen.
 >
@@ -490,9 +367,9 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 21 — SUS
+### SLIDE 15 — SUS
 
-**Tiempo:** 20:40 – 21:55 · **Pasos:** 4
+**Tiempo:** 15:10 – 16:25 · **Pasos:** 4
 
 > Participaron doce personas con perfil técnico, diez en celular y dos en computador.
 >
@@ -511,9 +388,9 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 22 — NASA-TLX y tiempos
+### SLIDE 16 — NASA-TLX y tiempos
 
-**Tiempo:** 21:55 – 23:20 · **Pasos:** 5
+**Tiempo:** 16:25 – 17:50 · **Pasos:** 5
 
 > NASA-TLX sí se aplicó en las dos condiciones. [click 1 — 3D] Con el visor 3D, la carga de trabajo percibida promedió 8,69. [click 2 — 2D] Con la documentación 2D, 19,89. [click 3 — diferencia] En promedio, 11,19 puntos menos en 3D. Y no fue un promedio arrastrado por unos pocos: en los doce casos, la carga fue menor en 3D. [pausa]
 >
@@ -530,9 +407,9 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 23 — Think-Aloud
+### SLIDE 17 — Think-Aloud
 
-**Tiempo:** 23:20 – 24:15 · **Pasos:** 4
+**Tiempo:** 17:50 – 18:45 · **Pasos:** 4
 
 > Mientras resolvían las tareas, los participantes pensaban en voz alta. Después clasifiqué lo que dijeron.
 >
@@ -549,13 +426,13 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 24 — Discusión
+### SLIDE 18 — Discusión
 
-**Tiempo:** 24:15 – 25:20 · **Pasos:** 2
+**Tiempo:** 18:45 – 19:50 · **Pasos:** 2
 
 > [click 1 — Lo que sí soporta] La evidencia sostiene cuatro cosas: en esta muestra, con el 3D se tardó menos, se percibió menos carga, la usabilidad fue alta y las personas describieron mejor cómo se relacionan las piezas. Que cinco fuentes distintas coincidan es lo que le da peso al resultado, aunque la muestra sea chica.
 >
-> [click 2 — Lo que no debe afirmarse] Y hay cuatro cosas que no afirmo. Que el 3D tenga más éxito: las 96 tareas se completaron en las dos condiciones. Eso se llama **efecto techo**. Cuando todos completan todo, el éxito deja de distinguir, y la diferencia aparece en el tiempo y el esfuerzo. Tampoco afirmo que esto se generalice: doce personas alcanzan para aprender del prototipo, no para hablar de toda la población. Ni que funcione igual en cualquier celular. Ni que Thermal sirva para diagnosticar. [mirar jurado]
+> [click 2 — Lo que no debe afirmarse] Y hay cuatro cosas que no afirmo. Que el 3D tenga más éxito: las 96 tareas se completaron en las dos condiciones. Eso se llama **efecto techo**. Cuando todos completan todo, el éxito deja de distinguir, y la diferencia aparece en el tiempo y el esfuerzo. Tampoco afirmo que esto se generalice, ni a otros drones ni a toda la población: doce personas alcanzan para aprender del prototipo, no para hablar de toda la población. Ni que funcione igual en cualquier celular. Ni que Thermal sirva para diagnosticar. [mirar jurado]
 
 **Transición:**
 > Con eso, las conclusiones por objetivo.
@@ -564,9 +441,9 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ---
 
-### SLIDE 25 — Conclusiones
+### SLIDE 19 — Conclusiones
 
-**Tiempo:** 25:20 – 26:25 · **Pasos:** 4
+**Tiempo:** 19:50 – 21:10 · **Pasos:** 4
 
 > Vuelvo a los cuatro objetivos.
 >
@@ -579,48 +456,29 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 > [click 4 — OE4] La evaluación. Usabilidad de 91,88. Carga percibida de 8,69 en 3D contra 19,89 en 2D. Tareas más rápidas en 3D. Y los comentarios explican por qué.
 >
 > Entonces, respondiendo la pregunta: en esta muestra, el visor 3D se asoció con menos tiempo y menos carga, y es viable en el navegador, con límites en los celulares más modestos. [mirar jurado]
+>
+> Lo que deja este trabajo es un camino documentado para llevar un CAD a la web sin perder sus piezas, una evaluación que cruza cinco fuentes y un hardware complejo que cualquiera puede explorar desde un enlace.
 
 **Transición:**
-> Esos límites los detallo.
+> Y lo que sigue.
 
 ---
 
-### SLIDE 26 — Limitaciones
+### SLIDE 20 — Trabajo futuro
 
-**Tiempo:** 26:25 – 27:05 · **Pasos:** 5
+**Tiempo:** 21:10 – 21:55 · **Pasos:** 6
 
-> [click 1 — Modelo único] Trabajé con un solo dron. La estructura está pensada para aceptar otros modelos, pero no lo probé. [click 2 — n = 12] Doce participantes alcanzan para una evaluación formativa, no para sacar estadísticas generales. [click 3 — Adaptación PC] La app se diseñó para celular primero; en computador funciona, pero la interfaz no está pensada para mouse. [click 4 — Cables] Y los cables y la electrónica interna quedaron fuera, por tiempo. [click 5 — Rigor] Decirlo con precisión es lo que permite saber hasta dónde valen los resultados.
+> ¿Recuerdan los tres niveles del alcance? Hoy TwinSight está en el primero. [click 1 — Digital Shadow] El siguiente es recibir datos del dron real, [click 2 — Digital Twin] y el último, un gemelo que además ayude a decidir. [click 3 — Fases 0 → 5] El informe lo divide en seis fases. [click 4 — Fases 0–1] Primero, más participantes, arreglar la navegación en el celular y describir cada pieza en un formato que no dependa de Unity. [click 5 — Fases 2–3] Después, conectar datos de vuelo: primero grabados, luego en vivo. [click 6 — Fases 4–5] Y al final, un modo de mantenimiento y modelos calibrados, incluido el térmico.
 
-**Transición:**
-> Y de ahí sale el trabajo futuro.
-
----
-
-### SLIDE 27 — Trabajo futuro
-
-**Tiempo:** 27:05 – 27:45 · **Pasos:** 6
-
-> ¿Recuerdan los tres niveles de la slide 5? Hoy TwinSight está en el primero. [click 1 — Digital Shadow] El siguiente es recibir datos del dron real, [click 2 — Digital Twin] y el último, un gemelo que además ayude a decidir. [click 3 — Fases 0 → 5] El informe lo divide en seis fases. [click 4 — Fases 0–1] Primero, más participantes, arreglar la navegación en el celular y describir cada pieza en un formato que no dependa de Unity. [click 5 — Fases 2–3] Después, conectar datos de vuelo: primero grabados, luego en vivo. [click 6 — Fases 4–5] Y al final, un modo de mantenimiento y modelos calibrados, incluido el térmico.
+> Empecé hablando de la distancia entre la documentación de un dron y entender cómo está armado. Este trabajo muestra que esa distancia se puede acortar desde el navegador. [mirar jurado]
 
 **No decir:** "la próxima versión será un digital twin" · "FEA en servidor" (no está en el informe)
 
 ---
 
-### SLIDE 28 — Aporte
+### SLIDE 21 — Cierre
 
-**Tiempo:** 27:45 – 28:25 · **Pasos:** 3
-
-> Empecé hablando de la distancia entre la documentación de un dron y entender cómo está armado. Este trabajo muestra que esa distancia se puede acortar desde el navegador.
->
-> [click 1 — Técnica] El aporte técnico es un camino documentado para llevar un CAD a la web sin perder las piezas, con una forma de clasificarlas, modos de lectura y un medidor de rendimiento. [click 2 — Metodológica] El metodológico, una evaluación que cruza cinco fuentes y compara 3D con 2D en las mismas personas. [click 3 — Comunicativa] Y el comunicativo: un hardware complejo que cualquiera puede explorar y entender desde un enlace.
-
-**No decir:** "visual product twin es una categoría validada" (el informe la propone como categoría de trabajo)
-
----
-
-### SLIDE 29 — Cierre
-
-**Tiempo:** 28:25 – 28:30 · **Pasos:** ninguno
+**Tiempo:** 21:55 – 22:00 · **Pasos:** ninguno
 
 > [avanzar] Muchas gracias. Quedo atento a sus preguntas.
 
@@ -674,7 +532,7 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 
 ## 8. Cortes de emergencia
 
-- **Si quedan menos de 7 minutos al llegar a la slide 19:** fusionar 19 y 20. Decir solo: la app mide su propio rendimiento; escritorio cerca de 60 FPS, Redmi 26,5, gama baja 17,6; funciona con límites en celulares modestos. Seguir en la 21.
-- **Si quedan menos de 5 minutos al llegar a la slide 21:** fusionar 21 a 23. SUS 91,88 solo en 3D; NASA-TLX 8,69 contra 19,89; tareas más rápidas en 3D; fricciones en navegación táctil, iconos y piezas pequeñas. En la 24, solo la columna de lo que no se afirma.
+- **Si quedan menos de 8 minutos al llegar a la slide 14:** decir solo: escritorio cerca de 60 FPS, Redmi 26,5, gama baja 17,6; funciona con límites en celulares modestos. Seguir en la 15.
+- **Si quedan menos de 6 minutos al llegar a la slide 15:** fusionar 15 a 17. SUS 91,88 solo en 3D; NASA-TLX 8,69 contra 19,89; tareas más rápidas en 3D; fricciones en navegación táctil, iconos y piezas pequeñas. En la 18, solo la columna de lo que no se afirma.
 - **Si el jurado interrumpe en la demo:** detener la interacción y responder: *"puedo mostrar lo que está publicado; lo que no está en la interfaz final no lo presento como alcance."*
-- **Si la app no responde en la demo:** volver al deck y narrar el video de la slide 18. No improvisar otra ruta ni comentar el fallo.
+- **Si la app no responde en la demo:** volver al deck y narrar el video de la slide 13. No improvisar otra ruta ni comentar el fallo.

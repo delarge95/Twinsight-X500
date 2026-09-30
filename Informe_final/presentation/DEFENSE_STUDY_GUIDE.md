@@ -17,7 +17,7 @@ Esta guia no debe llevarte a sobre-explicar durante la sustentacion. Sirve para 
 
 ## 1. Problema, brecha y propuesta
 
-Slides: 1-5.
+Slides: 1-4.
 
 **Que debes poder explicar**
 
@@ -56,7 +56,7 @@ Respuesta: no reemplaza la lectura tecnica experta; reduce friccion de ubicacion
 
 ## 2. Objetivos y cierre por evidencia
 
-Slide: 6 (y 25).
+Slide: 5 (y 19).
 
 **Que debes poder explicar**
 
@@ -90,7 +90,7 @@ Respuesta: OE3 (prototipo interactivo) quedaria mas expuesto oralmente, pero no 
 
 ## 3. Metodologia DSR y diseno comparativo
 
-Slides: 7-8.
+Slides: 5-6 (y B13).
 
 **Que debes poder explicar**
 
@@ -124,7 +124,7 @@ Respuesta: por escala formativa y control operativo de la sesion. La alternancia
 
 ## 4. Pipeline CAD, optimizacion y taxonomia
 
-Slides: 9-11 y 13.
+Slides: 7 y 9 (y B6).
 
 **Que debes poder explicar**
 
@@ -158,7 +158,7 @@ Respuesta: no. Son capas distintas. 95.617 describe el activo base optimizado; 2
 
 ## 5. Arquitectura, UI y microinteracciones
 
-Slides: 12 y 14.
+Slides: 8 y 10.
 
 **Que debes poder explicar**
 
@@ -192,7 +192,7 @@ Respuesta: porque alcance implementado y alcance publicado no son lo mismo. Lo d
 
 ## 6. Modos visuales, Analyze y Thermal
 
-Slides: 15-17.
+Slides: 11-12.
 
 **Que debes poder explicar**
 
@@ -227,7 +227,7 @@ Respuesta: tiene base fisica, pero simplificada. Sirve para entender por donde v
 
 ## 7. Demo y evidencia funcional
 
-Slide: 18.
+Slide: 13.
 
 **Que debes poder explicar**
 
@@ -256,7 +256,7 @@ Respuesta: no, si se tienen artefactos de respaldo: capturas, video/GIF, build d
 
 ## 8. Rendimiento, profiler y compatibilidad
 
-Slides: 19-20.
+Slide: 14 (y B5).
 
 **Que debes poder explicar**
 
@@ -289,7 +289,7 @@ Respuesta: porque el objetivo reportado es comportamiento operativo de la build 
 
 ## 9. Evaluacion con usuarios: tareas, SUS, NASA-TLX Raw
 
-Slides: 21-22.
+Slides: 15-16.
 
 **Que debes poder explicar**
 
@@ -324,7 +324,7 @@ Respuesta: no se dice que fue mejor en exito, porque hubo efecto techo. Se dice 
 
 ## 10. Think-Aloud, triangulacion y discusion
 
-Slides: 23-24.
+Slides: 17-18.
 
 **Que debes poder explicar**
 
@@ -357,7 +357,7 @@ Respuesta: puede existir sesgo de cortesia o contexto moderado; por eso el infor
 
 ## 11. Conclusiones, limites y futuro
 
-Slides: 25-28.
+Slides: 19-20 (y B14, B15).
 
 **Que debes poder explicar**
 

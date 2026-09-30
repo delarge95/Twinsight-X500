@@ -1,7 +1,7 @@
 # Mapa de evidencias de sustentacion - TwinSight X500
 
 Estado: canonico para enlazar informe, app, documentacion, presentacion y preguntas.
-Fecha de actualizacion: 2026-09-29 (sincronizado con `index_final.html`, 29 slides + B1-B11).
+Fecha de actualizacion: 2026-09-29 (sincronizado con `index_final.html`, pantalla de espera + 21 slides + B1-B15).
 Fuente autoritativa: `Informe_final/awoodcocks.pdf` (informe final); fuentes LaTeX en `Informe_final/chapters/`.
 
 ## 1. Jerarquia de autoridad
@@ -43,7 +43,7 @@ Regla para defensa:
 | Demo | `Informe_final/presentation/DEMO_SCRIPT.md` | Recorrido de demostracion. |
 | Deck | `Informe_final/presentation/index_final.html` | Presentacion final (abrir directamente en Chrome/Edge). |
 | Assets | `Informe_final/presentation/ASSETS_REQUIREMENTS.md` | Inventario final de imagenes, videos y modelo del deck. |
-| Exportaciones del profiler | `Telemetria/Mediciones_WebGL/` | JSON/CSV citados en la slide 19. |
+| Exportaciones del profiler | `Telemetria/Mediciones_WebGL/` | JSON/CSV citados en el backup B5. |
 | Preguntas | `Informe_final/presentation/JURY_QA_BANK.md` | Banco de respuestas para jurado. |
 
 ## 3. Mapa slide -> evidencia
@@ -55,32 +55,26 @@ Numeracion = posicion en el deck = numero visible de cada slide.
 | 1 | TwinSight X500 es una app WebGL para inspeccionar el dron. | Resumen; `01_introduccion.tex`. | Captura del visor + URL de la demo. | Evita abrir como pitch comercial. |
 | 2 | El reto es entender como se relacionan las piezas. | Introduccion; Fig. 1 y 2. | Documentacion → friccion → respuesta. | No desacreditar la documentacion 2D. |
 | 3 | La carga cognitiva explica por que importa la forma de presentar. | Marco teorico (Sweller); Fig. 7. | Intrinseca / extrinseca / germana. | Decir que NASA mide las tres cargas. |
-| 4 | La interfaz aplica jerarquia, agrupacion, estado y reconocimiento. | Marco teorico (Nielsen, Hutchins, Gestalt); Tabla 11 (Norman). | Tabla principio / app / deck. | Citar autores fuera de la bibliografia. |
-| 5 | Es visual product twin, no digital twin operacional. | Alcance y limitaciones; Fig. 3, 4 y 15. | Exclusiones / alcance. | Principal riesgo de sobrepromesa. |
-| 6 | Pregunta de investigacion y objetivos verificables. | Preguntas de investigacion; objetivos. | Pregunta + matriz OE1-OE4. | Objetivos sin resultado asociado. |
-| 7 | DSR y validacion formativa descriptiva. | Marco metodologico; Fig. 14. | Ciclo DSRM aplicado. | Pedir inferencia experimental. |
-| 8 | La evaluacion triangula cinco capas. | Instrumentos; Fig. 19 y 20. | Diagrama de triangulacion. | Mal uso de SUS/NASA. |
-| 9 | El CAD se tesela (6,5-6,9 M tri segun la ruta) y el pipeline lo lleva a 95 617. | Pipeline 3D; Tabla 5; Tabla 28; Fig. 22. | Flujo CAD → WebGL + cifras por ruta. | Decir que el CAD "tiene" triangulos. |
-| 10 | La escena runtime exportada es real y manipulable. | Tabla 17 (252 mallas, 229 054 tri). | Visor three.js del GLB (229 070 tri). | Confundir visor con activo base. |
-| 11 | 95 617 y 229 054 miden cosas distintas. | Tabla 17; Tabla 28 y su nota. | Dos cifras + como leerlas. | Contradiccion geometrica aparente. |
-| 12 | Los modulos se comunican por un bus de eventos. | Arquitectura operativa; Fig. 47-50. Codigo: `SelectionManager` publica `PartSelectedEvent`; `UIManager`, `HotspotManager`, `FastenerInspectionManager` suscritos. | Cuatro grupos + ejemplo real. | Lectura de "viewer simple" o explicacion espacial (arriba/abajo). |
-| 13 | La taxonomia 28/30/257 estructura la seleccion; la tornilleria usa proxies y un tornillo modular. | Normalizacion; Tabla 3; Fig. 21; Tabla 8; Figs. 28-30. Cifras de triangulos: ver claims numericos. | Cifras + hotspots + tornilleria + piezas base. | Confusion de conteos; "todos los fasteners son modulares". |
-| 14 | La ficha aparece bajo demanda; la barra de modos siempre esta visible. | Flujo visible de la build final; manual de usuario. | Flujo con barra fija + captura. | Decir que los modos aparecen al seleccionar. |
-| 15 | Inspect/Analyze reducen ruido para leer relaciones. | Flujo visible; Fig. 59-60. | Clips de aislamiento y explode. | Feature-list sin proposito. |
-| 16 | Cada modo visual responde una pregunta. | Sistema de visualizacion; Tabla 12; Fig. 61-63. | Realistic / X-Ray / Solid / Thermal. | Presentar efectos como decoracion. |
-| 17 | Thermal usa un modelo fisico simplificado por componentes, no FEA. | Modelo matematico del subsistema termico (pp. 136-138); Fig. 66-67. Codigo: `ThermalSimulationManager.cs`. | Como calcula + diagrama + limite. | Sobrevender (diagnostico) o infravalorar ("valores inventados"). |
-| 18 | La build realiza el flujo prometido. | `docs/Build/`; manual de usuario; `DEMO_SCRIPT.md`. | Demo en vivo; video de respaldo. | Depender de red o azar. |
-| 19 | El profiler hace trazable el rendimiento. | Resultados de rendimiento; Tabla 18. | Extracto JSON real del WebGLProfiler. | FPS sin contexto. |
-| 20 | Rendimiento viable, no universal. | Tabla 16; Tabla 19; Fig. 73. | Barras FPS por dispositivo. | Promesa universal movil. |
-| 21 | SUS favorable en el prototipo 3D; como se calcula. | Resultados de usabilidad; formula SUS (cap. 3); Tabla 25; Fig. 75. | SUS, calculo, rango, referencia 68. | Comparar SUS 3D vs 2D; leerlo como porcentaje. |
-| 22 | NASA-TLX Raw y tiempos favorecen al 3D descriptivamente; como se calcula. | Formula NASA-TLX Raw (cap. 3); Tablas 23, 25 y 26. | Cifras 3D/2D + tiempos + calculo. | Inferencia causal. |
-| 23 | Think-Aloud explica comprension y fricciones. | Tabla 27; Fig. 77. | Barras lima/ambar. | Leer "navegacion y control" como fortaleza. |
-| 24 | La discusion acota el resultado. | Discusion. | Soporta / no afirma. | Objeciones metodologicas. |
-| 25 | Cada objetivo cerrado con evidencia; pregunta respondida. | Conclusiones por objetivo. | Tabla OE → resultado → evidencia. | Conclusiones genericas. |
-| 26 | Limitaciones como alcance de validez. | Limitaciones. | Cuatro limites. | Disculparse o esconder limites. |
-| 27 | Trabajo futuro por fases hacia datos reales. | Trabajo futuro; Fig. 80. | Escalera + fases 0-5. | Prometer twin operacional inmediato. |
-| 28 | Contribucion tecnica, metodologica y comunicativa. | Aporte a la Ingenieria Multimedia; conclusiones. | Tres columnas. | Reducir el aporte a una app visual. |
-| 29 | Cierre y apertura a preguntas. | — | "Gracias." + URL. | Alargar el cierre. |
+| 4 | Es visual product twin, no digital twin operacional. | Alcance y limitaciones; Fig. 3, 4 y 15. | Exclusiones / alcance. | Principal riesgo de sobrepromesa. |
+| 5 | Pregunta de investigacion y objetivos verificables. | Preguntas de investigacion; objetivos. | Pregunta + matriz OE1-OE4. | Objetivos sin resultado asociado. |
+| 6 | La evaluacion triangula cinco capas. | Instrumentos; Fig. 19 y 20. | Diagrama de triangulacion. | Mal uso de SUS/NASA. |
+| 7 | El CAD se tesela (6,5-6,9 M tri segun la ruta) y el pipeline lo lleva a 95 617. | Pipeline 3D; Tabla 5; Tabla 28; Fig. 22. | Flujo CAD → WebGL + cifras por ruta. | Decir que el CAD "tiene" triangulos. |
+| 8 | Los modulos se comunican por un bus de eventos. | Arquitectura operativa; Fig. 47-50. Codigo: `SelectionManager` publica `PartSelectedEvent`; `UIManager`, `HotspotManager`, `FastenerInspectionManager` suscritos. | Cuatro grupos + ejemplo real. | Lectura de "viewer simple" o explicacion espacial (arriba/abajo). |
+| 9 | La taxonomia 28/30/257 estructura la seleccion; la tornilleria usa proxies y un tornillo modular. | Normalizacion; Tabla 3; Fig. 21; Tabla 8; Figs. 28-30. Cifras de triangulos: ver claims numericos. | Cifras + hotspots + tornilleria + piezas base. | Confusion de conteos; "todos los fasteners son modulares". |
+| 10 | La ficha aparece bajo demanda; la barra de modos siempre esta visible. | Flujo visible de la build final; manual de usuario. | Flujo con barra fija + captura. | Decir que los modos aparecen al seleccionar. |
+| 11 | Inspect, Analyze y Studio responden tres preguntas distintas. | Flujo visible; Fig. 59-63; Tabla 12. | Tres capturas moviles en video. | Feature-list sin proposito. |
+| 12 | Thermal usa un modelo fisico simplificado por componentes, no FEA. | Modelo matematico del subsistema termico (pp. 136-138); Fig. 66-67. Codigo: `ThermalSimulationManager.cs`. | Como calcula + diagrama + limite. | Sobrevender (diagnostico) o infravalorar ("valores inventados"). |
+| 13 | La build realiza el flujo prometido. | `docs/Build/`; manual de usuario; `DEMO_SCRIPT.md`. | Demo en vivo; video de respaldo. | Depender de red o azar. |
+| 14 | Rendimiento viable, no universal. | Tabla 16; Tabla 19; Fig. 73. | Barras FPS por dispositivo. | Promesa universal movil. |
+| 15 | SUS favorable en el prototipo 3D; como se calcula. | Resultados de usabilidad; formula SUS (cap. 3); Tabla 25; Fig. 75. | SUS, calculo, rango, referencia 68. | Comparar SUS 3D vs 2D; leerlo como porcentaje. |
+| 16 | NASA-TLX Raw y tiempos favorecen al 3D descriptivamente; como se calcula. | Formula NASA-TLX Raw (cap. 3); Tablas 23, 25 y 26. | Cifras 3D/2D + tiempos + calculo. | Inferencia causal. |
+| 17 | Think-Aloud explica comprension y fricciones. | Tabla 27; Fig. 77. | Barras lima/ambar. | Leer "navegacion y control" como fortaleza. |
+| 18 | La discusion acota el resultado. | Discusion. | Soporta / no afirma. | Objeciones metodologicas. |
+| 19 | Cada objetivo cerrado con evidencia; pregunta respondida; aporte. | Conclusiones por objetivo. | Tabla OE → resultado → evidencia. | Conclusiones genericas. |
+| 20 | Trabajo futuro por fases hacia datos reales. | Trabajo futuro; Fig. 80. | Escalera + fases 0-5. | Prometer twin operacional inmediato. |
+| 21 | Cierre y apertura a preguntas. | — | "Gracias." + URL. | Alargar el cierre. |
+
+Fuera de la ruta principal desde el recorte del 2026-09-30: principios (B12), metodologia (B13), profiler (B5), geometria (B6), limitaciones (B14) y aporte (B15).
 
 ## 4. Claims numericos autorizados
 
