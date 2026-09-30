@@ -22,7 +22,9 @@
   const css = document.createElement('style');
   css.textContent = `
   .pb-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);gap:clamp(18px,2.2vw,36px);align-items:stretch;margin-top:clamp(8px,1.4vh,16px)}
-  .pb-left .band{margin-top:0}
+  .pb-left .band{margin-top:0;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pb-left .band .metric{min-width:0}
+  .pb-left .band .tag{white-space:normal;line-height:1.35;letter-spacing:.12em;max-width:100%}
   .pb-left .band .metric{padding:clamp(8px,1.2vh,14px) clamp(10px,1.2vw,18px) 0}
   .pb-left .band .m-value{font-size:clamp(34px,3.4vw,52px)}
   .pb-left .band p{font-size:clamp(12px,.9vw,13.5px)}
