@@ -50,6 +50,14 @@
   .pb-hud{position:absolute;left:14px;top:12px;font:500 clamp(10px,.78vw,12px)/1.7 'JetBrains Mono',monospace;letter-spacing:.08em;color:#B4B8BE;pointer-events:none}
   .pb-hud b{color:#EDEEE8;font-weight:600}
   .pb-hud .st{color:#C8F53F;text-transform:uppercase;letter-spacing:.16em}
+  .pb-hs{position:absolute;inset:0;pointer-events:none}
+  .pb-hs .dot{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.5);
+    box-sizing:border-box;transition:opacity .35s,transform .35s;opacity:0;transform:scale(.3)}
+  .pb-hs .dot.on{opacity:1;transform:scale(1)}
+  .pb-hs .dot.act{background:rgba(255,255,255,.2);border:3px solid #fff;transform:scale(1.1)}
+  .pb-hs .dot span{position:absolute;left:26px;top:50%;transform:translateY(-50%);background:rgba(1,1,1,.92);border:1px solid rgba(255,255,255,.15);border-radius:6px;
+    padding:2px 9px;font:600 11px/1.5 Inter,'Space Grotesk',sans-serif;letter-spacing:.06em;color:rgba(255,255,255,.9);white-space:nowrap}
+  .pb-hs .dot.lft span{left:auto;right:26px}
   `;
   document.head.appendChild(css);
 
@@ -166,21 +174,25 @@
   /* ------------------------------------------------------------------ */
   /* Hotspots (paso 4 de la slide 9)                                     */
   /* ------------------------------------------------------------------ */
+  /* Hotspots con el estilo de Hotspots.uss de la app y las etiquetas de DronePartData (hotspotLabel) */
   const hotspots = [];
-  const ringTex = (() => {
-    const cv = document.createElement('canvas'); cv.width = cv.height = 128; const x = cv.getContext('2d');
-    x.strokeStyle = '#C8F53F'; x.lineWidth = 7; x.beginPath(); x.arc(64, 64, 44, 0, Math.PI * 2); x.stroke();
-    x.fillStyle = '#C8F53F'; x.beginPath(); x.arc(64, 64, 13, 0, Math.PI * 2); x.fill();
-    const t = new THREE.CanvasTexture(cv); t.encoding = THREE.sRGBEncoding; return t;
-  })();
+  const hsLayer = document.createElement('div'); hsLayer.className = 'pb-hs'; hostTax.appendChild(hsLayer);
   function buildHotspots(){
-    const pick = re => meshes.filter(m => re.test(m.name)).map(m => m.center.clone());
-    const pts = [].concat(pick(/^DJ-2216/), pick(/gps_m10/).slice(0, 1), pick(/MIANKE-PIXHAWK/).slice(0, 1), pick(/battery_PROXY|x500v2_battery/).slice(0, 1));
-    pts.forEach((p, i) => {
-      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: ringTex, transparent: true, opacity: 0, depthTest: false }));
-      sp.position.copy(p).add(new THREE.Vector3(0, 0.12, 0)); sp.scale.setScalar(0.16); sp.renderOrder = 10;
-      scene.add(sp); hotspots.push({ sprite: sp, phase: i * 0.7 });
-    });
+    const add = (m, label) => {
+      if (!m) return;
+      const el = document.createElement('div'); el.className = 'dot';
+      if (label) el.innerHTML = '<span>' + label + '</span>';
+      hsLayer.appendChild(el);
+      hotspots.push({ el: el, pos: m.center.clone().add(new THREE.Vector3(0, 0.05, 0)) });
+    };
+    meshes.filter(m => /^DJ-2216/.test(m.name)).forEach((m, i) => add(m, i === 0 ? 'Propulsion System' : ''));
+    add(meshes.find(m => /gps_m10/.test(m.name)), 'GPS & Compass');
+    add(meshes.find(m => /MIANKE-PIXHAWK/.test(m.name)), 'Flight Controller');
+    add(meshes.find(m => /x500v2_battery/.test(m.name)), 'Battery');
+  }
+  function projectTo(host, v){
+    const p = v.clone().project(camera);
+    return { x: (p.x * 0.5 + 0.5) * 100, y: (-p.y * 0.5 + 0.5) * 100, front: p.z < 1 };
   }
 
   /* ------------------------------------------------------------------ */
@@ -385,13 +397,27 @@
   /* Bucle                                                               */
   /* ------------------------------------------------------------------ */
   let mode = null, last = performance.now(), t = 0, stepPrev = -1, stepT = 0, thT = 0, thRunning = false, snap = true;
+  /* Modos externos: { slide, host, enter(), exit(), update(dt, step, t), render() opcional, dom: sin 3D } */
+  const extra = [];
+  let extMode = null;
+  function resetDrone(){
+    drone.rotation.set(0, 0, 0); drone.visible = true;
+    meshes.forEach(m => { m.mesh.material = m.tex; m.mesh.visible = true; m.tex.opacity = 1; m.tex.depthWrite = true; m.tex.emissive.setRGB(0, 0, 0); m.wire.visible = false; });
+    if (screw.ok) screw.grp.visible = false;
+  }
+  window.__PB = {
+    THREE: THREE, renderer: renderer, scene: scene, camera: camera, drone: drone, meshes: meshes, target: target, canvas: canvas,
+    get S(){ return S; }, get H(){ return H; }, ready: () => ready, wantPos: wantPos, wantLook: wantLook,
+    orbitPose: orbitPose, fit: fit, shownSteps: shownSteps, resetDrone: resetDrone, snap: () => { snap = true; },
+    register: m => extra.push(m)
+  };
   function setMode(next){
     mode = next; snap = true; stepPrev = -1;
     meshes.forEach(m => {
       m.mesh.material = next === 'th' ? m.th : m.tex;
       m.wire.visible = false;
     });
-    hotspots.forEach(h => { h.sprite.visible = next === 'tax'; });
+    if (next !== 'tax') hotspots.forEach(h => h.el.classList.remove('on'));
     if (screw.ok) screw.grp.visible = next === 'tax';
     if (next === 'th'){ resetThermal(); thRunning = false; thT = 0; }
   }
@@ -424,9 +450,9 @@
     legend.querySelectorAll('span').forEach(s => { s.style.opacity = (step === 2 && s.dataset.c !== '6') ? 0.35 : 1; });
     hotspots.forEach((h, i) => {
       const on = step === 4;
-      const o = h.sprite.material;
-      o.opacity = lerp(o.opacity, on ? 1 : 0, Math.min(1, dt * 5));
-      h.sprite.scale.setScalar(0.22 + 0.05 * Math.sin(t * 3 + h.phase));
+      h.el.classList.toggle('on', on);
+      h.el.classList.toggle('act', on && i === 0 && (t % 4) > 2);
+      if (on){ const p = projectTo(hostTax, h.pos); h.el.style.left = p.x + '%'; h.el.style.top = p.y + '%'; h.el.classList.toggle('lft', p.x > 62); }
     });
     /* tornillo modular */
     const lab = hostTax.querySelector('.pb-labels');
@@ -514,12 +540,40 @@
   function frame(now){
     requestAnimationFrame(frame);
     const dt = Math.min(0.05, (now - last) / 1000); last = now;
-    if (!ready || window.__preshowOpen) return;
+    if (window.__preshowOpen) return;
     const cur = document.querySelector('.slide.active');
+    /* modos externos */
+    const ext = extra.find(m => m.slide === cur) || null;
+    if (ext !== extMode){
+      if (extMode && extMode.exit) extMode.exit();
+      extMode = ext;
+      if (ext && !ext.dom && ready){ resetDrone(); mode = null; snap = true; }
+      if (ext && ext.enter && (ext.dom || ready)) ext.enter();
+      if (ext && !ext.dom && !ready) extMode = null;           // se reintenta cuando el modelo esté listo
+    }
+    if (extMode){
+      t += dt;
+      const step = shownSteps(extMode.slide);
+      if (extMode.dom){ extMode.update(dt, step, t); return; }
+      if (!ready) return;
+      if (extMode.host) fit(extMode.host);
+      extMode.update(dt, step, t);
+      if (extMode.render){ extMode.render(dt); return; }
+      if (camera.near !== 0.02){ camera.near = 0.02; camera.updateProjectionMatrix(); }
+      if (snap){ camPos.copy(wantPos); camLook.copy(wantLook); snap = false; }
+      const kk = Math.min(1, dt * 2.2);
+      camPos.lerp(wantPos, kk); camLook.lerp(wantLook, kk);
+      camera.position.copy(camPos); camera.lookAt(camLook);
+      renderer.setScissorTest(false);
+      renderer.render(scene, camera);
+      return;
+    }
+    if (!ready) return;
     const next = cur === sTax ? 'tax' : cur === sTh ? 'th' : null;
-    if (next !== mode) setMode(next);
+    if (next !== mode){ if (next) resetDrone(); setMode(next); }
     if (!mode) return;
     t += dt;
+    renderer.setScissorTest(false);
     const host = mode === 'tax' ? hostTax : hostTh;
     fit(host);
     const step = shownSteps(mode === 'tax' ? sTax : sTh);
