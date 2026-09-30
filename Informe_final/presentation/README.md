@@ -28,6 +28,8 @@
 |---|---|
 | `→`, `Espacio`, `Av Pág`, clic | Revelar el siguiente paso o avanzar de slide |
 | `←`, `Re Pág` | Ocultar el último paso o retroceder |
+| `S` | Abrir la vista del presentador (guion por clic, cronómetro, siguiente slide). Requiere proyector en modo extender |
+| `←` en la slide 1 · `P` · `0` + Enter | Volver a la pantalla de espera (slide 0) |
 | `Inicio` / `Fin` | Ir a la portada / al cierre (slide 21) |
 | `F` | Pantalla completa |
 | `N` | Notas del presentador (tiempo y clics por slide). **Solo para ensayar**: se ven en la misma pantalla que el jurado. |
@@ -47,6 +49,7 @@ La numeración visible de cada slide (01–30) coincide con la de todos los docu
 | `SPEAKER_CARDS.md` | Una tarjeta por slide: tiempo, clics, tesis oral, evidencia en pantalla y riesgo a evitar. Prioridad si el tiempo aprieta. |
 | `PRESENTATION_SCRIPT.md` | Guion oral completo (28:30): un `[click n]` por cada paso del deck, transiciones, frases a evitar, checklist técnico, preguntas frecuentes y cortes de emergencia. |
 | `PRESENTATION_OUTLINE.md` | Estructura de las 21 slides, bloques de tiempo, backups e inventario de assets. |
+| `presenter.html` · `presenter_data.js` | Vista del presentador (se abre desde el deck con `S`). `presenter_data.js` se genera con `python tools/build_presenter_data.py` a partir del guion y las tarjetas. |
 | `DEMO_SCRIPT.md` | Ruta de la demo en vivo (slide 13), respaldo en video y demo extendida para preguntas. |
 
 ### Para responder al jurado

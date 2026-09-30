@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TwinSight · Presentador</title>
+<link href="assets/fonts/fonts.css" rel="stylesheet">
+<style>
+:root{--bg:#07080a;--panel:#0d0f13;--line:rgba(237,238,232,.10);--ink:#EDEEE8;--ink2:#B4B8BE;--ink3:#767C85;--lime:#C8F53F;--amber:#FFB224;--red:#FF5C5C;--fs:1}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Space Grotesk',system-ui,sans-serif}
+body{display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+header{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--line)}
+.brand{font:600 12px 'JetBrains Mono',monospace;letter-spacing:.22em;text-transform:uppercase}
+.brand i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:10px;vertical-align:1px}
+.brand.on i{background:var(--lime);box-shadow:0 0 10px var(--lime)}
+.brand small{display:block;color:var(--ink3);font-weight:500;letter-spacing:.16em;margin-top:5px}
+.timers{display:flex;gap:30px;align-items:flex-end;justify-content:center}
+.tbox .lbl{font:500 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:var(--ink3);text-transform:uppercase}
+.tbox .val{font:500 40px/1 'Clash Display','Space Grotesk',sans-serif;letter-spacing:-.01em;margin-top:6px;font-variant-numeric:tabular-nums}
+.tbox .val.small{font-size:26px}
+.ok{color:var(--lime)}.warn{color:var(--amber)}.bad{color:var(--red)}
+.ctrls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+button,select{background:#14171c;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:500 12px 'JetBrains Mono',monospace;cursor:pointer}
+button:hover{border-color:rgba(200,245,63,.5)}
+button.primary{border-color:rgba(200,245,63,.55);color:var(--lime)}
+main{display:grid;grid-template-columns:minmax(0,1fr) 360px;min-height:0}
+.cur{padding:18px 28px 24px;overflow:auto;min-height:0}
+.side{border-left:1px solid var(--line);padding:18px 22px;overflow:auto;min-height:0;background:var(--panel)}
+.slidehead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.num{font:600 13px 'JetBrains Mono',monospace;letter-spacing:.2em;color:var(--lime)}
+.title{font:500 calc(28px*var(--fs))/1.15 'Clash Display','Space Grotesk',sans-serif}
+.budget{margin:12px 0 4px;height:6px;border-radius:4px;background:rgba(237,238,232,.08);overflow:hidden}
+.budget b{display:block;height:100%;width:0;background:var(--lime);transition:width .4s linear,background .4s}
+.bmeta{display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.08em}
+.steps{display:flex;gap:6px;margin:14px 0 4px;align-items:center}
+.steps b{width:26px;height:6px;border-radius:3px;background:rgba(237,238,232,.12)}
+.steps b.done{background:rgba(200,245,63,.45)}
+.steps b.now{background:var(--lime)}
+.steps span{font:500 11px 'JetBrains Mono',monospace;color:var(--ink3);margin-left:8px;letter-spacing:.1em}
+.key{margin:14px 0 6px;padding:12px 14px;border:1px solid rgba(200,245,63,.28);border-radius:10px;background:rgba(200,245,63,.04);font-size:calc(15px*var(--fs));line-height:1.5;color:var(--ink2)}
+.key::before{content:"LO QUE TIENE QUE QUEDAR";display:block;font:500 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:var(--lime);margin-bottom:6px}
+.script{margin-top:14px}
+.seg{position:relative;padding:10px 14px 10px 64px;border-radius:10px;font-size:calc(19px*var(--fs));line-height:1.6;color:var(--ink3);transition:color .3s,background .3s}
+.seg .tag{position:absolute;left:10px;top:12px;font:600 10px 'JetBrains Mono',monospace;letter-spacing:.08em;color:var(--ink3);width:46px}
+.seg.now{background:rgba(200,245,63,.06);color:var(--ink)}
+.seg.now .tag{color:var(--lime)}
+.seg.next{color:var(--ink2)}
+.seg .cue{font:500 .7em 'JetBrains Mono',monospace;letter-spacing:.08em;color:var(--amber);padding:1px 6px;border:1px solid rgba(255,178,36,.35);border-radius:5px;margin:0 3px;vertical-align:2px;white-space:nowrap}
+.seg b{color:inherit}
+.seg code,.proc code{font-family:'JetBrains Mono',monospace;font-size:.85em}
+.proc{margin:10px 0;padding:10px 14px 10px 32px;border:1px dashed var(--line);border-radius:10px;color:var(--ink2);font-size:calc(14px*var(--fs));line-height:1.5}
+.box{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:calc(14px*var(--fs));line-height:1.5;color:var(--ink2)}
+.box h4{margin:0 0 6px;font:500 10px 'JetBrains Mono',monospace;letter-spacing:.2em;color:var(--ink3);text-transform:uppercase}
+.box.avoid h4{color:var(--red)}
+.box .cue{color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:.8em}
+.nexttitle{font:500 calc(18px*var(--fs))/1.25 'Clash Display','Space Grotesk',sans-serif;color:var(--ink);margin:4px 0 6px}
+.bk{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px;color:var(--ink2)}
+.bk span:nth-child(2n){font-family:'JetBrains Mono',monospace;color:var(--lime)}
+.jump{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.jump button{padding:5px 8px;min-width:34px}
+.jump button.cur{border-color:var(--lime);color:var(--lime)}
+footer{padding:9px 22px;border-top:1px solid var(--line);font:500 11px 'JetBrains Mono',monospace;color:var(--ink3);letter-spacing:.06em;display:flex;gap:22px;flex-wrap:wrap}
+footer b{color:var(--ink2);font-weight:500}
+.pre h2{font:500 34px 'Clash Display',sans-serif;margin:8px 0 6px}
+.pre p{color:var(--ink2);font-size:16px;line-height:1.6;max-width:70ch}
+.pre ul{color:var(--ink2);line-height:1.8}
+.nolink{padding:40px;color:var(--ink2);font-size:17px;line-height:1.6;max-width:70ch}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand" id="conn"><i></i>TwinSight · Presentador<small id="connTxt">Esperando al deck…</small></div>
+  <div class="timers">
+    <div class="tbox"><div class="lbl">Transcurrido</div><div class="val" id="tElapsed">0:00</div></div>
+    <div class="tbox"><div class="lbl">Plan en este punto</div><div class="val small" id="tPlan">—</div></div>
+    <div class="tbox"><div class="lbl">Diferencia</div><div class="val small" id="tDelta">—</div></div>
+    <div class="tbox"><div class="lbl">Hora</div><div class="val small" id="tClock">--:--</div></div>
+  </div>
+  <div class="ctrls">
+    <button class="primary" id="bStart">▶ Iniciar</button>
+    <button id="bReset">↺</button>
+    <select id="sPace" title="Duración objetivo: escala los tiempos del guion">
+      <option value="1320">Guion · 22:00</option>
+      <option value="1560">Ritmo medio · 26:00</option>
+      <option value="1740" selected>Ritmo de ensayo · 29:00</option>
+    </select>
+    <button id="bFm">A−</button><button id="bFp">A+</button>
+  </div>
+</header>
+<main>
+  <section class="cur" id="cur"></section>
+  <aside class="side" id="side"></aside>
+</main>
+<footer>
+  <span><b>→ / Espacio</b> avanzar</span><span><b>←</b> retroceder</span><span><b>P</b> pantalla de espera</span>
+  <span><b>T</b> iniciar/pausar tiempo</span><span><b>1–21 + Enter</b> ir a slide</span><span><b>+ / −</b> tamaño de letra</span>
+</footer>
+<script src="presenter_data.js"></script>
+<script>
+(function(){
+  const D = window.__TW_SCRIPT || { slides: [], backups: [], total: 1320 };
+  const $ = id => document.getElementById(id);
+  const fmt = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  const store = { get(k, d){ try { const v = localStorage.getItem('twp_' + k); return v === null ? d : JSON.parse(v); } catch(_){ return d; } },
+                  set(k, v){ try { localStorage.setItem('twp_' + k, JSON.stringify(v)); } catch(_){} } };
+  let state = null, lastMsg = 0;
+  let timer = store.get('timer', { running: false, start: 0, acc: 0 });
+  let fs = store.get('fs', 1);
+  const pace = $('sPace'); pace.value = String(store.get('pace', 1740));
+  document.documentElement.style.setProperty('--fs', fs);
+
+  /* ---------- conexión con el deck ---------- */
+  const deck = window.opener;
+  function send(cmd, extra){ if (deck && !deck.closed){ try { deck.postMessage(Object.assign({ tw: 'cmd', cmd: cmd }, extra || {}), '*'); } catch(_){} } }
+  addEventListener('message', e => {
+    const d = e.data;
+    if (!d || d.tw !== 'state') return;
+    const wasPre = state ? state.preshow : true;
+    state = d; lastMsg = Date.now();
+    if (wasPre && !d.preshow && !timer.running && elapsed() === 0) startTimer();   // arranca al cerrar la slide 0
+    render();
+  });
+  setInterval(() => { if (Date.now() - lastMsg > 2500) send('hello'); updateConn(); }, 1500);
+  send('hello');
+  function updateConn(){
+    const on = deck && !deck.closed && Date.now() - lastMsg < 4000;
+    $('conn').classList.toggle('on', !!on);
+    $('connTxt').textContent = on ? 'Conectado al deck' : (deck ? 'Buscando el deck…' : 'Abre esta vista desde el deck con la tecla S');
+  }
+
+  /* ---------- cronómetro ---------- */
+  function elapsed(){ return (timer.acc + (timer.running ? Date.now() - timer.start : 0)) / 1000; }
+  function startTimer(){ if (timer.running) return; timer.running = true; timer.start = Date.now(); store.set('timer', timer); btns(); }
+  function pauseTimer(){ if (!timer.running) return; timer.acc += Date.now() - timer.start; timer.running = false; store.set('timer', timer); btns(); }
+  function btns(){ $('bStart').textContent = timer.running ? '⏸ Pausar' : '▶ Iniciar'; }
+  $('bStart').onclick = () => timer.running ? pauseTimer() : startTimer();
+  $('bReset').onclick = () => { if (confirm('¿Reiniciar el cronómetro?')){ timer = { running: false, start: 0, acc: 0 }; store.set('timer', timer); btns(); tick(); } };
+  pace.onchange = () => { store.set('pace', +pace.value); render(); };
+  function setFs(v){ fs = Math.min(1.6, Math.max(.8, v)); document.documentElement.style.setProperty('--fs', fs); store.set('fs', fs); }
+  $('bFm').onclick = () => setFs(fs - .1); $('bFp').onclick = () => setFs(fs + .1);
+  btns();
+
+  const scale = () => (+pace.value) / (D.total || 1320);
+  function slideFor(n){ return D.slides.find(s => s.n === n); }
+
+  function tick(){
+    const e = elapsed();
+    $('tElapsed').textContent = fmt(e);
+    const d = new Date(); $('tClock').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    const s = state && state.main && !state.preshow ? slideFor(+state.num) : null;
+    if (!s){ $('tPlan').textContent = '—'; $('tDelta').textContent = '—'; $('tDelta').className = 'val small'; return; }
+    const k = scale(), a = s.start * k, b = s.end * k;
+    $('tPlan').textContent = fmt(a) + '–' + fmt(b);
+    const over = e - b, early = a - e;
+    const dl = $('tDelta');
+    if (e > b){ dl.textContent = '+' + fmt(over) + ' atrasado'; dl.className = 'val small ' + (over > 20 ? 'bad' : 'warn'); }
+    else if (e < a){ dl.textContent = fmt(early) + ' adelantado'; dl.className = 'val small ok'; }
+    else { dl.textContent = 'en tiempo'; dl.className = 'val small ok'; }
+    const bar = document.querySelector('.budget b');
+    if (bar){
+      const pct = Math.max(0, Math.min(1, (e - a) / Math.max(1, b - a)));
+      bar.style.width = (pct * 100) + '%';
+      bar.style.background = e > b ? (over > 20 ? 'var(--red)' : 'var(--amber)') : 'var(--lime)';
+      const bm = document.querySelector('.bmeta span:last-child');
+      if (bm) bm.textContent = e > b ? 'tiempo de esta slide agotado' : 'quedan ' + fmt(b - Math.max(e, a)) + ' en esta slide';
+    }
+  }
+  setInterval(tick, 250);
+
+  /* ---------- render ---------- */
+  function render(){
+    const cur = $('cur'), side = $('side');
+    if (!state){ cur.innerHTML = '<div class="nolink">Esta vista se conecta sola con el deck. Abre <b>index_final.html</b> y pulsa <b>S</b>: se abrirá esta ventana ya conectada. Pon el deck en el proyector (modo <b>extender</b>, no duplicar) y deja esta ventana en tu pantalla.</div>'; side.innerHTML = ''; return; }
+    if (state.preshow){
+      const ps = D.preshow || {};
+      cur.innerHTML = '<div class="pre"><div class="num">SLIDE 0 · PANTALLA DE ESPERA</div><h2>El deck está mostrando el dron.</h2><p>' + (ps.msg || '') + '</p><ul><li>Landing abierta en otra ventana, al inicio de la sección 03.</li><li>Deck en pantalla completa (<b>F</b>) en el proyector.</li><li>Cuando empieces a hablar, pulsa <b>→</b>: se cierra la pantalla de espera y arranca el cronómetro.</li></ul></div>';
+      side.innerHTML = nextBox(1) + backupsBox() + jumpBox(0);
+      tick(); return;
+    }
+    if (!state.main){
+      cur.innerHTML = '<div class="pre"><div class="num">RESPALDO · ' + esc(state.num) + '</div><h2>' + esc(state.label.replace(/^B\d+\s*/, '')) + '</h2><p>Estás en un backup. Para volver, escribe el número de la slide en el contador del deck o usa los botones de la derecha.</p></div>';
+      side.innerHTML = backupsBox() + jumpBox(-1);
+      tick(); return;
+    }
+    const n = +state.num, s = slideFor(n);
+    if (!s){ cur.innerHTML = '<div class="nolink">Slide ' + n + ' sin guion.</div>'; return; }
+    const shown = state.shown, total = state.steps;
+    let dots = ''; for (let i = 1; i <= total; i++) dots += '<b class="' + (i < shown ? 'done' : i === shown ? 'now' : '') + '"></b>';
+    const nowK = shown;   // el segmento k se dice cuando ya se mostró el paso k
+    let segs = '';
+    s.segments.forEach(g => {
+      const cls = g.k === nowK ? 'now' : g.k === nowK + 1 ? 'next' : '';
+      const tag = g.k === 0 ? 'inicio' : 'clic ' + g.k;
+      segs += '<div class="seg ' + cls + '" data-k="' + g.k + '"><span class="tag">' + tag + '</span>' + g.html + '</div>';
+    });
+    const proc = s.procedure.length ? '<ol class="proc">' + s.procedure.map(x => '<li>' + x + '</li>').join('') + '</ol>' : '';
+    cur.innerHTML =
+      '<div class="slidehead"><span class="num">SLIDE ' + String(n).padStart(2, '0') + ' / ' + state.total + '</span><span class="title">' + esc(s.title) + '</span></div>' +
+      '<div class="budget"><b></b></div><div class="bmeta"><span>' + fmt(s.start * scale()) + ' – ' + fmt(s.end * scale()) + '</span><span></span></div>' +
+      '<div class="steps">' + dots + '<span>' + (total ? 'clic ' + shown + ' de ' + total : 'sin clics') + (total && shown === total ? ' · siguiente → pasa de slide' : '') + '</span></div>' +
+      (s.key ? '<div class="key">' + s.key + '</div>' : '') + proc +
+      '<div class="script">' + segs + '</div>' +
+      (s.transition ? '<div class="box"><h4>Transición</h4>' + s.transition + '</div>' : '') +
+      (s.contingency ? '<div class="box"><h4>Contingencia</h4>' + s.contingency + '</div>' : '') +
+      (s.avoid ? '<div class="box avoid"><h4>No decir</h4>' + s.avoid + '</div>' : '');
+    side.innerHTML = nextBox(n + 1) + backupsBox() + jumpBox(n);
+    const now = cur.querySelector('.seg.now');
+    if (now) now.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    tick();
+  }
+  function esc(x){ return String(x).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+  function nextBox(n){
+    const s = slideFor(n);
+    if (!s) return '<div class="box" style="border:0;padding:0;margin:0"><h4>Siguiente</h4>Fin de la ruta principal.</div>';
+    const first = (s.segments[0] && s.segments[0].html) || (s.segments[1] && s.segments[1].html) || '';
+    return '<div class="box" style="border:0;padding:0;margin:0"><h4>Siguiente · slide ' + n + '</h4><div class="nexttitle">' + esc(s.title) + '</div>' + (s.key ? '<div style="color:var(--ink2);font-size:14px;line-height:1.5">' + s.key + '</div>' : '') +
+      (first ? '<div style="color:var(--ink3);font-size:13px;line-height:1.5;margin-top:8px">«' + first.replace(/<[^>]+>/g, '').slice(0, 170) + '…»</div>' : '') + '</div>';
+  }
+  function backupsBox(){
+    if (!D.backups.length) return '';
+    return '<div class="box"><h4>Si preguntan por…</h4><div class="bk">' + D.backups.map(b => '<span>' + b.topic + '</span><span>' + b.go + '</span>').join('') + '</div></div>';
+  }
+  function jumpBox(n){
+    let h = '<div class="box"><h4>Ir a</h4><div class="jump"><button data-go="0" class="' + (n === 0 ? 'cur' : '') + '">0</button>';
+    D.slides.forEach(s => { h += '<button data-go="' + s.n + '" class="' + (s.n === n ? 'cur' : '') + '">' + s.n + '</button>'; });
+    return h + '</div></div>';
+  }
+  $('side').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) send('goto', { n: +b.dataset.go }); });
+
+  /* ---------- teclado: controla el deck desde esta ventana ---------- */
+  let typed = '';
+  addEventListener('keydown', e => {
+    if (e.target.closest('select')) return;
+    if (/^[0-9]$/.test(e.key)){ typed = (typed + e.key).slice(-2); return; }
+    if (e.key === 'Enter' && typed){ send('goto', { n: +typed }); typed = ''; e.preventDefault(); return; }
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)){ e.preventDefault(); send('next'); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)){ e.preventDefault(); send('prev'); }
+    else if (e.key === 'p' || e.key === 'P'){ send('preshow'); }
+    else if (e.key === 't' || e.key === 'T'){ timer.running ? pauseTimer() : startTimer(); }
+    else if (e.key === '+' || e.key === '='){ setFs(fs + .1); }
+    else if (e.key === '-'){ setFs(fs - .1); }
+    typed = '';
+  });
+
+  render(); updateConn();
+})();
+</script>
+</body>
+</html>

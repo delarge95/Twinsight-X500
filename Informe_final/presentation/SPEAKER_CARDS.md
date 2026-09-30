@@ -5,7 +5,7 @@
 **Fecha:** 2026-09-30.
 **Duración meta:** 22:00 según el guion. Con el ritmo medido en ensayo, ~29–30 min.
 **Fuente canónica:** `awoodcocks.pdf` (informe final).
-**Numeración:** posición en el deck; coincide con el número visible y con el contador "NN / 21". La pantalla de espera (slide 0) no cuenta: → la cierra, **P** la reabre. Backups: B1–B15 (escribir el código en el contador para saltar).
+**Numeración:** posición en el deck; coincide con el número visible y con el contador "NN / 21". La pantalla de espera (slide 0) no cuenta: → la cierra; ← en la slide 1 o **P** la reabren. **S** abre la vista del presentador. Backups: B1–B15 (escribir el código en el contador para saltar).
 
 ---
 

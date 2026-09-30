@@ -27,7 +27,7 @@ problema → teoría → alcance → método → cómo se construyó → demo �
 
 ## 2. Numeración
 
-El número de cada slide en este guion es su posición en el deck. Coincide con el número visible (kicker) y con el contador de arriba a la derecha ("NN / 21"). Antes de la slide 1 está la pantalla de espera (slide 0), que no cuenta: → la cierra y **P** la vuelve a abrir. Los backups van aparte, B1–B15. Para saltar a uno, escribe su código (por ejemplo `B3`) en el contador y pulsa Enter.
+El número de cada slide en este guion es su posición en el deck. Coincide con el número visible (kicker) y con el contador de arriba a la derecha ("NN / 21"). Antes de la slide 1 está la pantalla de espera (slide 0), que no cuenta: → la cierra; para volver a ella, **←** en la slide 1, **P**, **Inicio** en la slide 1 o escribir **0** en el contador. Los backups van aparte, B1–B15. Para saltar a uno, escribe su código (por ejemplo `B3`) en el contador y pulsa Enter.
 
 ---
 
@@ -83,13 +83,13 @@ Si notas que aceleras, son los nervios. Bajar el ritmo se lee como seguridad.
 | # | Verificación | Por qué |
 |---|---|---|
 | 1 | Abrir `index_final.html` con doble clic en **Chrome** o Edge, con zoom del navegador al 100 % (`Ctrl+0`). | El deck ajusta su tamaño a la resolución; el zoom del navegador altera ese cálculo. |
-| 2 | Proyector en modo **duplicar**, idealmente a 1920×1080. `F` para pantalla completa. | A 1920×1080 el texto crece ~25 %; a resoluciones menores se ajusta solo. |
+| 2 | Proyector en modo **extender** (no duplicar), idealmente a 1920×1080. Mover el deck al proyector y pulsar `F`. Pulsar **S** para abrir la vista del presentador y dejarla en la pantalla del portátil. | El jurado ve solo el deck; tú ves el guion, el cronómetro y la siguiente slide. |
 | 3 | Confirmar conexión a internet. | La landing y la app de la demo se cargan desde la red. |
 | 4 | Pasar una vez por las slides 11 (capturas) y 13 (video), volver con `Inicio` y pulsar **P** para dejar puesta la pantalla de espera. | Deja los videos en caché. |
 | 5 | Abrir la **landing** (twinsight.alexwoodcock.me) en **otra ventana**, al inicio de la sección 03 con el dron sin ensamblar. Abrir una vez «Abrir visor» para dejar la app en caché y cerrarla. | Es la demo de la slide 13. |
 | 6 | Desactivar notificaciones, actualizaciones y ahorro de energía. Cargador conectado. | Evita interrupciones y caídas de rendimiento. |
-| 7 | **No abrir las notas (`N`) durante la exposición**: se ven en la misma pantalla que el jurado. Usar `SPEAKER_CARDS.md` impreso o en el teléfono. | Las notas son para ensayar. |
-| 8 | Cronómetro visible con las marcas de las tarjetas. | El deck no muestra el tiempo. |
+| 7 | Usar la **vista del presentador** (`S`) en lugar de las notas (`N`): las notas se dibujan sobre el deck y las vería el jurado. Desde la vista del presentador también se avanza (→), se retrocede (←) y se salta a una slide (número + Enter). Si solo hay una pantalla, usar `SPEAKER_CARDS.md` impreso. | El cronómetro arranca solo al cerrar la slide 0 y marca si vas adelantado o atrasado. |
+| 8 | En la vista del presentador, elegir el ritmo (guion 22:00 o ensayo 29:00). Si el guion cambia, regenerar sus datos con `python tools/build_presenter_data.py`. | Las marcas de tiempo se escalan a ese ritmo. |
 
 ---
 
