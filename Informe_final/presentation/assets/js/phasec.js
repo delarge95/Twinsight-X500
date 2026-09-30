@@ -441,4 +441,108 @@
       update(dt, step){ box.classList.toggle('s1', step >= 1); box.classList.toggle('s2', step >= 2); }
     });
   })();
+  /* =================================================================== */
+  /* Slide 7 · Antes y después de una pieza (motor DJ-2216)              */
+  /* Antes: el motor en la importación teselada (optimizing6.fbx, 23 402 */
+  /* triángulos). Después: el motor del activo final (2 720) con el bake. */
+  /* =================================================================== */
+  (function pipe(){
+    const s = bySlide('Pipeline'); if (!s || !window.__MOTOR_CAD_GLB) return;
+    const inner = s.querySelector('.slide-inner'), dc = inner.querySelector('.duo-cols');
+    const grid = document.createElement('div'); grid.className = 'pc-grid'; grid.style.alignItems = 'stretch';
+    dc.parentNode.insertBefore(grid, dc);
+    const left = document.createElement('div'); left.appendChild(dc);
+    dc.style.gridTemplateColumns = '1fr'; dc.style.gap = 'clamp(8px,1.4vh,14px)'; dc.style.marginTop = '0';
+    const host = document.createElement('div'); host.className = 'pc-host'; host.style.minHeight = 'clamp(230px,34vh,380px)';
+    host.innerHTML = '<div class="pc-ba" data-s="0"><span>CAD teselado</span><b data-n="23402">0</b><em>triángulos</em></div>' +
+      '<div class="pc-ba" data-s="1"><span>Activo WebGL</span><b data-n="2720">0</b><em>triángulos</em></div>' +
+      '<div class="pc-ba-div"></div><div class="pc-prob-q pc-cap"></div>';
+    grid.appendChild(left); grid.appendChild(host);
+    const st = document.createElement('style');
+    st.textContent = ".pc-ba{position:absolute;top:12px;font:500 clamp(9.5px,.72vw,11px)/1.4 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#767C85;transition:opacity .4s}" +
+      ".pc-ba[data-s='0']{left:14px}.pc-ba[data-s='1']{left:calc(50% + 14px)}" +
+      ".pc-ba b{display:block;font:500 clamp(20px,2vw,30px)/1.2 'Clash Display','Space Grotesk',sans-serif;letter-spacing:-.01em;color:#EDEEE8;margin-top:4px}" +
+      ".pc-ba[data-s='1'] b{color:#C8F53F}.pc-ba em{font-style:normal}" +
+      ".pc-ba-div{position:absolute;left:50%;top:10%;bottom:14%;border-left:1px dashed rgba(237,238,232,.14)}";
+    document.head.appendChild(st);
+    let before = null, after = null, built = false, afterGray = null, afterTex = null, wireB = null, wireA = null;
+    const grpB = new THREE.Group(), grpA = new THREE.Group();
+    function normalize(geo){
+      geo.computeBoundingBox();
+      const bb = geo.boundingBox, c = bb.getCenter(new THREE.Vector3()), sz = bb.getSize(new THREE.Vector3());
+      geo.translate(-c.x, -c.y, -c.z);
+      const k = 1 / Math.max(sz.x, sz.y, sz.z); geo.scale(k, k, k);
+      return geo;
+    }
+    function build(){
+      if (built) return; built = true;
+      const m = PB.meshes.find(x => /^DJ-2216/.test(x.name));
+      if (m){
+        m.mesh.updateMatrixWorld(true);
+        const g = normalize(m.mesh.geometry.clone().applyMatrix4(m.mesh.matrixWorld));
+        afterTex = m.tex.clone(); afterTex.opacity = 1; afterTex.transparent = false; afterTex.emissive = new THREE.Color(0, 0, 0);
+        afterGray = new THREE.MeshStandardMaterial({ color: 0x8a9099, roughness: 0.55, metalness: 0.25, envMapIntensity: 1.1 });
+        after = new THREE.Mesh(g, afterGray); grpA.add(after);
+        wireA = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: 0xC8F53F, wireframe: true, transparent: true, opacity: 0, depthWrite: false }));
+        grpA.add(wireA);
+      }
+      fetch(window.__MOTOR_CAD_GLB).then(r => r.arrayBuffer()).then(buf => new THREE.GLTFLoader().parse(buf, '', gl => {
+        let mm = null; gl.scene.updateMatrixWorld(true); gl.scene.traverse(o => { if (o.isMesh && !mm) mm = o; });
+        const g = normalize(mm.geometry.clone().applyMatrix4(mm.matrixWorld));
+        before = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0x8a9099, roughness: 0.5, metalness: 0.3, envMapIntensity: 1.1 }));
+        grpB.add(before);
+        wireB = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: 0xb8c6d6, wireframe: true, transparent: true, opacity: 0.32, depthWrite: false }));
+        grpB.add(wireB);
+      }));
+      PB.scene.add(grpB); PB.scene.add(grpA); grpB.visible = grpA.visible = false;
+    }
+    (function warm(){ if (PB.ready()) setTimeout(build, 3500); else setTimeout(warm, 500); })();
+    const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 20);
+    let prev = -1, stT = 0, tt = 0;
+    const counters = Array.from(host.querySelectorAll('.pc-ba b'));
+    const fmtN = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const caps = ['El motor DJ-2216, tal como sale del CAD', 'La teselación convierte superficies en <b>23 402</b> triángulos',
+      'Limpieza de la malla en Blender', 'Retopología: la misma forma con <b>2 720</b> triángulos',
+      'Bake: el detalle vuelve como textura (normales y oclusión)', 'Exportación a Unity', 'Corre en el navegador',
+      'Esta pieza: <b>23 402 → 2 720</b> triángulos (−88 %)', 'La pieza conserva su nombre y su lugar en el ensamblaje'];
+    PB.register({
+      slide: s, host: host,
+      enter(){ build(); prev = -1; counters.forEach(c => { c.textContent = '0'; c._v = 0; }); },
+      exit(){ grpB.visible = grpA.visible = false; PB.drone.visible = true; },
+      update(dt, step){
+        if (step !== prev){ prev = step; stT = 0; }
+        stT += dt; tt += dt;
+        host.querySelector('[data-s="1"]').style.opacity = step >= 3 ? 1 : 0.25;
+        counters.forEach((c, i) => {
+          const on = i === 0 ? step >= 1 : step >= 3, n = +c.dataset.n;
+          c._v = on ? Math.min(n, (c._v || 0) + n * dt * 1.4) : 0;
+          c.textContent = fmtN(c._v);
+        });
+        if (after){
+          after.material = step >= 4 ? afterTex : afterGray;
+          wireA.material.opacity = lerp(wireA.material.opacity, step === 3 ? 0.55 : 0, Math.min(1, dt * 4));
+        }
+        if (wireB) wireB.material.opacity = step === 7 ? 0.32 + 0.25 * Math.sin(tt * 5) : 0.32;
+        const q = host.querySelector('.pc-prob-q'), html = caps[Math.min(step, caps.length - 1)];
+        if (q.innerHTML !== html) q.innerHTML = html;
+      },
+      render(){
+        const R = PB.renderer, W = PB.canvas._w, Hh = PB.canvas._h, step = PB.shownSteps(s);
+        PB.drone.visible = false;
+        R.setScissorTest(true); R.setClearColor(0x000000, 0); R.clear();
+        const ang = 0.6 + tt * 0.35, r = 2.35;
+        cam.position.set(r * Math.sin(ang) * 0.93, r * 0.36, r * Math.cos(ang) * 0.93); cam.lookAt(0, 0, 0);
+        const half = (x, grp, on) => {
+          grpB.visible = grp === grpB && on; grpA.visible = grp === grpA && on;
+          R.setViewport(x, 0, W / 2, Hh * 0.9); R.setScissor(x, 0, W / 2, Hh * 0.9);
+          cam.aspect = (W / 2) / (Hh * 0.9); cam.updateProjectionMatrix();
+          if (on) R.render(PB.scene, cam);
+        };
+        half(0, grpB, !!before);
+        half(W / 2, grpA, !!after && step >= 3);
+        grpB.visible = grpA.visible = false;
+        R.setScissorTest(false); R.setViewport(0, 0, W, Hh);
+      }
+    });
+  })();
 })();

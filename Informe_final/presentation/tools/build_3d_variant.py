@@ -12,7 +12,7 @@ src = open(os.path.join(ROOT, 'index_final.html'), encoding='utf8', newline='').
 anchor = '<script src="assets/model/preshow_glb_datauri.js"></script>'
 assert src.count(anchor) == 1, 'no se encontró el punto de inserción'
 inject = anchor + ''.join('\r\n<script src="%s"></script>' % s for s in (
-    'assets/model/screw_parts_datauri.js', 'assets/js/app_icons.js', 'assets/js/phaseb.js', 'assets/js/phasec.js'))
+    'assets/model/screw_parts_datauri.js', 'assets/model/motor_cad_datauri.js', 'assets/js/app_icons.js', 'assets/js/phaseb.js', 'assets/js/phasec.js'))
 out = src.replace(anchor, inject)
 out = out.replace('<title>TwinSight X500 — Defensa de Tesis</title>', '<title>TwinSight X500 — Defensa de Tesis (3D)</title>')
 open(os.path.join(ROOT, 'index_final_3d.html'), 'w', encoding='utf8', newline='').write(out)

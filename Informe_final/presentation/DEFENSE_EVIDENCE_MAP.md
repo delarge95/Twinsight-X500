@@ -104,6 +104,7 @@ Fuera de la ruta principal desde el recorte del 2026-09-30: principios (B12), me
 | Tornilleria importada (STEPper) | 425 208 triangulos (160 sujetadores; 79 % del archivo) | Medido en `blender_files/welded/stepper.fbx` (Blender 4.3, 2026-09-29). **No esta en el informe.** | "En la importacion con STEPper que se conserva en el proyecto." |
 | Tornilleria en la escena final | 14 408 triangulos (161 proxies de 88 tri o menos) | Medido en `blender_files/welded/x500v2_runtime_low_final.fbx`. **No esta en el informe.** | "En la escena exportada final." |
 | Piezas base del tornillo modular | 5 (3 cabezas, vuelta de rosca, punta) | Tabla 8; Figs. 28-29; `FastenerBuilder.cs` | "Las vueltas se repiten segun largo / paso de rosca." |
+| Motor DJ-2216 antes y despues (solo variante 3D, slide 7) | 23 402 → 2 720 triangulos (−88 %) | Medido en `blender_files/welded/optimizing6.fbx` (importacion teselada, 6 609 129 tri en total) y `x500v2_runtime_low_final.fbx`. **No esta en el informe.** | "En la importacion teselada que se conserva en el proyecto." |
 | Familias / instancias / reconciliaciones de fasteners | 20 / 168 / 9 | Tabla 8 | "Registradas en la escena documentada." |
 
 ## 5. Evidencia por frente
