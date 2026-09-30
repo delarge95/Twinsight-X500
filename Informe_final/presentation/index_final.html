@@ -498,8 +498,79 @@ em.acc-amber{font-style:normal;color:var(--amber)}
   addEventListener('resize', later);
 })();
 </script>
+<style>
+/* ===== SLIDE 0 · Pantalla de espera (fuera de la numeración) ===== */
+.preshow{position:fixed;inset:0;z-index:9000;background:#07080a;color:#EDEEE8;overflow:hidden;opacity:1;transition:opacity 1.1s cubic-bezier(.4,0,.2,1),visibility 0s linear 0s;cursor:none}
+.preshow.out{opacity:0;visibility:hidden;pointer-events:none;transition:opacity 1.1s cubic-bezier(.4,0,.2,1),visibility 0s linear 1.1s}
+.preshow canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 2.4s ease}
+.preshow.ready canvas{opacity:1}
+.ps-vignette{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(3,3,5,.72) 0%,rgba(3,3,5,.35) 30%,transparent 52%),radial-gradient(120% 85% at 50% 48%,transparent 42%,rgba(3,3,5,.55) 72%,rgba(2,2,3,.94) 100%)}
+.ps-grain{position:absolute;inset:-50%;pointer-events:none;opacity:.07;mix-blend-mode:overlay;animation:psGrain .9s steps(6) infinite}
+@keyframes psGrain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+.ps-dip{position:absolute;inset:0;background:#030304;pointer-events:none;opacity:0;transition:opacity .55s ease}
+.ps-dip.on{opacity:1}
+.ps-bar{position:absolute;left:0;right:0;height:clamp(46px,7.2vh,78px);background:#030304;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,3.2vw,56px);font:500 clamp(10px,.78vw,12.5px)/1 'JetBrains Mono',monospace;letter-spacing:.22em;text-transform:uppercase;color:#767C85;transform:translateY(0);transition:transform 1.6s cubic-bezier(.2,.8,.2,1)}
+.ps-bar.top{top:0}
+.ps-bar.bot{bottom:0}
+.preshow:not(.ready) .ps-bar.top{transform:translateY(-100%)}
+.preshow:not(.ready) .ps-bar.bot{transform:translateY(100%)}
+.ps-bar b{color:#EDEEE8;font-weight:600}
+.ps-bar .lime{color:#C8F53F}
+.ps-live{display:inline-flex;align-items:center;gap:.7em}
+.ps-live i{width:7px;height:7px;border-radius:50%;background:#C8F53F;box-shadow:0 0 12px #C8F53F;animation:psPulse 2.4s ease-in-out infinite}
+@keyframes psPulse{0%,100%{opacity:1}50%{opacity:.25}}
+.ps-title{position:absolute;left:clamp(20px,3.2vw,56px);bottom:calc(clamp(46px,7.2vh,78px) + clamp(22px,4.2vh,52px));max-width:min(62vw,880px);pointer-events:none}
+.ps-kicker{font:500 clamp(10px,.8vw,12.5px)/1.4 'JetBrains Mono',monospace;letter-spacing:.24em;text-transform:uppercase;color:#C8F53F;margin:0 0 clamp(8px,1.4vh,16px);opacity:0;transform:translateY(12px);transition:all 1.2s cubic-bezier(.2,.8,.2,1) .5s}
+.ps-title h1{font-family:'Clash Display','Space Grotesk',sans-serif;font-weight:500;font-size:clamp(46px,7.4vw,124px);line-height:.92;letter-spacing:-.025em;margin:0;opacity:0;transform:translateY(22px);transition:all 1.4s cubic-bezier(.2,.8,.2,1) .7s}
+.ps-title h1 em{font-style:normal;color:transparent;-webkit-text-stroke:1.2px rgba(237,238,232,.85)}
+.ps-sub{font:400 clamp(13px,1.05vw,17px)/1.5 'Space Grotesk',sans-serif;color:#9BA0A6;margin:clamp(10px,1.8vh,20px) 0 0;max-width:46ch;opacity:0;transform:translateY(12px);transition:all 1.2s cubic-bezier(.2,.8,.2,1) 1s}
+.preshow.ready .ps-kicker,.preshow.ready .ps-title h1,.preshow.ready .ps-sub{opacity:1;transform:none}
+.ps-cam{position:absolute;right:clamp(20px,3.2vw,56px);bottom:calc(clamp(46px,7.2vh,78px) + clamp(22px,4.2vh,52px));text-align:right;font:500 clamp(9.5px,.72vw,11.5px)/1.9 'JetBrains Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:#767C85;pointer-events:none;opacity:0;transition:opacity 1.2s ease 1.4s}
+.preshow.ready .ps-cam{opacity:1}
+.ps-cam .shot{color:#EDEEE8;display:block;transition:opacity .45s ease}
+.ps-cam .shot.swap{opacity:0}
+.ps-frame{position:absolute;inset:calc(clamp(46px,7.2vh,78px) + 16px) 16px;pointer-events:none;opacity:0;transition:opacity 1.2s ease 1.2s}
+.preshow.ready .ps-frame{opacity:.55}
+.ps-frame i{position:absolute;width:18px;height:18px;border:1px solid rgba(237,238,232,.35)}
+.ps-frame i:nth-child(1){top:0;left:0;border-right:0;border-bottom:0}
+.ps-frame i:nth-child(2){top:0;right:0;border-left:0;border-bottom:0}
+.ps-frame i:nth-child(3){bottom:0;left:0;border-right:0;border-top:0}
+.ps-frame i:nth-child(4){bottom:0;right:0;border-left:0;border-top:0}
+.ps-load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:500 11px/1 'JetBrains Mono',monospace;letter-spacing:.3em;text-transform:uppercase;color:#767C85;transition:opacity .6s ease}
+.preshow.ready .ps-load{opacity:0}
+@media (max-width:760px){.ps-bar .hide-sm{display:none}.ps-cam{display:none}.ps-title{max-width:88vw}}
+@media (prefers-reduced-motion:reduce){.ps-grain{animation:none}}
+</style>
 </head>
 <body>
+<!-- ============ 00 · PANTALLA DE ESPERA (fuera de la numeración) ============ -->
+<div class="preshow" id="preshow" aria-label="Pantalla de espera">
+  <canvas id="psCanvas" aria-hidden="true"></canvas>
+  <div class="ps-vignette"></div>
+  <div class="ps-grain" id="psGrain"></div>
+  <div class="ps-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="ps-dip" id="psDip"></div>
+  <div class="ps-load" id="psLoad">Cargando modelo</div>
+  <div class="ps-title">
+    <p class="ps-kicker">Defensa de grado · Ingeniería Multimedia · UNAD</p>
+    <h1>TwinSight <em>X500</em></h1>
+    <p class="ps-sub">Visualización 3D interactiva para la inspección técnica del dron Holybro X500 V2.</p>
+  </div>
+  <div class="ps-cam" aria-hidden="true">
+    <span class="shot" id="psShot">CAM 01 · Órbita</span>
+    <span>Holybro X500 V2 · WebGL en vivo</span>
+  </div>
+  <div class="ps-bar top">
+    <span><b>◆ TwinSight X500</b></span>
+    <span class="ps-live"><i></i><span>En espera</span></span>
+    <span class="lime" id="psClock">--:--</span>
+  </div>
+  <div class="ps-bar bot">
+    <span><b>Alexander Woodcock Salomón</b></span>
+    <span class="hide-sm">La sustentación comenzará en breve</span>
+    <span class="hide-sm">twinsight.alexwoodcock.me</span>
+  </div>
+</div>
 
 <div class="grid-bg" aria-hidden="true"></div>
 <div class="grid-flash" id="gridFlash" aria-hidden="true"></div>
@@ -1560,6 +1631,252 @@ em.acc-amber{font-style:normal;color:var(--amber)}
 
 <script src="assets/vendor/three.min.js"></script>
 <script src="assets/vendor/GLTFLoader.js"></script>
+<script src="assets/model/preshow_glb_datauri.js"></script>
+<script>
+/* ===== SLIDE 0 · Pantalla de espera cinemática (fuera de la numeración) =====
+   Se muestra al abrir el deck. → / Espacio / Enter / clic la cierran y empieza la slide 1.
+   La tecla P la vuelve a abrir. */
+window.__preshow = (function(){
+  const root = document.getElementById('preshow');
+  if (!root) return null;
+  const canvas = document.getElementById('psCanvas');
+  const dip = document.getElementById('psDip');
+  const shotEl = document.getElementById('psShot');
+  const clockEl = document.getElementById('psClock');
+  let open = true, rafId = null, renderer = null, scene, camera, target = new THREE.Vector3();
+  let ready = false, t0 = 0, H = 1, props = [], focus = {};
+  window.__preshowOpen = true;
+
+  /* Grano de película generado una vez */
+  (function(){
+    const c = document.createElement('canvas'); c.width = c.height = 160;
+    const x = c.getContext('2d'), d = x.createImageData(160, 160);
+    for (let i = 0; i < d.data.length; i += 4){ const v = Math.random() * 255 | 0; d.data[i] = d.data[i+1] = d.data[i+2] = v; d.data[i+3] = 255; }
+    x.putImageData(d, 0, 0);
+    document.getElementById('psGrain').style.backgroundImage = 'url(' + c.toDataURL() + ')';
+  })();
+
+  function tick(){
+    const d = new Date();
+    clockEl.textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
+  tick(); setInterval(tick, 5000);
+
+  /* ---------- Entorno de estudio (softboxes) para reflejos PBR ---------- */
+  function studioEnv(){
+    const env = new THREE.Scene();
+    const room = new THREE.Mesh(new THREE.BoxGeometry(20, 12, 20), new THREE.MeshBasicMaterial({ color: 0x0d0e11, side: THREE.BackSide }));
+    room.position.y = 4; env.add(room);
+    function box(w, h, x, y, z, ry, rx, c){
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: c, side: THREE.DoubleSide }));
+      m.position.set(x, y, z); m.rotation.set(rx || 0, ry || 0, 0); env.add(m);
+    }
+    const W = new THREE.Color(1, 1, 1);
+    box(9, 5, 0, 9.5, 0, 0, Math.PI / 2, W.clone().multiplyScalar(5.0));              // cenital grande
+    box(3.2, 6, -8.5, 4, 3, Math.PI / 2, 0, W.clone().multiplyScalar(7.0));           // key lateral
+    box(1.2, 8, 8.5, 4, -2, -Math.PI / 2, 0, new THREE.Color(2.6, 2.9, 3.4));          // strip frío
+    box(1.2, 8, 3, 4, -9.5, 0, 0, new THREE.Color(3.2, 3.3, 3.4));                     // strip trasero (rim)
+    box(6, 1.4, 0, 1.2, 9.5, Math.PI, 0, new THREE.Color(0.9, 1.0, 0.5));              // acento lima muy tenue
+    const pm = new THREE.PMREMGenerator(renderer);
+    const rt = pm.fromScene(env, 0.035);
+    pm.dispose();
+    return rt.texture;
+  }
+
+  function radialTex(inner, outer){
+    const c = document.createElement('canvas'); c.width = c.height = 256;
+    const x = c.getContext('2d'), g = x.createRadialGradient(128, 128, 0, 128, 128, 128);
+    g.addColorStop(0, inner); g.addColorStop(1, outer);
+    x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t;
+  }
+
+  function init(){
+    if (!window.THREE || !THREE.GLTFLoader || !window.__PRESHOW_GLB) return false;
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+    renderer.physicallyCorrectLights = true;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setClearColor(0x08090b, 1);
+
+    scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x08090b, 7, 17);
+    scene.environment = studioEnv();
+    camera = new THREE.PerspectiveCamera(30, 1, 0.02, 60);
+
+    const key = new THREE.DirectionalLight(0xfff4e8, 2.6);
+    key.position.set(-3.2, 6.5, 3.4);
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.camera.left = -2.4; key.shadow.camera.right = 2.4;
+    key.shadow.camera.top = 2.4; key.shadow.camera.bottom = -2.4;
+    key.shadow.camera.near = 1; key.shadow.camera.far = 16;
+    key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02; key.shadow.radius = 4;
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(0xcfe0ff, 1.8); rim.position.set(2.5, 3, -4.5); scene.add(rim);
+    const fill = new THREE.HemisphereLight(0xdfe6ee, 0x0a0b0e, 0.35); scene.add(fill);
+
+    /* Piso: sombra suave + halo radial que se funde con el fondo */
+    const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), new THREE.ShadowMaterial({ opacity: 0.55 }));
+    shadowPlane.rotation.x = -Math.PI / 2; shadowPlane.receiveShadow = true; scene.add(shadowPlane);
+    const halo = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), new THREE.MeshBasicMaterial({ map: radialTex('rgba(46,50,58,1)', 'rgba(8,9,11,0)'), transparent: true, depthWrite: false }));
+    halo.rotation.x = -Math.PI / 2; halo.position.y = -0.002; scene.add(halo);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(1.92, 1.935, 128), new THREE.MeshBasicMaterial({ color: 0xC8F53F, transparent: true, opacity: 0.22, depthWrite: false }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.001; scene.add(ring);
+
+    resize();
+    fetch(window.__PRESHOW_GLB).then(r => r.arrayBuffer()).then(buf => {
+      new THREE.GLTFLoader().parse(buf, '', onModel, () => { root.classList.add('ready'); });
+    }).catch(() => root.classList.add('ready'));
+    return true;
+  }
+
+  function onModel(g){
+    const obj = g.scene;
+    obj.traverse(o => {
+      if (!o.isMesh) return;
+      o.castShadow = true; o.receiveShadow = true;
+      const m = o.material;
+      if (m.name === 'X500_Atlas'){
+        m.metalness = 0.32; m.roughness = 1.0; m.envMapIntensity = 1.15;
+        if (m.normalScale) m.normalScale.set(1.1, 1.1);
+        if (m.map) m.map.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      } else {
+        m.envMapIntensity = 1.4;
+      }
+      if (/propeller/i.test(o.name) || /propeller/i.test(o.parent && o.parent.name)) props.push(o);
+    });
+    /* Orientación: el eje más corto del dron es su altura */
+    const raw = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3());
+    const orient = new THREE.Group(); orient.add(obj);
+    if (raw.z < raw.y && raw.z <= raw.x) orient.rotation.x = -Math.PI / 2;
+    else if (raw.x < raw.y && raw.x < raw.z) orient.rotation.z = Math.PI / 2;
+    orient.rotation.x += window.__psFlip ? Math.PI : 0;
+    orient.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(orient);
+    const size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+    const s = 2.7 / Math.max(size.x, size.z);
+    orient.position.sub(c);
+    const wrap = new THREE.Group(); wrap.add(orient); wrap.scale.setScalar(s);
+    wrap.position.y = size.y * s / 2;
+    scene.add(wrap);
+    wrap.updateMatrixWorld(true);
+    H = size.y * s;
+    target.set(0, H * 0.45, 0);
+    /* Puntos de interés para los planos de detalle */
+    function find(re){
+      let best = null;
+      obj.traverse(o => { if (!best && o.isMesh && re.test(o.name)) best = o; });
+      if (!best) return null;
+      return new THREE.Box3().setFromObject(best).getCenter(new THREE.Vector3());
+    }
+    focus.motor = find(/2216|motor/i) || new THREE.Vector3(1.0, H * 0.6, 1.0);
+    focus.top = find(/GPS/i) || new THREE.Vector3(0, H * 0.9, 0);
+    focus.core = find(/PIXHAWK|6C|FMU|pixhawk/i) || new THREE.Vector3(0, H * 0.55, 0);
+    try { renderer.compile(scene, camera); } catch(_){}
+    ready = true; t0 = performance.now();
+    root.classList.add('ready');
+    if (open && !rafId) rafId = requestAnimationFrame(frame);
+  }
+
+  /* ---------- Planos: esféricas alrededor de un objetivo, A → B con easing ---------- */
+  const SHOTS = [
+    { name: 'CAM 01 · Órbita',          dur: 11, tgt: 'center', a: [0.35, 1.18, 6.4], b: [1.35, 1.08, 5.6] },
+    { name: 'CAM 02 · Contrapicado',    dur: 9,  tgt: 'center', a: [2.55, 1.50, 5.3], b: [2.05, 1.42, 4.5] },
+    { name: 'CAM 03 · Detalle · motor', dur: 9,  tgt: 'motor',  a: [0.2, 1.05, 1.75], b: [0.85, 0.95, 1.4] },
+    { name: 'CAM 04 · Cenital',         dur: 10, tgt: 'center', a: [0.0, 0.16, 6.6], b: [0.9, 0.24, 5.8] },
+    { name: 'CAM 05 · Perfil',          dur: 9,  tgt: 'track',  a: [-1.05, 1.40, 4.9], b: [-1.05, 1.34, 4.6] },
+    { name: 'CAM 06 · Detalle · aviónica', dur: 9, tgt: 'top', a: [3.6, 0.85, 1.9], b: [4.3, 0.95, 1.6] }
+  ];
+  const ease = x => x < .5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3) / 2;
+  const lerp = (a, b, t) => a + (b - a) * t;
+  let shotIdx = -1, shotStart = 0;
+  const TOTAL = SHOTS.reduce((a, s) => a + s.dur, 0);
+
+  function tgtFor(s, k){
+    if (s.tgt === 'motor') return focus.motor.clone();
+    if (s.tgt === 'top') return focus.top.clone().lerp(focus.core, 0.4);
+    if (s.tgt === 'track') return new THREE.Vector3(lerp(-0.55, 0.55, k), H * 0.45, 0);
+    return target.clone();
+  }
+
+  function frame(now){
+    rafId = null;
+    if (!open) return;
+    const t = (now - t0) / 1000;
+    /* plano actual */
+    let acc = 0, i = 0, tt = t % TOTAL;
+    for (; i < SHOTS.length; i++){ if (tt < acc + SHOTS[i].dur) break; acc += SHOTS[i].dur; }
+    const s = SHOTS[i], k = ease(Math.min(1, (tt - acc) / s.dur));
+    if (i !== shotIdx){
+      shotIdx = i;
+      shotEl.classList.add('swap');
+      setTimeout(() => { shotEl.textContent = s.name; shotEl.classList.remove('swap'); }, 450);
+    }
+    /* fundido a negro al final de cada plano */
+    const left = s.dur - (tt - acc);
+    dip.classList.toggle('on', left < 0.6 || (tt - acc) < 0.15);
+    const th = lerp(s.a[0], s.b[0], k), ph = lerp(s.a[1], s.b[1], k), r = lerp(s.a[2], s.b[2], k);
+    const tg = tgtFor(s, k);
+    /* respiración de cámara muy sutil */
+    const br = Math.sin(t * 0.7) * 0.012;
+    camera.position.set(
+      tg.x + r * Math.sin(ph) * Math.sin(th),
+      Math.max(0.06, tg.y + r * Math.cos(ph) + br),
+      tg.z + r * Math.sin(ph) * Math.cos(th)
+    );
+    camera.lookAt(tg);
+    renderer.render(scene, camera);
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function resize(){
+    if (!renderer) return;
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.fov = w / h < 1 ? 46 : 30;
+    /* Encuadre desplazado a la derecha: el título ocupa el tercio izquierdo */
+    if (w / h > 1.2) camera.setViewOffset(w, h, -w * 0.13, 0, w, h); else camera.clearViewOffset();
+    camera.updateProjectionMatrix();
+  }
+  addEventListener('resize', resize);
+
+  function close(){
+    if (!open) return;
+    open = false; window.__preshowOpen = false;
+    root.classList.add('out');
+    if (typeof window.__deckReplay === 'function') setTimeout(window.__deckReplay, 350);
+    setTimeout(() => { if (!open && rafId){ cancelAnimationFrame(rafId); rafId = null; } }, 1200);
+  }
+  function show(){
+    if (open) return;
+    open = true; window.__preshowOpen = true;
+    root.classList.remove('out');
+    if (ready && !rafId) rafId = requestAnimationFrame(frame);
+  }
+
+  /* Captura: mientras la pantalla está abierta, las teclas no llegan al deck */
+  addEventListener('keydown', e => {
+    if (!open){
+      if ((e.key === 'p' || e.key === 'P') && !e.target.closest('input,textarea')){ e.preventDefault(); show(); }
+      return;
+    }
+    if (e.key === 'f' || e.key === 'F') return;         // pantalla completa sigue funcionando
+    e.stopImmediatePropagation(); e.preventDefault();
+    if (['ArrowRight',' ','Enter','PageDown'].includes(e.key)) close();
+  }, true);
+  root.addEventListener('click', close);
+
+  if (!init()){ root.classList.add('ready'); }
+  else if (!ready){ /* el bucle arranca al cargar el modelo */ }
+  return { close: close, show: show, seek: function(sec){ t0 = performance.now() - sec * 1000; } };
+})();
+</script>
 <script src="assets/model/drone_glb_datauri.js"></script>
 <script>
 /* ===== Visor 3D del activo (three.js) — orbitar · zoom · wireframe · autorrotación ===== */
@@ -2135,7 +2452,14 @@ window.__glViewer = (function(){
   }, {passive:true});
 
   updateChrome();
-  setTimeout(() => {
+  /* La pantalla de espera (slide 0) retrasa la entrada de la slide 1 hasta que se cierra */
+  window.__deckReplay = () => {
+    const s = slides[index];
+    s.classList.remove('active'); void s.offsetWidth;
+    s.classList.add('active');
+    scheduleReveals(s);
+  };
+  if (!window.__preshowOpen) setTimeout(() => {
     slides[0].classList.add('active');
     scheduleReveals(slides[0]);
   }, 120);
