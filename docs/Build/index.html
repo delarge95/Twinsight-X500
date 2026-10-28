@@ -72,56 +72,6 @@
         updateBannerVisibility();
       }
 
-      // Bridge helper functions for Unity WebGL runtime
-      window.X500V2ResolveParentOrigin = function() {
-        return "*";
-      };
-
-      window.X500V2SendParentMessage = function(message) {
-        if (typeof window === "undefined" || !window.parent || window.parent === window) {
-          return false;
-        }
-        var sent = false;
-        var origins = ["*"];
-        for (var i = 0; i < origins.length; i++) {
-          try {
-            window.parent.postMessage(message, origins[i]);
-            sent = true;
-          } catch (e) {}
-        }
-        return sent;
-      };
-
-      window.X500V2ExitParentDirectly = function() {
-        try {
-          if (typeof window === "undefined" || !window.parent || window.parent === window) {
-            return false;
-          }
-          if (typeof window.parent.requestAppExit === "function") {
-            window.parent.requestAppExit();
-            return true;
-          }
-          if (typeof window.parent.x500v2ExitApp === "function") {
-            window.parent.x500v2ExitApp();
-            return true;
-          }
-        } catch (e) {}
-        return false;
-      };
-
-      window.X500V2NavigateToLandingFallback = function() {
-        try {
-          if (typeof window !== "undefined" && window.location) {
-            window.location.href = "../";
-          }
-        } catch (e) {}
-      };
-
-      var X500V2ResolveParentOrigin = window.X500V2ResolveParentOrigin;
-      var X500V2SendParentMessage = window.X500V2SendParentMessage;
-      var X500V2ExitParentDirectly = window.X500V2ExitParentDirectly;
-      var X500V2NavigateToLandingFallback = window.X500V2NavigateToLandingFallback;
-
       function installX500V2Bridge(unityInstance) {
         window.x500v2UnityInstance = unityInstance;
         window.addEventListener("message", function (event) {
@@ -138,9 +88,9 @@
 
       var config = {
         arguments: [],
-        dataUrl: "Build/aa29adeb7f231701141c16548bf53518.data.unityweb",
-        frameworkUrl: "Build/2641f598c1c093f0d7692b2c448bc7a9.framework.js.unityweb",
-        codeUrl: "Build/27be0acd3d2d664c5366e617a53bd4cc.wasm.unityweb",
+        dataUrl: "Build/d56137afabbf1dbf1dc30edaa84845e9.data.unityweb",
+        frameworkUrl: "Build/60be6c8604d56f37e4629e99f342160a.framework.js.unityweb",
+        codeUrl: "Build/6169411f21af1adbd1178bbaf78ecb5c.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "UNAD",
         productName: "TwinSight X500",
@@ -160,7 +110,7 @@
       document.querySelector("#unity-loading-bar").style.display = "block";
 
       var script = document.createElement("script");
-      script.src = "Build/f8fa96e8ff3df61eb4f59773ca786208.loader.js";
+      script.src = "Build/a44d16c60c8417fc4e37102580f4bf3d.loader.js";
       script.onload = function () {
         createUnityInstance(canvas, config, function (progress) {
           document.querySelector("#unity-progress-bar-full").style.width =
