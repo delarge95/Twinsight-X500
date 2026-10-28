@@ -298,6 +298,34 @@ public class HotspotManager : Singleton<HotspotManager>
         _groupsById[grouped.Definition.Id] = grouped;
     }
 
+    /// <summary>
+    /// Deep link entry point: selects a hotspot group by id (e.g. "hotspot_battery")
+    /// exactly as a single click on its pin does (see CreateGroupHotspot clickAction).
+    /// Returns false if hotspots are not built yet or the id is unknown.
+    /// </summary>
+    public bool TrySelectGroupById(string groupId)
+    {
+        if (string.IsNullOrWhiteSpace(groupId)
+            || !_groupsById.TryGetValue(groupId, out HotspotGroupRuntime grouped)
+            || grouped == null
+            || grouped.Anchor == null
+            || grouped.Definition == null
+            || SelectionManager.Instance == null)
+        {
+            return false;
+        }
+
+        SelectionManager.Instance.SelectObject(
+            grouped.Anchor.transform,
+            fromHotspot: true,
+            hotspotGroupLabel: grouped.Definition.Label,
+            hotspotGroupSummary: $"{grouped.Definition.Summary} Includes {grouped.Members.Count} parts.",
+            hotspotGroupMembers: BuildGroupMemberSummary(grouped.Members));
+
+        ApplySelectedGroupHighlight(grouped);
+        return true;
+    }
+
     private static string BuildGroupMemberSummary(List<ExplodablePart> members)
     {
         if (members == null || members.Count == 0)

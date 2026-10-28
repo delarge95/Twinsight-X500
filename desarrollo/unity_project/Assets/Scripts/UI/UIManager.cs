@@ -103,6 +103,54 @@ namespace WebGL.UI
             return HandleLayeredBackNavigation(allowExitFromHeroMain: true);
         }
 
+        // ═══════════════════════════════════════════════════════
+        //  Deep link support (additive; used by DeepLinkSelector)
+        // ═══════════════════════════════════════════════════════
+
+        /// <summary>True once the UI sub-controllers (hero + details sheet) exist.</summary>
+        public bool IsReadyForDeepLink => _detailsSheet != null && _heroController != null;
+
+        /// <summary>
+        /// Leaves the hero screen exactly like the EXPLORE button does (dismiss hero,
+        /// which initialises hotspots, then enter Exploration). No-op if already dismissed.
+        /// </summary>
+        public void PrepareViewerForDeepLink()
+        {
+            if (_heroController == null || _heroController.HeroDismissed)
+            {
+                return;
+            }
+
+            _heroController.DismissHero();
+            AppStateMachine.Instance?.EnterExploration();
+        }
+
+        /// <summary>
+        /// Full (mother-part) selection a click on <paramref name="selection"/> resolves to
+        /// (same rule the isolation logic uses; motor_/prop_ roots map to their arm).
+        /// </summary>
+        public Transform ResolveFullSelectionForDeepLink(Transform selection)
+        {
+            return ResolveFullSelection(selection);
+        }
+
+        /// <summary>Isolates the current selection like the Isolate button does (no-op if already isolated).</summary>
+        public void IsolateCurrentSelectionForDeepLink()
+        {
+            if (_isIsolated || SelectionManager.Instance == null || SelectionManager.Instance.CurrentSelection == null)
+            {
+                return;
+            }
+
+            IsolateSelectedPart();
+        }
+
+        /// <summary>Opens the details sheet for the current selection (same as the FAB / info button).</summary>
+        public void OpenDetailsForDeepLink()
+        {
+            _detailsSheet?.ShowInfo();
+        }
+
         private bool HandleLayeredBackNavigation(bool allowExitFromHeroMain)
         {
             if (_onboardingController != null && _onboardingController.IsOpen)
