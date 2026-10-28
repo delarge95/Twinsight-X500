@@ -42,19 +42,19 @@ namespace WebGL.Editor.Fixes
             return fixes;
         }
 
-        private static HashSet<int> CollectExistingShaders(SerializedProperty prop)
+        private static HashSet<UnityEngine.Object> CollectExistingShaders(SerializedProperty prop)
         {
-            var set = new HashSet<int>();
+            var set = new HashSet<UnityEngine.Object>();
             for (int i = 0; i < prop.arraySize; i++)
             {
                 var shaderRef = prop.GetArrayElementAtIndex(i).objectReferenceValue;
                 if (shaderRef != null)
-                    set.Add(shaderRef.GetInstanceID());
+                    set.Add(shaderRef);
             }
             return set;
         }
 
-        private static int AddCustomShaders(SerializedProperty prop, HashSet<int> existing, string[] guids)
+        private static int AddCustomShaders(SerializedProperty prop, HashSet<UnityEngine.Object> existing, string[] guids)
         {
             int fixes = 0;
             foreach (var guid in guids)
@@ -63,12 +63,12 @@ namespace WebGL.Editor.Fixes
                 var shader = AssetDatabase.LoadAssetAtPath<Shader>(path);
                 if (shader == null) continue;
 
-                if (!existing.Contains(shader.GetInstanceID()))
+                if (!existing.Contains(shader))
                 {
                     int idx = prop.arraySize;
                     prop.InsertArrayElementAtIndex(idx);
                     prop.GetArrayElementAtIndex(idx).objectReferenceValue = shader;
-                    existing.Add(shader.GetInstanceID());
+                    existing.Add(shader);
                     Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} <color=green>FIX 3:</color> Added shader '{shader.name}' to Always Included");
                     fixes++;
                 }
@@ -80,7 +80,7 @@ namespace WebGL.Editor.Fixes
             return fixes;
         }
 
-        private static int AddURPShaders(SerializedProperty prop, HashSet<int> existing)
+        private static int AddURPShaders(SerializedProperty prop, HashSet<UnityEngine.Object> existing)
         {
             int fixes = 0;
             var urpShaderNames = new[]
@@ -95,12 +95,12 @@ namespace WebGL.Editor.Fixes
             foreach (var shaderName in urpShaderNames)
             {
                 var shader = Shader.Find(shaderName);
-                if (shader != null && !existing.Contains(shader.GetInstanceID()))
+                if (shader != null && !existing.Contains(shader))
                 {
                     int idx = prop.arraySize;
                     prop.InsertArrayElementAtIndex(idx);
                     prop.GetArrayElementAtIndex(idx).objectReferenceValue = shader;
-                    existing.Add(shader.GetInstanceID());
+                    existing.Add(shader);
                     Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} <color=green>FIX 3:</color> Added URP shader '{shaderName}' to Always Included");
                     fixes++;
                 }

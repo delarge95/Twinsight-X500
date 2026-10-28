@@ -712,7 +712,7 @@ namespace WebGL.Core.Managers
 
                 string uniqueKey = !string.IsNullOrWhiteSpace(marker.FastenerInstanceId)
                     ? marker.FastenerInstanceId
-                    : proxyRoot.GetInstanceID().ToString();
+                    : proxyRoot.GetEntityId().ToString();
 
                 if (!uniqueFastenerKeys.Add(uniqueKey))
                 {

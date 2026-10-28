@@ -311,7 +311,7 @@ namespace WebGL.Core.Managers
             }
 
             string clickId = clickedSelection != null
-                ? clickedSelection.GetInstanceID().ToString()
+                ? clickedSelection.GetEntityId().ToString()
                 : "__bg__";
             bool withinDoubleClickWindow = (now - _lastClickTime) < DOUBLE_CLICK_THRESHOLD;
             bool sameClickedObject = clickId == _lastClickId;
