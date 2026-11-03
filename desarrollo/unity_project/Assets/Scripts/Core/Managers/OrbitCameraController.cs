@@ -4,7 +4,7 @@ using WebGL.Core.Utils;
 
 namespace WebGL.Core.Managers
 {
-    public class OrbitCameraController : Singleton<OrbitCameraController>
+    public partial class OrbitCameraController : Singleton<OrbitCameraController>
     {
         // ── Constants ────────────────────────────────────────────
         private const float DEFAULT_VERTICAL_ANGLE  = 20f;
@@ -173,7 +173,11 @@ namespace WebGL.Core.Managers
             else
             {
                 _isTouchInput = false;
+#if UNITY_STANDALONE
+                HandleDesktopMouseInput();   // phase 2B: left-drag orbit on the background, Shift+RMB pan, zoom to cursor
+#else
                 HandleMouseInput();
+#endif
             }
         }
 
@@ -519,7 +523,11 @@ namespace WebGL.Core.Managers
             if (target != null)
                 targetFocusPoint = target.position + targetOffset;
             
+#if UNITY_STANDALONE
+            currentFocusPoint = Vector3.Lerp(currentFocusPoint, targetFocusPoint, dt * DesktopFocusRate(damp));
+#else
             currentFocusPoint = Vector3.Lerp(currentFocusPoint, targetFocusPoint, dt * damp);
+#endif
 
             // Calculate Position & Rotation
             Quaternion rotation = Quaternion.Euler(currentY, currentX, 0);
@@ -527,6 +535,12 @@ namespace WebGL.Core.Managers
             // Base Position
             Vector3 direction = new Vector3(0.0f, 0.0f, -currentDistance);
             Vector3 position = rotation * direction + currentFocusPoint;
+#if UNITY_STANDALONE
+            // Phase 2B: with the docked side panel open, slide the camera sideways so the focus point
+            // sits in the middle of the free area (parallel shift: the orientation does not change).
+            Vector3 lateralShift = DesktopLateralShift(rotation, dt);
+            position += lateralShift;
+#endif
 
             // --- VIEW SHIFT LOGIC ---
             // Calculate world-space vertical offset based on FOV and Distance
@@ -547,7 +561,11 @@ namespace WebGL.Core.Managers
                     
                     // We must also shift the LookAt target so rotation pivot remains correct relative to the screen
                     transform.position = position;
+#if UNITY_STANDALONE
+                    transform.LookAt(currentFocusPoint + shiftVector + lateralShift);
+#else
                     transform.LookAt(currentFocusPoint + shiftVector);
+#endif
                     return;
                 }
             }

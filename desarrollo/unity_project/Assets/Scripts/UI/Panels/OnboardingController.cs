@@ -283,7 +283,13 @@ namespace WebGL.UI.Panels
             _skipBtn = _overlay.Q<Button>("OnboardSkipBtn");
             _dotsContainer = _overlay.Q<VisualElement>("OnboardDots");
 
+#if UNITY_STANDALONE
+            // Phase 2B (U7): the Windows build never starts on the touch branch (a touch screen or a
+            // pen on a PC would otherwise show "tap" / "pinch"); the PC / mobile switch still works.
+            _isTouchDevice = Application.isMobilePlatform;
+#else
             _isTouchDevice = Application.isMobilePlatform || Input.touchSupported;
+#endif
             _isTouchMode = _isTouchDevice;
 
             _visualGlyphs[StepVisualGlyph.Hotspots] = _overlay.Q<VisualElement>("OnboardVisualHotspots");
@@ -692,6 +698,24 @@ namespace WebGL.UI.Panels
                     .Replace("{INFO_CLOSE}", "Double tap to close the info panel");
             }
 
+#if UNITY_STANDALONE
+            // Desktop build: left-drag on the background also orbits, Shift + right drag pans, the wheel
+            // zooms toward the cursor and a double click focuses (isolation is the I key / ISOLATE).
+            return template
+                .Replace("{ORBIT}", "Right mouse button + drag (or drag the background)")
+                .Replace("{PAN}", "Middle mouse button + drag (or Shift + right drag)")
+                .Replace("{ZOOM}", "Mouse wheel (zooms toward the cursor)")
+                .Replace("{ACTION}", "click")
+                .Replace("{ACTION_DOUBLE}", "double click")
+                .Replace("{SELECT}", "Click")
+                .Replace("{SELECT_BG}", "Click outside")
+                .Replace("{FILTER_TOGGLE}", "Click a filter to select or clear it")
+                .Replace("{FILTER_ISOLATE}", "Double click a filter to isolate it")
+                .Replace("{PART_ISOLATE}", "press I with a part or subpart selected")
+                .Replace("{HOTSPOT_ISOLATE}", "double click a hotspot to isolate it")
+                .Replace("{BG_DOUBLE}", "Double click outside to return to the previous grouping")
+                .Replace("{INFO_CLOSE}", "Double click to close the info panel");
+#else
             return template
                 .Replace("{ORBIT}", "Right mouse button + drag")
                 .Replace("{PAN}", "Middle mouse button + drag")
@@ -706,6 +730,7 @@ namespace WebGL.UI.Panels
                 .Replace("{HOTSPOT_ISOLATE}", "Double click a hotspot to isolate it")
                 .Replace("{BG_DOUBLE}", "Double click outside to return to the previous grouping")
                 .Replace("{INFO_CLOSE}", "Double click to close the info panel");
+#endif
         }
 
         private bool HasCueSequence(Step step)

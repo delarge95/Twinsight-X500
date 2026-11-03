@@ -394,6 +394,19 @@ public class HotspotManager : Singleton<HotspotManager>
             SmartHotspot.HeaderMaskRects[count++] = wb;
         }
 
+#if UNITY_STANDALONE
+        // Phase 2B: pins must not sit under the docked side panel either.
+        VisualElement sidePanel = _root.Q<VisualElement>("BottomSheet");
+        if (sidePanel != null && !sidePanel.ClassListContains("details-sheet--hidden") && count < SmartHotspot.HeaderMaskRects.Length)
+        {
+            Rect wb = sidePanel.worldBound;
+            if (!float.IsNaN(wb.width) && wb.width > 0f && wb.height > 0f)
+            {
+                SmartHotspot.HeaderMaskRects[count++] = wb;
+            }
+        }
+#endif
+
         SmartHotspot.HeaderMaskCount = count;
     }
 

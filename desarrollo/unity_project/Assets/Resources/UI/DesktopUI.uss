@@ -403,3 +403,196 @@
 .ui-compact .desktop-help-footer {
     margin-top: 10px;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   Phase 2B — desktop layout (class .layout--desktop on the Root, set by DesktopSidePanel).
+   The part details become a docked panel on the right; the capsule + mode sub-panels (BottomBar)
+   stay at the bottom centre of the FREE area (DesktopSidePanel moves the bar's right edge).
+   Every selector has 2+ classes so it beats the single-class rules of Theme.uss.
+   ════════════════════════════════════════════════════════════════ */
+
+.layout--desktop .bottom-bar {
+    transition-property: bottom, translate, right;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
+}
+
+/* The old sheet pushed the bar up: the side panel never does. */
+.layout--desktop .ui-shifted,
+.layout--desktop .ui-shifted-soft {
+    bottom: 0;
+    translate: 0 0;
+}
+
+.layout--desktop .actions-row--sheet-open {
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Docked details panel (right, full height between the header and the bottom edge) ── */
+.layout--desktop .details-sheet {
+    left: auto;
+    right: 16px;
+    top: 112px;
+    bottom: 16px;
+    width: 480px;
+    height: auto;
+    padding: 18px 8px 16px 24px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.14);
+    border-radius: 24px;
+    background-color: rgba(0, 0, 0, 0.94);
+    translate: 0 0;
+    opacity: 1;
+    transition-property: translate, opacity;
+    transition-duration: 0.3s, 0.25s;
+    transition-timing-function: ease-out, ease-out;
+}
+
+.layout--desktop .details-sheet--hidden {
+    translate: 115% 0;
+    opacity: 0;
+}
+
+.layout--desktop .sheet-handle {
+    display: none;
+}
+
+.layout--desktop .sheet-header {
+    padding-right: 56px;
+    margin-bottom: 2px;
+}
+
+.layout--desktop .sheet-title {
+    font-size: 24px;
+    white-space: normal;
+    flex-shrink: 1;
+}
+
+.layout--desktop .sheet-close-btn {
+    top: 14px;
+    right: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+}
+
+.layout--desktop .sheet-close-icon {
+    width: 22px;
+    min-width: 22px;
+    max-width: 22px;
+    height: 22px;
+    min-height: 22px;
+    max-height: 22px;
+}
+
+.layout--desktop .sheet-scroll {
+    margin-top: 6px;
+    padding-right: 12px;
+}
+
+/* Reading width: the panel content is ~432 px; 14-15 px type gives 55-65 characters per line. */
+.layout--desktop .sheet-description {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.60);
+    padding-right: 0;
+    margin-bottom: 14px;
+}
+
+.layout--desktop .sheet-foldout > .unity-foldout__toggle > .unity-toggle__input > .unity-foldout__text {
+    font-size: 12px;
+    letter-spacing: 3px;
+}
+
+.layout--desktop .data-row {
+    padding: 6px 0;
+    min-height: 40px;
+}
+
+.layout--desktop .data-label {
+    font-size: 12px;
+    width: 112px;
+    min-width: 112px;
+    max-width: 112px;
+    margin-right: 12px;
+}
+
+.layout--desktop .data-value {
+    font-size: 14px;
+    -unity-text-align: upper-left;
+}
+
+.layout--desktop .data-value.read-only-text > .unity-text-field__input {
+    font-size: 14px;
+}
+
+/* ── PART INFO: a small pill, bottom right (mirrors the SHORTCUTS pill at the bottom left) ── */
+.layout--desktop .info-bar-peek {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    width: auto;
+    min-width: 148px;
+    height: 44px;
+    padding: 0 22px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-width: 1px;
+    border-radius: 22px;
+    border-color: rgba(255, 255, 255, 0.18);
+    background-color: rgba(0, 0, 0, 0.45);
+    translate: 0 0;
+    opacity: 1;
+    transition-property: translate, opacity, border-color, background-color;
+    transition-duration: 0.2s;
+}
+
+.layout--desktop .info-bar-peek:hover {
+    height: 44px;
+    border-color: rgba(70, 175, 255, 1);
+    background-color: rgba(70, 175, 255, 0.08);
+}
+
+.layout--desktop .info-bar-peek:active {
+    height: 44px;
+    background-color: rgba(70, 175, 255, 0.16);
+}
+
+.layout--desktop .info-bar-peek--visible {
+    translate: 0 0;
+    opacity: 1;
+    visibility: visible;
+}
+
+.layout--desktop .info-bar-peek--hidden,
+.layout--desktop .info-bar-peek--sheet-open {
+    translate: 0 14px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.layout--desktop .peek-handle {
+    display: none;
+}
+
+.layout--desktop .peek-label {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.layout--desktop .info-bar-peek:hover .peek-label {
+    color: rgba(70, 175, 255, 1);
+}
+
+/* Tutorial open: hide the capsule and the header behind the card (it showed through the buttons). */
+.desktop-tutorial-open .bottom-bar,
+.desktop-tutorial-open .top-bar,
+.desktop-tutorial-open .info-bar-peek {
+    opacity: 0;
+}
+
+.layout--desktop .details-sheet .data-label {
+    color: rgba(255, 255, 255, 0.55);
+}

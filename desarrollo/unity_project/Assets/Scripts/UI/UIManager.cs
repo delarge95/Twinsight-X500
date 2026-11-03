@@ -386,10 +386,15 @@ namespace WebGL.UI
             // Notify sheet to close if any mode activates
             _modeController.OnAnyModeActivated += () =>
             {
+#if UNITY_STANDALONE
+                // Phase 2B: the docked side panel and the mode panels (CUT, FILTER, STUDIO...) coexist.
+                return;
+#else
                 if (_detailsSheet.IsSheetOpen)
                 {
                     _detailsSheet.SetSheetState(false);
                 }
+#endif
             };
 
             // ── Analyze Panel (shader cards — ShaderMenu inside StudioModeContainer) ──
@@ -1468,6 +1473,11 @@ namespace WebGL.UI
                 return;
             }
 
+            if (TryDesktopDoubleClickFocus(evt))
+            {
+                return;
+            }
+
             Transform clickedSelection = evt.ClickedTransform != null
                 ? evt.ClickedTransform
                 : SelectionManager.Instance?.CurrentSelection;
@@ -1593,6 +1603,29 @@ namespace WebGL.UI
             {
                 IsolateFullSelection(clickedFull ?? clickedSelection);
             }
+        }
+
+        /// <summary>
+        /// Phase 2B (U6, PC only): a double click on a part selects it (the first click already did) and
+        /// frames it with the camera. Isolation stays on the ISOLATE button and the I key.
+        /// WebGL / touch keep the double-click isolation flow.
+        /// </summary>
+        private bool TryDesktopDoubleClickFocus(PartDoubleClickedEvent evt)
+        {
+#if UNITY_STANDALONE
+            Transform focusTarget = SelectionManager.Instance != null && SelectionManager.Instance.CurrentSelection != null
+                ? SelectionManager.Instance.CurrentSelection
+                : evt.ClickedTransform;
+            if (focusTarget != null)
+            {
+                Debug.Log("[DesktopUI] camera: double click -> focus " + focusTarget.name);
+                OrbitCameraController.Instance?.FocusOnObject(focusTarget);
+            }
+
+            return true;
+#else
+            return false;
+#endif
         }
 
         private void OnHotspotGroupIsolated(HotspotGroupIsolatedEvent evt)

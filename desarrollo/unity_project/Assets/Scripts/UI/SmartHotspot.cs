@@ -158,7 +158,7 @@ public class SmartHotspot
     /// Panel-space rectangles of the header UI (title label, Home, Reset). Refreshed every frame by
     /// <see cref="HotspotManager"/>; pins whose 44 px dot would overlap one of them are hidden.
     /// </summary>
-    public static readonly Rect[] HeaderMaskRects = new Rect[3];
+    public static readonly Rect[] HeaderMaskRects = new Rect[4];
     public static int HeaderMaskCount;
     private const float HeaderMaskPadding = 30f; // dot radius (22) + a little air
 

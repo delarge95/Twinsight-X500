@@ -104,6 +104,9 @@ namespace WebGL.Core.Managers
 
             HandleHover();
             HandleClick();
+#if UNITY_STANDALONE
+            HandleDeferredBackgroundClick();
+#endif
         }
 
         #endregion
@@ -357,8 +360,51 @@ namespace WebGL.Core.Managers
             _lastClickedFullTransform = clickedFull;
             _lastClickedData = clickedData;
 
+#if UNITY_STANDALONE
+            // Phase 2B (U6): on the desktop a left press on the empty background may become an orbit
+            // drag, so the deselection waits for the release and only happens if the mouse did not drag.
+            if (hoveredObject == null)
+            {
+                _backgroundClickPending = true;
+                _backgroundClickPosition = Input.mousePosition;
+                return;
+            }
+#endif
+
             ApplyClickSelection();
         }
+
+#if UNITY_STANDALONE
+        private bool _backgroundClickPending;
+        private Vector2 _backgroundClickPosition;
+
+        private void HandleDeferredBackgroundClick()
+        {
+            if (!_backgroundClickPending)
+            {
+                return;
+            }
+
+            float threshold = OrbitCameraController.DesktopDragThreshold;
+            bool moved = ((Vector2)Input.mousePosition - _backgroundClickPosition).sqrMagnitude > threshold * threshold;
+            if (Input.GetMouseButton(0))
+            {
+                if (moved)
+                {
+                    _backgroundClickPending = false; // it is an orbit drag: keep the selection
+                }
+
+                return;
+            }
+
+            _backgroundClickPending = false;
+            if (!moved && hoveredObject == null && !InputManager.InputBlocked)
+            {
+                Debug.Log("[DesktopUI] selection: background click released without drag -> deselect");
+                ApplyClickSelection();
+            }
+        }
+#endif
 
         /// <summary>
         /// Test / automation hook: behaves like a single left click whose raycast hit

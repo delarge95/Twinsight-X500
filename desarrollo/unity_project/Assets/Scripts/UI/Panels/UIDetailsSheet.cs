@@ -405,7 +405,12 @@ namespace WebGL.UI.Panels
             if (_actionsRow != null) _actionsRow.EnableInClassList("actions-row--sheet-open", isOpen);
             if (_partNameLabel != null) _partNameLabel.EnableInClassList("selection-label--hidden", isOpen);
 
+#if UNITY_STANDALONE
+            // Phase 2B: the desktop side panel shifts the view sideways (DesktopSidePanel -> SetDesktopViewShiftX).
+            OrbitCameraController.Instance?.SetViewportShift(0f);
+#else
             OrbitCameraController.Instance?.SetViewportShift(isOpen ? 0.15f : 0f);
+#endif
 
             // Focus camera on the selected part when opening the sheet
             if (isOpen)
@@ -543,6 +548,14 @@ namespace WebGL.UI.Panels
                 CacheLastSelection(null, false, "", "", "", "", "");
                 if (_partNameLabel != null) _partNameLabel.AddToClassList("selection-label--hidden");
                 if (_infoBtn != null) _infoBtn.SetEnabled(false);
+#if UNITY_STANDALONE
+                // Phase 2B: the docked panel never shows stale data; deselecting (background click, Esc,
+                // reset) closes it, and PART INFO opens it again for the next part.
+                if (IsSheetOpen)
+                {
+                    SetSheetState(false);
+                }
+#endif
 
                 // PRE-PEEK INFO BAR LOGIC: Hide when nothing is selected
                 if (_infoBarPeek != null)
@@ -1642,9 +1655,24 @@ namespace WebGL.UI.Panels
             }
         }
 
+        /// <summary>
+        /// Phase 2B: on the desktop the sheet is a docked side panel (closed with its X / Esc / PART INFO),
+        /// so the touch-style "drag down to close" gestures are not registered.
+        /// </summary>
+        private static readonly bool IsSideDocked = DetectSideDocked();
+
+        private static bool DetectSideDocked()
+        {
+#if UNITY_STANDALONE
+            return true;
+#else
+            return false;
+#endif
+        }
+
         private void RegisterSheetDragClose(VisualElement element)
         {
-            if (element == null) return;
+            if (element == null || IsSideDocked) return;
 
             EventCallback<PointerDownEvent> swipeDown = evt =>
             {
@@ -1729,7 +1757,7 @@ namespace WebGL.UI.Panels
 
         private void RegisterSheetTopZoneSwipeClose(VisualElement element)
         {
-            if (element == null) return;
+            if (element == null || IsSideDocked) return;
 
             EventCallback<PointerDownEvent> swipeDown = evt =>
             {

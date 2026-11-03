@@ -244,7 +244,12 @@ namespace WebGL.UI.Panels
 
         public void SetSheetOpenState(bool isOpen)
         {
+#if UNITY_STANDALONE
+            // Phase 2B: with the docked side panel the mode panels stay open (they sit in the free area).
+            return;
+#else
             if (isOpen) DeactivateAllModes();
+#endif
         }
 
         public void ToggleHotspots() => _inspect.ToggleHotspots();

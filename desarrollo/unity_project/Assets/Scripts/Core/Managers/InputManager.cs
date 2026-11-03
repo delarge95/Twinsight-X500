@@ -150,7 +150,14 @@ namespace WebGL.Core.Managers
 
             if (IsDetailsSheetVisible())
             {
+#if UNITY_STANDALONE
+                // Phase 2B: the docked side panel leaves the capsule and the mode panels visible, so they
+                // must keep blocking camera gestures too (the old sheet covered them).
+                return (hasMirrored && IsPanelPositionOverDetailsSheet(mirroredPanelPos))
+                    || IsScreenPositionOverPickableUI(screenPos);
+#else
                 return hasMirrored && IsPanelPositionOverDetailsSheet(mirroredPanelPos);
+#endif
             }
 
             // Block on explicit controls only when sheet is closed

@@ -105,6 +105,9 @@ namespace WebGL.UI.Desktop
             AddRow(left, new[] { "H" }, T("Show / hide pins", "Mostrar / ocultar puntos"));
             AddRow(left, new[] { "I" }, T("Isolate selected part", "Aislar la pieza seleccionada"));
             AddRow(left, new[] { "E" }, T("Explode / assemble", "Explosionar / ensamblar"));
+            AddSection(left, T("WINDOW", "VENTANA"));
+            AddRow(left, new[] { "F11", "Alt+Enter" }, T("Fullscreen", "Pantalla completa"));
+            AddRow(left, new[] { "?", "F1" }, T("This help", "Esta ayuda"));
 
             // ── Column 2: view, window, mouse ──
             VisualElement right = NewColumn(columns);
@@ -112,14 +115,13 @@ namespace WebGL.UI.Desktop
             AddRow(right, new[] { "F" }, T("Focus the selected part", "Enfocar la pieza seleccionada"));
             AddRow(right, new[] { "Home", "R" }, T("Reset the view", "Restablecer la vista"));
             AddRow(right, new[] { "Esc" }, T("Back / deselect", "Atrás / deseleccionar"));
-            AddSection(right, T("WINDOW", "VENTANA"));
-            AddRow(right, new[] { "F11", "Alt+Enter" }, T("Fullscreen", "Pantalla completa"));
-            AddRow(right, new[] { "?", "F1" }, T("This help", "Esta ayuda"));
             AddSection(right, T("MOUSE", "RATÓN"));
-            AddRow(right, new[] { T("Left", "Izq.") }, T("Select a part (twice: sub-part)", "Seleccionar (dos veces: subpieza)"));
-            AddRow(right, new[] { T("Right", "Der.") }, T("Orbit", "Orbitar"));
-            AddRow(right, new[] { T("Middle", "Central") }, T("Pan", "Desplazar"));
-            AddRow(right, new[] { T("Wheel", "Rueda") }, T("Zoom", "Zoom"));
+            AddRow(right, new[] { T("Click", "Clic") }, T("Select a part", "Seleccionar una pieza"));
+            AddRow(right, new[] { T("Double click", "Doble clic") }, T("Select and focus", "Seleccionar y enfocar"));
+            AddRow(right, new[] { T("Drag", "Arrastrar") }, T("Orbit (on the background)", "Orbitar (sobre el fondo)"));
+            AddRow(right, new[] { T("Right drag", "Der. arrastrar") }, T("Orbit", "Orbitar"));
+            AddRow(right, new[] { T("Middle drag", "Central arrastrar"), "Shift + " + T("Right drag", "Der.") }, T("Pan", "Desplazar"));
+            AddRow(right, new[] { T("Wheel", "Rueda") }, T("Zoom toward the cursor", "Zoom hacia el cursor"));
 
             var footer = new VisualElement { pickingMode = PickingMode.Ignore };
             footer.AddToClassList("desktop-help-footer");

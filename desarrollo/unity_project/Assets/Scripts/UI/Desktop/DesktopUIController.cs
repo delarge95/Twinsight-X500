@@ -33,6 +33,7 @@ namespace WebGL.UI.Desktop
         private DesktopTooltip _tooltip;
         private DesktopHelpOverlay _help;
         private DesktopDisplayPanel _display;
+        private DesktopSidePanel _sidePanel;
         private VisualElement _hint;
         private VisualElement _bottomSheet;
         private bool _ready;
@@ -49,6 +50,7 @@ namespace WebGL.UI.Desktop
             if (e != null) _tooltip?.ShowFor(e);
         }
         internal DesktopTooltip Tooltip => _tooltip;
+        internal DesktopSidePanel SidePanel => _sidePanel;
         internal DesktopHelpOverlay Help => _help;
         internal DesktopUIScaler Scaler => _scaler;
 
@@ -93,6 +95,7 @@ namespace WebGL.UI.Desktop
             _tooltip?.Dispose();
             _help?.Dispose();
             _display?.Dispose();
+            _sidePanel?.Dispose();
             _hint?.RemoveFromHierarchy();
             _scaler?.Restore();
         }
@@ -146,6 +149,7 @@ namespace WebGL.UI.Desktop
             _scaler = new DesktopUIScaler(document);
             _scaler.Tick();
 
+            _sidePanel = new DesktopSidePanel(_root);
             _display = new DesktopDisplayPanel(_root);
             _help = new DesktopHelpOverlay(_root);
             BuildHint();
@@ -198,6 +202,7 @@ namespace WebGL.UI.Desktop
             }
 
             _scaler.Tick();
+            _sidePanel.Tick();
             DesktopWindowSettings.TickMinimumSize();
 
             if (Screen.width != _lastScreenW || Screen.height != _lastScreenH)
@@ -218,6 +223,9 @@ namespace WebGL.UI.Desktop
             bool sheetOpen = _bottomSheet != null && !_bottomSheet.ClassListContains("details-sheet--hidden");
             bool hide = _ui.IsHeroVisible || _ui.IsOnboardingOpen || sheetOpen || IsHelpOpen;
             _hint.EnableInClassList("desktop-hint--hidden", hide);
+
+            // The tutorial is a full card: the viewer UI behind it (capsule, header) only adds noise.
+            _root.EnableInClassList("desktop-tutorial-open", _ui.IsOnboardingOpen);
         }
 
         private bool IsTypingInTextField()
@@ -289,6 +297,13 @@ namespace WebGL.UI.Desktop
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length - 1; i++)
             {
+                if (args[i].Equals("-desk-demo2b", StringComparison.OrdinalIgnoreCase))
+                {
+                    var demo2b = gameObject.AddComponent<DesktopCaptureDemo2B>();
+                    demo2b.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-desk-demo", StringComparison.OrdinalIgnoreCase))
                 {
                     var demo = gameObject.AddComponent<DesktopCaptureDemo>();
