@@ -63,7 +63,13 @@ namespace WebGL.Editor.Fixes
                 Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} FIX 1a: Graphics pipeline already set to '{bestAsset.name}' ✓");
             }
 
-            if (QualitySettings.renderPipeline != bestAsset)
+            // Nunca pisar el asset URP de un nivel PC_* (fase 1 de la build de escritorio).
+            bool currentIsPcLevel = QualityLevelFixer.IsPcLevel(QualitySettings.names[QualitySettings.GetQualityLevel()]);
+            if (currentIsPcLevel)
+            {
+                Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} FIX 1b: current quality level is a PC level, left untouched");
+            }
+            else if (QualitySettings.renderPipeline != bestAsset)
             {
                 QualitySettings.renderPipeline = bestAsset;
                 Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} <color=green>FIX 1b:</color> Set Quality pipeline to '{bestAsset.name}'");

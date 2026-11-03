@@ -44,6 +44,13 @@ namespace WebGL.Core.Managers
         public event System.Action<bool> OnLightBackgroundChanged;
         public bool IsLightBackground { get; private set; }
 
+#if UNITY_STANDALONE
+        // PC (fase 1): notifica cambios de preset / hora / luz / fondo para refrescar el probe de reflejos.
+        public event System.Action OnEnvironmentChanged;
+        public Light KeyLight => directionalLight;
+        private void NotifyEnvironmentChanged() => OnEnvironmentChanged?.Invoke();
+#endif
+
         // Shader property IDs (cached)
         private static readonly int TopColorId    = Shader.PropertyToID("_TopColor");
         private static readonly int BottomColorId = Shader.PropertyToID("_BottomColor");
@@ -137,7 +144,12 @@ namespace WebGL.Core.Managers
             light.name = lightName;
             light.type = LightType.Directional;
             light.shadows = shadows;
+#if UNITY_STANDALONE
+            // PC: sombras de contacto mas marcadas (el asset PC_* ya trae cascadas y 4096).
+            light.shadowStrength = shadows == LightShadows.None ? 0f : 0.85f;
+#else
             light.shadowStrength = shadows == LightShadows.None ? 0f : 0.52f;
+#endif
             light.shadowBias = 0.06f;
             light.shadowNormalBias = 0.35f;
             light.renderMode = LightRenderMode.Auto;
@@ -153,7 +165,20 @@ namespace WebGL.Core.Managers
 
             light.name = lightName;
             light.type = LightType.Spot;
+#if UNITY_STANDALONE
+            // PC (fase 1, G4): solo 2 luces adicionales proyectan sombra (relleno y cenital) para
+            // dar sombras de contacto sin multiplicar el coste. Solo se dibujan si el asset URP del
+            // nivel de calidad tiene "Additional Lights > Cast Shadows" (PC_High / PC_Ultra).
+            light.shadows = (lightName == "Studio Fill Softbox" || lightName == "Studio Top Softbox")
+                ? LightShadows.Soft
+                : LightShadows.None;
+            if (light.shadows != LightShadows.None)
+            {
+                light.shadowStrength = 0.6f;
+            }
+#else
             light.shadows = LightShadows.None;
+#endif
             light.renderMode = LightRenderMode.Auto;
             light.spotAngle = spotAngle;
             light.innerSpotAngle = Mathf.Clamp(spotAngle * 0.62f, 12f, spotAngle);
@@ -176,6 +201,9 @@ namespace WebGL.Core.Managers
             euler.y = angleY;
             directionalLight.transform.eulerAngles = euler;
             ApplySupplementalStudioLighting(directionalLight.color, directionalLight.intensity, euler);
+#if UNITY_STANDALONE
+            NotifyEnvironmentChanged();
+#endif
         }
 
         // Base skybox colors captured when a preset is applied (for intensity scaling)
@@ -194,12 +222,18 @@ namespace WebGL.Core.Managers
                 directionalLight != null ? directionalLight.color : Color.white,
                 intensity,
                 directionalLight != null ? directionalLight.transform.eulerAngles : new Vector3(50f, 45f, 0f));
+#if UNITY_STANDALONE
+            NotifyEnvironmentChanged();
+#endif
         }
 
         public void SetBackgroundIntensity(float intensityPercent)
         {
             _backgroundIntensity = Mathf.Clamp(intensityPercent, 0f, 100f);
             ApplyBackgroundColors();
+#if UNITY_STANDALONE
+            NotifyEnvironmentChanged();
+#endif
         }
 
         public void ApplyPreset(string presetName)
@@ -524,6 +558,9 @@ namespace WebGL.Core.Managers
             }
 
             _transitionRoutine = null;
+#if UNITY_STANDALONE
+            NotifyEnvironmentChanged();
+#endif
         }
 
         private void ApplyBackgroundColors()

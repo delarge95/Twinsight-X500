@@ -31,6 +31,19 @@ namespace WebGL.Core.Managers
 
         private void Start()
         {
+#if UNITY_STANDALONE
+            // PC (fase 1, G12): la escala de render la gestiona RenderQualityController con el asset
+            // del nivel PC_* (hasta 2,0). Este gestor, pensado para WebGL, no la toca en escritorio.
+            enabled = false;
+            return;
+#else
+            StartWebGL();
+#endif
+        }
+
+#if !UNITY_STANDALONE
+        private void StartWebGL()
+        {
             _pipelineAsset = GraphicsSettings.currentRenderPipeline;
             if (_pipelineAsset == null)
             {
@@ -65,6 +78,7 @@ namespace WebGL.Core.Managers
             InvokeRepeating(nameof(CheckPerformance), checkInterval, checkInterval);
             Debug.Log($"[QualityManager] Started — initial renderScale: {currentScale:0.00}");
         }
+#endif
 
         private void CheckPerformance()
         {

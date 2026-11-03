@@ -32,8 +32,14 @@ namespace WebGL.UI.Panels
             QualityTier.Ultra
         };
 
+#if UNITY_STANDALONE
+        // PC: MSAA hasta 8x
+        private static readonly int[] MsaaCycle = { 0, 2, 4, 8 };
+        private static readonly string[] MsaaLabels = { "OFF", "2X", "4X", "8X" };
+#else
         private static readonly int[] MsaaCycle = { 0, 2, 4 };
         private static readonly string[] MsaaLabels = { "OFF", "2X", "4X" };
+#endif
         private static readonly int[] TextureCycle = { 0, 1, 2 };
         private static readonly string[] TextureLabels = { "FULL", "HALF", "QUARTER" };
 
@@ -60,6 +66,12 @@ namespace WebGL.UI.Panels
                 root.Q<Button>("QualityBtn_High"),
                 root.Q<Button>("QualityBtn_Ultra")
             };
+
+#if UNITY_STANDALONE
+            // PC (G12): rangos ampliados de los deslizadores (el UXML compartido con WebGL no cambia).
+            if (_renderScaleSlider != null) _renderScaleSlider.highValue = RenderQualityController.PcMaxRenderScale;
+            if (_shadowDistanceSlider != null) _shadowDistanceSlider.highValue = 80f;
+#endif
 
             _expanded = RenderQualityController.SavedTier != QualityTier.Auto;
 

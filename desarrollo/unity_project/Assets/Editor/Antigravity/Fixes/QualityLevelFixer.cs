@@ -10,6 +10,11 @@ namespace WebGL.Editor.Fixes
     /// </summary>
     public static class QualityLevelFixer
     {
+        internal static bool IsPcLevel(string levelName)
+        {
+            return !string.IsNullOrEmpty(levelName) && levelName.StartsWith("PC_");
+        }
+
         [MenuItem("WebGL/Fixes/2. Set WebGL Quality Level")]
         public static int Fix()
         {
@@ -33,18 +38,27 @@ namespace WebGL.Editor.Fixes
                 return 0;
             }
 
-            QualitySettings.renderPipeline = bestAsset;
-            Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} <color=green>FIX 2:</color> Set current quality level pipeline to '{bestAsset.name}'");
-
             var allNames = QualitySettings.names;
             int currentLevel = QualitySettings.GetQualityLevel();
+
+            // Los niveles PC_* (fase 1 de la build de escritorio) tienen su propio asset URP:
+            // este fixer es solo para los niveles de WebGL y nunca debe tocarlos.
+            if (!IsPcLevel(allNames[currentLevel]))
+            {
+                QualitySettings.renderPipeline = bestAsset;
+                Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} <color=green>FIX 2:</color> Set current quality level pipeline to '{bestAsset.name}'");
+            }
+
+            int touched = 0;
             for (int i = 0; i < allNames.Length; i++)
             {
+                if (IsPcLevel(allNames[i])) continue;
                 QualitySettings.SetQualityLevel(i, false);
                 QualitySettings.renderPipeline = bestAsset;
+                touched++;
             }
             QualitySettings.SetQualityLevel(currentLevel, false);
-            Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} FIX 2: Applied URP asset to all {allNames.Length} quality levels");
+            Debug.Log($"{WebGLBuildFixer.LOG_PREFIX} FIX 2: Applied URP asset to {touched} WebGL quality level(s) ({allNames.Length - touched} PC level(s) left untouched)");
 
             return 1;
         }

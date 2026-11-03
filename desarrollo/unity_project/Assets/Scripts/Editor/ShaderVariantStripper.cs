@@ -50,6 +50,13 @@ namespace WebGL.Editor
             "STEREO_MULTIVIEW_ON",
         };
         
+        // Keywords que solo existen en ClippableLit para PC (fase 1): en WebGL se eliminan
+        // para que las variantes compiladas de ese shader sigan siendo las de antes.
+        private static readonly HashSet<string> ClippableLitPcOnlyKeywords = new()
+        {
+            "_CASTING_PUNCTUAL_LIGHT_SHADOW",
+        };
+
         private int _strippedCount = 0;
         private int _totalCount = 0;
 
@@ -79,7 +86,8 @@ namespace WebGL.Editor
                 {
                     string keywordName = keyword.name;
                     
-                    if (StripKeywords.Contains(keywordName))
+                    if (StripKeywords.Contains(keywordName) ||
+                        (shader.name == "WebGL/ClippableLit" && ClippableLitPcOnlyKeywords.Contains(keywordName)))
                     {
                         shouldStrip = true;
                         strippedKeyword = keywordName;

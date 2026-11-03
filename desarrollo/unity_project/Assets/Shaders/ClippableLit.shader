@@ -57,6 +57,9 @@ Shader "WebGL/ClippableLit"
             #pragma shader_feature_local _CLIP_ENABLED
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS
+            // G4 (PC): sombras de luces adicionales (spot de estudio). ShaderVariantStripper
+            // elimina _ADDITIONAL_LIGHT_SHADOWS en WebGL: las variantes WebGL no cambian.
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile _ _SHADOWS_SOFT
             #pragma multi_compile_fog
 
@@ -251,6 +254,8 @@ Shader "WebGL/ClippableLit"
             #pragma fragment ShadowFrag
 
             #pragma multi_compile_local _ _CLIP_ENABLED
+            // G4 (PC): caster de luces puntuales/spot. ShaderVariantStripper lo elimina en WebGL.
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
@@ -274,6 +279,7 @@ Shader "WebGL/ClippableLit"
             float _GlobalClipEnabled2;
 
             float3 _LightDirection;
+            float3 _LightPosition;
 
             Varyings ShadowVert(Attributes IN)
             {
@@ -281,9 +287,15 @@ Shader "WebGL/ClippableLit"
                 
                 float3 positionWS = TransformObjectToWorld(IN.positionOS.xyz);
                 float3 normalWS = TransformObjectToWorldNormal(IN.normalOS);
+
+                #if defined(_CASTING_PUNCTUAL_LIGHT_SHADOW)
+                    float3 lightDirectionWS = normalize(_LightPosition - positionWS);
+                #else
+                    float3 lightDirectionWS = _LightDirection;
+                #endif
                 
                 OUT.positionWS = positionWS;
-                OUT.positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection));
+                OUT.positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, lightDirectionWS));
 
                 return OUT;
             }
