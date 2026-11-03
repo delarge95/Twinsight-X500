@@ -18,7 +18,6 @@ namespace WebGL.UI.Panels
             { "NEXT", "SIGUIENTE" },
             { "GOT IT", "ENTENDIDO" },
             { "Close", "Cerrar" },
-            { "CODE PROTOTYPE · CONCEPTUAL DRAFT (NOT FINAL)", "BOCETO EN CÓDIGO · PROTOTIPO CONCEPTUAL NO DEFINITIVO" },
             { "EXPLORE", "EXPLORAR" },
             { "DEVICE", "DISPOSITIVO" },
             { "ABOUT", "ACERCA DE" },
@@ -124,7 +123,34 @@ namespace WebGL.UI.Panels
             { "ASSEMBLY", "ENSAMBLAJE" },
             { "KEY & REFERENCES", "CLAVE Y REFERENCIAS" },
             { "CONTAINED PARTS", "PIEZAS CONTENIDAS" },
-            { "PARENT ASSEMBLY", "PIEZA MADRE" }
+            { "PARENT ASSEMBLY", "PIEZA MADRE" },
+            // Fase 2A
+            { "Back", "Atrás" },
+            { "DIDACTIC SIMULATION · ILLUSTRATIVE", "SIMULACIÓN DIDÁCTICA · ILUSTRATIVO" },
+            { "Return to Menu", "Volver al menú" },
+            { "Reset Camera", "Restablecer cámara" },
+            { "Close panel", "Cerrar panel" },
+            { "Inspect - Pins, Isolate, Power", "Inspeccionar: puntos, aislar, energía" },
+            { "Analyze — Cut, Explode, Filter", "Analizar: corte, explosión, filtro" },
+            { "Studio — Shaders, Environment & Lighting", "Estudio: modos de render, entorno y luz" },
+            { "Invert plane direction", "Invertir dirección del plano" },
+            { "Invert second plane direction", "Invertir dirección del segundo plano" },
+            { "Combine active planes", "Combinar planos activos" },
+            { "DISPLAY", "PANTALLA" },
+            { "WINDOW MODE", "MODO DE VENTANA" },
+            { "RESOLUTION", "RESOLUCIÓN" },
+            { "VSYNC", "VSYNC" },
+            { "UI SIZE", "TAMAÑO DE INTERFAZ" },
+            { "WINDOWED", "VENTANA" },
+            { "FULLSCREEN", "PANTALLA COMPLETA" },
+            { "KEYBOARD SHORTCUTS", "ATAJOS DE TECLADO" },
+            { "MOUSE", "RATÓN" },
+            { "QUIT", "SALIR" },
+            { "Quit TwinSight X500", "Salir de TwinSight X500" },
+            { "Close TwinSight X500 and return to the desktop?", "¿Cerrar TwinSight X500 y volver al escritorio?" },
+            { "QUIT APP", "CERRAR LA APP" },
+            { "Drone model", "Modelo del dron" },
+            { "MODEL", "MODELO" }
         };
 
         private static readonly Dictionary<string, string> EsToEn = BuildReverseMap();

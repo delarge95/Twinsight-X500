@@ -1,0 +1,405 @@
+/* ════════════════════════════════════════════════════════════════
+   TwinSight X500 — PC desktop additions (phase 2A).
+   Loaded at runtime ONLY in Standalone builds by DesktopUIController
+   (the class .desktop-ui is added to the UIDocument root), so WebGL never sees it.
+   Same tokens as Theme.uss: celeste rgb(70,175,255), white 0.65 muted text, pills.
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Minimum pointer target: 44 px (agreed with the web) ── */
+.desktop-ui .hero-info-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+}
+
+.desktop-ui .config-tier-auto {
+    height: 48px;
+    font-size: 14px;
+}
+
+.desktop-ui .config-tier-card {
+    height: 44px;
+    font-size: 13px;
+}
+
+.desktop-ui .config-cycle-btn {
+    min-width: 128px;
+    height: 44px;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.desktop-ui .config-row {
+    min-height: 48px;
+}
+
+.desktop-ui .config-row-label,
+.desktop-ui .config-advanced-section .env-slider-label,
+.desktop-ui .config-section-label {
+    font-size: 13px;
+}
+
+.desktop-ui .about-tool-btn {
+    height: 44px;
+    min-height: 44px;
+    font-size: 13px;
+}
+
+.desktop-ui .onboard-close-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+}
+
+/* Disabled settings row (resolution while in fullscreen) */
+.desktop-ui .config-cycle-btn:disabled {
+    opacity: 0.45;
+}
+
+/* ── Display section inside CONFIG ── */
+.desktop-display-section {
+    width: 100%;
+    max-width: 360px;
+    margin-top: 6px;
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.10);
+    align-self: center;
+}
+
+.desktop-display-section .env-slider-group {
+    width: 100%;
+    align-self: stretch;
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 8px;
+}
+
+.desktop-display-section .env-slider-label {
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.72);
+    white-space: normal;
+    margin-bottom: 4px;
+}
+
+.desktop-display-section .env-slider {
+    width: 100%;
+    flex-grow: 0;
+}
+
+/* ── Floating tooltip (label + key caps) ── */
+.desktop-tooltip {
+    position: absolute;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: rgba(1, 1, 1, 0.94);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.22);
+    border-radius: 12px;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.12s;
+}
+
+.desktop-tooltip--visible {
+    opacity: 1;
+}
+
+.desktop-tooltip-text {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.92);
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* ── Key cap pill (tooltips, help overlay, hint) ── */
+.desktop-keycap {
+    min-width: 28px;
+    height: 28px;
+    margin-left: 6px;
+    padding: 0 10px;
+    border-radius: 14px;
+    border-width: 1px;
+    border-color: rgba(70, 175, 255, 1);
+    background-color: rgba(70, 175, 255, 0.10);
+    color: rgba(70, 175, 255, 1);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+
+.desktop-keycap--first {
+    margin-left: 0;
+}
+
+.desktop-tooltip .desktop-keycap {
+    margin-left: 10px;
+}
+
+.desktop-keycap-sep {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-left: 6px;
+    -unity-text-align: middle-center;
+}
+
+/* ── Shortcut hint pill (bottom-left) ── */
+.desktop-hint {
+    position: absolute;
+    left: 24px;
+    bottom: 24px;
+    height: 44px;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 16px 0 8px;
+    border-radius: 22px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.18);
+    background-color: rgba(0, 0, 0, 0.45);
+    transition-property: border-color, background-color, opacity;
+    transition-duration: 0.18s;
+}
+
+.desktop-hint:hover {
+    border-color: rgba(70, 175, 255, 1);
+    background-color: rgba(70, 175, 255, 0.08);
+}
+
+.desktop-hint--hidden {
+    display: none;
+}
+
+.desktop-hint-text {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.65);
+    -unity-font-style: bold;
+    margin-left: 8px;
+}
+
+.desktop-hint .desktop-keycap {
+    margin-left: 0;
+}
+
+/* ── Help overlay ── */
+.desktop-help {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.80);
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.15s;
+}
+
+.desktop-help--visible {
+    opacity: 1;
+}
+
+.desktop-help--hidden {
+    display: none;
+}
+
+.desktop-help-card {
+    width: 900px;
+    max-width: 94%;
+    max-height: 94%;
+    padding: 22px 36px 18px 36px;
+    background-color: rgba(1, 1, 1, 0.96);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.22);
+    border-radius: 28px;
+}
+
+.desktop-help-title {
+    font-size: 24px;
+    letter-spacing: 4px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 4px;
+}
+
+.desktop-help-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.55);
+    -unity-text-align: middle-center;
+    margin-bottom: 8px;
+}
+
+.desktop-help-columns {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.desktop-help-column {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-left: 12px;
+    margin-right: 12px;
+}
+
+.desktop-help-section {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.55);
+    -unity-font-style: bold;
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+
+.desktop-help-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 34px;
+}
+
+.desktop-help-keys {
+    width: 190px;
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.desktop-help-desc {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: normal;
+    flex-shrink: 1;
+}
+
+.desktop-help-footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.desktop-help-footer-text {
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.55);
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   Compact layout — added by DesktopUIController when the logical
+   window height is under ~900 px (a 1280x720 window).
+   ════════════════════════════════════════════════════════════════ */
+.ui-compact .top-bar {
+    margin-top: 16px;
+}
+
+.ui-compact .actions-row {
+    height: 96px;
+    border-radius: 48px;
+    padding: 0 32px;
+    min-width: 440px;
+}
+
+.ui-compact .mode-btn {
+    width: 112px;
+    height: 80px;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.ui-compact .mode-btn-icon {
+    width: 44px;
+    min-width: 44px;
+    max-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    margin-bottom: 4px;
+}
+
+.ui-compact .mode-btn-label {
+    font-size: 16px;
+}
+
+.ui-compact .submenu-card {
+    width: 120px;
+    height: 104px;
+    margin: 3px;
+}
+
+.ui-compact .submenu-grid {
+    width: 396px;
+}
+
+.ui-compact .submenu-icon {
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    margin-bottom: 4px;
+}
+
+.ui-compact .submenu-label {
+    font-size: 15px;
+}
+
+.ui-compact .submenu-title {
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+.ui-compact .submenu-title--section {
+    margin-top: 8px;
+}
+
+.ui-compact .mode-container {
+    margin-bottom: 4px;
+}
+
+.ui-compact .mode-submenu {
+    padding: 4px 0;
+    margin-bottom: 4px;
+}
+
+.ui-compact .thermal-legend {
+    height: 240px;
+    bottom: 160px;
+}
+
+/* Help overlay — narrow key column (single cap) and compact sizing */
+.desktop-help-column--narrow .desktop-help-keys {
+    width: 56px;
+}
+
+.ui-compact .desktop-help-card {
+    padding: 14px 28px 12px 28px;
+}
+
+.ui-compact .desktop-help-row {
+    min-height: 30px;
+}
+
+.ui-compact .desktop-help-desc {
+    font-size: 15px;
+}
+
+.ui-compact .desktop-help-section {
+    margin-top: 6px;
+}
+
+.ui-compact .desktop-help-footer {
+    margin-top: 10px;
+}

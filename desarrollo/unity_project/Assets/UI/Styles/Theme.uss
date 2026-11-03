@@ -3306,3 +3306,95 @@
     background-color: rgba(64, 158, 255, 0.32);
     border-color: rgba(123, 195, 255, 0.85);
 }
+
+/* ════════════════════════════════════════════════════════════════
+   Fase 2A (UX audit): single "active" state, sub-panel back button,
+   thermal data-source note, onboarding spacer.
+   ════════════════════════════════════════════════════════════════ */
+
+/* AUX-U09 — ONE active state: celeste border + icon + label, NO fill.
+   (A fill is only shown while the card is pressed.) Declared last so it wins
+   over the :hover / :active fills that stuck after a tap. */
+.submenu-card--active,
+.submenu-card--active:hover,
+.ui-light-bg .submenu-card--active,
+.ui-light-bg .submenu-card--active:hover {
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(70, 175, 255, 1);
+}
+
+.submenu-card--active:active,
+.ui-light-bg .submenu-card--active:active {
+    background-color: rgba(70, 175, 255, 0.10);
+    border-color: rgba(70, 175, 255, 1);
+}
+
+.cross-section-config-btn.submenu-card--active,
+.cross-section-config-btn.submenu-card--active:hover,
+.ui-light-bg .cross-section-config-btn.submenu-card--active,
+.ui-light-bg .cross-section-config-btn.submenu-card--active:hover {
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(70, 175, 255, 1);
+}
+
+/* AUX-U10 — back button inside CUT / FILTER sub-panels */
+.submenu-back-btn {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 48px;
+    height: 48px;
+    margin: 0 0 0 -300px;
+    padding: 0;
+    border-radius: 24px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.18);
+    background-color: rgba(0, 0, 0, 0);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    transition-property: border-color, background-color;
+    transition-duration: 0.2s;
+}
+
+.submenu-back-btn:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.submenu-back-btn:active {
+    border-color: rgba(70, 175, 255, 1);
+    background-color: rgba(70, 175, 255, 0.10);
+}
+
+.ui-light-bg .submenu-back-btn {
+    color: rgba(22, 24, 28, 0.84);
+    border-color: rgba(0, 0, 0, 0.24);
+}
+
+/* AUX-U12 — origin of the thermal colours */
+.thermal-source-note {
+    position: absolute;
+    left: auto;
+    right: 0;
+    top: -56px;
+    width: 250px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.18);
+    background-color: rgba(0, 0, 0, 0.55);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 13px;
+    letter-spacing: 0.6px;
+    white-space: normal;
+    -unity-text-align: middle-right;
+}
+
+/* AUX-U07 — onboarding header spacer (replaces the removed prototype banner) */
+.onboard-top-spacer {
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 1px;
+}

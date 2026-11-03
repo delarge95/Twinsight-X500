@@ -573,13 +573,7 @@ namespace WebGL.UI.Panels
             _animationView?.SetPlaying(true);
             HandleAnimationPhaseChanged(0);
 
-            // Prototype badge text
-            if (_prototypeLabel != null)
-            {
-                _prototypeLabel.text = AppLanguageManager.IsSpanish
-                    ? "BOCETO EN CÓDIGO · PROTOTIPO CONCEPTUAL NO DEFINITIVO"
-                    : "CODE PROTOTYPE · CONCEPTUAL DRAFT (NOT FINAL)";
-            }
+            // AUX-U07: the "CODE PROTOTYPE · CONCEPTUAL DRAFT" badge was removed from the UXML.
 
             // Close button tooltip
             if (_closeBtn != null)

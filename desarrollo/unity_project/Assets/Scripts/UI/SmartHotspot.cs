@@ -132,6 +132,13 @@ public class SmartHotspot
             return;
         }
 
+        // Pins must never be drawn over the header (part name, Home / Reset buttons).
+        if (IsOverHeaderMask(rawPos))
+        {
+            Hide();
+            return;
+        }
+
         if (!_hasPreviousPos)
         {
             _smoothedPos = rawPos;
@@ -145,6 +152,29 @@ public class SmartHotspot
         _root.style.left = _smoothedPos.x;
         _root.style.top = _smoothedPos.y;
         Show();
+    }
+
+    /// <summary>
+    /// Panel-space rectangles of the header UI (title label, Home, Reset). Refreshed every frame by
+    /// <see cref="HotspotManager"/>; pins whose 44 px dot would overlap one of them are hidden.
+    /// </summary>
+    public static readonly Rect[] HeaderMaskRects = new Rect[3];
+    public static int HeaderMaskCount;
+    private const float HeaderMaskPadding = 30f; // dot radius (22) + a little air
+
+    private static bool IsOverHeaderMask(Vector2 pinPos)
+    {
+        for (int i = 0; i < HeaderMaskCount; i++)
+        {
+            Rect r = HeaderMaskRects[i];
+            if (pinPos.x > r.xMin - HeaderMaskPadding && pinPos.x < r.xMax + HeaderMaskPadding
+                && pinPos.y > r.yMin - HeaderMaskPadding && pinPos.y < r.yMax + HeaderMaskPadding)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void OnPointerEnter(PointerEnterEvent evt)

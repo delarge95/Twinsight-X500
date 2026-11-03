@@ -151,8 +151,82 @@ namespace WebGL.UI
             _detailsSheet?.ShowInfo();
         }
 
+        // ═══════════════════════════════════════════════════════
+        //  Shortcut / desktop API (U2). Safe on every platform: only the
+        //  desktop controller (UNITY_STANDALONE) calls these.
+        // ═══════════════════════════════════════════════════════
+
+        /// <summary>Overlay (e.g. desktop help) that wants to consume the Esc / back action first.</summary>
+        public static System.Func<bool> OverlayBackHandler;
+
+        public VisualElement Root => root;
+        public bool IsHeroVisible => _heroController != null && !_heroController.HeroDismissed;
+        public bool IsOnboardingOpen => _onboardingController != null && _onboardingController.IsOpen;
+
+        /// <summary>1 = Inspect, 2 = Analyze, 3 = Studio (same 3-state toggle as clicking the mode button).</summary>
+        public void ShortcutToggleMode(int index)
+        {
+            if (IsHeroVisible || IsOnboardingOpen) return;
+            _modeController?.ToggleMode(index);
+        }
+
+        public void ShortcutTogglePins()
+        {
+            if (IsHeroVisible || IsOnboardingOpen) return;
+            _modeController?.ToggleHotspots();
+        }
+
+        public void ShortcutToggleIsolation()
+        {
+            if (IsHeroVisible || IsOnboardingOpen) return;
+            if (!_isIsolated && !HasHotspotIsolationLayer
+                && (SelectionManager.Instance == null || SelectionManager.Instance.CurrentSelection == null))
+            {
+                return;
+            }
+
+            ToggleIsolation();
+        }
+
+        public void ShortcutToggleExplode()
+        {
+            if (IsHeroVisible || IsOnboardingOpen) return;
+            _modeController?.ToggleExplode();
+        }
+
+        public void ShortcutFocusSelection()
+        {
+            if (IsHeroVisible || IsOnboardingOpen) return;
+
+            Transform selection = SelectionManager.Instance != null ? SelectionManager.Instance.CurrentSelection : null;
+            if (selection != null)
+            {
+                OrbitCameraController.Instance?.FocusOnObject(selection);
+            }
+            else
+            {
+                OrbitCameraController.Instance?.ResetView();
+            }
+        }
+
+        public void ShortcutResetView()
+        {
+            if (IsHeroVisible || IsOnboardingOpen) return;
+            OnResetClicked();
+        }
+
+        public void ShortcutBack()
+        {
+            HandleEscapeKey();
+        }
+
         private bool HandleLayeredBackNavigation(bool allowExitFromHeroMain)
         {
+            if (OverlayBackHandler != null && OverlayBackHandler())
+            {
+                return true;
+            }
+
             if (_onboardingController != null && _onboardingController.IsOpen)
             {
                 _onboardingController.Dismiss();
@@ -184,6 +258,17 @@ namespace WebGL.UI
             {
                 return true;
             }
+
+#if UNITY_STANDALONE
+            // Desktop: Esc deselects the current part before it falls back to the hero screen.
+            if (!allowExitFromHeroMain
+                && SelectionManager.Instance != null
+                && SelectionManager.Instance.HasSelection)
+            {
+                SelectionManager.Instance.Deselect();
+                return true;
+            }
+#endif
 
             if (_heroController != null && _heroController.HeroDismissed)
             {
@@ -493,7 +578,16 @@ namespace WebGL.UI
             // Explicitly disable cross-section on reset (one of only two valid triggers)
             CrossSectionManager.Instance?.DisableCrossSection();
 
-            EventBus.Publish(new PartSelectedEvent(null));
+            // AUX-U04: deselect through the SelectionManager so the highlight is cleared too
+            // (publishing the null event alone left the part tinted after Reset).
+            if (SelectionManager.Instance != null)
+            {
+                SelectionManager.Instance.Deselect();
+            }
+            else
+            {
+                EventBus.Publish(new PartSelectedEvent(null));
+            }
         }
 
         private void OnExplosionSliderChanged(ChangeEvent<float> evt)
@@ -638,6 +732,14 @@ namespace WebGL.UI
             }
 
             if (selection.IsChildOf(fullSelection))
+            {
+                return true;
+            }
+
+            // U9: motor_XX / prop_XX son hermanos de arm_XX; su ensamblaje completo es el brazo.
+            ExplodablePart ownerPart = selection.GetComponentInParent<ExplodablePart>();
+            if (ownerPart != null && ownerPart.transform != fullSelection
+                && ResolveAssemblyAnchor(ownerPart.transform) == fullSelection)
             {
                 return true;
             }

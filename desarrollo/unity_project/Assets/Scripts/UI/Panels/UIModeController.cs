@@ -165,6 +165,28 @@ namespace WebGL.UI.Panels
                 DeactivateAllModes();
         }
 
+        /// <summary>Keyboard shortcut entry point: 1 = Inspect, 2 = Analyze, 3 = Studio (same toggle as the button).</summary>
+        public void ToggleMode(int index)
+        {
+            switch (index)
+            {
+                case 1: HandleModeBtnClick(ActiveMode.Tools); break;
+                case 2: HandleModeBtnClick(ActiveMode.Analyze); break;
+                case 3: HandleModeBtnClick(ActiveMode.Studio); break;
+            }
+        }
+
+        /// <summary>Keyboard shortcut entry point: opens Analyze (if needed) and toggles the explosion.</summary>
+        public void ToggleExplode()
+        {
+            if (_activeMode != ActiveMode.Analyze)
+            {
+                ActivateMode(ActiveMode.Analyze);
+            }
+
+            _analyze.ToggleExplodePanel();
+        }
+
         // ═══════════════════════════════════════════════════════
         //  Navigation — Activate / Deactivate
         // ═══════════════════════════════════════════════════════

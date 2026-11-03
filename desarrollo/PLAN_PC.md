@@ -122,3 +122,52 @@ La app está limitada por la CPU (254 renderers y scripts; el Hero sin visor da 
 4. `QualityLevelFixer` y `URPPipelineFixer` (Editor) ignoran los niveles `PC_*`.
 5. Cambios en `ProjectSettings`: `QualitySettings.asset` (niveles nuevos, `Standalone: 4`) y `TagManager.asset` (capa 31 `PCReflectionOnly`).
 6. Build de prueba WebGL: build WebGL de prueba compilada con éxito (~4 min, 0 errores) a `E:\TwinSight_builds\webgl_check\` (nunca a `docs/Build`; `git status` de `docs/` limpio). Al terminar, la plataforma activa del Editor es WebGL y 0 errores de compilación.
+
+## 6. Fase 2A — resultados (2026-11-03, Unity 6000.6.5f1, rama `pc-desktop`)
+
+Alcance: parte funcional de la UI de escritorio (atajos, tooltips, escala/DPI, ventana, selección del motor y arreglos de la auditoría UX/UI). El layout lateral de la ficha (U1) queda para la 2B. No se tocaron los ajustes gráficos de la fase 1 ni la cápsula/tarjetas/pills/celeste/Space Grotesk.
+
+### 6.1 Cómo está hecho (aislamiento de PC)
+Todo lo exclusivo de escritorio vive en `Assets/Scripts/UI/Desktop/` bajo `#if UNITY_STANDALONE` y se crea por código (`DesktopUIController.Bootstrap`, `RuntimeInitializeOnLoadMethod`): la escena y `MainPanelSettings.asset` NO cambian (verificado con `git status`). Sus estilos están en `Assets/Resources/UI/DesktopUI.uss`, que solo se carga en Standalone (clase `.desktop-ui` en la raíz del UIDocument). Archivos: `DesktopUIController` (arranque, atajos, pastilla "?"), `DesktopTooltip`, `DesktopHelpOverlay`, `DesktopDisplayPanel` (sección PANTALLA de CONFIG), `DesktopUIScaler`, `DesktopWindowSettings`, `DesktopCaptureDemo` (solo con `-desk-demo <carpeta>`, para las capturas). El celeste usado es el de `Theme.uss` (`rgb(70,175,255)`), para ser coherente con la UI existente.
+
+### 6.2 Tabla de atajos (U2, solo Standalone; Input Manager antiguo)
+| Tecla | Acción |
+|---|---|
+| `1` / `2` / `3` | INSPECT / ANALYZE / STUDIO (mismo conmutador de 3 estados que el botón; no actúa en el Hero ni con el tutorial abierto) |
+| `F` | Enfocar la selección (sin selección: reset de vista) |
+| `Home` o `R` | Reset de vista (igual que el botón: sale de Explode/Analyze, desactiva el corte y deselecciona) |
+| `H` | Pins (mostrar/ocultar) |
+| `I` | Aislar la selección (alterna) |
+| `E` | Explosión (abre Analyze si hace falta y alterna) |
+| `Esc` | Atrás por capas: ayuda, tutorial, ficha, submenú/modo, **deseleccionar** (nuevo, solo PC), volver al Hero |
+| `F11` o `Alt+Enter` | Ventana / pantalla completa (se desactivó el Alt+Enter nativo de Unity, `allowFullscreenSwitch = 0`, para guardar el estado) |
+| `?` o `F1` | Overlay de ayuda (pills celestes, ES/EN); también se cierra con `Esc` o clic. Botón "?" abajo a la izquierda |
+
+No se disparan con Ctrl/Alt pulsados ni mientras hay foco en un campo de texto (`ITextEdition`); con la ayuda abierta solo funcionan `F11`, `?`, `F1` y `Esc`.
+
+### 6.3 Resultados por punto
+| # | Resultado |
+|---|---|
+| 1 U2 atajos | Hecho. Comprobado en el .exe real (teclas enviadas con SendKeys y trazas `[DesktopUI] shortcut:` en `Player.log`: 1/2/3, ?, F1, Esc cierra la ayuda, E, H, F11 dos veces con cambio a 1920x1080 y vuelta). F, I, Home/R y Esc-deselecciona comprobados en Play llamando a la misma API `UIManager.Shortcut*`. |
+| 2 U3 tooltips/hover | Hecho. UI Toolkit no pinta `tooltip=` en runtime: etiqueta flotante propia (0,4 s de reposo, arriba o abajo según la posición) con el texto del UXML (traducido ES/EN) y un pill con la tecla (por ejemplo "Toggle Hotspots [H]", "Reset Camera [R / Home]"). Los `:hover` de tarjetas, botones de modo y círculos ya existían en `Theme.uss` y se mantienen. |
+| 3 U4 escala/DPI | Hecho. `DesktopUIScaler` sustituye (solo en memoria, se restaura al salir) el "Scale With Screen Size / match 0,5" por una escala constante `clamp(alto/1080 * "Tamaño de interfaz", 0,92, 2,0)`: 1280x720 da 0,92 (lógico 1391x783; antes 0,67), 1920x1080 da 1,0 y 2560x1440 da 1,33. 0,92 es el suelo que mantiene el control más pequeño (48 px) en 44 px o más. Por debajo de 900 px lógicos de alto se añade `.ui-compact` (tarjetas 120x104, cápsula 96 px) para que el panel STUDIO quepa. También 44 px mínimo en CONFIG (tarjetas, botones cíclicos, botón "i", cerrar del tutorial) vía `DesktopUI.uss`. "Tamaño de interfaz" 80-150 % en CONFIG llama a `AccessibilityManager.SetUIScale` (no estaba en la escena: se crea por código en PC; en PC ya no aplica `style.scale`, multiplica la escala del panel). |
+| 3b cápsula cortada | Causa: una ventana con área cliente de 1080 px en un monitor 1080p deja el borde inferior bajo la barra de tareas. `DesktopWindowSettings.FitWindowToWorkArea` encoge el área cliente al área de trabajo (`Screen.mainWindowDisplayInfo.workArea` menos unos 48 px de marco) y centra la ventana (se desactiva con `-desk-nofit`). |
+| 4 U5 ventana | Hecho. `resizableWindow = 1` (ProjectSettings, solo Standalone). Mínimo 1280x720 (el Player de Unity no tiene mínimo nativo: si queda por debajo y se suelta el ratón, vuelve al mínimo a los 0,35 s; limitado por el área de trabajo en pantallas pequeñas). CONFIG > PANTALLA (solo PC): modo ventana o pantalla completa (sin bordes, a resolución nativa; la resolución se deshabilita en pantalla completa), resolución (lista menor o igual al monitor, aplica al tamaño de la ventana), VSYNC y TAMAÑO DE INTERFAZ. Se guarda en PlayerPrefs `Desk_*`; los argumentos `-screen-*` y `-vsync` mandan. En PC el Hero muestra **QUIT/SALIR** (`Application.Quit`) en vez de EXIT, **MODEL/MODELO** en vez de DEVICE, y los textos "WebGL" pasan a "escritorio". |
+| 5 U9 motor | Hecho. Helper `BelongsToFull(raw, full) = raw.IsChildOf(full) \|\| ResolvePrimarySelection(raw) == full` en `SelectionManager` (y equivalente en `UIManager.IsSubSelection` para aislar) más `ResolveDetachedAssemblyPart` (motor_XX es hermano de arm_XX; la hélice ya es hija del brazo). Verificado con `SelectionManager.SimulateClickOn` (mismo código que el clic real): clic en el motor sin selección da **motor solo** (full = brazo, sub = motor); clic en la geometría del brazo con el motor seleccionado da **el brazo**; clic en el brazo da el brazo; fondo vuelve al brazo y luego a nada; clic en el motor de otro brazo selecciona ese motor. |
+| 6 Auditoría | **AUX-U03**: el bloqueo era una lista de nombres (faltaban STUDIO/THERMAL, etc.); ahora `InputManager.IsScreenPositionOverPickableUI` usa `Panel.Pick` (cualquier elemento visible con `picking-mode: Position`) en la ruta de selección y hover. Comprobado: THERMAL, XRAY, EnvPreset, StudioPanel, botones de modo y Home/Reset se detectan; en reposo solo bloquean pins, cápsula y botones (sin falsos positivos). **AUX-U04**: Reset llama a `SelectionManager.Deselect()` (antes solo publicaba el evento y quedaba el resaltado). **AUX-U10**: el cambio de modo conserva la selección (verificado: tras 2/3/1 la selección y el título siguen) y hay botón "<" en los subpaneles CUT y FILTER (Esc también retrocede). **AUX-U09**: estado activo único, borde, icono y texto celestes sin relleno (reglas finales en `Theme.uss`; el relleno solo mientras se pulsa). **AUX-U07**: eliminado el rótulo "CODE PROTOTYPE · CONCEPTUAL DRAFT" (UXML, código y diccionario). **AUX-U12**: leyenda térmica con "DIDACTIC SIMULATION · ILLUSTRATIVE" / "SIMULACIÓN DIDÁCTICA · ILUSTRATIVO". |
+| 7 Pin sobre el título | Hecho. `HotspotManager` calcula cada frame los rectángulos de `TopContextLabel`, `HomeBtn` y `ResetViewBtn`; `SmartHotspot` oculta los pins cuyo círculo (radio 22 más 8) los toque. |
+
+### 6.4 Qué cambia en WebGL al recompilar
+Los arreglos de fallos son de todas las plataformas y cambiarán WebGL: U9 (motor), AUX-U03 (bloqueo de clic por `Panel.Pick`, también mejora el táctil), AUX-U04 (Reset deselecciona), AUX-U10 (botones "<" en CUT/FILTER, `MainLayout.uxml`), AUX-U09 (estado activo, `Theme.uss`), AUX-U07 (sin rótulo CODE PROTOTYPE), AUX-U12 (nota térmica), pin enmascarado bajo la cabecera, nuevas traducciones en `AppLanguageManager` y API pública nueva en `UIManager`/`UIModeController` (inerte). NO cambian en WebGL (solo `#if UNITY_STANDALONE` o recursos que WebGL no usa): atajos, tooltips, escala, ventana/PANTALLA, Salir/Modelo, la regla de Esc que deselecciona, `AccessibilityManager` (en WebGL sigue con `style.scale`), `DesktopUI.uss` (queda en `Resources`, sin usarse), `resizableWindow` y `allowFullscreenSwitch` (ajustes de Standalone). **No se compiló ni publicó WebGL en `docs/`** (hace falta al usuario). Con WebGL activo el proyecto compila con 0 errores.
+
+### 6.5 Verificación, builds y capturas
+- Compilación: 0 errores (Standalone y WebGL). Build Windows x86_64 Mono: `E:\TwinSight_builds\pc_fase2a\TwinSightX500.exe`.
+- Capturas generadas por el propio .exe con `-desk-demo` (no dependen del monitor): `docs/unity_pc/capturas_fase2a/` (por resolución: cápsula completa, tooltip con atajo, STUDIO, ayuda, motor seleccionado solo y CONFIG con PANTALLA). 1280x720 en ventana; "1920x1080" en ventana, que el ajuste al área de trabajo deja en 1904x984 (cápsula completa, escala 0,92); y 2560x1440 NO se pudo obtener en este monitor 1080p: con `-screen-width 2560 -screen-height 1440 -desk-nofit` Windows limita el ancho a 1920, así que la captura es 1920x1440 (escala 1,333 como en 2560x1440, aunque con 1440x1080 lógicos en vez de 1920x1080). Pantalla completa forzada a 2560x1440 tampoco es posible con este monitor.
+- `MainPanelSettings.asset` no queda modificado en disco.
+
+### 6.6 Pendiente / no verificado
+- Clic real con ratón (hover, arrastre del borde de la ventana hasta el mínimo 1280x720) no se automatizó: lógica verificada por código y Play; el mínimo por sondeo puede parpadear al arrastrar.
+- Las capturas por `CopyFromScreen` (SendKeys) salían desfasadas; las definitivas son las del propio juego (`ReadPixels`).
+- Tarjetas RENDER MODE/ENVIRONMENT sin icono (2ª parte de AUX-U09) y color del título "SELECT A PART": sin tocar.
+- Escala de Windows (125/150 %) no probada; la escala depende de la altura del área cliente.
+- U1 (ficha lateral), U6 (cámara), U7 (hero/onboarding de escritorio), U8 y U10 siguen pendientes (2B y siguientes).

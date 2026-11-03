@@ -406,8 +406,88 @@ namespace WebGL.Core.Managers
             return true;
         }
 
+        /// <summary>
+        /// AUX-U03: generic hit-test. True when the topmost visible UI Toolkit element under the
+        /// pointer is pickable (picking-mode Position). The old named-control whitelist missed cards
+        /// such as THERMAL / STUDIO panels, so a click on them leaked through and selected the part
+        /// behind. Debug helper: <see cref="DescribePickAt"/>.
+        /// </summary>
+        public bool IsScreenPositionOverPickableUI(Vector2 screenPos)
+        {
+            return TryPickUIAtScreenPosition(screenPos, out _);
+        }
+
+        /// <summary>Name/classes of the pickable element under a screen position (debug), or null.</summary>
+        public string DescribePickAt(Vector2 screenPos)
+        {
+            if (!TryPickUIAtScreenPosition(screenPos, out VisualElement picked)) return null;
+            return picked.name + "." + string.Join(".", picked.GetClasses());
+        }
+
+        private bool TryPickUIAtScreenPosition(Vector2 screenPos, out VisualElement blocking)
+        {
+            blocking = null;
+            CacheUIDocumentIfNeeded();
+            if (_uiPanel == null || _mainUIDocument?.rootVisualElement == null || !IsFinite(screenPos))
+            {
+                return false;
+            }
+
+            // RuntimePanelUtils.ScreenToPanel expects a top-left origin screen position.
+            Vector2 panelPos = RuntimePanelUtils.ScreenToPanel(_uiPanel, MirrorScreenY(screenPos));
+            if (!IsFinite(panelPos))
+            {
+                return false;
+            }
+
+            VisualElement picked;
+            try
+            {
+                picked = _uiPanel.Pick(panelPos);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            if (picked == null)
+            {
+                return false;
+            }
+
+            VisualElement root = _mainUIDocument.rootVisualElement;
+            if (picked == root || picked == root.parent)
+            {
+                return false;
+            }
+
+            // Skip hidden chains (display none, visibility hidden, hidden-peek classes).
+            for (VisualElement current = picked; current != null; current = current.parent)
+            {
+                if (current.resolvedStyle.display == DisplayStyle.None
+                    || current.resolvedStyle.visibility == Visibility.Hidden
+                    || current.ClassListContains("info-bar-peek--hidden")
+                    || current.ClassListContains("info-bar-peek--sheet-open")
+                    || current.ClassListContains("selection-label--hidden")
+                    || current.ClassListContains("details-sheet--hidden")
+                    || current.ClassListContains("fab-button--hidden")
+                    || current.ClassListContains("hotspot-dot--hidden"))
+                {
+                    return false;
+                }
+            }
+
+            blocking = picked;
+            return true;
+        }
+
         private bool IsScreenPositionOverSelectionBlockingUIRaw(Vector2 screenPos)
         {
+            if (IsScreenPositionOverPickableUI(screenPos))
+            {
+                return true;
+            }
+
             if (!TryGetPanelPositionCandidates(screenPos, out Vector2 rawPanelPos, out bool hasRaw, out Vector2 mirroredPanelPos, out bool hasMirrored))
             {
                 return false;

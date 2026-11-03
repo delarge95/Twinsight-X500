@@ -412,6 +412,56 @@ namespace WebGL.UI.Panels
             {
                 exploreBtn.text = spanish ? "ABRIR VISOR" : "OPEN VIEWER";
             }
+
+#if UNITY_STANDALONE
+            ApplyDesktopTexts(spanish);
+#endif
         }
+
+#if UNITY_STANDALONE
+        /// <summary>
+        /// PC (U5 / AUX-U11): on the desktop EXIT really closes the app, so it is called QUIT/SALIR,
+        /// and DEVICE is renamed to what it opens (the drone model list).
+        /// </summary>
+        private void ApplyDesktopTexts(bool spanish)
+        {
+            var deviceBtn = _root.Q<Button>("HeroDeviceBtn");
+            if (deviceBtn != null) deviceBtn.text = spanish ? "MODELO" : "MODEL";
+
+            var exitBtn = _root.Q<Button>("HeroExitBtn");
+            if (exitBtn != null) exitBtn.text = spanish ? "SALIR" : "QUIT";
+
+            var subtitle = _root.Q<Label>("HeroSubtitle");
+            if (subtitle != null)
+            {
+                subtitle.text = spanish ? "Visor de escritorio visual-semántico" : "Visual-semantic desktop viewer";
+            }
+
+            Label devicesTitle = _submenuDevices?.Q<Label>(className: "hero-title");
+            if (devicesTitle != null) devicesTitle.text = spanish ? "Modelo del dron" : "Drone model";
+
+            Label exitTitle = _submenuExit?.Q<Label>(className: "hero-title");
+            if (exitTitle != null) exitTitle.text = spanish ? "Salir de TwinSight X500" : "Quit TwinSight X500";
+
+            Label exitDesc = _submenuExit?.Q<Label>(className: "about-desc");
+            if (exitDesc != null)
+            {
+                exitDesc.text = spanish
+                    ? "¿Cerrar TwinSight X500 y volver al escritorio?"
+                    : "Close TwinSight X500 and return to the desktop?";
+            }
+
+            var exitConfirm = _root.Q<Button>("ExitConfirmBtn");
+            if (exitConfirm != null) exitConfirm.text = spanish ? "CERRAR LA APP" : "QUIT APP";
+
+            Label aboutDesc = _submenuAbout?.Q<Label>(className: "about-desc");
+            if (aboutDesc != null)
+            {
+                aboutDesc.text = spanish
+                    ? "TwinSight X500 es un visor técnico 3D interactivo para el prototipo de tesis Holybro X500 V2. Versión de escritorio para Windows, hecha con Unity."
+                    : "TwinSight X500 is an interactive 3D technical viewer for the Holybro X500 V2 thesis prototype. Windows desktop build, made with Unity.";
+            }
+        }
+#endif
     }
 }

@@ -357,6 +357,22 @@ namespace WebGL.Core.Managers
             _lastClickedFullTransform = clickedFull;
             _lastClickedData = clickedData;
 
+            ApplyClickSelection();
+        }
+
+        /// <summary>
+        /// Test / automation hook: behaves like a single left click whose raycast hit
+        /// <paramref name="rawHit"/> (null = background), without touching the real mouse state.
+        /// </summary>
+        public void SimulateClickOn(Transform rawHit)
+        {
+            hoveredRawTransform = rawHit;
+            hoveredObject = rawHit != null ? ResolveSelectableTransform(rawHit) : null;
+            ApplyClickSelection();
+        }
+
+        private void ApplyClickSelection()
+        {
             // ── Normal selection logic ──
             if (hoveredObject == null)
             {
@@ -395,10 +411,19 @@ namespace WebGL.Core.Managers
 
             Transform clickedRaw = hoveredObject;
             Transform clickedFullSelection = ResolvePrimarySelection(hoveredRawTransform != null ? hoveredRawTransform : hoveredObject);
+
+            // U9: motor_XX / prop_XX son hermanos de arm_XX (no hijos). Si el clic cae en uno de
+            // ellos, la pieza que se selecciona es el propio motor (sub-seleccion del brazo).
+            Transform clickedAssembly = ResolveDetachedAssemblyPart(clickedRaw);
+            if (clickedAssembly != null)
+            {
+                clickedRaw = clickedAssembly;
+            }
+
             bool clickedIsSubSelection = clickedRaw != null
                 && clickedFullSelection != null
                 && clickedRaw != clickedFullSelection
-                && clickedRaw.IsChildOf(clickedFullSelection);
+                && BelongsToFull(clickedRaw, clickedFullSelection);
             FastenerRuntimeMarker clickedFastenerMarker = ResolveFastenerMarker(clickedRaw);
             bool clickedIsFastener = IsValidFastenerMarker(clickedFastenerMarker);
             Transform clickedFastenerRoot = clickedIsFastener ? ResolveFastenerSelectionRoot(clickedRaw) : null;
@@ -434,6 +459,13 @@ namespace WebGL.Core.Managers
                 if (clickedIsFastener && clickedFastenerParent != null)
                 {
                     SelectObject(clickedFastenerParent);
+                    return;
+                }
+
+                // U9: el motor (hermano del brazo) se selecciona solo, sin pasar por el brazo.
+                if (clickedAssembly != null)
+                {
+                    SelectObject(clickedAssembly);
                     return;
                 }
 
@@ -490,6 +522,14 @@ namespace WebGL.Core.Managers
                         return;
                     }
 
+                    // U9: with the motor selected (a sibling of the arm, not one of its sub-parts),
+                    // a click on the arm's own geometry selects the arm, not one of its pieces.
+                    if (clickedAssembly == null && ResolveDetachedAssemblyPart(currentSubSelection) != null)
+                    {
+                        SelectObject(currentFullSelection);
+                        return;
+                    }
+
                     SelectObject(clickedRaw);
                     return;
                 }
@@ -499,7 +539,14 @@ namespace WebGL.Core.Managers
                 return;
             }
 
-            // Clicked another parent branch: start over with that full parent selection.
+            // Clicked another parent branch: start over with that full parent selection
+            // (U9: el motor de otro brazo se selecciona solo).
+            if (clickedAssembly != null)
+            {
+                SelectObject(clickedAssembly);
+                return;
+            }
+
             SelectObject(clickedFullSelection != null ? clickedFullSelection : clickedRaw);
         }
 
@@ -1053,6 +1100,56 @@ namespace WebGL.Core.Managers
             }
 
             return selection;
+        }
+
+        /// <summary>
+        /// U9: true si <paramref name="raw"/> cuelga de <paramref name="full"/> o si la pieza completa a la
+        /// que se resuelve (motor_/prop_ -> arm_) es <paramref name="full"/> aunque sea su hermano.
+        /// </summary>
+        private static bool BelongsToFull(Transform raw, Transform full)
+        {
+            if (raw == null || full == null)
+            {
+                return false;
+            }
+
+            return raw.IsChildOf(full) || ResolvePrimarySelection(raw) == full;
+        }
+
+        /// <summary>
+        /// U9: si <paramref name="raw"/> pertenece a un motor_XX / prop_XX (anchors hermanos del brazo),
+        /// devuelve la raiz de ese anchor; en otro caso null.
+        /// </summary>
+        private static Transform ResolveDetachedAssemblyPart(Transform raw)
+        {
+            if (raw == null)
+            {
+                return null;
+            }
+
+            ExplodablePart owner = raw.GetComponent<ExplodablePart>();
+            if (owner == null)
+            {
+                owner = raw.GetComponentInParent<ExplodablePart>();
+            }
+
+            if (owner == null)
+            {
+                return null;
+            }
+
+            Transform ownerTransform = owner.transform;
+            string id = ownerTransform.name;
+            bool isAnchor = id.StartsWith("x500v2_motor_", System.StringComparison.OrdinalIgnoreCase)
+                || id.StartsWith("x500v2_prop_", System.StringComparison.OrdinalIgnoreCase);
+            if (!isAnchor)
+            {
+                return null;
+            }
+
+            // Only anchors that are NOT already a child of their arm (props are children: IsChildOf covers them).
+            Transform full = ResolvePrimarySelection(ownerTransform);
+            return full != null && full != ownerTransform && !ownerTransform.IsChildOf(full) ? ownerTransform : null;
         }
 
         private static Transform ResolvePrimarySelection(Transform rawTransform)

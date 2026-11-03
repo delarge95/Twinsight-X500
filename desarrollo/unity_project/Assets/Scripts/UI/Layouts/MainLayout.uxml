@@ -144,6 +144,8 @@
             <ui:Label name="ThermalMaxTemp" text="100°C" class="thermal-legend-label" picking-mode="Ignore" />
             <ui:VisualElement name="ThermalLegendGradient" class="thermal-legend-gradient" picking-mode="Ignore" />
             <ui:Label name="ThermalMinTemp" text="20°C" class="thermal-legend-label" picking-mode="Ignore" />
+            <!-- AUX-U12: the thermal view is a teaching simulation, not a measurement -->
+            <ui:Label name="ThermalSourceNote" text="DIDACTIC SIMULATION · ILLUSTRATIVE" class="thermal-source-note" picking-mode="Ignore" />
         </ui:VisualElement>
 
         <!-- ═══════════════════════════════════════════════
@@ -216,6 +218,7 @@
 
                 <!-- Level 2a — Cross-Section Panel -->
                 <ui:VisualElement name="CrossSectionPanel" class="mode-submenu cross-section-panel submenu--hidden" picking-mode="Position">
+                    <ui:Button name="CrossSectionBackBtn" class="submenu-back-btn" text="&lt;" tooltip="Back" />
                     <ui:Label text="CROSS SECTION" class="submenu-title" picking-mode="Ignore" />
                     <ui:VisualElement class="cross-section-control-row" picking-mode="Position">
                         <ui:VisualElement class="cross-section-axis-group" picking-mode="Position">
@@ -257,6 +260,7 @@
 
                 <!-- Level 2c — Filter Sub-Panel -->
                 <ui:VisualElement name="FilterSubPanel" class="mode-submenu submenu--hidden" picking-mode="Position">
+                    <ui:Button name="FilterBackBtn" class="submenu-back-btn" text="&lt;" tooltip="Back" />
                     <ui:Label text="FILTER CATEGORY" class="submenu-title" picking-mode="Ignore"/>
                     <ui:VisualElement class="submenu-grid">
                         <ui:Button name="CatBtn_Structure" class="submenu-card">
@@ -530,10 +534,9 @@
                     </ui:VisualElement>
                 </ui:Button>
 
-                <!-- Prototype disclaimer badge (center) -->
-                <ui:VisualElement name="OnboardPrototypeBanner" class="onboard-prototype-banner" picking-mode="Ignore">
-                    <ui:Label name="OnboardPrototypeLabel" text="BOCETO EN CÓDIGO · PROTOTIPO NO DEFINITIVO" class="onboard-prototype-text" picking-mode="Ignore" />
-                </ui:VisualElement>
+                <!-- AUX-U07: "CODE PROTOTYPE · CONCEPTUAL DRAFT" banner removed from the public build.
+                     This spacer keeps the switch left and the close button right. -->
+                <ui:VisualElement class="onboard-top-spacer" picking-mode="Ignore" />
 
                 <!-- Close Button (right) -->
                 <ui:Button name="OnboardCloseBtn" class="onboard-close-btn" tooltip="Close">

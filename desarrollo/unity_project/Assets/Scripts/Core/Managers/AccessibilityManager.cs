@@ -19,6 +19,11 @@ namespace WebGL.Core.Managers
         private bool reducedMotion = false;
 
         public float UIScale => currentUIScale;
+        public float MinUIScale => minUIScale;
+        public float MaxUIScale => maxUIScale;
+
+        /// <summary>Raised whenever the "UI size" multiplier changes (PC scaler listens to it).</summary>
+        public event System.Action<float> OnUIScaleChanged;
         public bool HighContrastMode => highContrastMode;
         public bool ReducedMotion => reducedMotion;
 
@@ -76,8 +81,14 @@ namespace WebGL.Core.Managers
 
             var root = uiDocument.rootVisualElement;
 
+#if UNITY_STANDALONE
+            // PC (U4): the UI size multiplies the PanelSettings scale (see DesktopUIScaler), which keeps
+            // hit-testing and layout exact. A visual scale transform on the root would not.
+            OnUIScaleChanged?.Invoke(currentUIScale);
+#else
             // Apply UI Scale
             root.style.scale = new StyleScale(new Scale(new Vector3(currentUIScale, currentUIScale, 1f)));
+#endif
 
             // Apply High Contrast Mode
             if (highContrastMode)

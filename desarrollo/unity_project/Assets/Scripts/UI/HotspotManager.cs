@@ -369,9 +369,39 @@ public class HotspotManager : Singleton<HotspotManager>
         EventBus.Subscribe<HotspotGroupVisualsClearRequestedEvent>(HandleHotspotGroupVisualsClearRequested);
     }
 
+    private VisualElement[] _headerMaskElements;
+
+    private void RefreshHeaderMask()
+    {
+        if (_headerMaskElements == null)
+        {
+            _headerMaskElements = new[]
+            {
+                _root.Q<VisualElement>("TopContextLabel"),
+                _root.Q<VisualElement>("HomeBtn"),
+                _root.Q<VisualElement>("ResetViewBtn")
+            };
+        }
+
+        int count = 0;
+        for (int i = 0; i < _headerMaskElements.Length; i++)
+        {
+            VisualElement e = _headerMaskElements[i];
+            if (e == null) continue;
+
+            Rect wb = e.worldBound;
+            if (float.IsNaN(wb.width) || wb.width <= 0f || wb.height <= 0f) continue;
+            SmartHotspot.HeaderMaskRects[count++] = wb;
+        }
+
+        SmartHotspot.HeaderMaskCount = count;
+    }
+
     private void LateUpdate()
     {
         if (_container == null) return;
+
+        if (_root != null) RefreshHeaderMask();
 
         foreach (var hotspot in _activeHotspots)
         {

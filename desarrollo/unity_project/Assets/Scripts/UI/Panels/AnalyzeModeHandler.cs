@@ -79,6 +79,17 @@ namespace WebGL.UI.Panels
                 _filterBtn.clicked += onFilter;
                 AddCleanup(() => _filterBtn.clicked -= onFilter);
             }
+
+            // AUX-U10: explicit "back" button in the CUT and FILTER sub-panels.
+            foreach (string backName in new[] { "CrossSectionBackBtn", "FilterBackBtn" })
+            {
+                Button back = Container?.Q<Button>(backName);
+                if (back == null) continue;
+
+                Action onBack = () => NavigateToCardGrid();
+                back.clicked += onBack;
+                AddCleanup(() => back.clicked -= onBack);
+            }
         }
 
         public override void Activate()
