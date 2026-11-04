@@ -596,3 +596,189 @@
 .layout--desktop .details-sheet .data-label {
     color: rgba(255, 255, 255, 0.55);
 }
+
+/* ════════════════════════════════════════════════════════════════
+   Phase 3B — part tree (left docked panel, symmetric to the details panel) and its pill.
+   ════════════════════════════════════════════════════════════════ */
+.desktop-treepill {
+    left: 214px;
+}
+
+.desktop-treepill--active {
+    left: 24px;
+    border-color: rgba(70, 175, 255, 1);
+    background-color: rgba(70, 175, 255, 0.10);
+}
+
+.desktop-tree {
+    position: absolute;
+    left: 16px;
+    top: 112px;
+    bottom: 84px;
+    width: 340px;
+    padding: 16px 8px 12px 16px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.14);
+    border-radius: 24px;
+    background-color: rgba(5, 7, 11, 0.98);
+    transition-property: translate, opacity;
+    transition-duration: 0.3s, 0.25s;
+    transition-timing-function: ease-out, ease-out;
+}
+
+.desktop-tree--hidden {
+    display: none;
+}
+
+.desktop-tree-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 8px;
+    margin-bottom: 10px;
+}
+
+.desktop-tree-title {
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: rgb(255, 255, 255);
+    -unity-font-style: bold;
+}
+
+.desktop-tree-close {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+}
+
+.desktop-tree-close:hover {
+    border-color: rgba(70, 175, 255, 1);
+    color: rgba(70, 175, 255, 1);
+}
+
+.desktop-tree-searchbox {
+    margin-right: 8px;
+    margin-bottom: 6px;
+    height: 44px;
+}
+
+.desktop-tree .desktop-tree-search {
+    margin: 0;
+    height: 44px;
+}
+
+.desktop-tree .desktop-tree-search > .unity-base-text-field__input {
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 22px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.18);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    -unity-text-align: middle-left;
+}
+
+.desktop-tree .desktop-tree-search:focus > .unity-base-text-field__input {
+    border-color: rgba(70, 175, 255, 1);
+    background-color: rgba(70, 175, 255, 0.08);
+}
+
+.desktop-tree-placeholder {
+    position: absolute;
+    left: 18px;
+    top: 0;
+    bottom: 0;
+    -unity-text-align: middle-left;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.40);
+}
+
+.desktop-tree-placeholder--focus {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.desktop-tree-count {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+    margin: 4px 8px 8px 6px;
+    letter-spacing: 0.5px;
+}
+
+.desktop-tree-scroll {
+    flex-grow: 1;
+    padding-right: 4px;
+}
+
+.desktop-tree-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 36px;
+    margin: 0 0 1px 0;
+    padding: 4px 8px 4px 10px;
+    border-width: 0;
+    border-left-width: 2px;
+    border-color: rgba(0, 0, 0, 0);
+    border-radius: 10px;
+    background-color: transparent;
+    -unity-text-align: middle-left;
+}
+
+.desktop-tree-row:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+.desktop-tree-row--cursor {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+.desktop-tree-row--selected {
+    border-color: rgba(70, 175, 255, 1);
+    background-color: rgba(70, 175, 255, 0.12);
+}
+
+.desktop-tree-row--category {
+    margin-top: 6px;
+}
+
+.desktop-tree-row--category .desktop-tree-rowtitle {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.5);
+    -unity-font-style: bold;
+}
+
+.desktop-tree-rowtitle {
+    flex-shrink: 1;
+    flex-grow: 1;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.88);
+    white-space: normal;
+    -unity-text-align: middle-left;
+}
+
+.desktop-tree-row--selected .desktop-tree-rowtitle {
+    color: rgba(70, 175, 255, 1);
+}
+
+.desktop-tree-row--match .desktop-tree-rowtitle {
+    color: rgb(255, 255, 255);
+}
+
+.desktop-tree-chevron {
+    width: 16px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    -unity-text-align: middle-center;
+}
+
+.desktop-tree-row--group .desktop-tree-rowtitle {
+    color: rgba(255, 255, 255, 0.62);
+}

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: PC_XRay
+  m_Shader: {fileID: 4800000, guid: 10e3b67c2343e3144b3904cd4da4af63, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _BehindIntensity: 0.5
+    - _FresnelIntensity: 1
+    - _FresnelPower: 2.2
+    - _InnerAlpha: 0.1
+    - _Intensity: 0.75
+    - _OuterAlpha: 0.8
+    m_Colors:
+    - _BaseColor: {r: 0.29999998, g: 0.7, b: 1, a: 0.3}
+    - _BehindColor: {r: 0.19999996, g: 0.5, b: 0.8, a: 0.5}
+    - _RimColor: {r: 0.5, g: 0.8, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

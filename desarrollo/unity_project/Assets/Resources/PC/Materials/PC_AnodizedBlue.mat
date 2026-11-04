@@ -62,8 +62,10 @@ Material:
     - _AlbedoBumpScale: 0
     - _AlbedoBumpSpec: 0
     - _AlbedoBumpStep: 1
+    - _AlbedoMax: 1
     - _AnisoShininess: 90
     - _AnisoStrength: 0
+    - _BumpFilter: 0.6
     - _BumpScale: 0.6
     - _ClearCoat: 0
     - _ClearCoatSmoothness: 0
@@ -73,6 +75,7 @@ Material:
     - _CurvatureStrength: 0.18
     - _DetailNormalScale: 0.15
     - _DetailTiling: 14
+    - _FinalDark: 1
     - _HighlightIntensity: 0
     - _HighlightRimPower: 2.5
     - _Metallic: 0.85
@@ -80,6 +83,9 @@ Material:
     - _RoughnessMapScale: 1
     - _RoughnessMapStrength: 0.25
     - _Smoothness: 0.58
+    - _SmoothnessMax: 1
+    - _SpecAA: 0
+    - _SpecDark: 1
     - _TranslucencyPower: 2
     - _TranslucencyStrength: 0.4
     - _UseAlbedoBump: 0

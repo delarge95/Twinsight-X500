@@ -34,6 +34,7 @@ namespace WebGL.UI.Desktop
         private DesktopHelpOverlay _help;
         private DesktopDisplayPanel _display;
         private DesktopSidePanel _sidePanel;
+        private DesktopPartTree _tree;
         private VisualElement _hint;
         private VisualElement _bottomSheet;
         private bool _ready;
@@ -51,6 +52,7 @@ namespace WebGL.UI.Desktop
         }
         internal DesktopTooltip Tooltip => _tooltip;
         internal DesktopSidePanel SidePanel => _sidePanel;
+        internal DesktopPartTree Tree => _tree;
         internal DesktopHelpOverlay Help => _help;
         internal DesktopUIScaler Scaler => _scaler;
 
@@ -68,6 +70,23 @@ namespace WebGL.UI.Desktop
         {
             Instance = this;
             DesktopWindowSettings.ReadCommandLine();
+            ApplyLangArgument();
+        }
+
+        // "-lang es|en" (phase 3B): same language switch as the ES/EN button, for deep links and demos.
+        private static void ApplyLangArgument()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            for (int i = 1; i < args.Length - 1; i++)
+            {
+                if (!args[i].Equals("-lang", StringComparison.OrdinalIgnoreCase)) continue;
+                string code = args[i + 1].Trim().ToLowerInvariant();
+                if (code == "es" || code == "en")
+                {
+                    AppLanguageManager.SetLanguage(code);
+                    Debug.Log("[DesktopUI] -lang " + code);
+                }
+            }
         }
 
         private void Start()
@@ -96,6 +115,7 @@ namespace WebGL.UI.Desktop
             _help?.Dispose();
             _display?.Dispose();
             _sidePanel?.Dispose();
+            _tree?.Dispose();
             _hint?.RemoveFromHierarchy();
             _scaler?.Restore();
         }
@@ -150,6 +170,8 @@ namespace WebGL.UI.Desktop
             _scaler.Tick();
 
             _sidePanel = new DesktopSidePanel(_root);
+            _tree = new DesktopPartTree(_root);
+            _sidePanel.Tree = _tree;
             _display = new DesktopDisplayPanel(_root);
             _help = new DesktopHelpOverlay(_root);
             BuildHint();
@@ -161,6 +183,12 @@ namespace WebGL.UI.Desktop
                 {
                     Log("Esc -> help closed");
                     _help.Close();
+                    return true;
+                }
+
+                if (_tree != null && _tree.IsOpen && _tree.HandleBack())
+                {
+                    Log("Esc -> part tree");
                     return true;
                 }
 
@@ -203,6 +231,7 @@ namespace WebGL.UI.Desktop
 
             _scaler.Tick();
             _sidePanel.Tick();
+            _tree.Tick();
             DesktopWindowSettings.TickMinimumSize();
 
             if (Screen.width != _lastScreenW || Screen.height != _lastScreenH)
@@ -222,7 +251,9 @@ namespace WebGL.UI.Desktop
 
             bool sheetOpen = _bottomSheet != null && !_bottomSheet.ClassListContains("details-sheet--hidden");
             bool hide = _ui.IsHeroVisible || _ui.IsOnboardingOpen || sheetOpen || IsHelpOpen;
-            _hint.EnableInClassList("desktop-hint--hidden", hide);
+            _hint.EnableInClassList("desktop-hint--hidden", hide || (_tree != null && _tree.IsOpen));
+            _tree?.SetPillHidden(_ui.IsHeroVisible || _ui.IsOnboardingOpen || IsHelpOpen);
+            if (_tree != null && _tree.IsOpen && (_ui.IsHeroVisible || _ui.IsOnboardingOpen)) _tree.SetOpen(false);
 
             // The tutorial is a full card: the viewer UI behind it (capsule, header) only adds noise.
             _root.EnableInClassList("desktop-tutorial-open", _ui.IsOnboardingOpen);
@@ -262,8 +293,21 @@ namespace WebGL.UI.Desktop
                 return;
             }
 
+            bool treeAllowed = !_ui.IsHeroVisible && !_ui.IsOnboardingOpen && !_help.IsOpen;
+            if (treeAllowed && ctrl && Input.GetKeyDown(KeyCode.F))
+            {
+                Log("Ctrl+F -> part tree + search"); _tree.Open(true);
+                return;
+            }
+
             if (IsTypingInTextField())
             {
+                return;
+            }
+
+            if (treeAllowed && !alt && !ctrl && Input.inputString != null && Input.inputString.IndexOf('/') >= 0)
+            {
+                Log("/ -> part tree + search"); _tree.Open(true);
                 return;
             }
 
@@ -300,6 +344,13 @@ namespace WebGL.UI.Desktop
                 if (args[i].Equals("-desk-matshots", StringComparison.OrdinalIgnoreCase))
                 {
                     PCMaterialShots.TryAttach(gameObject);
+                    return;
+                }
+
+                if (args[i].Equals("-desk-demo3b", StringComparison.OrdinalIgnoreCase))
+                {
+                    var demo3b = gameObject.AddComponent<DesktopCaptureDemo3B>();
+                    demo3b.OutputDirectory = args[i + 1];
                     return;
                 }
 

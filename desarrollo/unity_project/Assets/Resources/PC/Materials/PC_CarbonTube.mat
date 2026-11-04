@@ -63,24 +63,30 @@ Material:
     - _AlbedoBumpScale: 2
     - _AlbedoBumpSpec: 0.3
     - _AlbedoBumpStep: 1.5
+    - _AlbedoMax: 0.045
     - _AnisoShininess: 150
-    - _AnisoStrength: 0.18
+    - _AnisoStrength: 0.07
+    - _BumpFilter: 0.6
     - _BumpScale: 0.35
-    - _ClearCoat: 1
-    - _ClearCoatSmoothness: 0.72
+    - _ClearCoat: 0.85
+    - _ClearCoatSmoothness: 0.62
     - _ClipEdgeWidth: 0.01
     - _ClipEnabled: 0
     - _CurvatureCavityStrength: 0.2
     - _CurvatureStrength: 0.068
     - _DetailNormalScale: 0.35
     - _DetailTiling: 22
+    - _FinalDark: 0.75
     - _HighlightIntensity: 0
     - _HighlightRimPower: 2.5
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _RoughnessMapScale: 1
     - _RoughnessMapStrength: 1
-    - _Smoothness: 0.4
+    - _Smoothness: 0.3
+    - _SmoothnessMax: 0.45
+    - _SpecAA: 2
+    - _SpecDark: 0.45
     - _TranslucencyPower: 2
     - _TranslucencyStrength: 0.4
     - _UseAlbedoBump: 1

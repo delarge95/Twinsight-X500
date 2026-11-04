@@ -31,6 +31,8 @@ namespace WebGL.UI.Desktop
         private readonly VisualElement _thermal;
 
         private bool _open;
+        private float _leftShift = -1f;
+        internal DesktopPartTree Tree;
         private float _width = -1f;
         private float _lastRootWidth = -1f;
 
@@ -54,7 +56,7 @@ namespace WebGL.UI.Desktop
             _root.RemoveFromClassList("layout--desktop");
             _root.RemoveFromClassList("layout--panel-open");
             if (_sheet != null) _sheet.style.width = StyleKeyword.Null;
-            if (_bar != null) _bar.style.right = StyleKeyword.Null;
+            if (_bar != null) { _bar.style.right = StyleKeyword.Null; _bar.style.left = StyleKeyword.Null; }
             if (_thermal != null) _thermal.style.right = StyleKeyword.Null;
             OrbitCameraController.Instance?.SetDesktopViewShiftX(0f);
         }
@@ -96,6 +98,17 @@ namespace WebGL.UI.Desktop
 
             // The camera can appear after the UI: keep it informed every frame (cheap).
             OrbitCameraController.Instance?.SetDesktopViewShiftX(OccupiedWidth / (2f * logicalWidth));
+
+            // Left docked part tree (phase 3B): the capsule keeps centred in the free area.
+            float left = Tree != null ? Tree.OccupiedWidth : 0f;
+            if (!Mathf.Approximately(left, _leftShift))
+            {
+                _leftShift = left;
+                if (_bar != null)
+                {
+                    if (left > 0f) _bar.style.left = left; else _bar.style.left = StyleKeyword.Null;
+                }
+            }
 
             if (!changed)
             {

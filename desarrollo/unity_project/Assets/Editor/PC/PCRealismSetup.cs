@@ -35,6 +35,7 @@ namespace WebGL.Editor.PC
             BuildSkyMaterial();
             BuildMaterials();
             BuildSsao();
+            BuildViewModeMaterials();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("[PCRealismSetup] Listo: HDRI, trenzado, skybox, materiales PC y SSAO.");
@@ -163,6 +164,21 @@ namespace WebGL.Editor.PC
             imp.SaveAndReimport();
         }
 
+        // Fase 3B (G11): materiales de modos de vista de PC (ViewModeManager los carga de Resources/PC/Materials).
+        private static void BuildViewModeMaterials()
+        {
+            foreach (var pair in new[] { ("PC_XRay", "TwinSight/XRayPC"), ("PC_Wireframe", "TwinSight/WireframePC") })
+            {
+                string path = MatFolder + "/" + pair.Item1 + ".mat";
+                Shader sh = Shader.Find(pair.Item2);
+                if (sh == null) { Debug.LogWarning("[PCRealismSetup] Falta el shader " + pair.Item2); continue; }
+                var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat == null) { mat = new Material(sh); AssetDatabase.CreateAsset(mat, path); }
+                else mat.shader = sh;
+                EditorUtility.SetDirty(mat);
+            }
+        }
+
         private static void BuildSkyMaterial()
         {
             var cube = AssetDatabase.LoadAssetAtPath<Cubemap>(HdriPath);
@@ -193,6 +209,7 @@ namespace WebGL.Editor.PC
             public bool hex;                   // tornilleria: Hex_AO / Hex_Normal_Atlas (UV propia de la cabeza)
             public float curvEdge, curvCavity; // -1 = copiar de la fuente
             public float albedoBump, albedoStep, albedoSpec;
+            public float albedoMax, smoothMax, specAA, specDark, finalDark;
             public float aniso, anisoShin;
             public Color anisoColor;
             public float occlusion;
@@ -201,15 +218,15 @@ namespace WebGL.Editor.PC
 
         private static Def D(string name, string source, bool atlas, float metallic, float smooth)
         {
-            return new Def { name = name, source = source, atlas = atlas, color = Color.white, metallic = metallic, smooth = smooth, bump = 1f, curvEdge = -1f, curvCavity = -1f, albedoStep = 1f, anisoShin = 90f, anisoColor = new Color(0.7f, 0.75f, 0.9f), roughStrength = 1f, roughScale = 1f, occlusion = 1f };
+            return new Def { name = name, source = source, atlas = atlas, color = Color.white, metallic = metallic, smooth = smooth, bump = 1f, curvEdge = -1f, curvCavity = -1f, albedoStep = 1f, anisoShin = 90f, anisoColor = new Color(0.7f, 0.75f, 0.9f), roughStrength = 1f, roughScale = 1f, occlusion = 1f, albedoMax = 1f, smoothMax = 1f, specDark = 1f, finalDark = 1f };
         }
 
         private static List<Def> Defs()
         {
             var l = new List<Def>();
             Def d;
-            d = D("PC_CarbonPlate", "carbon_fiber_01", true, 0.0f, 0.42f); d.bump = 0.35f; d.clearCoat = 1f; d.coatSmooth = 0.72f; d.albedoBump = 2.0f; d.albedoStep = 1.5f; d.albedoSpec = 0.3f; d.aniso = 0.18f; d.anisoShin = 150f; l.Add(d);
-            d = D("PC_CarbonTube", "MAT_Plastic_Black", true, 0.0f, 0.4f); d.bump = 0.35f; d.clearCoat = 1f; d.coatSmooth = 0.72f; d.albedoBump = 2.0f; d.albedoStep = 1.5f; d.albedoSpec = 0.3f; d.aniso = 0.18f; d.anisoShin = 150f; l.Add(d);
+            d = D("PC_CarbonPlate", "carbon_fiber_01", true, 0.0f, 0.30f); d.bump = 0.35f; d.clearCoat = 0.85f; d.coatSmooth = 0.62f; d.albedoBump = 2.0f; d.albedoStep = 1.5f; d.albedoSpec = 0.3f; d.aniso = 0.07f; d.anisoShin = 150f; d.albedoMax = 0.045f; d.smoothMax = 0.45f; d.specAA = 2.0f; d.specDark = 0.45f; d.finalDark = 0.5f; l.Add(d);
+            d = D("PC_CarbonTube", "MAT_Plastic_Black", true, 0.0f, 0.30f); d.bump = 0.35f; d.clearCoat = 0.85f; d.coatSmooth = 0.62f; d.albedoBump = 2.0f; d.albedoStep = 1.5f; d.albedoSpec = 0.3f; d.aniso = 0.07f; d.anisoShin = 150f; d.albedoMax = 0.045f; d.smoothMax = 0.45f; d.specAA = 2.0f; d.specDark = 0.45f; d.finalDark = 0.75f; l.Add(d);
             d = D("PC_AnodizedBlue", "MAT_Plastic_Blue", true, 0.85f, 0.58f); d.bump = 0.6f; d.brushed = true; d.detail = 0.15f; d.detailTiling = 14f; d.rough = true; d.roughStrength = 0.25f; l.Add(d);
             d = D("PC_AnodizedBlack", "MAT_Alum_Black", true, 0.9f, 0.5f); d.bump = 0f; d.brushed = true; d.detail = 0.1f; d.detailTiling = 14f; d.rough = true; d.roughStrength = 0.25f; l.Add(d);
             d = D("PC_Motor", "BAKE_PREVIEW.007", true, 0.9f, 0.5f); d.brushed = true; d.detail = 0.12f; d.detailTiling = 14f; d.rough = true; d.roughStrength = 0.25f; l.Add(d);
@@ -283,6 +300,7 @@ namespace WebGL.Editor.PC
                 mat.SetFloat("_OcclusionStrength", d.occlusion);
                 SetKw(mat, "_PC_ALBEDOBUMP", "_UseAlbedoBump", d.albedoBump > 0f);
                 mat.SetFloat("_AlbedoBumpScale", d.albedoBump); mat.SetFloat("_AlbedoBumpStep", d.albedoStep); mat.SetFloat("_AlbedoBumpSpec", d.albedoSpec);
+                mat.SetFloat("_AlbedoMax", d.albedoMax > 0f ? d.albedoMax : 1f); mat.SetFloat("_SmoothnessMax", d.smoothMax > 0f ? d.smoothMax : 1f); mat.SetFloat("_SpecAA", d.specAA); mat.SetFloat("_SpecDark", d.specDark > 0f ? d.specDark : 1f); mat.SetFloat("_FinalDark", d.finalDark > 0f ? d.finalDark : 1f);
                 SetKw(mat, "_PC_ANISO", "_UseAniso", d.aniso > 0f);
                 mat.SetFloat("_AnisoStrength", d.aniso); mat.SetFloat("_AnisoShininess", d.anisoShin); mat.SetColor("_AnisoColor", d.anisoColor);
 

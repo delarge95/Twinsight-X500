@@ -41,6 +41,23 @@ namespace WebGL.UI
         [SerializeField] private string editorTestPart = string.Empty;
 
         private static string pendingPartId;
+        private string manualPartId;
+        private bool manualOpenDetails = true;
+
+#if UNITY_STANDALONE
+        /// <summary>
+        /// PC (phase 3B): selects a catalog entry through the same deep-link path (used by the desktop part tree).
+        /// <paramref name="openDetails"/> false only frames the camera on the selection (like the F key).
+        /// </summary>
+        public static void RequestSelect(string entryId, bool openDetails)
+        {
+            if (string.IsNullOrWhiteSpace(entryId)) return;
+            var host = new GameObject(BridgeObjectName + "_Tree");
+            var sel = host.AddComponent<DeepLinkSelector>();
+            sel.manualPartId = entryId;
+            sel.manualOpenDetails = openDetails;
+        }
+#endif
 
         // ── Bootstrap ───────────────────────────────────────────────
 
@@ -66,7 +83,9 @@ namespace WebGL.UI
 
         private void Start()
         {
-            string partId = !string.IsNullOrEmpty(pendingPartId)
+            string partId = !string.IsNullOrEmpty(manualPartId)
+                ? manualPartId
+                : !string.IsNullOrEmpty(pendingPartId)
                 ? pendingPartId
                 : ReadRequestedPartId(editorTestPart);
             pendingPartId = null;
@@ -228,6 +247,14 @@ namespace WebGL.UI
             if (selected)
             {
                 yield return null;
+#if UNITY_STANDALONE
+                if (!manualOpenDetails)
+                {
+                    UIManager.Instance.ShortcutFocusSelection();
+                    Destroy(gameObject);
+                    yield break;
+                }
+#endif
                 UIManager.Instance.OpenDetailsForDeepLink();
             }
 
@@ -243,6 +270,25 @@ namespace WebGL.UI
             {
                 return fromUrl;
             }
+
+#if UNITY_STANDALONE && !UNITY_EDITOR
+            // PC: "TwinSightX500.exe -part <id>" (equivalent to the web's ?part=). Also accepts a
+            // "twinsight://part/<id>" URL passed as the first argument (protocol registration is documented, not automatic).
+            string[] cli = Environment.GetCommandLineArgs();
+            for (int i = 1; i < cli.Length; i++)
+            {
+                if (string.Equals(cli[i], "-part", StringComparison.OrdinalIgnoreCase) && i + 1 < cli.Length)
+                {
+                    return Sanitize(cli[i + 1]);
+                }
+
+                const string scheme = "twinsight://part/";
+                if (cli[i].StartsWith(scheme, StringComparison.OrdinalIgnoreCase))
+                {
+                    return Sanitize(Decode(cli[i].Substring(scheme.Length).TrimEnd('/')));
+                }
+            }
+#endif
 
 #if UNITY_EDITOR
             if (!string.IsNullOrWhiteSpace(editorFallback))

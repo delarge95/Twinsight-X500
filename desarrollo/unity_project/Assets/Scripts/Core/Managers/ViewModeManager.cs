@@ -293,8 +293,29 @@ namespace WebGL.Core.Managers
                 }
             }
 
+#if UNITY_STANDALONE
+            // PC (fase 3B, G11): rayos X aditivo y alambre limpio (los shaders no existen en WebGL).
+            xRayMaterial = PcViewMaterial("PC_XRay", xRayMaterial);
+            wireframeMaterial = PcViewMaterial("PC_Wireframe", wireframeMaterial);
+#endif
             CalibrateViewModeMaterials();
         }
+
+#if UNITY_STANDALONE
+        private static Material PcViewMaterial(string resourceName, Material original)
+        {
+            Material pc = Resources.Load<Material>("PC/Materials/" + resourceName);
+            if (pc == null || pc.shader == null || !pc.shader.isSupported) return original;
+            var m = new Material(pc) { name = resourceName };
+            if (original != null)
+            {
+                if (original.HasProperty("_BaseColor") && m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", original.GetColor("_BaseColor"));
+                if (original.HasProperty("_FresnelPower") && m.HasProperty("_FresnelPower")) m.SetFloat("_FresnelPower", Mathf.Max(original.GetFloat("_FresnelPower"), 2.2f));
+                if (original.HasProperty("_WireColor") && m.HasProperty("_WireColor")) m.SetColor("_WireColor", original.GetColor("_WireColor"));
+            }
+            return m;
+        }
+#endif
 
         private void CalibrateViewModeMaterials()
         {

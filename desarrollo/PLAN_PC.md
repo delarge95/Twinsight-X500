@@ -299,3 +299,39 @@ Mapas del original (todos salvo GRAY63 usan el atlas: `diffuse_union` 4096, `nor
 - El anisotropo es falso (no hay tangentes de hebra en la malla): suma poco; si se quiere real, habria que bakear tangentes.
 - Sin emision de LEDs ni de pantallas: el original no tiene mapas de emision; hacerlos exigiria pintarlos por script sobre el atlas (queda para la 3B junto a las texturas 4K/8K).
 - Color real del nylon del X500 V2 sin confirmar.
+
+## 10. Fase 3B (2026-11-04, rama `pc-desktop`, solo PC)
+
+Alcance: retoques de materiales (carbono oscuro, tornillos redondos), arbol de piezas con busqueda (U8), enlace profundo `-part` (U10), modos de vista en alta calidad (G11) y texturas 4K (G8). Todo bajo `#if UNITY_STANDALONE`, en `Assets/Resources/PC`, `Assets/Shaders/PC` o en overrides de importacion de Standalone. Capturas: `E:\twinsight-web-twin\docs\unity_pc\capturas_fase3b\`. Build: `E:\TwinSight_builds\pc_fase3b\TwinSightX500.exe`.
+
+### 10.1 Materiales
+- **Carbono (`DroneLitPC`, `PC_CarbonPlate`/`PC_CarbonTube`).** Nuevas propiedades (apagadas por defecto): `_AlbedoMax` (techo suave del albedo, solo con `_PC_ALBEDOBUMP`), `_BumpFilter` (el relieve derivado del albedo se atenua cuando un texel es menor que un pixel: menos destellos ruidosos), `_SmoothnessMax`, `_SpecAA` (Toksvig a partir del gradiente del relieve), `_SpecDark` (multiplica la oclusion: menos reflejo de entorno) y `_FinalDark` (multiplicador final de iluminacion). Carbono: smoothness 0,30 (max 0,45), clear-coat 0,85/0,62, anisotropia 0,07, `_AlbedoMax` 0,045, `_SpecDark` 0,45, `_FinalDark` 0,5 (placa) y 0,75 (tubo). El relieve de sarga (albedo bump 2,0) se mantiene.
+- **Por que el .exe se veia mas claro que el Editor.** No se pudo aislar la causa exacta: en el .exe la placa quedaba en gris plano (~sRGB 102) aunque se pusiera el color base a negro, se quitaran luces o ambiente, o se bajara el techo del albedo, mientras que la misma configuracion se veia oscura en el Editor. Descartado: material equivocado (el renderer tiene `PC_CarbonPlate`/`DroneLitPC`, sin MaterialPropertyBlock), variante sin keyword, textura (misma importacion). El multiplicador `_FinalDark` es una solucion directa que oscurece el resultado en el .exe; queda pendiente entender el origen (se sospecha de la reflexion del HDRI a baja inclinacion y del brillo de las luces adicionales).
+- **Tornillos (`PCScrewSmoother`, en `PCMaterialSwapper.cs`).** Las normales de la pared ya eran radiales; lo que se veia facetado era la silueta de 12 (o 8) lados. En runtime y solo en PC se copia la malla y se subdivide dos veces, empujando los puntos medios del anillo exterior a la circunferencia (12 -> 48 lados; tapa y hueco hexagonal con su UV `Hex_AO`/`Hex_Normal_Atlas` intactos, sin grietas). Se omiten mallas de 4-6 puntos de anillo (tuercas hexagonales, nylon). 82 de 160 fasteners redondeados (15 mallas, ~1400 triangulos cada una). No se toca el FBX ni WebGL.
+
+### 10.2 U8 - arbol de piezas (`DesktopPartTree.cs`)
+Panel izquierdo (340 px, simetrico al panel derecho; `Ctrl+F` o `/` lo abren y enfocan la busqueda, `Esc` limpia/cierra, flechas + Enter) y pastilla "PIEZAS" junto a "ATAJOS". Jerarquia del catalogo bilingue: categorias (Estructura, Propulsion, Avionica y energia, Fijaciones) -> pieza -> subpiezas; los grupos sin objeto propio (p. ej. "Conjunto de brazo") solo pliegan. Busqueda sin acentos y sin mayusculas, por palabras, en ES/EN y alias. El clic usa `DeepLinkSelector.RequestSelect` (mismo camino que el enlace profundo, no abre la ficha: solo selecciona y enfoca); la seleccion hecha en la escena resalta la fila (`PartSelectedEvent`) y abre su rama. La capsula se centra en el area libre (como con el panel derecho).
+
+### 10.3 U10 - enlace profundo
+`TwinSightX500.exe -part <entryId> [-lang es|en]` (tambien acepta un primer argumento `twinsight://part/<id>`). Reutiliza `DeepLinkSelector` (se activa solo en Standalone con la linea de comandos). Verificado: `-part x500v2_gps_m10 -lang es` abre en espanol con el modulo GPS seleccionado y la ficha abierta (`05_deeplink_part_gps_screen.png`). **Protocolo `twinsight://` (solo documentacion, no se escribe nada en el registro):** para registrarlo el usuario puede importar un `.reg` con `HKEY_CURRENT_USER\Software\Classes\twinsight` -> `URL Protocol=""`, `shell\open\command` = `"C:\ruta\TwinSightX500.exe" "%1"`; Windows pasa la URL como primer argumento y el codigo extrae el id.
+
+### 10.4 G11 - modos de vista
+`TwinSight/XRayPC` (mezcla aditiva: no depende del orden de dibujo; borde fresnel HDR con el bloom del perfil) y `TwinSight/WireframePC` (grosor en pixeles con antialiasing, distancias a aristas `noperspective`, atenuacion en triangulos de pocos pixeles para que las zonas densas no formen una mancha solida, aditivo). Mismo recorte global CUT. `ViewModeManager` los carga solo en Standalone desde `Resources/PC/Materials/PC_XRay|PC_Wireframe`; el resto de modos no cambia. SSAO no afecta a los modos transparentes (se aplica en el shader de los materiales opacos). Strip total de ambos shaders en WebGL (`ShaderVariantStripper`). Capturas `10_modo_xray` ... `15_modo_thermal`, `*_cerca` y antes (`V_*_ANTES`).
+
+### 10.5 G8 - texturas
+Override de importacion **Standalone** (no afecta a WebGL, que ya tenia su propio override) para `final_curve_{diffuse_union,normal_resultante,ao,curve,roughness}`: 4096 px, compresion HQ (BC7/BC5), sin crunch. El build pasa de ~116 a ~234 MB. Sin descargas.
+
+### 10.5b FPS (RTX 5060 Ti, 1920x1080 ventana, vsync 0, visor abierto con `-perf-viewer`, ventanas de 10 s, logs en `E:\TwinSight_builds\pc_fase3b\logs\`)
+| Nivel | FPS media (ventanas 3-14) | p1 | referencia 3A |
+|---|---|---|---|
+| PC_Ultra | ~107 (101-112) | ~63 | ~324 |
+| PC_High | ~96 (90-100) | ~57 | n/d |
+La bajada frente a la 3A (324) no se aislo: entre la 3A y ahora entraron el pulido de materiales (relieve por albedo: 4 muestras extra de una textura de 4096), texturas 4K con BC7, ~82 mallas de tornillo con 1400 triangulos y el arbol de piezas. Pendiente medir cada cambio por separado.
+
+### 10.6 No hecho / pendiente
+- Opcional 7 (contorno #bfeaff y atenuacion de no seleccionados): no se hizo.
+- Causa raiz del gris del carbono en el .exe (ver 10.1): en pruebas, ni `_FinalDark`, ni `_AlbedoMax`, ni el color base negro, ni quitar el post-procesado cambiaron el gris de la placa (sRGB ~95-100) en el .exe; la placa se ve oscura en otros angulos (`04_arbol_resaltado_gps`).
+- Aislar el coste de FPS de la fase.
+- Aislamiento WebGL: `git diff 4ce5ab9` sin cambios en .mat originales, `URP_AutoFixed`, escena ni calidad WebGL; los .meta de las 5 texturas `final_curve_*` solo cambian el bloque Standalone (y 2 campos de sprite que Unity anade). Control en Play con WebGL activo: 289 materiales, 0 con shaders PC, sin `_DesktopUI`, asset `URP_AutoFixed` (`99_webgl_control.png`). `UniversalRenderPipelineGlobalSettings.asset` se restauro con `git checkout`.
+- 82 de 160 tornillos redondeados (el resto tiene anillos de 4-8 puntos u otra forma).
+- La fila resaltada del arbol no siempre se desplaza hasta la vista si el arbol estaba cerrado al seleccionar.

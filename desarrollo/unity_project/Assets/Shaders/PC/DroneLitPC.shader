@@ -57,6 +57,12 @@ Shader "TwinSight/DroneLitPC"
         _AlbedoBumpScale("Albedo Bump Scale", Range(0, 12)) = 3.0
         _AlbedoBumpStep("Albedo Bump Step (texels)", Range(0.5, 3)) = 1.0
         _AlbedoBumpSpec("Albedo Bump Specular Variation", Range(0, 1)) = 0.0
+        _BumpFilter("Albedo Bump minification fade", Range(0, 2)) = 0.6
+        _AlbedoMax("Albedo soft ceiling (1 = off)", Range(0.05, 1)) = 1.0
+        _SmoothnessMax("Smoothness ceiling", Range(0, 1)) = 1.0
+        _SpecAA("Specular AA from bump (Toksvig)", Range(0, 8)) = 0.0
+        _SpecDark("Occlusion multiplier (dark lacquer)", Range(0, 1)) = 1.0
+        _FinalDark("Final lighting multiplier (dark lacquer)", Range(0.1, 1)) = 1.0
 
         [Header(PC Anisotropy)]
         [Toggle(_PC_ANISO)] _UseAniso("Fake anisotropic highlight", Float) = 0
@@ -179,6 +185,12 @@ Shader "TwinSight/DroneLitPC"
                 half _AlbedoBumpScale;
                 half _AlbedoBumpStep;
                 half _AlbedoBumpSpec;
+                half _BumpFilter;
+                half _AlbedoMax;
+                half _SmoothnessMax;
+                half _SpecAA;
+                half _SpecDark;
+                half _FinalDark;
                 half _AnisoStrength;
                 half _AnisoShininess;
                 half4 _AnisoColor;
@@ -248,6 +260,11 @@ Shader "TwinSight/DroneLitPC"
                 half concave = saturate(-deltaCurv) * _CurvatureCavityStrength;
                 albedo.rgb = albedo.rgb * (1.0 - concave * 0.45) + (convex * 0.45 * (1.0 - albedo.rgb * 0.3));
 
+                // techo suave del albedo (laca oscura): comprime los destellos claros del atlas sin tocar los oscuros
+                #if defined(_PC_ALBEDOBUMP)
+                    albedo.rgb = albedo.rgb / (1.0 + albedo.rgb / _AlbedoMax);
+                #endif
+
                 half3 normalTS = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, IN.uv), _BumpScale);
                 #if defined(_PC_DETAIL)
                     half3 detailTS = UnpackNormalScale(SAMPLE_TEXTURE2D(_DetailNormalMap, sampler_DetailNormalMap, IN.uv * _DetailTiling), _DetailNormalScale);
@@ -263,6 +280,10 @@ Shader "TwinSight/DroneLitPC"
                     half hD = AlbedoHeight(IN.uv - float2(0, e.y));
                     half hU = AlbedoHeight(IN.uv + float2(0, e.y));
                     bumpGrad = half2(hL - hR, hD - hU) * _AlbedoBumpScale;
+                    // texels mas pequenos que un pixel: el relieve ya no se resuelve, se atenua (evita destellos con ruido)
+                    float2 uvT = IN.uv * _BaseMap_TexelSize.zw;
+                    float tpp = max(length(ddx(uvT)), length(ddy(uvT)));
+                    bumpGrad *= rcp(1.0 + _BumpFilter * max(0.0, tpp - 1.0));
                     bumpH = AlbedoHeight(IN.uv);
                     normalTS = normalize(half3(normalTS.xy + bumpGrad, normalTS.z));
                 }
@@ -286,6 +307,8 @@ Shader "TwinSight/DroneLitPC"
                 #if defined(_PC_ALBEDOBUMP)
                     // las hebras mas altas (claras) son algo mas pulidas, los huecos mas mates
                     smoothness = saturate(smoothness * (1.0 + (saturate(bumpH * 2.2) - 0.5) * _AlbedoBumpSpec));
+                    smoothness = min(smoothness, _SmoothnessMax);
+                    smoothness *= rcp(1.0 + _SpecAA * dot(bumpGrad, bumpGrad));
                 #endif
 
                 half rawAO = SAMPLE_TEXTURE2D(_OcclusionMap, sampler_OcclusionMap, IN.uv).g;
@@ -307,7 +330,7 @@ Shader "TwinSight/DroneLitPC"
                 surfaceData.metallic = metallic;
                 surfaceData.smoothness = smoothness;
                 surfaceData.normalTS = normalTS;
-                surfaceData.occlusion = occlusion;
+                surfaceData.occlusion = occlusion * _SpecDark;
                 surfaceData.alpha = 1.0;
                 surfaceData.clearCoatMask = 0;
                 surfaceData.clearCoatSmoothness = 1;
@@ -339,6 +362,8 @@ Shader "TwinSight/DroneLitPC"
                     color.rgb += _AnisoColor.rgb * al.color * al.shadowAttenuation * spec * w * _AnisoStrength * occlusion;
                 }
                 #endif
+
+                color.rgb *= _FinalDark;
 
                 #if defined(_PC_TRANSLUCENT)
                 {

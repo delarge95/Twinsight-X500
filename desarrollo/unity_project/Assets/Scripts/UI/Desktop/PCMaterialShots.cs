@@ -106,10 +106,30 @@ namespace WebGL.UI.Desktop
             var env = EnvironmentController.Instance;
             Debug.Log($"[PCMaterialShots] tier={RenderQualityController.ResolvedTier} swapped={PCMaterialSwapper.SwappedCount} screen={Screen.width}x{Screen.height}");
 
+            foreach (var rr in FindObjectsByType<Renderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (!rr.name.ToUpperInvariant().Contains("PLATE")) continue;
+                var names = new System.Text.StringBuilder();
+                foreach (var sm in rr.sharedMaterials) names.Append(sm != null ? sm.name + "[" + sm.shader.name + "] " : "null ");
+                var mpb = new MaterialPropertyBlock(); rr.GetPropertyBlock(mpb);
+                Debug.Log($"[PCMaterialShots] PLATE {rr.name} type={rr.GetType().Name} mats={names} mpbEmpty={mpb.isEmpty} layer={rr.gameObject.layer} lightmap={rr.lightmapIndex}");
+            }
+
             // a) placa y tubos de carbono en primer plano, luz rasante
             Sun(14f, 300f);
             yield return FramePoint(new Vector3(-0.8f, 1.0f, 0.1f), -20f, 38f, 1.2f);
             yield return Shot("01_carbono_placa");
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-mat-probe") >= 0)
+            {
+                var acd = Camera.main.GetComponent("UniversalAdditionalCameraData");
+                var prop = acd != null ? acd.GetType().GetProperty("renderPostProcessing") : null;
+                if (prop != null)
+                {
+                    prop.SetValue(acd, false);
+                    yield return Shot("01_probe_nopost");
+                    prop.SetValue(acd, true);
+                }
+            }
             yield return Frame(Find("GUAN-CHENG.002_low"), 35f, 25f, 1.8f);
             yield return Shot("02_carbono_tubo");
             yield return Frame(Find("BOTTOM-PLATE-X500-V5_001_low"), 200f, -35f, 1.7f);
