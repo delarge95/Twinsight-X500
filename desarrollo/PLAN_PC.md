@@ -242,3 +242,60 @@ Salvedades: la vista por defecto del visor es lejana (el dron ocupa poco de la p
 - Las vistas de las capturas son equivalentes a las de la fase 1, no idénticas.
 - El apagado de SSAO al bajar de tier en caliente solo se comprobó por código.
 - La build WebGL real no se compiló en `docs/` (como en fases anteriores).
+
+## 9. Pulido de materiales (2026-11-04, rama `pc-desktop`, solo PC)
+
+Todo en `Assets/Resources/PC`, `Assets/Shaders/PC/DroneLitPC.shader`, `PCRealismSetup` (Editor) y `PC_Renderer` (SSAO de PC). WebGL no cambia (ver 9.5). Se regenera con `TwinSight > PC > Build PC Realism (fase 3A)` (idempotente). Capturas ANTES/DESPUES (PC_Ultra, mismas vistas, 1920x1080, sin interfaz; ver 9.6) generadas con `PCMaterialShots` (`-desk-matshots <carpeta> <antes|despues>`).
+
+### 9.1 Carbono plano: causa y solucion
+- **Causa.** El atlas del dron (`final_curve_*`) lleva el twill como imagen en el albedo (4096 px) y la normal `final_curve_normal_resultante.png` lo lleva con muy poca amplitud, con una inclinacion media (x,y ~ -0,2) por el bake. En PC se le bajo la `_BumpScale` a 0,25 (para no inclinar toda la luz) y el importer la deja en 2048 px con mips: el relieve casi desaparece y el trenzado queda "impreso" sobre una superficie lisa. Tampoco se usaba `final_curve_roughness.png` (en la zona de carbono es un gris constante 0,75: no aporta informacion).
+- **Solucion.** (1) Nuevo keyword `_PC_ALBEDOBUMP` en `DroneLitPC`: relieve por diferencias finitas de la luminancia del albedo (4 muestras, paso en texels). Va alineado al twill original y al mismo tamano de trenzado (no hay textura nueva ni cambia la escala), es de media cero (no inclina la luz) y se filtra solo con los mips. Carbono: escala 2,0, paso 1,5 texels. (2) Variacion de brillo por hebra (`_AlbedoBumpSpec` 0,3: las hebras altas son algo mas pulidas, los huecos mas mates). (3) Brillo anisotropo falso `_PC_ANISO` (Kajiya-Kay en la luz principal, con la direccion de hebra perpendicular al gradiente del relieve), muy suave (0,18). (4) La normal original del atlas se conserva a 0,35 (antes 0,25) y se mantienen AO y curvatura. (5) El clear-coat queda como capa encima (smoothness 0,72) sin aplastar el relieve. Antes/despues: capturas 01, 02, 03, 04, 15.
+- Descartado: normal procedural gruesa de la 3A (cuerda con destellos); un normal map nuevo de 4096 px (+20 MB en el repo) frente a derivar el relieve del albedo; mapa de rugosidad del carbono (constante).
+
+### 9.2 Tornillos temporales (GRAY63): causa y solucion
+- **Causa.** El `GRAY63` original usa **`Hex_AO.png`** (albedo, AO y curvatura: hexagono gris sobre blanco, 256 px) y **`Hex_Normal_Atlas.png`** (aristas del hexagono). Las cabezas llevan UV propia con ese hexagono. En la 3A, `PCRealismSetup` creo `PC_ScrewZinc`, `PC_NutZinc` y `PC_Nylon` con `atlas = false`, que **anulaba `_BaseMap`, `_BumpMap`, `_CurvatureMap` y `_OcclusionMap`**: se perdio la textura, no era el HDRI ni la exposicion. Ademas el color 0,8 con metallic 1 reflejaba el HDRI casi blanco (cabezas planas y claras) y el SSAO con muestreo medio dejaba grano negro en los contactos.
+- **Solucion.** Los tres materiales vuelven a usar `Hex_AO`/`Hex_Normal_Atlas` (bump 1,6, AO y curvatura bajas). Tornillos y tuercas: acero pavonado/gunmetal oscuro (albedo 0,04, metallic 0,85, smoothness 0,34-0,36, borde de curvatura +0,10 para el leve brillo). Nylon: se mantiene el color (blanco roto) y se hace mate (smoothness 0,18); no se pudo confirmar el color real en el X500 V2. SSAO de PC: 12 muestras, normales High y ruido Interleaved Gradient (en esta version del enum `BlueNoise = 0`, `InterleavedGradient = 1`; la 3A tenia el comentario al reves). Capturas 04, 05, 16.
+- Limite: las cabezas son cilindros de 12 lados (malla de baja resolucion): el hueco es de textura (normal + AO), no geometria; a muy poca distancia se nota. Las tuercas son hexagonales de malla y su cara no usa la UV del hexagono.
+
+### 9.3 Los 18 materiales de PC frente a su original de WebGL
+Mapas del original (todos salvo GRAY63 usan el atlas: `diffuse_union` 4096, `normal_resultante` 2048 en import, `curve` 2048, `ao` 2048; ninguno trae mapa de emision ni de metallic). "Antes" = fase 3A. La emision de LEDs/pantallas no existe como mapa en el original; las serigrafias van en el albedo del atlas (se ven nitidas en 08 y 09), asi que no hay emision que restaurar.
+
+| # | Material PC | Original (WebGL) | Antes (3A) | Despues (pulido) |
+|---|---|---|---|---|
+| 1 | PC_CarbonPlate | carbon_fiber_01 / BAKE_PREVIEW.001 (atlas) | atlas, normal 0,25, clear-coat 0,7, sin relieve | + relieve por albedo (2,0), brillo por hebra, anisotropo suave, normal 0,35, clear-coat 0,72; AO y curvatura del atlas |
+| 2 | PC_CarbonTube | MAT_Plastic_Black (tubos) | igual que 1 | igual que 1 |
+| 3 | PC_AnodizedBlue | MAT_Plastic_Blue | atlas, metallic 0,85, smooth 0,58 | + mecanizado fino (`pc_brushed_n`, escala 0,15), rugosidad real al 25 % |
+| 4 | PC_AnodizedBlack | MAT_Alum_Black (Pixhawk/IMU) | atlas, metallic 0,9 | + mecanizado 0,10, rugosidad real al 25 % |
+| 5 | PC_Motor | BAKE_PREVIEW.007 (campana) | atlas, metallic 0,8 | metallic 0,9, smooth 0,5, mecanizado 0,12, rugosidad real 25 % |
+| 6 | PC_Prop | MAT_Plastic_Black (helices) | atlas + translucidez de borde | sin cambios |
+| 7 | PC_PlasticBlack | MAT_Plastic_Black | atlas | sin cambios (serigrafia y radio nitidos en el albedo) |
+| 8 | PC_Rubber | MAT_Rubber / MAT_Rubber_black | atlas, smooth 0,15 | sin cambios |
+| 9 | PC_PCB | MAT_Electronics / BAKE_PREVIEW.003 | atlas, metallic 0,1 | sin cambios (sin UV propia para pistas) |
+| 10 | PC_Steel | MAT_Steel | atlas, metallic 1 | + mecanizado 0,10, rugosidad real 20 % |
+| 11 | PC_ScrewZinc (114) | GRAY63 (Hex_AO + Hex_Normal_Atlas) | **sin texturas**, color 0,8 | Hex_AO/Hex_Normal restaurados, gunmetal oscuro |
+| 12 | PC_NutZinc (36) | GRAY63 | **sin texturas**, color 0,7 | Hex restaurados, gunmetal oscuro |
+| 13 | PC_Nylon (10) | GRAY63 | sin texturas, smooth 0,3 | Hex restaurados, mate (0,18) |
+| 14 | PC_Housing.002 | BAKE_PREVIEW.002 | atlas | sin cambios |
+| 15 | PC_Housing.004 (bateria) | BAKE_PREVIEW.004 | atlas | sin cambios |
+| 16 | PC_Housing.005 (GPS) | BAKE_PREVIEW.005 | atlas | sin cambios |
+| 17 | PC_Housing.006 (radio) | BAKE_PREVIEW.006 | atlas | sin cambios |
+| 18 | PC_Housing.008 (bobinado) | BAKE_PREVIEW.008 | atlas, metallic 0 | metallic 0,7, smooth 0,45 (cobre) |
+
+`final_curve_roughness.png` queda conectada solo a los metales (3, 4, 5, 10) con fuerza 0,2-0,25: en el resto es casi constante. Las gomas y los cables (MAT_Rubber) ya tenian todos los mapas del original y no mejoraron al tocarlos.
+
+### 9.4 Cambios de motor
+- `DroneLitPC`: `_PC_ALBEDOBUMP` (+`_AlbedoBumpScale/_AlbedoBumpStep/_AlbedoBumpSpec`) y `_PC_ANISO` (+`_AnisoStrength/_AnisoShininess/_AnisoColor`). Apagados por defecto. El shader no se compila para WebGL.
+- `PCRealismSetup`: nuevo `GenerateBrushed()` (`pc_brushed_n.png`, 256 px tileable, 32 px en WebGL; el PNG esta excluido por `.git/info/exclude` y se versiona con `git add -f`), Def con mapas Hex, rugosidad y detalle por material, SSAO de PC afinado. `PCMaterialShots` (solo Standalone) para las capturas.
+- Los 5 `PC_*.asset` (URP de PC) solo cambian los `m_PrefilterSSAO*` que Unity recalcula con el nuevo ruido y muestreo.
+
+### 9.5 Aislamiento de WebGL
+`git diff` vacio en `Assets/Models`, `Assets/Materials`, `Assets/Scenes` y `URP_AutoFixed.asset` (0 lineas). `UniversalRenderPipelineGlobalSettings.asset` cambio solo al compilar para Standalone (Unity quita una entrada de `m_RuntimeSettings`) y se restauro con `git checkout`; no se incluye en el commit. Control en Play con WebGL activo: 0 errores, 289 materiales, 0 con `DroneLitPC` (`capturas_materiales/99_webgl_control.png`, pantalla de inicio). Compilacion: 0 errores en Standalone y en WebGL; plataforma activa al terminar: WebGL. No se compilo WebGL en `docs/`.
+
+### 9.6 Capturas y build
+`E:\twinsight-web-twin\docs\unity_pc\capturas_materiales\` (ignoradas por git, como las de las fases previas): `01_carbono_placa`, `02_carbono_tubo`, `03_carbono_placa_inferior` (luz rasante, 14 grados), `04_tornillos_cabeza`, `05_tuerca`, `06_aluminio_motor`, `07_motor`, `08_pixhawk`, `09_radio`, `10_bateria`, `11_patas_gomas`, `12_vista_general`, `13_vista_media`, `14-16_entorno_Day|Sunset_*` (general, carbono, tornillos), cada una `_antes` y `_despues`. Build Windows x86_64 Mono: `E:\TwinSight_builds\pc_materiales\TwinSightX500.exe` (prueba con `-desk-matshots`: 251 de 258 renderers con material PC, nivel Ultra).
+
+### 9.7 Pendiente / no verificado
+- Las capturas salen del Editor (Play, plataforma Standalone) a 1920x1080 sin interfaz; el .exe se probo con las mismas vistas a 1600x900 (carbono y tornillos equivalentes). A 0,6 m el reflejo de la luz clave lava la placa mas en el .exe que en el Editor.
+- El anisotropo es falso (no hay tangentes de hebra en la malla): suma poco; si se quiere real, habria que bakear tangentes.
+- Sin emision de LEDs ni de pantallas: el original no tiene mapas de emision; hacerlos exigiria pintarlos por script sobre el atlas (queda para la 3B junto a las texturas 4K/8K).
+- Color real del nylon del X500 V2 sin confirmar.

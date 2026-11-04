@@ -24,15 +24,15 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: e7c2cdaae02378b49b88f3dbf3c264e9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 503b32d350c2eb14a9adacb8a19134c5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CurvatureMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: e7c2cdaae02378b49b88f3dbf3c264e9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailNormalMap:
@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: e7c2cdaae02378b49b88f3dbf3c264e9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _RoughnessMap:
@@ -57,24 +57,31 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BumpScale: 1
+    - _AlbedoBumpScale: 0
+    - _AlbedoBumpSpec: 0
+    - _AlbedoBumpStep: 1
+    - _AnisoShininess: 90
+    - _AnisoStrength: 0
+    - _BumpScale: 1.6
     - _ClearCoat: 0
     - _ClearCoatSmoothness: 0
     - _ClipEdgeWidth: 0.01
     - _ClipEnabled: 0
-    - _CurvatureCavityStrength: 0
-    - _CurvatureStrength: 0
+    - _CurvatureCavityStrength: 0.3
+    - _CurvatureStrength: 0.1
     - _DetailNormalScale: 1
     - _DetailTiling: 16
     - _HighlightIntensity: 0
     - _HighlightRimPower: 2.5
-    - _Metallic: 1
+    - _Metallic: 0.85
     - _OcclusionStrength: 1
     - _RoughnessMapScale: 1
     - _RoughnessMapStrength: 1
-    - _Smoothness: 0.5
+    - _Smoothness: 0.34
     - _TranslucencyPower: 2
     - _TranslucencyStrength: 0.4
+    - _UseAlbedoBump: 0
+    - _UseAniso: 0
     - _UseClearCoat: 0
     - _UseDetail: 0
     - _UseEmission: 0
@@ -82,7 +89,8 @@ Material:
     - _UseRoughnessMap: 0
     - _UseTranslucent: 0
     m_Colors:
-    - _BaseColor: {r: 0.7, g: 0.72, b: 0.74, a: 1}
+    - _AnisoColor: {r: 0.7, g: 0.75, b: 0.9, a: 1}
+    - _BaseColor: {r: 0.04, g: 0.042, b: 0.048, a: 1}
     - _ClipColor: {r: 1, g: 0.5, b: 0, a: 1}
     - _ClipPlane: {r: 0, g: 1, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

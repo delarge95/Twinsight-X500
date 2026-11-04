@@ -9,6 +9,10 @@
 //   _PC_DETAIL        normal de detalle con tiling
 //   _PC_EMISSION      emision
 //   _PC_TRANSLUCENT   translucidez simple en el borde (helices)
+//   _PC_ALBEDOBUMP    relieve a partir de la luminancia del albedo (diferencias finitas, alineado con la
+//                     textura; recupera el trenzado del carbono que la normal del atlas casi no lleva)
+//   _PC_ANISO         brillo anisotropo falso (Kajiya-Kay) en la luz principal, con la direccion de la hebra
+//                     sacada del gradiente del relieve
 // Recibe SSAO (_SCREEN_SPACE_OCCLUSION), sombras de luces adicionales y sombras suaves de URP 17.
 // No se compila para WebGL: exclude_renderers gles gles3 + ShaderVariantStripper.
 Shader "TwinSight/DroneLitPC"
@@ -47,6 +51,18 @@ Shader "TwinSight/DroneLitPC"
         [Normal] _DetailNormalMap("Detail Normal Map", 2D) = "bump" {}
         _DetailNormalScale("Detail Normal Scale", Range(0, 2)) = 1.0
         _DetailTiling("Detail Tiling", Float) = 16.0
+
+        [Header(PC Albedo Bump)]
+        [Toggle(_PC_ALBEDOBUMP)] _UseAlbedoBump("Bump from albedo luminance", Float) = 0
+        _AlbedoBumpScale("Albedo Bump Scale", Range(0, 12)) = 3.0
+        _AlbedoBumpStep("Albedo Bump Step (texels)", Range(0.5, 3)) = 1.0
+        _AlbedoBumpSpec("Albedo Bump Specular Variation", Range(0, 1)) = 0.0
+
+        [Header(PC Anisotropy)]
+        [Toggle(_PC_ANISO)] _UseAniso("Fake anisotropic highlight", Float) = 0
+        _AnisoStrength("Aniso Strength", Range(0, 3)) = 0.5
+        _AnisoShininess("Aniso Shininess", Range(8, 400)) = 90
+        _AnisoColor("Aniso Color", Color) = (0.7, 0.75, 0.9, 1)
 
         [Header(PC Emission)]
         [Toggle(_PC_EMISSION)] _UseEmission("Emission", Float) = 0
@@ -102,6 +118,8 @@ Shader "TwinSight/DroneLitPC"
             #pragma shader_feature_local_fragment _PC_DETAIL
             #pragma shader_feature_local_fragment _PC_EMISSION
             #pragma shader_feature_local_fragment _PC_TRANSLUCENT
+            #pragma shader_feature_local_fragment _PC_ALBEDOBUMP
+            #pragma shader_feature_local_fragment _PC_ANISO
 
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS
@@ -158,6 +176,12 @@ Shader "TwinSight/DroneLitPC"
                 half4 _TranslucencyColor;
                 half _TranslucencyStrength;
                 half _TranslucencyPower;
+                half _AlbedoBumpScale;
+                half _AlbedoBumpStep;
+                half _AlbedoBumpSpec;
+                half _AnisoStrength;
+                half _AnisoShininess;
+                half4 _AnisoColor;
                 half4 _HighlightColor;
                 half _HighlightIntensity;
                 half _HighlightRimPower;
@@ -166,10 +190,17 @@ Shader "TwinSight/DroneLitPC"
                 half _ClipEdgeWidth;
             CBUFFER_END
 
+            float4 _BaseMap_TexelSize;
             float4 _GlobalClipPlane;
             float _GlobalClipEnabled;
             float4 _GlobalClipPlane2;
             float _GlobalClipEnabled2;
+
+            half AlbedoHeight(float2 uv)
+            {
+                half3 c = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv).rgb;
+                return sqrt(dot(c, half3(0.299, 0.587, 0.114)));   // ~ espacio perceptual
+            }
 
             Varyings vert(Attributes IN)
             {
@@ -222,6 +253,20 @@ Shader "TwinSight/DroneLitPC"
                     half3 detailTS = UnpackNormalScale(SAMPLE_TEXTURE2D(_DetailNormalMap, sampler_DetailNormalMap, IN.uv * _DetailTiling), _DetailNormalScale);
                     normalTS = normalize(half3(normalTS.xy + detailTS.xy, normalTS.z * detailTS.z));
                 #endif
+                half2 bumpGrad = 0;
+                half bumpH = 0.5;
+                #if defined(_PC_ALBEDOBUMP)
+                {
+                    float2 e = _BaseMap_TexelSize.xy * _AlbedoBumpStep;
+                    half hL = AlbedoHeight(IN.uv - float2(e.x, 0));
+                    half hR = AlbedoHeight(IN.uv + float2(e.x, 0));
+                    half hD = AlbedoHeight(IN.uv - float2(0, e.y));
+                    half hU = AlbedoHeight(IN.uv + float2(0, e.y));
+                    bumpGrad = half2(hL - hR, hD - hU) * _AlbedoBumpScale;
+                    bumpH = AlbedoHeight(IN.uv);
+                    normalTS = normalize(half3(normalTS.xy + bumpGrad, normalTS.z));
+                }
+                #endif
                 half3x3 TBN = half3x3(IN.tangentWS, IN.bitangentWS, IN.normalWS);
                 half3 normalWS = TransformTangentToWorld(normalTS, TBN);
                 normalWS = NormalizeNormalPerPixel(normalWS);
@@ -236,6 +281,11 @@ Shader "TwinSight/DroneLitPC"
                 #if defined(_PC_ROUGHNESSMAP)
                     half rough = SAMPLE_TEXTURE2D(_RoughnessMap, sampler_RoughnessMap, IN.uv).r;
                     smoothness = lerp(smoothness, saturate(1.0 - rough * _RoughnessMapScale), _RoughnessMapStrength);
+                #endif
+
+                #if defined(_PC_ALBEDOBUMP)
+                    // las hebras mas altas (claras) son algo mas pulidas, los huecos mas mates
+                    smoothness = saturate(smoothness * (1.0 + (saturate(bumpH * 2.2) - 0.5) * _AlbedoBumpSpec));
                 #endif
 
                 half rawAO = SAMPLE_TEXTURE2D(_OcclusionMap, sampler_OcclusionMap, IN.uv).g;
@@ -273,6 +323,22 @@ Shader "TwinSight/DroneLitPC"
                 surfaceData.albedo *= (1.0 - highlightAmount * 0.30);
 
                 half4 color = UniversalFragmentPBR(inputData, surfaceData);
+
+                #if defined(_PC_ANISO)
+                {
+                    // Kajiya-Kay: la hebra corre perpendicular al gradiente del relieve (en el plano tangente).
+                    half gl = length(bumpGrad);
+                    half3 strandTS = half3(-bumpGrad.y, bumpGrad.x, 0) / max(gl, 1e-4);
+                    half3 strandWS = normalize(TransformTangentToWorld(strandTS, TBN));
+                    Light al = GetMainLight(inputData.shadowCoord);
+                    half3 hv = normalize(al.direction + inputData.viewDirectionWS);
+                    half th = dot(strandWS, hv);
+                    half sinTH = sqrt(saturate(1.0 - th * th));
+                    half spec = pow(sinTH, _AnisoShininess) * saturate(dot(normalWS, al.direction));
+                    half w = smoothstep(0.002, 0.03, gl);   // sin hebra definida no hay anisotropia
+                    color.rgb += _AnisoColor.rgb * al.color * al.shadowAttenuation * spec * w * _AnisoStrength * occlusion;
+                }
+                #endif
 
                 #if defined(_PC_TRANSLUCENT)
                 {

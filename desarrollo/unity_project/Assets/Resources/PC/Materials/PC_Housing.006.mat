@@ -57,6 +57,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AlbedoBumpScale: 0
+    - _AlbedoBumpSpec: 0
+    - _AlbedoBumpStep: 1
+    - _AnisoShininess: 90
+    - _AnisoStrength: 0
     - _BumpScale: 1
     - _ClearCoat: 0
     - _ClearCoatSmoothness: 0
@@ -75,6 +80,8 @@ Material:
     - _Smoothness: 0.5
     - _TranslucencyPower: 2
     - _TranslucencyStrength: 0.4
+    - _UseAlbedoBump: 0
+    - _UseAniso: 0
     - _UseClearCoat: 0
     - _UseDetail: 0
     - _UseEmission: 0
@@ -82,6 +89,7 @@ Material:
     - _UseRoughnessMap: 0
     - _UseTranslucent: 0
     m_Colors:
+    - _AnisoColor: {r: 0.7, g: 0.75, b: 0.9, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _ClipColor: {r: 1, g: 0.5, b: 0, a: 1}
     - _ClipPlane: {r: 0, g: 1, b: 0, a: 0}
