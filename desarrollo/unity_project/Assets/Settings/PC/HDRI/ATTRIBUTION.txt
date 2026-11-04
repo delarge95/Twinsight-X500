@@ -1,0 +1,9 @@
+HDRI de estudio usado SOLO en la build de PC (Standalone) como entorno de reflejos y luz ambiental.
+
+  Nombre:   Studio Small 09 (studio_small_09_2k.hdr, 2K)
+  Autor:    Sergej Majboroda
+  Fuente:   https://polyhaven.com/a/studio_small_09
+  Descarga: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/studio_small_09_2k.hdr (6,3 MB, SHA-1 3558b7e49a8a54b6971ef768c59c3a427ee81f60)
+  Licencia: CC0 1.0 (dominio publico). No requiere atribucion; se cita por cortesia. Poly Haven: https://polyhaven.com
+  Uso:      no se muestra de fondo (el fondo sigue siendo el degradado); alimenta el skybox de la escena
+            (ambiente SH) y el Reflection Probe. Ver desarrollo/PLAN_PC.md, "Fase 3A".

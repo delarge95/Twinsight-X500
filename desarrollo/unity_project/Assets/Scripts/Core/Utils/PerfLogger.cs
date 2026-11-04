@@ -35,12 +35,27 @@ namespace WebGL.Core.Utils
 
             var go = new GameObject("_PerfLogger");
             DontDestroyOnLoad(go);
-            go.AddComponent<PerfLogger>();
+            var pl = go.AddComponent<PerfLogger>();
+            foreach (string a in Environment.GetCommandLineArgs())
+            {
+                // Fase 3A: -perf-viewer abre el visor a los 8 s para medir con el dron en pantalla.
+                if (string.Equals(a, "-perf-viewer", StringComparison.OrdinalIgnoreCase)) pl.StartCoroutine(pl.OpenViewer());
+            }
             Debug.Log("[PerfLogger] activo (-perflog). GPU=" + SystemInfo.graphicsDeviceName +
                       " | API=" + SystemInfo.graphicsDeviceType + " | CPU=" + SystemInfo.processorType +
                       " | Res=" + Screen.width + "x" + Screen.height + " | Calidad=" + QualitySettings.names[QualitySettings.GetQualityLevel()] +
                       " | vSync=" + QualitySettings.vSyncCount);
 #endif
+        }
+
+        private System.Collections.IEnumerator OpenViewer()
+        {
+            yield return new WaitForSecondsRealtime(8f);
+            // Reflection: Core no referencia el ensamblado UI.
+            Type t = Type.GetType("WebGL.UI.UIManager, UI");
+            object inst = t != null ? UnityEngine.Object.FindFirstObjectByType(t) : null;
+            t?.GetMethod("PrepareViewerForDeepLink")?.Invoke(inst, null);
+            Debug.Log("[PerfLogger] visor abierto: tipo=" + (t != null) + " instancia=" + (inst != null));
         }
 
         private void Update()
@@ -68,7 +83,7 @@ namespace WebGL.Core.Utils
             float minFps = 1f / worst;
             float p1Fps = 1f / p99;
             _windowIndex++;
-            Debug.Log($"[PerfLogger] ventana {_windowIndex} ({_windowElapsed:F1}s, {n} frames): FPS media={avgFps:F1} min={minFps:F1} p1={p1Fps:F1}");
+            Debug.Log($"[PerfLogger] ventana {_windowIndex} ({_windowElapsed:F1}s, {n} frames): t={Time.realtimeSinceStartup:F0}s FPS media={avgFps:F1} min={minFps:F1} p1={p1Fps:F1}");
             _frameTimes.Clear();
             _windowElapsed = 0f;
         }

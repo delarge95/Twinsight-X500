@@ -297,6 +297,13 @@ namespace WebGL.UI.Desktop
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length - 1; i++)
             {
+                if (args[i].Equals("-desk-demo3a", StringComparison.OrdinalIgnoreCase))
+                {
+                    var demo3a = gameObject.AddComponent<DesktopCaptureDemo3A>();
+                    demo3a.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-desk-demo2b", StringComparison.OrdinalIgnoreCase))
                 {
                     var demo2b = gameObject.AddComponent<DesktopCaptureDemo2B>();

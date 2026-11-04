@@ -61,6 +61,8 @@ Shader "WebGL/ClippableLit"
             // elimina _ADDITIONAL_LIGHT_SHADOWS en WebGL: las variantes WebGL no cambian.
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile _ _SHADOWS_SOFT
+            // G9 (PC): SSAO. ShaderVariantStripper elimina _SCREEN_SPACE_OCCLUSION en WebGL.
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
             #pragma multi_compile_fog
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"

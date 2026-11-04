@@ -501,6 +501,11 @@ namespace WebGL.Core.Managers
 
         private Material CreateClippableCopy(Material original)
         {
+#if UNITY_STANDALONE
+            // PC (fase 3A): DroneLitPC ya recorta con los mismos planos globales; no se degrada a ClippableLit.
+            if (original != null && original.shader != null && original.shader.name == "TwinSight/DroneLitPC")
+                return original;
+#endif
             if (original == null)
                 return new Material(clippableLitShader);
 

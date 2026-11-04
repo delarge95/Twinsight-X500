@@ -90,12 +90,14 @@ namespace WebGL.Core.Managers
                 _pcCliQuality = true;
                 ApplyTier(cliTier, savePref: false);
                 PCStudioReflections.Ensure();
+                PCMaterialSwapper.Ensure();
                 return;
             }
 #endif
             ApplyTier(SavedTier, savePref: false);
 #if UNITY_STANDALONE
             PCStudioReflections.Ensure();
+                PCMaterialSwapper.Ensure();
 #endif
         }
 

@@ -48,6 +48,7 @@ namespace WebGL.Core.Managers
         // PC (fase 1): notifica cambios de preset / hora / luz / fondo para refrescar el probe de reflejos.
         public event System.Action OnEnvironmentChanged;
         public Light KeyLight => directionalLight;
+        public Material GradientSkybox => _gradientSkybox;
         private void NotifyEnvironmentChanged() => OnEnvironmentChanged?.Invoke();
 #endif
 
@@ -459,6 +460,11 @@ namespace WebGL.Core.Managers
             if (Camera.main != null && _gradientSkybox != null)
             {
                 Camera.main.clearFlags = CameraClearFlags.Skybox;
+#if UNITY_STANDALONE
+                // PC (fase 3A): RenderSettings.skybox es el HDRI de estudio; el degradado va en un componente Skybox de la camara.
+                if (PCStudioReflections.OwnsEnvironment) PCStudioReflections.AssignCameraBackground(Camera.main, _gradientSkybox);
+                else
+#endif
                 RenderSettings.skybox = _gradientSkybox;
             }
 
@@ -472,7 +478,11 @@ namespace WebGL.Core.Managers
             float fromDither = _gradientSkybox != null ? _gradientSkybox.GetFloat(DitherStrengthId) : 0f;
             float fromGrid = _gradientSkybox != null ? _gradientSkybox.GetFloat(GridEnabledId) : 0f;
 
-            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
+            bool pcOwnsAmbient = false;
+#if UNITY_STANDALONE
+            pcOwnsAmbient = PCStudioReflections.OwnsEnvironment;
+#endif
+            if (!pcOwnsAmbient) RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
             Color fromSkyColor = RenderSettings.ambientSkyColor;
             Color fromEquatorColor = RenderSettings.ambientEquatorColor;
             Color fromGroundColor = RenderSettings.ambientGroundColor;
@@ -502,9 +512,12 @@ namespace WebGL.Core.Managers
                     
                     ResolveAmbientLighting(target, bgFactor, out Color skyLighting, out Color equatorLighting, out Color groundLighting);
                     
-                    RenderSettings.ambientSkyColor = Color.Lerp(fromSkyColor, skyLighting, t);
-                    RenderSettings.ambientEquatorColor = Color.Lerp(fromEquatorColor, equatorLighting, t);
-                    RenderSettings.ambientGroundColor = Color.Lerp(fromGroundColor, groundLighting, t);
+                    if (!pcOwnsAmbient)
+                    {
+                        RenderSettings.ambientSkyColor = Color.Lerp(fromSkyColor, skyLighting, t);
+                        RenderSettings.ambientEquatorColor = Color.Lerp(fromEquatorColor, equatorLighting, t);
+                        RenderSettings.ambientGroundColor = Color.Lerp(fromGroundColor, groundLighting, t);
+                    }
                 }
 
                 if (directionalLight != null)
@@ -529,9 +542,12 @@ namespace WebGL.Core.Managers
 
                 float bgFactor = Mathf.Clamp01(_backgroundIntensity / 100f);
                 ResolveAmbientLighting(target, bgFactor, out Color skyLighting, out Color equatorLighting, out Color groundLighting);
-                RenderSettings.ambientSkyColor = skyLighting;
-                RenderSettings.ambientEquatorColor = equatorLighting;
-                RenderSettings.ambientGroundColor = groundLighting;
+                if (!pcOwnsAmbient)
+                {
+                    RenderSettings.ambientSkyColor = skyLighting;
+                    RenderSettings.ambientEquatorColor = equatorLighting;
+                    RenderSettings.ambientGroundColor = groundLighting;
+                }
             }
 
             if (directionalLight != null)
@@ -580,6 +596,9 @@ namespace WebGL.Core.Managers
             _gradientSkybox.SetColor(BottomColorId, bottom);
 
             ResolveAmbientLighting(GetPresetData(_currentPreset), bgFactor, out Color skyLighting, out Color equatorLighting, out Color groundLighting);
+#if UNITY_STANDALONE
+            if (PCStudioReflections.OwnsEnvironment) return;
+#endif
             RenderSettings.ambientSkyColor = skyLighting;
             RenderSettings.ambientEquatorColor = equatorLighting;
             RenderSettings.ambientGroundColor = groundLighting;
@@ -634,7 +653,7 @@ namespace WebGL.Core.Managers
                 keyEuler.y + 120f,
                 0.55f,
                 1.45f,
-                Color.Lerp(keyColor, coolSoftbox, 0.48f),
+                FillColor(keyColor, coolSoftbox),
                 Mathf.Clamp(keyIntensity * 0.50f * studioBoost, 0.18f, 6.0f),
                 3.4f,
                 88f,
@@ -647,7 +666,7 @@ namespace WebGL.Core.Managers
                 keyEuler.y + 205f,
                 0.95f,
                 1.42f,
-                Color.Lerp(keyColor, neutralSoftbox, 0.62f),
+                RimColor(keyColor, neutralSoftbox),
                 Mathf.Clamp(keyIntensity * 0.75f * studioBoost, 0.20f, 8.0f),
                 3.2f,
                 58f,
@@ -660,7 +679,7 @@ namespace WebGL.Core.Managers
                 keyEuler.y + 18f,
                 1.70f,
                 0.42f,
-                Color.Lerp(keyColor, warmSoftbox, 0.35f),
+                TopColor(keyColor, warmSoftbox),
                 Mathf.Clamp(keyIntensity * 0.52f * studioBoost, 0.18f, 7.0f),
                 2.8f,
                 104f,
@@ -673,11 +692,50 @@ namespace WebGL.Core.Managers
                 keyEuler.y + 182f,
                 -0.55f,
                 0.90f,
-                Color.Lerp(keyColor, coolSoftbox, 0.70f),
+                BounceColor(keyColor, coolSoftbox),
                 Mathf.Clamp(keyIntensity * 0.28f * studioBoost, 0.08f, 3.0f),
                 2.4f,
                 116f,
                 performanceMode);
+        }
+
+        // G10 (PC, fase 3A): rig key/fill/rim con temperatura de color (K) coherente con el HDRI de estudio
+        // (softboxes neutros): key = el color del preset; fill 7000 K (frio, suave); rim 8500 K (contra
+        // frio); top 5600 K; bounce 4300 K (calido). El tinte del preset (Sunset, color...) se mantiene a medias.
+        private static Color Kelvin(Color keyColor, float kelvin, float presetMix)
+        {
+            Color c = Mathf.CorrelatedColorTemperatureToRGB(kelvin);
+            float m = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
+            c = new Color(c.r / m, c.g / m, c.b / m, 1f);
+            return c * Color.Lerp(Color.white, keyColor, presetMix);
+        }
+        private static Color FillColor(Color key, Color legacy) {
+#if UNITY_STANDALONE
+            return Kelvin(key, 7000f, 0.5f);
+#else
+            return Color.Lerp(key, legacy, 0.48f);
+#endif
+        }
+        private static Color RimColor(Color key, Color legacy) {
+#if UNITY_STANDALONE
+            return Kelvin(key, 8500f, 0.4f);
+#else
+            return Color.Lerp(key, legacy, 0.62f);
+#endif
+        }
+        private static Color TopColor(Color key, Color legacy) {
+#if UNITY_STANDALONE
+            return Kelvin(key, 5600f, 0.6f);
+#else
+            return Color.Lerp(key, legacy, 0.35f);
+#endif
+        }
+        private static Color BounceColor(Color key, Color legacy) {
+#if UNITY_STANDALONE
+            return Kelvin(key, 4300f, 0.5f);
+#else
+            return Color.Lerp(key, legacy, 0.70f);
+#endif
         }
 
         private static void PositionStudioSoftbox(
@@ -713,7 +771,12 @@ namespace WebGL.Core.Managers
             light.intensity = intensity;
             light.range = Mathf.Max(safeRadius * rangeFactor, 4f);
             light.spotAngle = spotAngle;
+#if UNITY_STANDALONE
+            // Suavidad: penumbra amplia (cono interior estrecho) para que el relleno se funda con el HDRI.
+            light.innerSpotAngle = Mathf.Clamp(spotAngle * 0.3f, 8f, spotAngle);
+#else
             light.innerSpotAngle = Mathf.Clamp(spotAngle * 0.62f, 12f, spotAngle);
+#endif
             light.enabled = true;
         }
 

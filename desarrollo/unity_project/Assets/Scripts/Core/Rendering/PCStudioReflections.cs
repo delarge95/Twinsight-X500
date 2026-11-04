@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace WebGL.Core.Managers
 {
@@ -65,6 +66,39 @@ namespace WebGL.Core.Managers
         private bool _radiusFromDrone;
         private int _renders;
 
+        // ── Fase 3A: HDRI de estudio (Poly Haven, studio_small_09, CC0) ──
+        // Se usa como skybox de la escena (RenderSettings.skybox): alimenta el ambiente (SH) y el
+        // Reflection Probe. El fondo visible sigue siendo el degradado: se asigna a la camara con un
+        // componente Skybox (tiene prioridad sobre RenderSettings.skybox).
+        public static bool UseHdri = true;
+        public static float HdriYawOffset = 0f;     // grados: alinea el softbox principal del HDRI con la luz clave
+        public static float HdriExposure = 1.2f;
+        public static float AmbientIntensity = 1.05f;
+        public static float PanelWeight = 0.0f;     // 0 = sin paneles emisivos (solo HDRI)
+        private Material _hdriMat;
+        private static bool _ownsEnvironment;
+        public static bool OwnsEnvironment => _ownsEnvironment;
+        private Skybox _camSkybox;
+        private Material _gradient;
+
+        public static void AssignCameraBackground(Camera cam, Material gradient)
+        {
+            if (cam == null || gradient == null) return;
+            var sb = cam.GetComponent<Skybox>();
+            if (sb == null) sb = cam.gameObject.AddComponent<Skybox>();
+            sb.material = gradient;
+        }
+
+        private static void ApplySsaoForTier(QualityTier tier)
+        {
+            // SSAO: solo en High y Ultra (la feature vive en PC_Renderer y se enciende/apaga por tier).
+            bool on = tier >= QualityTier.High;
+            foreach (var f in Resources.FindObjectsOfTypeAll<ScreenSpaceAmbientOcclusion>())
+            {
+                if (f != null && f.isActive != on) f.SetActive(on);
+            }
+        }
+
         public int RenderCount => _renders;
         public string ShaderUsed { get; private set; }
 
@@ -88,14 +122,19 @@ namespace WebGL.Core.Managers
             int named = LayerMask.NameToLayer(LayerName);
             _layer = named >= 0 ? named : FallbackLayer;
 
+            var skySrc = Resources.Load<Material>("PC/PC_HDRISky");
+            if (UseHdri && skySrc != null) { _hdriMat = new Material(skySrc) { name = "PC_HDRISky (runtime)" }; _ownsEnvironment = true; }
+
             BuildProbe();
             BuildPanels();
+            ApplySsaoForTier(RenderQualityController.ResolvedTier);
             RenderQualityController.OnTierChanged += OnTierChanged;
             ScheduleRefresh(0.6f);
         }
 
         private void OnDestroy()
         {
+            _ownsEnvironment = false;
             RenderQualityController.OnTierChanged -= OnTierChanged;
             if (_env != null) _env.OnEnvironmentChanged -= OnEnvironmentChanged;
             if (_instance == this) _instance = null;
@@ -110,6 +149,7 @@ namespace WebGL.Core.Managers
 
         private void OnTierChanged(QualityTier tier)
         {
+            ApplySsaoForTier(tier);
             ScheduleRefresh(0.1f);
         }
 
@@ -160,7 +200,7 @@ namespace WebGL.Core.Managers
             _probe.nearClipPlane = 0.3f;
             _probe.farClipPlane = 600f;
             _probe.shadowDistance = 0f;
-            _probe.clearFlags = ReflectionProbeClearFlags.SolidColor;
+            _probe.clearFlags = _hdriMat != null ? ReflectionProbeClearFlags.Skybox : ReflectionProbeClearFlags.SolidColor;
             _probe.backgroundColor = new Color(0.04f, 0.045f, 0.055f, 1f);
             _probe.cullingMask = 1 << _layer;
             _probe.resolution = 256;
@@ -306,10 +346,12 @@ namespace WebGL.Core.Managers
                 t.localScale = new Vector3(w, h, 1f);
 
                 Color baseColor = d.useKeyColor ? Color.Lerp(Color.white, keyColor, 0.7f) : Color.Lerp(d.tint, keyColor, 0.18f);
-                Color hdr = baseColor * (d.intensity * exposure);
+                float weight = _hdriMat != null ? PanelWeight : 1f;
+                Color hdr = baseColor * (d.intensity * exposure * weight);
                 hdr.a = 1f;
                 SetMaterialColor(_panelMaterials[i], hdr);
                 _panelRenderers[i].gameObject.layer = _layer;
+                _panelRenderers[i].enabled = weight > 0.001f;
             }
 
             _probe.transform.position = _center;
@@ -325,6 +367,23 @@ namespace WebGL.Core.Managers
             // La camara principal no renderiza los paneles.
             Camera main = Camera.main;
             if (main != null) main.cullingMask &= ~(1 << _layer);
+
+            if (_hdriMat != null)
+            {
+                // Rotacion: el softbox principal del HDRI sigue a la luz clave; exposicion y tinte siguen al preset.
+                _hdriMat.SetFloat("_Rotation", Mathf.Repeat(-keyPosYaw + HdriYawOffset, 360f));
+                _hdriMat.SetFloat("_Exposure", HdriExposure * exposure);
+                Color tint = Color.Lerp(Color.white, keyColor, 0.45f) * 0.5f;
+                tint.a = 0.5f;
+                _hdriMat.SetColor("_Tint", tint);
+                RenderSettings.skybox = _hdriMat;
+                RenderSettings.ambientMode = AmbientMode.Skybox;
+                RenderSettings.ambientIntensity = AmbientIntensity;
+                RenderSettings.defaultReflectionMode = DefaultReflectionMode.Skybox;
+                RenderSettings.reflectionIntensity = 1f;
+                if (_env != null) AssignCameraBackground(Camera.main, _env.GradientSkybox);
+                DynamicGI.UpdateEnvironment();
+            }
 
             _probe.RenderProbe();
             _renders++;

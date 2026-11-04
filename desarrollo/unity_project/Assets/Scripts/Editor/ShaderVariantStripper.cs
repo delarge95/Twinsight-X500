@@ -55,6 +55,7 @@ namespace WebGL.Editor
         private static readonly HashSet<string> ClippableLitPcOnlyKeywords = new()
         {
             "_CASTING_PUNCTUAL_LIGHT_SHADOW",
+            "_SCREEN_SPACE_OCCLUSION",   // fase 3A (SSAO en PC)
         };
 
         private int _strippedCount = 0;
@@ -73,6 +74,15 @@ namespace WebGL.Editor
             if (shader == null || shader.name.StartsWith("Hidden/CoreSRP") || shader.name.StartsWith("Hidden/Universal"))
                 return;
             
+            // Fase 3A: los shaders/materiales de PC (Resources/PC) no se compilan para WebGL.
+            if (shader.name == "TwinSight/DroneLitPC")
+            {
+                _strippedCount += variants.Count;
+                _totalCount += variants.Count;
+                variants.Clear();
+                return;
+            }
+
             _totalCount += variants.Count;
             
             for (int i = variants.Count - 1; i >= 0; --i)
