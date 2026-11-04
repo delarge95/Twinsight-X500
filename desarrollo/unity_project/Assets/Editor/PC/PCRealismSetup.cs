@@ -156,8 +156,8 @@ namespace WebGL.Editor.PC
         {
             var l = new List<Def>();
             Def d;
-            d = D("PC_CarbonPlate", "carbon_fiber_01", true, 0.0f, 0.42f); d.bump = 0.35f; d.clearCoat = 1f; d.coatSmooth = 0.88f; d.detail = 0.7f; d.detailTiling = 28f; l.Add(d);
-            d = D("PC_CarbonTube", "MAT_Plastic_Black", true, 0.0f, 0.4f); d.bump = 0.3f; d.clearCoat = 1f; d.coatSmooth = 0.9f; d.detail = 0.35f; d.detailTiling = 22f; l.Add(d);
+            d = D("PC_CarbonPlate", "carbon_fiber_01", true, 0.0f, 0.42f); d.bump = 0.25f; d.clearCoat = 1f; d.coatSmooth = 0.7f; d.detail = 0f; d.detailTiling = 28f; l.Add(d);
+            d = D("PC_CarbonTube", "MAT_Plastic_Black", true, 0.0f, 0.4f); d.bump = 0.25f; d.clearCoat = 1f; d.coatSmooth = 0.7f; d.detail = 0f; d.detailTiling = 22f; l.Add(d);
             d = D("PC_AnodizedBlue", "MAT_Plastic_Blue", true, 0.85f, 0.58f); d.bump = 0.6f; l.Add(d);
             d = D("PC_AnodizedBlack", "MAT_Alum_Black", true, 0.9f, 0.5f); d.bump = 0f; l.Add(d);
             d = D("PC_Motor", "BAKE_PREVIEW.007", true, 0.8f, 0.55f); l.Add(d);

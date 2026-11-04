@@ -55,6 +55,20 @@ namespace WebGL.Core.Utils
             Type t = Type.GetType("WebGL.UI.UIManager, UI");
             object inst = t != null ? UnityEngine.Object.FindFirstObjectByType(t) : null;
             t?.GetMethod("PrepareViewerForDeepLink")?.Invoke(inst, null);
+            string shot = null;
+            string[] a = Environment.GetCommandLineArgs();
+            for (int i = 0; i < a.Length - 1; i++) if (a[i] == "-perf-shot") shot = a[i + 1];
+            if (shot != null)
+            {
+                // Captura durante la medicion (confirma que el visor esta abierto).
+                yield return new WaitForSecondsRealtime(22f);
+                yield return new WaitForEndOfFrame();
+                var tex = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+                tex.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+                tex.Apply();
+                System.IO.File.WriteAllBytes(shot, ImageConversion.EncodeToPNG(tex));
+                Destroy(tex);
+            }
             Debug.Log("[PerfLogger] visor abierto: tipo=" + (t != null) + " instancia=" + (inst != null));
         }
 
