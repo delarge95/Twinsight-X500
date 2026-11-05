@@ -92,8 +92,56 @@ namespace WebGL.Core.Managers
         private void Update()
         {
             CacheUIDocumentIfNeeded();
+#if UNITY_STANDALONE
+            RefreshUIGesture();
+#endif
             HandleInput();
         }
+
+#if UNITY_STANDALONE
+        // PC: a pointer gesture that STARTS on pickable UI owns the gesture until every button is released
+        // (slider drags, panel drags). Without it, dragging a slider outside its bounds orbited the camera or
+        // changed hover/selection, because the UI block only looked at the press point.
+        private static readonly bool UIGestureDisabledForTest =
+            Array.IndexOf(Environment.GetCommandLineArgs(), "-no-uigesture") >= 0;   // test flag: reproduce the old behaviour
+        private int _uiGestureFrame = -1;
+        private bool _uiGestureOwned;
+        private bool _uiGesturePrevHeld;
+
+        /// <summary>True while a mouse gesture that began on pickable UI is still held.</summary>
+        public bool UIGestureOwnsPointer
+        {
+            get { RefreshUIGesture(); return _uiGestureOwned && !UIGestureDisabledForTest; }
+        }
+
+        private void RefreshUIGesture()
+        {
+            if (_uiGestureFrame == Time.frameCount) return;
+            _uiGestureFrame = Time.frameCount;
+
+            bool down = Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2);
+            bool held = Input.GetMouseButton(0) || Input.GetMouseButton(1) || Input.GetMouseButton(2);
+            if (!held && !down)
+            {
+                _uiGestureOwned = false;
+                _uiGesturePrevHeld = false;
+                return;
+            }
+
+            if (down && !_uiGesturePrevHeld)
+            {
+                _uiGestureOwned = IsScreenPositionOverPickableUI(Input.mousePosition);
+            }
+
+            _uiGesturePrevHeld = held;
+        }
+
+        /// <summary>True when the cursor is over any pickable UI (keeps the wheel from zooming under panels / the part tree).</summary>
+        public bool IsPointerOverPickableUIForWheel()
+        {
+            return IsScreenPositionOverPickableUI(Input.mousePosition);
+        }
+#endif
 
         // ═══════════════════════════════════════════════════════
         //  UI Detection — Uses RuntimePanelUtils + Panel.Pick()
@@ -116,6 +164,9 @@ namespace WebGL.Core.Managers
         /// </summary>
         public bool IsPointerOverCameraBlockingUI()
         {
+#if UNITY_STANDALONE
+            if (UIGestureOwnsPointer) return true;
+#endif
             if (InputBlocked)
             {
                 return true;
@@ -179,6 +230,9 @@ namespace WebGL.Core.Managers
         /// </summary>
         public bool IsPointerOverSelectionBlockingUI()
         {
+#if UNITY_STANDALONE
+            if (UIGestureOwnsPointer) return true;
+#endif
             if (InputBlocked)
             {
                 return true;

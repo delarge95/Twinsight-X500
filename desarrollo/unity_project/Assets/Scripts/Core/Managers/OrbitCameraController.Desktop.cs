@@ -152,7 +152,8 @@ namespace WebGL.Core.Managers
 
             // ── Wheel: zoom toward the cursor ──
             float scroll = Input.GetAxis("Mouse ScrollWheel");
-            if (Mathf.Abs(scroll) > 0.001f && !IsPointerOverCameraBlockingUI())
+            if (Mathf.Abs(scroll) > 0.001f && !IsPointerOverCameraBlockingUI()
+                && !(InputManager.Instance != null && InputManager.Instance.IsPointerOverPickableUIForWheel()))
             {
                 DesktopZoomAt(Input.mousePosition, scroll * MOUSE_SCROLL_SCALE);
             }

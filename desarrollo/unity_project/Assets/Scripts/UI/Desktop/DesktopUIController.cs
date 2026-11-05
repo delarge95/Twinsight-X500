@@ -348,6 +348,21 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-desk-demoui", StringComparison.OrdinalIgnoreCase))
+                {
+                    var demoUi = gameObject.AddComponent<DesktopCaptureDemoUI>();
+                    demoUi.OutputDirectory = args[i + 1];
+                    return;
+                }
+
+                if (args[i].Equals("-desk-sliderprobe", StringComparison.OrdinalIgnoreCase) && i + 2 < args.Length)
+                {
+                    var probe = gameObject.AddComponent<DesktopCaptureDemoUI>();
+                    probe.OutputDirectory = args[i + 1];
+                    probe.ProbeKind = args[i + 2];
+                    return;
+                }
+
                 if (args[i].Equals("-desk-demo3b", StringComparison.OrdinalIgnoreCase))
                 {
                     var demo3b = gameObject.AddComponent<DesktopCaptureDemo3B>();
