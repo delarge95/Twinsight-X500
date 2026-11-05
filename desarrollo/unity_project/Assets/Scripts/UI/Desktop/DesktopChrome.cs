@@ -53,6 +53,7 @@ namespace WebGL.UI.Desktop
         private Button _studioRender, _studioEnv;
         private VisualElement _studioStrip, _studioPanel, _studioContainer;
         private Label _studioRenderLabel;
+        private DesktopVectorIcon _renderIcon;
         private VisualElement _toolsGrid, _analyzeGrid;
         private readonly List<DesktopVectorIcon> _icons = new List<DesktopVectorIcon>();
 
@@ -120,6 +121,102 @@ namespace WebGL.UI.Desktop
             b.RegisterCallback<PointerEnterEvent>(_ => ic.MarkDirtyRepaint());
             b.RegisterCallback<PointerLeaveEvent>(_ => ic.MarkDirtyRepaint());
             return b;
+        }
+
+        private DesktopVectorIcon NewIcon(string shape, float size)
+        {
+            var ic = new DesktopVectorIcon(shape, size);
+            _icons.Add(ic);
+            return ic;
+        }
+
+        /// <summary>Every icon of the PC UI comes from the one set: the procedural / text glyphs of the shared UXML are replaced here.</summary>
+        private void DecorateDesktopControls()
+        {
+            var cards = new Dictionary<string, string>
+            {
+                { "ToolHotspotBtn", "pins" }, { "ToolIsolateBtn", "isolate" }, { "ToolPowerBtn", "power" },
+                { "AnalyzeCrossSectionBtn", "cut" }, { "AnalyzeExplodeBtn", "explode" }, { "AnalyzeFilterBtn", "filter" },
+                { "ShaderMode_Realistic", "realistic" }, { "ShaderMode_XRay", "xray" }, { "ShaderMode_Blueprint", "studio" },
+                { "ShaderMode_SolidColor", "solid" }, { "ShaderMode_Wireframe", "wire" }, { "ShaderMode_Ghosted", "ghost" },
+                { "ShaderMode_Thermal", "thermal" },
+                { "EnvPreset_Studio", "env_studio" }, { "EnvPreset_Night", "env_time" }, { "EnvPreset_Blueprint", "env_color" },
+                { "EnvPreset_Neutral", "env_studio" },
+                { "CatBtn_Structure", "solid" }, { "CatBtn_Propulsion", "propulsion" }, { "CatBtn_Avionics", "avionics" },
+                { "CatBtn_Sensors", "sensors" }, { "CatBtn_Power", "battery" }, { "CatBtn_Payload", "fastener" }
+            };
+            foreach (var kv in cards)
+            {
+                Button b = _root.Q<Button>(kv.Key);
+                if (b == null) continue;
+                var ic = NewIcon(kv.Value, 16);
+                ic.AddToClassList("dk-card-icon");
+                b.Insert(0, ic);
+            }
+
+            foreach (string n in new[] { "CrossSectionBackBtn", "FilterBackBtn" })
+            {
+                Button b = _root.Q<Button>(n);
+                if (b == null) continue;
+                b.text = string.Empty;
+                b.Add(NewIcon("close", 16));
+            }
+
+            Button sheetClose = _root.Q<Button>("SheetCloseBtn");
+            if (sheetClose != null) sheetClose.Add(NewIcon("close", 16));
+
+            Button combine = _root.Q<Button>("CrossSectionCombineBtn");
+            if (combine != null) combine.Add(NewIcon("angle", 16));
+            foreach (string n in new[] { "CrossSectionInvertBtnInline", "CrossSectionInvertBtn2Inline" })
+            {
+                Button b = _root.Q<Button>(n);
+                if (b != null) b.Add(NewIcon("invert", 16));
+            }
+
+            Button info = _root.Q<Button>("HeroInfoBtn");
+            if (info != null)
+            {
+                info.text = string.Empty;
+                info.AddToClassList("dk-b");
+                info.AddToClassList("dk-b--icon");
+                info.Add(NewIcon("info", 20));
+            }
+
+            foreach (string n in new[] { "SubmenuBackBtn_Devices", "SubmenuBackBtn_About", "SubmenuBackBtn_Config", "SubmenuBackBtn_Exit" })
+            {
+                Button b = _root.Q<Button>(n);
+                if (b == null) continue;
+                b.text = string.Empty;
+                b.AddToClassList("dk-b");
+                b.AddToClassList("dk-b--icon");
+                b.AddToClassList("dk-b--hero-back");
+                b.Add(NewIcon("back", 24));
+            }
+
+            StyleHeroButton("HeroExploreBtn", "dk-b--primary", null);
+            StyleHeroButton("HeroDeviceBtn", "dk-b--secondary", "studio");
+            StyleHeroButton("HeroConfigBtn", "dk-b--secondary", "settings");
+            StyleHeroButton("HeroExitBtn", "dk-b--secondary", null);
+            StyleHeroButton("HeroHelpBtn", "dk-b--secondary", "help");
+            StyleHeroButton("HeroGithubBtn", "dk-b--ghost", null);
+            StyleHeroButton("HeroPerfCaptureBtn", "dk-b--ghost", null);
+            StyleHeroButton("ExitConfirmBtn", "dk-b--primary", null);
+            StyleHeroButton("ExitCancelBtn", "dk-b--secondary", null);
+        }
+
+        private void StyleHeroButton(string name, string variant, string icon)
+        {
+            Button b = _root.Q<Button>(name);
+            if (b == null) return;
+            b.AddToClassList("dk-b");
+            b.AddToClassList("dk-b--lg");
+            b.AddToClassList(variant);
+            if (icon != null)
+            {
+                var ic = NewIcon(icon, 20);
+                ic.AddToClassList("dk-b-lead");
+                b.Add(ic);
+            }
         }
 
         private static Label Kbd(string key)
@@ -190,6 +287,9 @@ namespace WebGL.UI.Desktop
                 int mode = i + 1;
                 var b = new Button(() => _ui.ShortcutToggleMode(mode)) { name = "DkMode" + mode };
                 b.AddToClassList("dk-seg-btn");
+                var segIcon = new DesktopVectorIcon(mode == 1 ? "inspect" : mode == 2 ? "analyze" : "studio", 16);
+                _icons.Add(segIcon);
+                b.Add(segIcon);
                 var t = new Label { pickingMode = PickingMode.Ignore };
                 t.AddToClassList("dk-seg-text");
                 b.Add(t);
@@ -220,6 +320,10 @@ namespace WebGL.UI.Desktop
 
             var lang = new VisualElement();
             lang.AddToClassList("dk-lang");
+            var langIcon = new DesktopVectorIcon("language", 16);
+            langIcon.AddToClassList("dk-lang-icon");
+            _icons.Add(langIcon);
+            lang.Add(langIcon);
             _btnLangEn = new Button(() => AppLanguageManager.SetLanguage("en")) { text = "EN" };
             _btnLangEs = new Button(() => AppLanguageManager.SetLanguage("es")) { text = "ES" };
             _btnLangEn.AddToClassList("dk-lang-btn");
@@ -328,7 +432,7 @@ namespace WebGL.UI.Desktop
             var title = new Label { name = "DkSettingsTitle", pickingMode = PickingMode.Ignore };
             title.AddToClassList("dk-pop-title");
             head.Add(title);
-            var close = IconButton("close", "DkSettingsClose", CloseSettings, 14);
+            var close = IconButton("close", "DkSettingsClose", CloseSettings, 16);
             close.AddToClassList("dk-ibtn--small");
             head.Add(close);
             _settings.Add(head);
@@ -400,11 +504,7 @@ namespace WebGL.UI.Desktop
             ClearInlineStyles(_root.Q<VisualElement>("ToolPowerLoadValue"));
             ClearInlineStyles(_root.Q<VisualElement>("ToolPowerLoadSlider"));
 
-            foreach (string n in new[] { "CrossSectionBackBtn", "FilterBackBtn" })
-            {
-                var b = _root.Q<Button>(n);
-                if (b != null) b.text = "x";
-            }
+            DecorateDesktopControls();
 
             // Render modes hidden in the shared UXML (Realistic, Wireframe, Ghosted) are exposed on PC.
             foreach (string n in new[] { "ShaderMode_Realistic", "ShaderMode_Wireframe", "ShaderMode_Ghosted" })
@@ -420,14 +520,18 @@ namespace WebGL.UI.Desktop
                 _studioStrip.AddToClassList("dk-strip--studio");
                 _studioRender = new Button(() => SetStudioSection(_studioSection == "render" ? "none" : "render")) { name = "DkStudioRender" };
                 _studioRender.AddToClassList("dk-strip-btn");
-                _studioRender.Add(new DesktopVectorIcon("render", 15) { name = "DkRenderIcon" });
+                _renderIcon = new DesktopVectorIcon("realistic", 16) { name = "DkRenderIcon" };
+                _icons.Add(_renderIcon);
+                _studioRender.Add(_renderIcon);
                 _studioRenderLabel = new Label { pickingMode = PickingMode.Ignore };
                 _studioRenderLabel.AddToClassList("dk-strip-text");
                 _studioRender.Add(_studioRenderLabel);
                 _studioRender.Add(Kbd("V"));
                 _studioEnv = new Button(() => SetStudioSection(_studioSection == "env" ? "none" : "env")) { name = "DkStudioEnv" };
                 _studioEnv.AddToClassList("dk-strip-btn");
-                _studioEnv.Add(new DesktopVectorIcon("env", 15));
+                var envIcon = new DesktopVectorIcon("env_time", 16);
+                _icons.Add(envIcon);
+                _studioEnv.Add(envIcon);
                 var envLabel = new Label { name = "DkEnvLabel", pickingMode = PickingMode.Ignore };
                 envLabel.AddToClassList("dk-strip-text");
                 _studioEnv.Add(envLabel);
@@ -494,14 +598,14 @@ namespace WebGL.UI.Desktop
             footer.AddToClassList("dk-sheet-footer");
             var focus = new Button(() => _ui.ShortcutFocusSelection()) { name = "DkFocus" };
             focus.AddToClassList("dk-btn");
-            focus.Add(new DesktopVectorIcon("focus", 14));
+            focus.Add(NewIcon("focus", 16));
             var fl = new Label { name = "DkFocusLabel", pickingMode = PickingMode.Ignore };
             fl.AddToClassList("dk-btn-text");
             focus.Add(fl);
             focus.Add(Kbd("F"));
             var iso = new Button(() => _ui.ShortcutToggleIsolation()) { name = "DkIsolate" };
             iso.AddToClassList("dk-btn");
-            iso.Add(new DesktopVectorIcon("iso", 14));
+            iso.Add(NewIcon("isolate", 16));
             var il = new Label { name = "DkIsolateLabel", pickingMode = PickingMode.Ignore };
             il.AddToClassList("dk-btn-text");
             iso.Add(il);
@@ -612,6 +716,7 @@ namespace WebGL.UI.Desktop
                 if (_studioRenderLabel != null && ViewModeManager.Instance != null)
                 {
                     _studioRenderLabel.text = T("Render: ", "Render: ") + ModeName(ViewModeManager.Instance.CurrentMode);
+                    _renderIcon?.SetShape(ModeIcon(ViewModeManager.Instance.CurrentMode));
                 }
             }
 
@@ -631,12 +736,26 @@ namespace WebGL.UI.Desktop
                            "Arrastrar fondo: orbitar · Shift+clic der.: desplazar · Rueda: zoom al cursor · Doble clic: enfocar");
             _helpLabel.text = T("Shortcuts", "Atajos");
 
-            foreach (DesktopVectorIcon ic in _icons) ic.MarkDirtyRepaint();
+            foreach (DesktopVectorIcon ic in _icons) ic.Refresh();
         }
 
         private static void SetOn(Button b, bool on)
         {
             if (b != null) b.EnableInClassList("dk-ibtn--on", on);
+        }
+
+        private static string ModeIcon(ViewMode m)
+        {
+            switch (m)
+            {
+                case ViewMode.XRay: return "xray";
+                case ViewMode.SolidColor: return "solid";
+                case ViewMode.Thermal: return "thermal";
+                case ViewMode.Wireframe: return "wire";
+                case ViewMode.Ghosted: return "ghost";
+                case ViewMode.Blueprint: return "studio";
+                default: return "realistic";
+            }
         }
 
         private static string ModeName(ViewMode m)

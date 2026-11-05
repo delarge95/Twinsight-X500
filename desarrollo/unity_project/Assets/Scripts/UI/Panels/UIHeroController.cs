@@ -425,11 +425,19 @@ namespace WebGL.UI.Panels
         /// </summary>
         private void ApplyDesktopTexts(bool spanish)
         {
+            // sentence case, like the approved button sheet (the shared strings stay upper case for WebGL / mobile)
+            void Txt(string n, string es, string en) { var b = _root.Q<Button>(n); if (b != null) b.text = spanish ? es : en; }
+            Txt("HeroExploreBtn", "Abrir visor", "Open viewer");
+            Txt("HeroConfigBtn", "Configuración", "Settings");
+            Txt("HeroHelpBtn", "Ver tutorial", "View tutorial");
+            Txt("HeroGithubBtn", "Ver el repositorio", "View source repository");
+            Txt("ExitCancelBtn", "Cancelar", "Cancel");
+
             var deviceBtn = _root.Q<Button>("HeroDeviceBtn");
-            if (deviceBtn != null) deviceBtn.text = spanish ? "MODELO" : "MODEL";
+            if (deviceBtn != null) deviceBtn.text = spanish ? "Modelo" : "Model";
 
             var exitBtn = _root.Q<Button>("HeroExitBtn");
-            if (exitBtn != null) exitBtn.text = spanish ? "SALIR" : "QUIT";
+            if (exitBtn != null) exitBtn.text = spanish ? "Salir" : "Quit";
 
             var subtitle = _root.Q<Label>("HeroSubtitle");
             if (subtitle != null)
@@ -452,7 +460,7 @@ namespace WebGL.UI.Panels
             }
 
             var exitConfirm = _root.Q<Button>("ExitConfirmBtn");
-            if (exitConfirm != null) exitConfirm.text = spanish ? "CERRAR LA APP" : "QUIT APP";
+            if (exitConfirm != null) exitConfirm.text = spanish ? "Cerrar la app" : "Quit app";
 
             Label aboutDesc = _submenuAbout?.Q<Label>(className: "about-desc");
             if (aboutDesc != null)

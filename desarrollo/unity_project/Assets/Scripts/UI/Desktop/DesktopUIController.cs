@@ -245,6 +245,7 @@ namespace WebGL.UI.Desktop
             _sidePanel.Tick();
             _tree.Tick();
             _chrome?.Tick(_scaler.LogicalSize.x);
+            DesktopVectorIcon.RefreshAll();
             DesktopWindowSettings.TickMinimumSize();
 
             if (Screen.width != _lastScreenW || Screen.height != _lastScreenH)
@@ -253,6 +254,10 @@ namespace WebGL.UI.Desktop
                 _lastScreenH = Screen.height;
                 _display?.Refresh();
             }
+
+            // keyboard focus ring (the button system draws it only after Tab / arrows, never after a click)
+            if (Input.GetMouseButtonDown(0)) _root.RemoveFromClassList("dk-keynav");
+            else if (Input.GetKeyDown(KeyCode.Tab)) _root.AddToClassList("dk-keynav");
 
             UpdateHintVisibility();
             HandleShortcuts();

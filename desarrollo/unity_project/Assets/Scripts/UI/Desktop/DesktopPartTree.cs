@@ -31,7 +31,7 @@ namespace WebGL.UI.Desktop
             public readonly List<Node> Children = new List<Node>();
             public bool Expanded;
             public Button Row;
-            public Label Chevron;
+            public DesktopVectorIcon Chevron;
             public Label Title;
             public string SearchKey = string.Empty;
             public int Depth;
@@ -85,8 +85,9 @@ namespace WebGL.UI.Desktop
             header.AddToClassList("desktop-tree-header");
             _title = new Label("PIEZAS") { pickingMode = PickingMode.Ignore };
             _title.AddToClassList("desktop-tree-title");
-            var close = new Button(() => SetOpen(false)) { text = "✕" };
+            var close = new Button(() => SetOpen(false));
             close.AddToClassList("desktop-tree-close");
+            close.Add(new DesktopVectorIcon("close", 16));
             header.Add(_title);
             header.Add(close);
             _panel.Add(header);
@@ -429,7 +430,7 @@ namespace WebGL.UI.Desktop
             row.EnableInClassList("desktop-tree-row--group", n.IsGroup);
             row.style.paddingLeft = 10 + n.Depth * 16;
 
-            var chev = new Label(n.Children.Count > 0 ? "▸" : string.Empty) { pickingMode = PickingMode.Ignore };
+            var chev = new DesktopVectorIcon("chevron", 16);
             chev.AddToClassList("desktop-tree-chevron");
             var title = new Label { pickingMode = PickingMode.Ignore };
             title.AddToClassList("desktop-tree-rowtitle");
@@ -486,7 +487,8 @@ namespace WebGL.UI.Desktop
             n.Row.EnableInClassList("desktop-tree-row--match", filtering && selfMatch && n.Entry != null && !n.IsGroup);
 
             bool expanded = filtering ? true : n.Expanded;
-            if (n.Children.Count > 0) n.Chevron.text = expanded ? "▾" : "▸";
+            n.Chevron.style.visibility = n.Children.Count > 0 ? Visibility.Visible : Visibility.Hidden;
+            n.Chevron.EnableInClassList("desktop-tree-chevron--open", n.Children.Count > 0 && expanded);
             if (show)
             {
                 _visible.Add(n);

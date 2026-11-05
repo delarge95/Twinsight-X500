@@ -1,27 +1,99 @@
 #if UNITY_STANDALONE
+using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace WebGL.UI.Desktop
 {
     /// <summary>
-    /// PC only (phase 4). Small stroked vector icons drawn with Painter2D on a 24x24 grid, tinted with the
-    /// element's USS <c>color</c> so hover/active states of the chrome recolour them (celeste accent).
+    /// PC only. The single icon set of the approved sheet (docs/unity_pc/maqueta_iconos): SVG path data on a 24 grid
+    /// (<see cref="DesktopIconData"/>), parsed once, flattened to polylines and stroked with Painter2D:
+    /// 1.5 px stroke, round caps and joins, no fill, no animation. Tinted with the element's USS <c>color</c>
+    /// (rest / hover / active) so the chrome recolours them. Drawn at 16 / 20 / 24 px (or any size) without a package.
     /// </summary>
     internal sealed class DesktopVectorIcon : VisualElement
     {
-        private readonly string _shape;
+        private struct Stroke
+        {
+            public Vector2[] Points;
+            public bool Closed;
+            public bool Dashed;
+        }
+
+        private static readonly Dictionary<string, List<Stroke>> Cache = new Dictionary<string, List<Stroke>>();
+
+        // names used by older call sites
+        private static readonly Dictionary<string, string> Alias = new Dictionary<string, string>
+        {
+            { "pin", "pins" }, { "iso", "isolate" }, { "tree", "parts" }, { "sidel", "panel_l" }, { "sider", "panel_r" },
+            { "gear", "settings" }, { "render", "studio" }, { "env", "env_time" }, { "chev", "chevron" }, { "expl", "explode" },
+            { "filt", "filter" }, { "swap", "invert" }
+        };
+
+        private string _shape;
+        private readonly float _size;
 
         public DesktopVectorIcon(string shape, float size = 16f)
         {
             _shape = shape;
+            _size = size;
             pickingMode = PickingMode.Ignore;
             AddToClassList("dk-icon");
             style.width = size;
             style.height = size;
             style.minWidth = size;
+            style.minHeight = size;
             style.flexShrink = 0;
             generateVisualContent += Draw;
+            RegisterCallback<AttachToPanelEvent>(_ => Live.Add(this));
+            RegisterCallback<DetachFromPanelEvent>(_ => Live.Remove(this));
+        }
+
+        private static readonly HashSet<DesktopVectorIcon> Live = new HashSet<DesktopVectorIcon>();
+        private Color _lastColor;
+
+        /// <summary>Called once per frame by DesktopUIController: repaints the icons whose USS tint changed.</summary>
+        public static void RefreshAll()
+        {
+            foreach (DesktopVectorIcon ic in Live) ic.Refresh();
+        }
+
+        /// <summary>Repaints only when the tint (USS hover / active state) changed.</summary>
+        public void Refresh()
+        {
+            Color c = resolvedStyle.color;
+            if (c != _lastColor) { _lastColor = c; MarkDirtyRepaint(); }
+        }
+
+        public string Shape => _shape;
+
+        public void SetShape(string shape)
+        {
+            if (_shape == shape) return;
+            _shape = shape;
+            MarkDirtyRepaint();
+        }
+
+        private static List<Stroke> Get(string shape)
+        {
+            if (shape == null) return null;
+            if (Alias.TryGetValue(shape, out string real)) shape = real;
+            if (Cache.TryGetValue(shape, out List<Stroke> cached)) return cached;
+
+            List<Stroke> list = null;
+            if (DesktopIconData.Paths.TryGetValue(shape, out string[] paths))
+            {
+                list = new List<Stroke>();
+                foreach (string p in paths)
+                {
+                    bool dashed = p.Length > 0 && p[0] == '~';
+                    Parse(dashed ? p.Substring(1) : p, dashed, list);
+                }
+            }
+
+            Cache[shape] = list;
+            return list;
         }
 
         private void Draw(MeshGenerationContext ctx)
@@ -29,61 +101,253 @@ namespace WebGL.UI.Desktop
             Rect r = contentRect;
             if (r.width < 2f || r.height < 2f) return;
 
+            List<Stroke> strokes = Get(_shape);
+            if (strokes == null) return;
+
             float k = Mathf.Min(r.width, r.height) / 24f;
             Vector2 o = new Vector2(r.x + (r.width - 24f * k) * 0.5f, r.y + (r.height - 24f * k) * 0.5f);
-            Vector2 P(float x, float y) => o + new Vector2(x, y) * k;
 
             Painter2D p = ctx.painter2D;
             p.strokeColor = resolvedStyle.color;
-            p.lineWidth = Mathf.Max(1.2f, 1.7f * k);
+            p.lineWidth = 1.5f * Mathf.Max(1f, _size / 24f);
             p.lineCap = LineCap.Round;
             p.lineJoin = LineJoin.Round;
 
-            void Line(params float[] c)
+            foreach (Stroke s in strokes)
             {
+                if (s.Points.Length < 2) continue;
+                if (s.Dashed)
+                {
+                    DrawDashed(p, s, o, k);
+                    continue;
+                }
+
                 p.BeginPath();
-                p.MoveTo(P(c[0], c[1]));
-                for (int i = 2; i + 1 < c.Length; i += 2) p.LineTo(P(c[i], c[i + 1]));
+                p.MoveTo(o + s.Points[0] * k);
+                for (int i = 1; i < s.Points.Length; i++) p.LineTo(o + s.Points[i] * k);
+                if (s.Closed) p.ClosePath();
                 p.Stroke();
             }
+        }
 
-            void Circle(float cx, float cy, float rad)
+        private static void DrawDashed(Painter2D p, Stroke s, Vector2 o, float k)
+        {
+            const float on = 2f, off = 2.4f;
+            float phase = 0f;
+            bool drawing = true;
+            Vector2 prev = s.Points[0];
+            bool open = false;
+            int n = s.Points.Length + (s.Closed ? 1 : 0);
+            for (int i = 1; i < n; i++)
             {
-                p.BeginPath();
-                p.Arc(P(cx, cy), rad * k, Angle.Degrees(0f), Angle.Degrees(360f));
-                p.Stroke();
+                Vector2 cur = s.Points[i % s.Points.Length];
+                float len = Vector2.Distance(prev, cur);
+                float pos = 0f;
+                while (pos < len)
+                {
+                    float limit = drawing ? on : off;
+                    float step = Mathf.Min(limit - phase, len - pos);
+                    Vector2 a = Vector2.Lerp(prev, cur, pos / len);
+                    Vector2 b = Vector2.Lerp(prev, cur, (pos + step) / len);
+                    if (drawing)
+                    {
+                        if (!open) { p.BeginPath(); p.MoveTo(o + a * k); open = true; }
+                        p.LineTo(o + b * k);
+                    }
+
+                    pos += step;
+                    phase += step;
+                    if (phase >= limit - 1e-4f)
+                    {
+                        if (drawing && open) { p.Stroke(); open = false; }
+                        drawing = !drawing;
+                        phase = 0f;
+                    }
+                }
+
+                prev = cur;
             }
 
-            switch (_shape)
+            if (open) p.Stroke();
+        }
+
+        // ───────────────────────── SVG path parsing (M L H V C S A Z, absolute and relative) ─────────────────────────
+
+        private static void Parse(string d, bool dashed, List<Stroke> output)
+        {
+            int i = 0;
+            char cmd = ' ';
+            Vector2 cur = Vector2.zero, start = Vector2.zero, lastCtrl = Vector2.zero;
+            char prevCmd = ' ';
+            List<Vector2> pts = null;
+
+            void Flush(bool closed)
             {
-                case "home": Line(3, 11, 12, 4, 21, 11); Line(5, 10, 5, 20, 19, 20, 19, 10); break;
-                case "pin": Circle(12, 10, 5); Line(12, 15, 12, 21); Circle(12, 10, 1.6f); break;
-                case "iso": Line(4, 9, 4, 5, 8, 5); Line(20, 9, 20, 5, 16, 5); Line(4, 15, 4, 19, 8, 19); Line(20, 15, 20, 19, 16, 19); Circle(12, 12, 1.6f); break;
-                case "bolt": Line(13, 3, 5, 14, 11, 14, 10, 21, 18, 10, 12, 10, 13, 3); break;
-                case "cut": Line(3, 15, 21, 9); Line(5, 8, 9, 15); Line(15, 6, 19, 13); break;
-                case "expl": Line(12, 3, 12, 8); Line(12, 16, 12, 21); Line(3, 12, 8, 12); Line(16, 12, 21, 12); Line(9, 9, 15, 9, 15, 15, 9, 15, 9, 9); break;
-                case "filt": Line(4, 5, 20, 5, 14, 13, 14, 19, 10, 17, 10, 13, 4, 5); break;
-                case "reset":
-                    p.BeginPath(); p.Arc(P(12, 12), 8f * k, Angle.Degrees(-40f), Angle.Degrees(290f)); p.Stroke();
-                    Line(20, 4, 20, 9, 15, 9);
-                    break;
-                case "tree": Line(5, 6, 19, 6); Line(9, 11, 19, 11); Line(9, 16, 19, 16); Line(13, 21, 19, 21); Line(5, 11, 5, 16, 9, 16); break;
-                case "search": Circle(11, 11, 6); Line(16, 16, 20, 20); break;
-                case "sidel": Line(4, 5, 20, 5, 20, 19, 4, 19, 4, 5); Line(9, 5, 9, 19); break;
-                case "sider": Line(4, 5, 20, 5, 20, 19, 4, 19, 4, 5); Line(15, 5, 15, 19); break;
-                case "gear":
-                    Circle(12, 12, 3.2f);
-                    Line(12, 3, 12, 6); Line(12, 18, 12, 21); Line(3, 12, 6, 12); Line(18, 12, 21, 12);
-                    Line(5.6f, 5.6f, 7.7f, 7.7f); Line(16.3f, 16.3f, 18.4f, 18.4f); Line(18.4f, 5.6f, 16.3f, 7.7f); Line(7.7f, 16.3f, 5.6f, 18.4f);
-                    break;
-                case "close": Line(6, 6, 18, 18); Line(18, 6, 6, 18); break;
-                case "render": Line(12, 3, 20, 7.5f, 20, 16.5f, 12, 21, 4, 16.5f, 4, 7.5f, 12, 3); Line(12, 12, 20, 7.5f); Line(12, 12, 12, 21); Line(12, 12, 4, 7.5f); break;
-                case "env": Circle(12, 12, 4); Line(12, 2, 12, 4); Line(12, 20, 12, 22); Line(2, 12, 4, 12); Line(20, 12, 22, 12); break;
-                case "swap": Line(4, 9, 18, 9, 15, 6); Line(20, 15, 6, 15, 9, 18); break;
-                case "focus": Circle(12, 12, 3); Line(12, 3, 12, 6); Line(12, 18, 12, 21); Line(3, 12, 6, 12); Line(18, 12, 21, 12); break;
-                case "chev": Line(9, 6, 15, 12, 9, 18); break;
-                case "help": Circle(12, 12, 9); Line(9.5f, 9.5f, 10, 8, 12, 7.5f, 14, 8.2f, 14.5f, 10, 12, 12, 12, 13.5f); Line(12, 16.6f, 12, 16.8f); break;
+                if (pts != null && pts.Count > 1) output.Add(new Stroke { Points = pts.ToArray(), Closed = closed, Dashed = dashed });
+                pts = null;
             }
+
+            while (true)
+            {
+                SkipSep(d, ref i);
+                if (i >= d.Length) break;
+                if (char.IsLetter(d[i])) { cmd = d[i]; i++; }
+                char up = char.ToUpperInvariant(cmd);
+                bool rel = cmd != up;
+
+                if (up == 'Z')
+                {
+                    Flush(true);
+                    cur = start;
+                    prevCmd = 'Z';
+                    continue;
+                }
+
+                if (up == 'M')
+                {
+                    Flush(false);
+                    float x = Num(d, ref i), y = Num(d, ref i);
+                    cur = rel ? cur + new Vector2(x, y) : new Vector2(x, y);
+                    start = cur;
+                    pts = new List<Vector2> { cur };
+                    cmd = rel ? 'l' : 'L';
+                    prevCmd = 'M';
+                    continue;
+                }
+
+                if (pts == null) pts = new List<Vector2> { cur };
+
+                switch (up)
+                {
+                    case 'L':
+                    {
+                        float x = Num(d, ref i), y = Num(d, ref i);
+                        cur = rel ? cur + new Vector2(x, y) : new Vector2(x, y);
+                        pts.Add(cur);
+                        break;
+                    }
+                    case 'H':
+                    {
+                        float x = Num(d, ref i);
+                        cur = new Vector2(rel ? cur.x + x : x, cur.y);
+                        pts.Add(cur);
+                        break;
+                    }
+                    case 'V':
+                    {
+                        float y = Num(d, ref i);
+                        cur = new Vector2(cur.x, rel ? cur.y + y : y);
+                        pts.Add(cur);
+                        break;
+                    }
+                    case 'C':
+                    case 'S':
+                    {
+                        Vector2 c1;
+                        if (up == 'C')
+                        {
+                            float x1 = Num(d, ref i), y1 = Num(d, ref i);
+                            c1 = rel ? cur + new Vector2(x1, y1) : new Vector2(x1, y1);
+                        }
+                        else
+                        {
+                            c1 = (prevCmd == 'C' || prevCmd == 'S') ? 2f * cur - lastCtrl : cur;
+                        }
+
+                        float x2 = Num(d, ref i), y2 = Num(d, ref i), x = Num(d, ref i), y = Num(d, ref i);
+                        Vector2 c2 = rel ? cur + new Vector2(x2, y2) : new Vector2(x2, y2);
+                        Vector2 e = rel ? cur + new Vector2(x, y) : new Vector2(x, y);
+                        for (int s = 1; s <= 14; s++)
+                        {
+                            float t = s / 14f, u = 1f - t;
+                            pts.Add(u * u * u * cur + 3f * u * u * t * c1 + 3f * u * t * t * c2 + t * t * t * e);
+                        }
+
+                        lastCtrl = c2;
+                        cur = e;
+                        break;
+                    }
+                    case 'A':
+                    {
+                        float rx = Num(d, ref i), ry = Num(d, ref i), rot = Num(d, ref i);
+                        float fa = Num(d, ref i), fs = Num(d, ref i), x = Num(d, ref i), y = Num(d, ref i);
+                        Vector2 e = rel ? cur + new Vector2(x, y) : new Vector2(x, y);
+                        Arc(pts, cur, e, rx, ry, rot, fa != 0f, fs != 0f);
+                        cur = e;
+                        break;
+                    }
+                    default:
+                        Flush(false);
+                        return;
+                }
+
+                prevCmd = up;
+            }
+
+            Flush(false);
+        }
+
+        private static void SkipSep(string d, ref int i)
+        {
+            while (i < d.Length && (d[i] == ' ' || d[i] == ',' || d[i] == '\n' || d[i] == '\t')) i++;
+        }
+
+        private static float Num(string d, ref int i)
+        {
+            SkipSep(d, ref i);
+            int s = i;
+            if (i < d.Length && (d[i] == '-' || d[i] == '+')) i++;
+            bool dot = false;
+            while (i < d.Length)
+            {
+                char c = d[i];
+                if (c >= '0' && c <= '9') { i++; continue; }
+                if (c == '.' && !dot) { dot = true; i++; continue; }
+                break;
+            }
+
+            return float.Parse(d.Substring(s, i - s), CultureInfo.InvariantCulture);
+        }
+
+        // SVG endpoint arc -> centre parametrisation, flattened (W3C implementation notes F.6.5).
+        private static void Arc(List<Vector2> pts, Vector2 p0, Vector2 p1, float rx, float ry, float rotDeg, bool large, bool sweep)
+        {
+            if (rx == 0f || ry == 0f || p0 == p1) { pts.Add(p1); return; }
+
+            rx = Mathf.Abs(rx);
+            ry = Mathf.Abs(ry);
+            float phi = rotDeg * Mathf.Deg2Rad;
+            float cos = Mathf.Cos(phi), sin = Mathf.Sin(phi);
+            Vector2 dp = (p0 - p1) * 0.5f;
+            float x1 = cos * dp.x + sin * dp.y;
+            float y1 = -sin * dp.x + cos * dp.y;
+            float lambda = x1 * x1 / (rx * rx) + y1 * y1 / (ry * ry);
+            if (lambda > 1f) { float sq = Mathf.Sqrt(lambda); rx *= sq; ry *= sq; }
+
+            float num = rx * rx * ry * ry - rx * rx * y1 * y1 - ry * ry * x1 * x1;
+            float den = rx * rx * y1 * y1 + ry * ry * x1 * x1;
+            float co = Mathf.Sqrt(Mathf.Max(0f, num / den));
+            if (large == sweep) co = -co;
+            float cxp = co * rx * y1 / ry;
+            float cyp = -co * ry * x1 / rx;
+            Vector2 c = new Vector2(cos * cxp - sin * cyp + (p0.x + p1.x) * 0.5f, sin * cxp + cos * cyp + (p0.y + p1.y) * 0.5f);
+
+            float Ang(float ux, float uy, float vx, float vy) => Mathf.Atan2(ux * vy - uy * vx, ux * vx + uy * vy);
+
+            float th1 = Ang(1f, 0f, (x1 - cxp) / rx, (y1 - cyp) / ry);
+            float dth = Ang((x1 - cxp) / rx, (y1 - cyp) / ry, (-x1 - cxp) / rx, (-y1 - cyp) / ry);
+            if (!sweep && dth > 0f) dth -= 2f * Mathf.PI;
+            else if (sweep && dth < 0f) dth += 2f * Mathf.PI;
+
+            int steps = Mathf.Max(4, Mathf.CeilToInt(Mathf.Abs(dth) / (Mathf.PI / 18f)));
+            for (int s = 1; s <= steps; s++)
+            {
+                float a = th1 + dth * s / steps;
+                float ex = rx * Mathf.Cos(a), ey = ry * Mathf.Sin(a);
+                pts.Add(new Vector2(cos * ex - sin * ey + c.x, sin * ex + cos * ey + c.y));
+            }
+
+            pts[pts.Count - 1] = p1;
         }
     }
 }

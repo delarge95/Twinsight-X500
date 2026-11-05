@@ -26,7 +26,7 @@ namespace WebGL.UI.Desktop
         private readonly StringBuilder _log = new StringBuilder();
 
         private bool _heroOnly;
-        private void Start() { _heroOnly = ProbeKind == "hero"; StartCoroutine(string.IsNullOrEmpty(ProbeKind) || _heroOnly ? RunInventory() : RunProbe()); }
+        private void Start() { _heroOnly = ProbeKind == "hero"; StartCoroutine(ProbeKind == "tutorial" ? RunTutorial() : string.IsNullOrEmpty(ProbeKind) || _heroOnly ? RunInventory() : RunProbe()); }
         private void Log(string line) { _log.AppendLine(line); Debug.Log("[DesktopDemoUI] " + line); }
 
         private IEnumerator Shot(string name)
@@ -212,6 +212,34 @@ namespace WebGL.UI.Desktop
                 yield return Shot("04_tutorial_paso1");
             }
             File.WriteAllText(Path.Combine(OutputDirectory, "inventario_cobertura.log"), _log.ToString());
+            Application.Quit();
+        }
+
+        // ── hero + 6-step tutorial (phase 5) ──
+        private IEnumerator RunTutorial()
+        {
+            yield return Prepare();
+            UIManager ui = UIManager.Instance;
+            VisualElement root = ui.Root;
+            string tag = Screen.width + "x" + Screen.height;
+            yield return Shot("10_hero_" + tag);
+            Click(root.Q<Button>("HeroConfigBtn")); yield return Shot("11_hero_config_" + tag);
+            Click(root.Q<Button>("SubmenuBackBtn_Config")); yield return new WaitForSecondsRealtime(0.6f);
+            Click(root.Q<Button>("HeroInfoBtn")); yield return Shot("12_hero_acerca_" + tag);
+            Click(root.Q<Button>("HeroHelpBtn")); yield return new WaitForSecondsRealtime(1.0f);
+            FieldInfo f = typeof(UIManager).GetField("_onboardingController", BindingFlags.NonPublic | BindingFlags.Instance);
+            object onboarding = f?.GetValue(ui);
+            var desk = onboarding?.GetType().GetProperty("Desktop", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(onboarding) as DesktopTutorial;
+            Log("tutorial abierto=" + ui.IsOnboardingOpen + " desktop=" + (desk != null));
+            for (int i = 0; i < 6; i++)
+            {
+                desk?.GoTo(i);
+                yield return Shot("13_tutorial_paso" + (i + 1) + "_" + tag);
+            }
+
+            desk?.GoTo(0);
+            ViewModeManager.Instance?.SetViewMode(ViewMode.Realistic);
+            File.WriteAllText(Path.Combine(OutputDirectory, "tutorial_" + tag + ".log"), _log.ToString());
             Application.Quit();
         }
 

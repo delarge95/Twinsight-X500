@@ -82,9 +82,17 @@ namespace WebGL.UI.Desktop
         {
             _card.Clear();
 
+            var head = new VisualElement { pickingMode = PickingMode.Ignore };
+            head.AddToClassList("desktop-help-head");
+            head.Add(new DesktopVectorIcon("help", 20));
             var title = new Label(T("KEYBOARD SHORTCUTS", "ATAJOS DE TECLADO")) { pickingMode = PickingMode.Ignore };
             title.AddToClassList("desktop-help-title");
-            _card.Add(title);
+            head.Add(title);
+            var closeIcon = new VisualElement { pickingMode = PickingMode.Ignore };
+            closeIcon.AddToClassList("desktop-help-close");
+            closeIcon.Add(new DesktopVectorIcon("close", 16));
+            head.Add(closeIcon);
+            _card.Add(head);
 
             var subtitle = new Label(T("TwinSight X500 · desktop viewer", "TwinSight X500 · visor de escritorio")) { pickingMode = PickingMode.Ignore };
             subtitle.AddToClassList("desktop-help-subtitle");
