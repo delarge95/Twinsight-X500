@@ -56,6 +56,7 @@ namespace WebGL.Core.Managers
 
         public void SwapAll()
         {
+            if (PCDebugFlags.Has("noswap")) return;
             var renderers = DroneRenderResolver.CollectManagedRenderers();
             int count = 0;
             foreach (Renderer r in renderers)

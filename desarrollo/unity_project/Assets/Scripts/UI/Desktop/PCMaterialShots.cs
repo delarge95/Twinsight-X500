@@ -83,6 +83,90 @@ namespace WebGL.UI.Desktop
             return FramePoint(c, az, el, dist);
         }
 
+        private IEnumerator ProbeTop()
+        {
+                var tp = Find("TOP-PLATE-X500-V5_001_low");
+                var rr = tp != null ? tp.GetComponent<Renderer>() : null;
+                if (rr != null)
+                {
+                    var mesh = rr.GetComponent<MeshFilter>().sharedMesh;
+                    Vector3 ls = rr.transform.lossyScale;
+                    var ns = mesh.normals; Vector3 avg = Vector3.zero; foreach (var n in ns) avg += n; avg /= Mathf.Max(1, ns.Length);
+                    var tr = mesh.triangles; var vs = mesh.vertices; int agree = 0, total = 0;
+                    for (int i = 0; i + 2 < tr.Length && total < 3000; i += 3, total++)
+                    {
+                        Vector3 fn = Vector3.Cross(vs[tr[i + 1]] - vs[tr[i]], vs[tr[i + 2]] - vs[tr[i]]);
+                        Vector3 vn = ns[tr[i]] + ns[tr[i + 1]] + ns[tr[i + 2]];
+                        if (Vector3.Dot(fn, vn) > 0) agree++;
+                    }
+                    Debug.Log($"[PCMaterialShots] TOP scale={ls} avgNormalLocal={avg} avgNormalWorld={rr.transform.TransformDirection(avg)} normalsAgreeWithWinding={agree}/{total} submeshes={mesh.subMeshCount} mats={rr.sharedMaterials.Length} verts={mesh.vertexCount} lightmap={rr.lightmapIndex} shadows={rr.shadowCastingMode}");
+                    foreach (var l in FindObjectsByType<Light>(FindObjectsSortMode.None))
+                        Debug.Log($"[PCMaterialShots] light {l.name} {l.type} int={l.intensity:F2} range={l.range:F1} pos={l.transform.position} fwd={l.transform.forward} enabled={l.enabled}");
+                    foreach (var o in FindObjectsByType<Renderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                    {
+                        if (o == rr || !o.enabled || !o.gameObject.activeInHierarchy || !(o is MeshRenderer)) continue;
+                        if (o.bounds.Intersects(rr.bounds) && o.bounds.size.x > 0.5f) Debug.Log($"[PCMaterialShots] OVERLAP {o.name} size={o.bounds.size} mat={(o.sharedMaterial != null ? o.sharedMaterial.name : "null")}");
+                    }
+                    var saved = rr.sharedMaterials;
+                    var mi = new Material(saved[0]);
+                    var cases = new (string, Action<Material>)[]
+                    {
+                        ("probeA_noclearcoat", m => m.DisableKeyword("_CLEARCOAT")),
+                        ("probeB_noclearcoat_rough", m => { m.DisableKeyword("_CLEARCOAT"); m.SetFloat("_Smoothness", 0f); m.SetFloat("_SmoothnessMax", 0f); m.SetFloat("_Metallic", 0f); }),
+                        ("probeC_black_flat", m => { m.DisableKeyword("_CLEARCOAT"); m.SetColor("_BaseColor", Color.black); m.SetFloat("_Smoothness", 0f); m.SetFloat("_SmoothnessMax", 0f); m.SetFloat("_SpecDark", 0f); }),
+                    };
+                    foreach (var (nm, apply) in cases)
+                    {
+                        mi = new Material(saved[0]); apply(mi);
+                        rr.sharedMaterials = new[] { mi };
+                        yield return new WaitForSecondsRealtime(0.6f);
+                        yield return new WaitForEndOfFrame();
+                        var cur = rr.sharedMaterial;
+                        Debug.Log($"[PCMaterialShots] {nm}: sharedMaterial={cur.name} same={ReferenceEquals(cur, mi)} shader={cur.shader.name} clearcoat={cur.IsKeywordEnabled("_CLEARCOAT")} smooth={cur.GetFloat("_Smoothness")} base={cur.GetColor("_BaseColor")}");
+                        yield return Shot("17_" + nm);
+                    }
+                    var red = new Material(Shader.Find("Universal Render Pipeline/Lit")); red.SetColor("_BaseColor", Color.red);
+                    rr.sharedMaterials = new[] { red };
+                    yield return new WaitForSecondsRealtime(0.6f);
+                    yield return new WaitForEndOfFrame();
+                    Debug.Log($"[PCMaterialShots] red: sharedMaterial={rr.sharedMaterial.name} shader={rr.sharedMaterial.shader.name}");
+                    yield return Shot("17_probeD_red_lit");
+                    rr.sharedMaterials = saved;
+                }
+                    }
+
+        private IEnumerator ProbeLights()
+        {
+            var env = EnvironmentController.Instance;
+            if (env != null) env.enabled = false;
+            var lights = FindObjectsByType<Light>(FindObjectsSortMode.None);
+            var en = new bool[lights.Length]; for (int i = 0; i < lights.Length; i++) en[i] = lights[i].enabled;
+            float ai = UnityEngine.RenderSettings.ambientIntensity, ri = UnityEngine.RenderSettings.reflectionIntensity;
+            var amode = UnityEngine.RenderSettings.ambientMode;
+            // S1: todo apagado
+            foreach (var l in lights) l.enabled = false;
+            UnityEngine.RenderSettings.ambientIntensity = 0f; UnityEngine.RenderSettings.reflectionIntensity = 0f;
+            yield return Shot("17_L1_todo_apagado");
+            // S2: solo ambiente
+            UnityEngine.RenderSettings.ambientIntensity = ai;
+            yield return Shot("17_L2_solo_ambiente");
+            UnityEngine.RenderSettings.ambientIntensity = 0f;
+            // S3: solo reflexion
+            UnityEngine.RenderSettings.reflectionIntensity = ri;
+            yield return Shot("17_L3_solo_reflexion");
+            UnityEngine.RenderSettings.reflectionIntensity = 0f;
+            // S4..: luces una a una
+            for (int i = 0; i < lights.Length; i++)
+            {
+                lights[i].enabled = true;
+                yield return Shot("17_L4_solo_" + lights[i].name.Replace(" ", "_"));
+                lights[i].enabled = false;
+            }
+            for (int i = 0; i < lights.Length; i++) lights[i].enabled = en[i];
+            UnityEngine.RenderSettings.ambientIntensity = ai; UnityEngine.RenderSettings.reflectionIntensity = ri;
+            if (env != null) env.enabled = true;
+        }
+
         private IEnumerator Run()
         {
             Directory.CreateDirectory(OutputDirectory);
@@ -119,25 +203,6 @@ namespace WebGL.UI.Desktop
             Sun(14f, 300f);
             yield return FramePoint(new Vector3(-0.8f, 1.0f, 0.1f), -20f, 38f, 1.2f);
             yield return Shot("01_carbono_placa");
-            if (Array.IndexOf(Environment.GetCommandLineArgs(), "-mat-probe") >= 0)
-            {
-                var tp = Find("TOP-PLATE-X500-V5_001_low");
-                var rr = tp != null ? tp.GetComponent<Renderer>() : null;
-                if (rr != null)
-                {
-                    var tex0 = rr.sharedMaterial.GetTexture("_BaseMap");
-                    Debug.Log($"[PCMaterialShots] top plate baseMap={(tex0 != null ? tex0.name + " " + tex0.width + "x" + tex0.height + " mips=" + (tex0 as Texture2D)?.mipmapCount + " fmt=" + (tex0 as Texture2D)?.format : "null")} mesh={rr.GetComponent<MeshFilter>()?.sharedMesh?.name} uvOK={rr.GetComponent<MeshFilter>()?.sharedMesh?.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.TexCoord0)} tan={rr.GetComponent<MeshFilter>()?.sharedMesh?.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.Tangent)} static={rr.gameObject.isStatic} instancing={rr.sharedMaterial.enableInstancing}");
-                    rr.enabled = false;
-                    yield return Shot("01_probe_topplate_off");
-                    rr.enabled = true;
-                    var mi = rr.material;
-                    mi.SetColor("_BaseColor", Color.black);
-                    yield return Shot("01_probe_instance_black");
-                    mi.SetColor("_BaseColor", Color.white);
-                    mi.SetFloat("_Metallic", 0f); mi.SetFloat("_Smoothness", 0.05f); mi.DisableKeyword("_CLEARCOAT"); mi.DisableKeyword("_PC_ANISO"); mi.DisableKeyword("_PC_ALBEDOBUMP");
-                    yield return Shot("01_probe_instance_plain");
-                }
-            }
             yield return Frame(Find("GUAN-CHENG.002_low"), 35f, 25f, 1.8f);
             yield return Shot("02_carbono_tubo");
             yield return Frame(Find("BOTTOM-PLATE-X500-V5_001_low"), 200f, -35f, 1.7f);
@@ -173,6 +238,20 @@ namespace WebGL.UI.Desktop
             yield return Shot("13_vista_media");
             yield return FramePoint(new Vector3(0f, 0.95f, 0f), 200f, 82f, 3.6f);
             yield return Shot("17_vista_cenital");
+            {
+                var tpl = Find("TOP-PLATE-X500-V5_001_low");
+                var hs = tpl != null ? tpl.GetComponentInParent<WebGL.Core.Content.HighlightSystem>() : null;
+                if (hs != null)
+                {
+                    hs.OnHoverEnter();
+                    yield return Shot("19_hover_placa_cenital");
+                    yield return FramePoint(new Vector3(0f, 0.95f, 0f), 215f, 35f, 3.2f);
+                    yield return Shot("19_hover_placa_media");
+                    hs.OnHoverExit();
+                    yield return Shot("19_sin_hover_placa_media");
+                }
+                else Debug.Log("[PCMaterialShots] sin HighlightSystem en la placa superior");
+            }
             yield return FramePoint(new Vector3(0f, 0.95f, 0f), 215f, 35f, 3.2f);
             yield return Shot("18_placa_superior_media");
 

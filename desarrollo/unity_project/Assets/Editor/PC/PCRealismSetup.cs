@@ -225,8 +225,8 @@ namespace WebGL.Editor.PC
         {
             var l = new List<Def>();
             Def d;
-            d = D("PC_CarbonPlate", "carbon_fiber_01", true, 0.0f, 0.30f); d.bump = 0.35f; d.clearCoat = 0.85f; d.coatSmooth = 0.62f; d.albedoBump = 2.0f; d.albedoStep = 1.5f; d.albedoSpec = 0.3f; d.aniso = 0.07f; d.anisoShin = 150f; d.albedoMax = 0.045f; d.smoothMax = 0.45f; d.specAA = 2.0f; d.specDark = 0.45f; d.finalDark = 0.5f; l.Add(d);
-            d = D("PC_CarbonTube", "MAT_Plastic_Black", true, 0.0f, 0.30f); d.bump = 0.35f; d.clearCoat = 0.85f; d.coatSmooth = 0.62f; d.albedoBump = 2.0f; d.albedoStep = 1.5f; d.albedoSpec = 0.3f; d.aniso = 0.07f; d.anisoShin = 150f; d.albedoMax = 0.045f; d.smoothMax = 0.45f; d.specAA = 2.0f; d.specDark = 0.45f; d.finalDark = 0.75f; l.Add(d);
+            d = D("PC_CarbonPlate", "carbon_fiber_01", true, 0.0f, 0.30f); d.bump = 0.35f; d.clearCoat = 0.85f; d.coatSmooth = 0.62f; d.albedoBump = 1.0f; d.albedoStep = 1.5f; d.albedoSpec = 0.3f; d.aniso = 0.07f; d.anisoShin = 150f; d.albedoMax = 0.045f; d.smoothMax = 0.45f; d.specAA = 2.0f; d.specDark = 0.45f; d.finalDark = 0.5f; l.Add(d);
+            d = D("PC_CarbonTube", "MAT_Plastic_Black", true, 0.0f, 0.30f); d.bump = 0.35f; d.clearCoat = 0.85f; d.coatSmooth = 0.62f; d.albedoBump = 1.0f; d.albedoStep = 1.5f; d.albedoSpec = 0.3f; d.aniso = 0.07f; d.anisoShin = 150f; d.albedoMax = 0.045f; d.smoothMax = 0.45f; d.specAA = 2.0f; d.specDark = 0.45f; d.finalDark = 0.75f; l.Add(d);
             d = D("PC_AnodizedBlue", "MAT_Plastic_Blue", true, 0.85f, 0.58f); d.bump = 0.6f; d.brushed = true; d.detail = 0.15f; d.detailTiling = 14f; d.rough = true; d.roughStrength = 0.25f; l.Add(d);
             d = D("PC_AnodizedBlack", "MAT_Alum_Black", true, 0.9f, 0.5f); d.bump = 0f; d.brushed = true; d.detail = 0.1f; d.detailTiling = 14f; d.rough = true; d.roughStrength = 0.25f; l.Add(d);
             d = D("PC_Motor", "BAKE_PREVIEW.007", true, 0.9f, 0.5f); d.brushed = true; d.detail = 0.12f; d.detailTiling = 14f; d.rough = true; d.roughStrength = 0.25f; l.Add(d);

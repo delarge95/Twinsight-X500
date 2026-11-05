@@ -336,15 +336,32 @@ La bajada frente a la 3A (324) no se aislo: entre la 3A y ahora entraron el puli
 - 82 de 160 tornillos redondeados (el resto tiene anillos de 4-8 puntos u otra forma).
 - La fila resaltada del arbol no siempre se desplaza hasta la vista si el arbol estaba cerrado al seleccionar.
 
-## 11. Fase 3B.1 (2026-11-04, interrumpida a peticion del usuario; rama `pc-desktop`)
+## 11. Fase 3B.1 (2026-11-05, rama `pc-desktop`, solo PC)
 
-**Hecho (herramientas de diagnostico, sin cambios visuales):**
-- `PCDebugFlags` (Standalone): `-pcdbg flag1,flag2` con `noalbedobump, noaniso, noclearcoat, noscrews, notree, mip1, nossao, rs1, probe0` para biseccionar FPS y aspecto desde el .exe. `PCMaterialShots` (`-mat-probe`) con sondas de la placa superior y vistas nuevas (`17_vista_cenital`, `18_placa_superior_media`). Build: `E:\TwinSight_builds\pc_fase3b1\TwinSightX500.exe`. Capturas: `capturas_fase3b1\`.
+### 11.1 Placa superior gris: era el HOVER (confirmado por el usuario)
+- **Causa.** `HighlightSystem` aplica al pasar el raton `hoverColor` = blanco (1,1,1) con intensidad 0,28 por MaterialPropertyBlock (`_HighlightColor`/`_HighlightIntensity`). `DroneLitPC` lo sumaba como `color += _HighlightColor * h * (0,35 + 0,85*rim)`: un relleno blanco de ~0,1 lineal (sRGB ~90-100) sobre una placa que mira hacia arriba (rim ~0). Por eso no dependia del albedo, del clear-coat ni del entorno, y desaparecia al desactivar el renderer. En el Editor guiado por MCP no hay raton real y nunca se activaba. Fue ademas la razon de la serie de sondas anteriores (color base negro, probe0, etc.): ninguna tocaba el realce.
+- **Arreglo (solo PC, `DroneLitPC.shader`).** El realce pasa a un borde celeste (#bfeaff mezclado al 60 % con el color del realce) con relleno casi nulo: `color += hc * h * (0,03 + 1,1*rim)`, y el oscurecimiento del albedo baja de 0,30 a 0,10. WebGL usa `ClippableLit` (sin cambios). Comprobado en el .exe con `HighlightSystem.OnHoverEnter` sobre la placa superior: `capturas_fase3b19_hover_placa_cenital`, `19_hover_placa_media` y `19_sin_hover_placa_media` (carbono oscuro con y sin hover, hover como borde fino).
+- **Relieve.** `_AlbedoBumpScale` 2,0 -> 1,0 (sarga fina en vez de chapa estriada).
+- **Compatibilidad SRP Batcher.** Los pases ShadowCaster/DepthOnly/DepthNormals de `DroneLitPC` no declaraban el cbuffer `UnityPerMaterial` (con `_ClipPlane` suelto); ahora los 4 pases comparten el mismo cbuffer (con `_BaseMap_TexelSize` dentro). `useSRPBatcher` ya estaba activo en los assets PC.
 
-**Tarea 1 - placa superior gris (causa NO resuelta, pero acotada):**
-- Hipotesis de reflejo del HDRI: DESCARTADA. Con `-pcdbg probe0` (sin probe ni reflexion global) todo el dron se oscurece menos la placa superior, que sigue igual (`grid_probe.png`).
-- La placa superior (`TOP-PLATE-X500-V5_001_low`, original `BAKE_PREVIEW.001`) si usa `PC_CarbonPlate` (misma instancia compartida que la placa inferior, sin MPB; BC7 4096, UV y tangentes presentes, no estatica). Mismo atlas que `carbon_fiber_01`.
-- En el .exe, desactivar ese renderer elimina el gris (pixel 98 -> 49); pero con una instancia propia del material con `_BaseColor` negro, metallic 0, smooth 0.05 y sin clear-coat/aniso/albedo-bump el pixel sigue en ~100. Es decir: el gris no depende del albedo, ni de la especular, ni del entorno, ni del post-procesado. En el Editor (Play, misma plataforma) la misma vista sale oscura (`17_vista_cenital_editor0.png`). Apunta a algo propio del .exe para esa malla (variante de shader del player, canal de vertices o contribucion constante); no investigado mas.
-- Pendiente: probar en el .exe con `Universal Render Pipeline/Lit` rojo sobre ese renderer para separar shader de malla; revisar variantes compiladas del pase ForwardLit de `DroneLitPC` en el player; reducir el relieve del twill (aun parece chapa estriada) con `_AlbedoBumpScale` 2.0 -> ~1.0.
+### 11.2 FPS: no hay regresion de codigo
+Medicion `-perflog -quality PC_Ultra -vsync 0 -perf-viewer` (viewer abierto, ventanas de 10 s; las ventanas de 340-380 FPS de algunas ejecuciones son el Hero sin visor y no cuentan). Logs en `E:\TwinSight_builds\pc_fase3b1\logs\`.
+| Configuracion | FPS visor (ventanas 3-7) |
+|---|---|
+| 3B.1 base (renderScale 1,5) | ~118-125 |
+| 3B.1 base (renderScale 1,25) | ~119-122 |
+| `-pcdbg noalbedobump,noaniso` | ~123 |
+| `-pcdbg noscrews` | ~120 |
+| `-pcdbg notree` | ~128 |
+| `-pcdbg nossao` | ~125 |
+| `-pcdbg rs1` | ~118 |
+| `-pcdbg mip1` (texturas a la mitad) | ~105-110 |
+| `-pcdbg noswap` (materiales originales ClippableLit) | ~110-137 |
+| todas las anteriores juntas | ~100-125 |
+| **Build de la fase 3A (`pc_fase3a2`), medida hoy** | **~125-132** |
+Conclusion: la build de la 3A, que dio ~324 en su dia, da hoy ~128 en esta misma maquina: la diferencia es del entorno de medicion (Editor de Unity abierto, estado de la maquina), no del codigo. Entre 3A y 3B.1 la diferencia medida es ~5 %. Ningun interruptor (4K, relieve por albedo, tornillos, arbol, SSAO, escala de render, materiales PC) recupera 250. Para comparar hay que medir con el Editor cerrado. Se devolvio `PC_Ultra.renderScale` de 1,5 a 1,25 (valor de la 3A; el cambio a 1,5 vino con el pulido de materiales, sin motivo documentado). Las texturas 4K se mantienen (cuestan ~5 % y no hay ganancia de FPS al reducirlas).
 
-**Tarea 2 - FPS (sin biseccion):** no se llego a medir. Mediciones disponibles de la 3B: PC_Ultra ~107, PC_High ~96 (3A: ~324). Pendiente ejecutar, con `-perflog -quality PC_Ultra -vsync 0 -perf-viewer -pcdbg <flag>`, cada flag por separado (`noalbedobump,noaniso`, `mip1`, `noscrews`, `notree`, `nossao`, `rs1`) y revertir/ajustar el culpable (texturas 4K -> 2K si pesan).
+### 11.3 Pendiente
+- Medir FPS con el Editor cerrado para confirmar ~300.
+- Opcional: desplazar el arbol a la fila seleccionada al abrirlo (no hecho).
+- Opcional 7 (contorno #bfeaff y atenuado del resto) en la web/escritorio completo: aqui solo se ajusto el realce de PC.

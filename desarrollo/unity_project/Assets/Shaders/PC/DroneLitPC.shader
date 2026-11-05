@@ -165,6 +165,7 @@ Shader "TwinSight/DroneLitPC"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseMap_ST;
+                float4 _BaseMap_TexelSize;
                 half4 _BaseColor;
                 half _Metallic;
                 half _Smoothness;
@@ -202,7 +203,6 @@ Shader "TwinSight/DroneLitPC"
                 half _ClipEdgeWidth;
             CBUFFER_END
 
-            float4 _BaseMap_TexelSize;
             float4 _GlobalClipPlane;
             float _GlobalClipEnabled;
             float4 _GlobalClipPlane2;
@@ -343,7 +343,7 @@ Shader "TwinSight/DroneLitPC"
                 #endif
 
                 half highlightAmount = saturate(_HighlightIntensity);
-                surfaceData.albedo *= (1.0 - highlightAmount * 0.30);
+                surfaceData.albedo *= (1.0 - highlightAmount * 0.10);
 
                 half4 color = UniversalFragmentPBR(inputData, surfaceData);
 
@@ -381,7 +381,10 @@ Shader "TwinSight/DroneLitPC"
                 {
                     float ndotv = saturate(dot(normalize(normalWS), normalize(inputData.viewDirectionWS)));
                     float rim = pow(1.0 - ndotv, max(_HighlightRimPower, 0.5));
-                    color.rgb += _HighlightColor.rgb * highlightAmount * (0.35 + 0.85 * rim);
+                    // PC: realce de borde celeste (#bfeaff mezclado con el color del realce) y casi nada de relleno:
+                    // el hover/seleccion no lava el material (antes: relleno blanco = velo gris sobre la placa).
+                    half3 hc = lerp(_HighlightColor.rgb, half3(0.75, 0.92, 1.0), 0.6);
+                    color.rgb += hc * highlightAmount * (0.03 + 1.1 * rim);
                 }
 
                 color.a = 1.0;
@@ -415,7 +418,45 @@ Shader "TwinSight/DroneLitPC"
             struct Attributes { float4 positionOS : POSITION; float3 normalOS : NORMAL; };
             struct Varyings { float4 positionCS : SV_POSITION; float3 positionWS : TEXCOORD0; };
 
-            float4 _ClipPlane;
+            CBUFFER_START(UnityPerMaterial)
+                float4 _BaseMap_ST;
+                float4 _BaseMap_TexelSize;
+                half4 _BaseColor;
+                half _Metallic;
+                half _Smoothness;
+                half _BumpScale;
+                half _CurvatureStrength;
+                half _CurvatureCavityStrength;
+                half _OcclusionStrength;
+                half _RoughnessMapStrength;
+                half _RoughnessMapScale;
+                half _ClearCoat;
+                half _ClearCoatSmoothness;
+                half _DetailNormalScale;
+                half _DetailTiling;
+                half4 _EmissionColor;
+                half4 _TranslucencyColor;
+                half _TranslucencyStrength;
+                half _TranslucencyPower;
+                half _AlbedoBumpScale;
+                half _AlbedoBumpStep;
+                half _AlbedoBumpSpec;
+                half _BumpFilter;
+                half _AlbedoMax;
+                half _SmoothnessMax;
+                half _SpecAA;
+                half _SpecDark;
+                half _FinalDark;
+                half _AnisoStrength;
+                half _AnisoShininess;
+                half4 _AnisoColor;
+                half4 _HighlightColor;
+                half _HighlightIntensity;
+                half _HighlightRimPower;
+                float4 _ClipPlane;
+                half4 _ClipColor;
+                half _ClipEdgeWidth;
+            CBUFFER_END
             float4 _GlobalClipPlane;
             float _GlobalClipEnabled;
             float4 _GlobalClipPlane2;
@@ -481,7 +522,45 @@ Shader "TwinSight/DroneLitPC"
             struct Attributes { float4 positionOS : POSITION; };
             struct Varyings { float4 positionCS : SV_POSITION; float3 positionWS : TEXCOORD0; };
 
-            float4 _ClipPlane;
+            CBUFFER_START(UnityPerMaterial)
+                float4 _BaseMap_ST;
+                float4 _BaseMap_TexelSize;
+                half4 _BaseColor;
+                half _Metallic;
+                half _Smoothness;
+                half _BumpScale;
+                half _CurvatureStrength;
+                half _CurvatureCavityStrength;
+                half _OcclusionStrength;
+                half _RoughnessMapStrength;
+                half _RoughnessMapScale;
+                half _ClearCoat;
+                half _ClearCoatSmoothness;
+                half _DetailNormalScale;
+                half _DetailTiling;
+                half4 _EmissionColor;
+                half4 _TranslucencyColor;
+                half _TranslucencyStrength;
+                half _TranslucencyPower;
+                half _AlbedoBumpScale;
+                half _AlbedoBumpStep;
+                half _AlbedoBumpSpec;
+                half _BumpFilter;
+                half _AlbedoMax;
+                half _SmoothnessMax;
+                half _SpecAA;
+                half _SpecDark;
+                half _FinalDark;
+                half _AnisoStrength;
+                half _AnisoShininess;
+                half4 _AnisoColor;
+                half4 _HighlightColor;
+                half _HighlightIntensity;
+                half _HighlightRimPower;
+                float4 _ClipPlane;
+                half4 _ClipColor;
+                half _ClipEdgeWidth;
+            CBUFFER_END
             float4 _GlobalClipPlane;
             float _GlobalClipEnabled;
             float4 _GlobalClipPlane2;
@@ -537,7 +616,45 @@ Shader "TwinSight/DroneLitPC"
             struct Attributes { float4 positionOS : POSITION; float3 normalOS : NORMAL; };
             struct Varyings { float4 positionCS : SV_POSITION; float3 positionWS : TEXCOORD0; float3 normalWS : TEXCOORD1; };
 
-            float4 _ClipPlane;
+            CBUFFER_START(UnityPerMaterial)
+                float4 _BaseMap_ST;
+                float4 _BaseMap_TexelSize;
+                half4 _BaseColor;
+                half _Metallic;
+                half _Smoothness;
+                half _BumpScale;
+                half _CurvatureStrength;
+                half _CurvatureCavityStrength;
+                half _OcclusionStrength;
+                half _RoughnessMapStrength;
+                half _RoughnessMapScale;
+                half _ClearCoat;
+                half _ClearCoatSmoothness;
+                half _DetailNormalScale;
+                half _DetailTiling;
+                half4 _EmissionColor;
+                half4 _TranslucencyColor;
+                half _TranslucencyStrength;
+                half _TranslucencyPower;
+                half _AlbedoBumpScale;
+                half _AlbedoBumpStep;
+                half _AlbedoBumpSpec;
+                half _BumpFilter;
+                half _AlbedoMax;
+                half _SmoothnessMax;
+                half _SpecAA;
+                half _SpecDark;
+                half _FinalDark;
+                half _AnisoStrength;
+                half _AnisoShininess;
+                half4 _AnisoColor;
+                half4 _HighlightColor;
+                half _HighlightIntensity;
+                half _HighlightRimPower;
+                float4 _ClipPlane;
+                half4 _ClipColor;
+                half _ClipEdgeWidth;
+            CBUFFER_END
             float4 _GlobalClipPlane;
             float _GlobalClipEnabled;
             float4 _GlobalClipPlane2;

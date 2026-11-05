@@ -60,7 +60,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AlbedoBumpScale: 2
+    - _AlbedoBumpScale: 1
     - _AlbedoBumpSpec: 0.3
     - _AlbedoBumpStep: 1.5
     - _AlbedoMax: 0.045
