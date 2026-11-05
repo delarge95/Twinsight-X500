@@ -399,3 +399,17 @@ La maqueta `docs/unity_pc/maqueta_desktop/index.html` quedo aprobada y se implem
 - Raton real (SetCursorPos + mouse_event, `-desk-sliderprobe <carpeta> flow` y `flow.ps1`): clic en la pieza (inspector se abre solo), alternar inspector, modos, CORTE (arrastre del deslizador fuera del control: valor 0 -> 2, camara y seleccion constantes), ENTORNO (rotacion de luz 45 -> 327), render termico, arbol, ajustes (abre/cierra con su X), ayuda (Esc la cierra), teclas C, G y V.
 - Cobertura del canvas a 1920x1080 (union de superficies pickables / de ellas, lo que se superpone al modelo): reposo 12,3 % / 0 %; pieza + inspector 26,7 % / 0 %; ANALIZAR corte 29,4 % / 2,9 %; ESTUDIO entorno 30,1 % / 3,6 %; arbol + inspector 37,9 % / 0 %; antes (UI movil): reposo 4,9 %, ficha 26,9 %, ficha + corte 34,9 %, ESTUDIO 25,7 % **tapando el modelo**. Ahora el cromo es acoplado (el modelo se reencuadra y nada lo tapa salvo popovers de 2-4 %).
 - Pendiente: probar escala de Windows al 125/150 %, doble monitor y ventana 21:9; `[`/`]` con teclados que los necesiten con AltGr.
+
+## 14. Pulido de la interfaz de escritorio y hoja de iconos (2026-11-05, rama `pc-desktop`)
+
+### 14.1 Pulido (build `E:\TwinSight_builds\pc_ui_pulido\`, capturas `docs/unity_pc/capturas_ui_pulido/`, antes = `ANTES_*`)
+- **Tildes:** `IDENTIFICACIÓN`, `FILTRAR CATEGORÍA`, `TÉRMICO`, `Filtrar categorías` (diccionario compartido `AppLanguageManager` y `UIDetailsSheet`: es una corrección ortográfica de texto, también afecta al español de WebGL) y los tooltips nuevos de la barra (`Volver al menú`, `Árbol de piezas`, `energía`, `explosión`).
+- **Deslizadores en cuadrícula:** columna de etiqueta de 132 px (118 en Ajustes) con ajuste de línea en lugar de desbordar bajo el pulgar ("INTENSIDAD DEL OBJETO" ya no se solapa) y pista alineada en todos los popovers; etiquetas de datos del inspector con ajuste de línea.
+- **Inspector:** IDENTIFICACIÓN se abre por defecto al abrir el panel; separador bajo la descripción y filas alineadas arriba.
+- **Árbol:** `DesktopPartTree` se suscribe desde el constructor y guarda la última selección: al abrirlo (aunque la pieza se eligiera antes de la primera apertura) resalta la fila, despliega la rama y se desplaza hasta ella; se limpia si no hay selección.
+- **Selección 3D:** `DroneLitPC` suma contorno celeste más grueso y un velo mínimo cuando la intensidad es la de selección (0,55; el hover, 0,28, no cambia).
+- **Pruebas:** 1920x1080, 1536x864 (equivale a Windows al 125 %), 1280x720 (150 %), 1920x820 (21:9; el escritorio limita la ventana al área de trabajo, no se pudo 2560x1080) y 1920x1080 con "Tamaño de interfaz" 150 % (`-uiscale 1.5`): sin solapes. A 720p el inspector no se abre solo (ancho lógico < 1600), a demanda.
+- Receta de shaders (12.3) funcionó de nuevo: sin necesidad de reimportar esta vez.
+
+### 14.2 Hoja de diseño de iconos, botones y tutorial (solo maqueta)
+`docs/unity_pc/maqueta_iconos/index.html`: inventario de iconos/botones con incoherencias (tres sistemas de iconos, trazos 1,5/1,8/1,95, tarjetas de RENDER/ENTORNO/FILTRO sin icono, emoji en el tutorial), set de 40 iconos a 1,5 px sobre 24, sistema de botones (7 variantes x 6 estados, escritorio frente a móvil), tutorial de 6 pasos en 1920x1080 y 390x844 y lista de cambios para WebGL/móvil. No implementado: afecta a código compartido y necesita aprobación y una build WebGL nueva.

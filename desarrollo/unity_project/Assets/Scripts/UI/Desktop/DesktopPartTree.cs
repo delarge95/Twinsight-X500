@@ -66,7 +66,9 @@ namespace WebGL.UI.Desktop
         private string _filter = string.Empty;
         private bool _open;
         private bool _built;
-        private bool _subscribed;
+        private PartSelectedEvent _lastEvt;
+        private bool _hasLastEvt;
+        private void CacheSelection(PartSelectedEvent evt) { _lastEvt = evt; _hasLastEvt = true; if (_built) OnPartSelected(evt); }
 
         public bool IsOpen => _open;
         public float OccupiedWidth => _open ? Width + 2f * Margin : 0f;
@@ -134,12 +136,13 @@ namespace WebGL.UI.Desktop
 
             ApplyLanguage();
             AppLanguageManager.LanguageChanged += OnLanguageChanged;
+            EventBus.Subscribe<PartSelectedEvent>(CacheSelection);
         }
 
         public void Dispose()
         {
             AppLanguageManager.LanguageChanged -= OnLanguageChanged;
-            if (_subscribed) EventBus.Unsubscribe<PartSelectedEvent>(OnPartSelected);
+            EventBus.Unsubscribe<PartSelectedEvent>(CacheSelection);
             _panel.RemoveFromHierarchy();
             _pill.RemoveFromHierarchy();
         }
@@ -160,6 +163,13 @@ namespace WebGL.UI.Desktop
             _open = open;
             if (open)
             {
+                if (SelectionManager.Instance != null && SelectionManager.Instance.CurrentSelection == null)
+                {
+                    _hasLastEvt = false;
+                    _selected?.Row?.RemoveFromClassList("desktop-tree-row--selected");
+                    _selected = null;
+                }
+
                 EnsureBuilt();
                 SyncSelectionHighlight(true);
             }
@@ -369,11 +379,7 @@ namespace WebGL.UI.Desktop
             BuildRows();
             Refresh();
 
-            if (!_subscribed)
-            {
-                EventBus.Subscribe<PartSelectedEvent>(OnPartSelected);
-                _subscribed = true;
-            }
+            if (_hasLastEvt) OnPartSelected(_lastEvt);
         }
 
         private static void SortChildren(Node n)

@@ -238,6 +238,17 @@ namespace WebGL.UI.Desktop
             if (ProbeKind == "chrome")
             {
                 string tag = Screen.width + "x" + Screen.height;
+                string[] cl = Environment.GetCommandLineArgs();
+                for (int ai = 0; ai < cl.Length - 1; ai++)
+                {
+                    if (cl[ai] == "-uiscale" && float.TryParse(cl[ai + 1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float us2))
+                    {
+                        AccessibilityManager.Instance?.SetUIScale(us2);
+                        tag += "_ui" + Mathf.RoundToInt(us2 * 100f);
+                    }
+                }
+
+                yield return new WaitForSecondsRealtime(0.6f);
                 DesktopChrome chrome = ctrl.Chrome;
                 sm.SimulateClickOn(null);
                 oc.ResetView(); oc.SetAngles(-30f, 22f, true); oc.SetDistance(8.5f, true);

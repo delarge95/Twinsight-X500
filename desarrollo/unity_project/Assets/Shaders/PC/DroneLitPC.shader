@@ -384,7 +384,9 @@ Shader "TwinSight/DroneLitPC"
                     // PC: realce de borde celeste (#bfeaff mezclado con el color del realce) y casi nada de relleno:
                     // el hover/seleccion no lava el material (antes: relleno blanco = velo gris sobre la placa).
                     half3 hc = lerp(_HighlightColor.rgb, half3(0.75, 0.92, 1.0), 0.6);
-                    color.rgb += hc * highlightAmount * (0.03 + 1.1 * rim);
+                    // seleccion (intensidad 0,55) frente a hover (0,28): contorno celeste mas grueso y un velo minimo para que la pieza seleccionada se lea
+                    half selBoost = saturate((highlightAmount - 0.35) / 0.2);
+                    color.rgb += hc * highlightAmount * (0.03 + 0.10 * selBoost + (1.1 + 1.8 * selBoost) * rim);
                 }
 
                 color.a = 1.0;

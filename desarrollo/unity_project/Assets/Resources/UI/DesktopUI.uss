@@ -1226,8 +1226,8 @@
 .dk-pop .inspect-power-value { font-size: 12px; }
 
 .dk-pop .env-slider-group { width: auto; height: 28px; margin: 2px 0 0 0; padding: 0; align-self: stretch; }
-.dk-pop .env-slider-label { font-size: 11px; width: 118px; margin-right: 8px; letter-spacing: 0.5px; }
-.dk-pop .env-slider { min-height: 28px; }
+.dk-pop .env-slider-label { font-size: 11px; width: 132px; min-width: 132px; max-width: 132px; margin-right: 8px; letter-spacing: 0; white-space: normal; -unity-text-align: middle-left; flex-shrink: 0; }
+.dk-pop .env-slider { min-height: 28px; flex-grow: 1; flex-basis: 0; min-width: 0; }
 
 .dk-studio--render #EnvGrid,
 .dk-studio--render .env-slider-group,
@@ -1402,3 +1402,19 @@
 .dk-config-embedded .env-slider-label { font-size: 11px; letter-spacing: 0.5px; }
 .dk-config-embedded .env-slider-group,
 .dk-config-embedded .desktop-display-section .env-slider-group { height: auto; min-height: 44px; }
+
+/* polish: aligned label column in every slider row, wrapped instead of overlapped by the thumb */
+.dk-config-embedded .env-slider-label { white-space: normal; -unity-text-align: middle-left; letter-spacing: 0; }
+.dk-config-embedded .config-advanced-section .env-slider-group { flex-direction: row; align-items: center; }
+.dk-config-embedded .config-advanced-section .env-slider-label { width: 118px; min-width: 118px; max-width: 118px; flex-shrink: 0; margin-right: 8px; }
+.dk-config-embedded .config-advanced-section .env-slider { flex-grow: 1; flex-basis: 0; min-width: 0; }
+.dk-config-embedded .desktop-display-section .env-slider-group { flex-direction: column; align-items: stretch; }
+.dk-pop .cross-section-plane-caption { white-space: normal; }
+
+/* inspector rhythm: even gaps, first foldout open by default (set from DesktopChrome) */
+.layout--desktop.chrome2 .sheet-description { margin-top: 2px; margin-bottom: 12px; padding-bottom: 10px; border-bottom-width: 1px; border-bottom-color: rgba(255, 255, 255, 0.08); }
+.layout--desktop.chrome2 .sheet-foldout { margin-top: 0; margin-bottom: 0; }
+.layout--desktop.chrome2 .sheet-scroll .unity-foldout__content { padding-bottom: 6px; }
+
+.layout--desktop.chrome2 .data-label { white-space: normal; width: 104px; min-width: 104px; max-width: 104px; -unity-text-align: upper-left; }
+.layout--desktop.chrome2 .data-row { align-items: flex-start; }

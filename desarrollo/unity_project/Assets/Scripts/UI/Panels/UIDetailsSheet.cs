@@ -752,7 +752,7 @@ namespace WebGL.UI.Panels
                 _sheetDesc.text = FormatTextOrND(block.summary);
             }
 
-            RenderFieldRows(_foldoutIdentification, AppLanguageManager.IsSpanish ? "IDENTIFICACION" : "IDENTIFICATION", block.identification);
+            RenderFieldRows(_foldoutIdentification, AppLanguageManager.IsSpanish ? "IDENTIFICACIÓN" : "IDENTIFICATION", block.identification);
             RenderFieldRows(_foldoutSpecifications, AppLanguageManager.IsSpanish ? "ESPECIFICACIONES" : "SPECIFICATIONS", block.specifications);
             RenderRelationship(_foldoutRelationship, block.relationship);
             RenderTextRows(_foldoutAssembly, AppLanguageManager.IsSpanish ? "ENSAMBLAJE" : "ASSEMBLY", block.assembly);

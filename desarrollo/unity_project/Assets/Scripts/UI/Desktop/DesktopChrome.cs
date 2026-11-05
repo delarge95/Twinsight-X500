@@ -60,6 +60,7 @@ namespace WebGL.UI.Desktop
         private bool _studioWasVisible;
         private string _studioSection = "render";
         private bool _settingsOpen;
+        private bool _sheetWasOpen;
 
         private static readonly ViewMode[] CycleOrder =
         {
@@ -165,7 +166,7 @@ namespace WebGL.UI.Desktop
             _top.AddToClassList("dk-top");
 
             var home = IconButton("home", "DkHome", () => Fire(_root.Q<Button>("HomeBtn")));
-            home.tooltip = T("Return to menu", "Volver al menu");
+            home.tooltip = T("Return to menu", "Volver al menú");
             _top.Add(home);
 
             var brand = new Label("TwinSight") { pickingMode = PickingMode.Ignore };
@@ -562,6 +563,13 @@ namespace WebGL.UI.Desktop
 
             bool treeOpen = _tree.IsOpen;
             bool sheetOpen = _side.IsOpen;
+            if (sheetOpen && !_sheetWasOpen)
+            {
+                Foldout ident = _root.Q<Foldout>("FoldoutIdentification");
+                if (ident != null) ident.value = true;
+            }
+
+            _sheetWasOpen = sheetOpen;
             SetOn(_btnTree, treeOpen);
             SetOn(_btnInspector, sheetOpen);
             SetOn(_btnPins, _root.Q<Button>("ToolHotspotBtn")?.ClassListContains("submenu-card--active") == true);
@@ -660,15 +668,15 @@ namespace WebGL.UI.Desktop
             _btnPins.tooltip = T("Pins", "Puntos");
             _btnIso.tooltip = T("Isolate selected part", "Aislar la pieza seleccionada");
             _root.Q<Button>("DkReset").tooltip = T("Reset view", "Restablecer vista");
-            _btnTree.tooltip = T("Parts tree", "Arbol de piezas");
+            _btnTree.tooltip = T("Parts tree", "Árbol de piezas");
             _btnInspector.tooltip = T("Part inspector", "Inspector de pieza");
             _btnGear.tooltip = T("Settings", "Ajustes");
             _btnHelp.tooltip = T("Shortcuts", "Atajos");
-            _railTree.tooltip = T("Parts tree", "Arbol de piezas");
+            _railTree.tooltip = T("Parts tree", "Árbol de piezas");
             _railSearch.tooltip = T("Search part", "Buscar pieza");
             _railInspector.tooltip = T("Part inspector", "Inspector de pieza");
-            _modeSeg[0].tooltip = T("Inspect: pins, isolate, power", "Inspeccionar: puntos, aislar, energia");
-            _modeSeg[1].tooltip = T("Analyze: cut, explode, filter", "Analizar: corte, explosion, filtro");
+            _modeSeg[0].tooltip = T("Inspect: pins, isolate, power", "Inspeccionar: puntos, aislar, energía");
+            _modeSeg[1].tooltip = T("Analyze: cut, explode, filter", "Analizar: corte, explosión, filtro");
             _modeSeg[2].tooltip = T("Studio: render and environment", "Estudio: render y entorno");
         }
     }
