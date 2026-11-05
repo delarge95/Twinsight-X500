@@ -172,6 +172,7 @@ namespace WebGL.UI.Desktop
             _sidePanel = new DesktopSidePanel(_root);
             _tree = new DesktopPartTree(_root);
             _sidePanel.Tree = _tree;
+            if (PCDebugFlags.Has("notree")) _tree.Dispose();
             _display = new DesktopDisplayPanel(_root);
             _help = new DesktopHelpOverlay(_root);
             BuildHint();

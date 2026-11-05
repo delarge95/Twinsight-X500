@@ -121,13 +121,21 @@ namespace WebGL.UI.Desktop
             yield return Shot("01_carbono_placa");
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "-mat-probe") >= 0)
             {
-                var acd = Camera.main.GetComponent("UniversalAdditionalCameraData");
-                var prop = acd != null ? acd.GetType().GetProperty("renderPostProcessing") : null;
-                if (prop != null)
+                var tp = Find("TOP-PLATE-X500-V5_001_low");
+                var rr = tp != null ? tp.GetComponent<Renderer>() : null;
+                if (rr != null)
                 {
-                    prop.SetValue(acd, false);
-                    yield return Shot("01_probe_nopost");
-                    prop.SetValue(acd, true);
+                    var tex0 = rr.sharedMaterial.GetTexture("_BaseMap");
+                    Debug.Log($"[PCMaterialShots] top plate baseMap={(tex0 != null ? tex0.name + " " + tex0.width + "x" + tex0.height + " mips=" + (tex0 as Texture2D)?.mipmapCount + " fmt=" + (tex0 as Texture2D)?.format : "null")} mesh={rr.GetComponent<MeshFilter>()?.sharedMesh?.name} uvOK={rr.GetComponent<MeshFilter>()?.sharedMesh?.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.TexCoord0)} tan={rr.GetComponent<MeshFilter>()?.sharedMesh?.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.Tangent)} static={rr.gameObject.isStatic} instancing={rr.sharedMaterial.enableInstancing}");
+                    rr.enabled = false;
+                    yield return Shot("01_probe_topplate_off");
+                    rr.enabled = true;
+                    var mi = rr.material;
+                    mi.SetColor("_BaseColor", Color.black);
+                    yield return Shot("01_probe_instance_black");
+                    mi.SetColor("_BaseColor", Color.white);
+                    mi.SetFloat("_Metallic", 0f); mi.SetFloat("_Smoothness", 0.05f); mi.DisableKeyword("_CLEARCOAT"); mi.DisableKeyword("_PC_ANISO"); mi.DisableKeyword("_PC_ALBEDOBUMP");
+                    yield return Shot("01_probe_instance_plain");
                 }
             }
             yield return Frame(Find("GUAN-CHENG.002_low"), 35f, 25f, 1.8f);
@@ -163,6 +171,10 @@ namespace WebGL.UI.Desktop
             yield return Shot("12_vista_general");
             yield return FramePoint(new Vector3(0f, 0.6f, 0f), 215f, 22f, 6.0f);
             yield return Shot("13_vista_media");
+            yield return FramePoint(new Vector3(0f, 0.95f, 0f), 200f, 82f, 3.6f);
+            yield return Shot("17_vista_cenital");
+            yield return FramePoint(new Vector3(0f, 0.95f, 0f), 215f, 35f, 3.2f);
+            yield return Shot("18_placa_superior_media");
 
             // f) otros entornos
             foreach (string p in new[] { "Day", "Sunset" })

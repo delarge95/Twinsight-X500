@@ -72,7 +72,7 @@ namespace WebGL.Core.Managers
                 {
                     r.sharedMaterials = mats;
                     count++;
-                    foreach (Material m in mats)
+                    if (!PCDebugFlags.Has("noscrews")) foreach (Material m in mats)
                     {
                         if (m != null && (m.name == "PC_ScrewZinc" || m.name == "PC_Nylon"))
                         {
@@ -83,6 +83,8 @@ namespace WebGL.Core.Managers
                 }
                 _done.Add(r);
             }
+            PCDebugFlags.ApplyMaterialFlags(_cache.Values);
+            PCDebugFlags.ApplyGlobalFlags();
             SwappedCount += count;
             Debug.Log("[PCMaterialSwapper] Renderers con material PC: " + count + " de " + renderers.Count + " | tornillos redondeados: " + PCScrewSmoother.SmoothedRenderers + " (mallas: " + PCScrewSmoother.BuiltMeshes + ")");
         }

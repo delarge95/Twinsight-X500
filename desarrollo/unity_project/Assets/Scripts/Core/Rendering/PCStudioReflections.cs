@@ -387,6 +387,7 @@ namespace WebGL.Core.Managers
 
             _probe.RenderProbe();
             _renders++;
+            if (PCDebugFlags.Has("probe0")) { _probe.intensity = 0f; }
 
             // Cualquier superficie fuera del probe (no deberia haber) usa el mismo cubemap.
             Texture tex = _probe.realtimeTexture != null ? (Texture)_probe.realtimeTexture : _probe.texture;
@@ -394,7 +395,7 @@ namespace WebGL.Core.Managers
             {
                 RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
                 RenderSettings.customReflectionTexture = tex;
-                RenderSettings.reflectionIntensity = 1f;
+                RenderSettings.reflectionIntensity = PCDebugFlags.Has("probe0") ? 0f : 1f;
             }
         }
 

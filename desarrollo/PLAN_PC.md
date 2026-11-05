@@ -335,3 +335,16 @@ La bajada frente a la 3A (324) no se aislo: entre la 3A y ahora entraron el puli
 - Aislamiento WebGL: `git diff 4ce5ab9` sin cambios en .mat originales, `URP_AutoFixed`, escena ni calidad WebGL; los .meta de las 5 texturas `final_curve_*` solo cambian el bloque Standalone (y 2 campos de sprite que Unity anade). Control en Play con WebGL activo: 289 materiales, 0 con shaders PC, sin `_DesktopUI`, asset `URP_AutoFixed` (`99_webgl_control.png`). `UniversalRenderPipelineGlobalSettings.asset` se restauro con `git checkout`.
 - 82 de 160 tornillos redondeados (el resto tiene anillos de 4-8 puntos u otra forma).
 - La fila resaltada del arbol no siempre se desplaza hasta la vista si el arbol estaba cerrado al seleccionar.
+
+## 11. Fase 3B.1 (2026-11-04, interrumpida a peticion del usuario; rama `pc-desktop`)
+
+**Hecho (herramientas de diagnostico, sin cambios visuales):**
+- `PCDebugFlags` (Standalone): `-pcdbg flag1,flag2` con `noalbedobump, noaniso, noclearcoat, noscrews, notree, mip1, nossao, rs1, probe0` para biseccionar FPS y aspecto desde el .exe. `PCMaterialShots` (`-mat-probe`) con sondas de la placa superior y vistas nuevas (`17_vista_cenital`, `18_placa_superior_media`). Build: `E:\TwinSight_builds\pc_fase3b1\TwinSightX500.exe`. Capturas: `capturas_fase3b1\`.
+
+**Tarea 1 - placa superior gris (causa NO resuelta, pero acotada):**
+- Hipotesis de reflejo del HDRI: DESCARTADA. Con `-pcdbg probe0` (sin probe ni reflexion global) todo el dron se oscurece menos la placa superior, que sigue igual (`grid_probe.png`).
+- La placa superior (`TOP-PLATE-X500-V5_001_low`, original `BAKE_PREVIEW.001`) si usa `PC_CarbonPlate` (misma instancia compartida que la placa inferior, sin MPB; BC7 4096, UV y tangentes presentes, no estatica). Mismo atlas que `carbon_fiber_01`.
+- En el .exe, desactivar ese renderer elimina el gris (pixel 98 -> 49); pero con una instancia propia del material con `_BaseColor` negro, metallic 0, smooth 0.05 y sin clear-coat/aniso/albedo-bump el pixel sigue en ~100. Es decir: el gris no depende del albedo, ni de la especular, ni del entorno, ni del post-procesado. En el Editor (Play, misma plataforma) la misma vista sale oscura (`17_vista_cenital_editor0.png`). Apunta a algo propio del .exe para esa malla (variante de shader del player, canal de vertices o contribucion constante); no investigado mas.
+- Pendiente: probar en el .exe con `Universal Render Pipeline/Lit` rojo sobre ese renderer para separar shader de malla; revisar variantes compiladas del pase ForwardLit de `DroneLitPC` en el player; reducir el relieve del twill (aun parece chapa estriada) con `_AlbedoBumpScale` 2.0 -> ~1.0.
+
+**Tarea 2 - FPS (sin biseccion):** no se llego a medir. Mediciones disponibles de la 3B: PC_Ultra ~107, PC_High ~96 (3A: ~324). Pendiente ejecutar, con `-perflog -quality PC_Ultra -vsync 0 -perf-viewer -pcdbg <flag>`, cada flag por separado (`noalbedobump,noaniso`, `mip1`, `noscrews`, `notree`, `nossao`, `rs1`) y revertir/ajustar el culpable (texturas 4K -> 2K si pesan).
