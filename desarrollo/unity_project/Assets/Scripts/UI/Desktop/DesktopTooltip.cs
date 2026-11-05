@@ -30,7 +30,12 @@ namespace WebGL.UI.Desktop
             { "CrossSectionBackBtn", "Esc" },
             { "FilterBackBtn", "Esc" },
             { "OnboardCloseBtn", "Esc" },
-            { "HeroInfoBtn", "F1" }
+            { "HeroInfoBtn", "F1" },
+            { "DkMode1", "1" }, { "DkMode2", "2" }, { "DkMode3", "3" },
+            { "DkPins", "H" }, { "DkIso", "I" }, { "DkReset", "R|Home" },
+            { "DkTree", "T" }, { "DkRailTree", "T" }, { "DkRailSearch", "Ctrl+F" }, { "DkInspector", "P" }, { "DkRailInspector", "P" },
+            { "DkHelp", "?" }, { "DkStatusHelp", "?" }, { "DkFocus", "F" }, { "DkIsolate", "I" },
+            { "AnalyzeCrossSectionBtn", "C" }, { "AnalyzeFilterBtn", "G" }
         };
 
         private readonly VisualElement _root;

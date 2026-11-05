@@ -23,7 +23,7 @@ namespace WebGL.UI.Desktop
         public const float MinWidth = 380f;
         public const float MaxWidth = 480f;
         public const float WidthFraction = 0.34f;
-        public const float Margin = 16f;
+        public const float Margin = 0f;   // phase 4: the inspector is docked flush to the edge
 
         private readonly VisualElement _root;
         private readonly VisualElement _sheet;
@@ -75,7 +75,7 @@ namespace WebGL.UI.Desktop
             }
 
             bool changed = false;
-            float width = Mathf.Round(Mathf.Clamp(logicalWidth * WidthFraction, MinWidth, MaxWidth));
+            float width = logicalWidth < 1500f ? 300f : 340f;   // phase 4 (mockup): 340 px, 300 px on small windows
             if (!Mathf.Approximately(width, _width))
             {
                 _width = width;
@@ -97,10 +97,11 @@ namespace WebGL.UI.Desktop
             }
 
             // The camera can appear after the UI: keep it informed every frame (cheap).
-            OrbitCameraController.Instance?.SetDesktopViewShiftX(OccupiedWidth / (2f * logicalWidth));
-
-            // Left docked part tree (phase 3B): the capsule keeps centred in the free area.
-            float left = Tree != null ? Tree.OccupiedWidth : 0f;
+            float rightOcc = _open ? _width : DesktopChrome.RailWidth;
+            float leftOcc = (Tree != null && Tree.IsOpen) ? DesktopPartTree.Width : DesktopChrome.RailWidth;
+            OrbitCameraController.Instance?.SetDesktopViewShiftX((rightOcc - leftOcc) / (2f * logicalWidth));
+            if (_bar != null) _bar.style.right = rightOcc;
+            float left = leftOcc;
             if (!Mathf.Approximately(left, _leftShift))
             {
                 _leftShift = left;
@@ -120,7 +121,7 @@ namespace WebGL.UI.Desktop
             float occupied = OccupiedWidth;
             if (_bar != null)
             {
-                _bar.style.right = occupied;
+                _bar.style.right = rightOcc;
             }
 
             if (_thermal != null)

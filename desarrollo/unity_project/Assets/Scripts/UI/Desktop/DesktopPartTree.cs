@@ -20,8 +20,8 @@ namespace WebGL.UI.Desktop
     /// </summary>
     internal sealed class DesktopPartTree
     {
-        public const float Width = 340f;
-        public const float Margin = 16f;
+        public const float Width = 280f;   // phase 4 (mockup)
+        public const float Margin = 0f;
 
         private sealed class Node
         {

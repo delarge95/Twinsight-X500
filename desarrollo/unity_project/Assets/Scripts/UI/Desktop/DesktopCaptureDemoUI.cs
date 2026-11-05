@@ -84,6 +84,7 @@ namespace WebGL.UI.Desktop
             Scan(root, root, screenLogical, list);
             const int gx = 192, gy = 108;
             var grid = new bool[gx * gy];
+            var gridO = new bool[gx * gy];
             var sb = new StringBuilder();
             foreach (VisualElement e in list)
             {
@@ -95,9 +96,12 @@ namespace WebGL.UI.Desktop
                 int x0 = Mathf.Clamp((int)(px / Screen.width * gx), 0, gx - 1), x1 = Mathf.Clamp((int)((px + pw) / Screen.width * gx), 0, gx - 1);
                 int y0 = Mathf.Clamp((int)(py / Screen.height * gy), 0, gy - 1), y1 = Mathf.Clamp((int)((py + ph) / Screen.height * gy), 0, gy - 1);
                 for (int y = y0; y <= y1; y++) for (int x = x0; x <= x1; x++) grid[y * gx + x] = true;
+                bool docked = e.name == "DkTopBar" || e.name == "DkRailL" || e.name == "DkRailR" || e.name == "DkStatus" || e.ClassListContains("details-sheet") || e.ClassListContains("desktop-tree") || e.ClassListContains("hotspot-dot");
+                if (!docked) for (int y = y0; y <= y1; y++) for (int x = x0; x <= x1; x++) gridO[y * gx + x] = true;
             }
             int n = 0; foreach (bool b in grid) if (b) n++;
-            Log($"[{name}] cubre {100f * n / grid.Length:F1}% del canvas con {list.Count} superficies:{sb}");
+            int nO = 0; foreach (bool b in gridO) if (b) nO++;
+            Log($"[{name}] cubre {100f * n / grid.Length:F1}% (acoplado+superpuesto), {100f * nO / gridO.Length:F1}% superpuesto al modelo, con {list.Count} superficies:{sb}");
         }
 
         private static GameObject FindPart() => GameObject.Find("x500v2_arm_FL");
@@ -230,6 +234,99 @@ namespace WebGL.UI.Desktop
             Collider col = part.GetComponentInChildren<Collider>();
             sm.SimulateClickOn(col != null ? col.transform : part.transform);
             yield return new WaitForSecondsRealtime(1f);
+
+            if (ProbeKind == "chrome")
+            {
+                string tag = Screen.width + "x" + Screen.height;
+                DesktopChrome chrome = ctrl.Chrome;
+                sm.SimulateClickOn(null);
+                oc.ResetView(); oc.SetAngles(-30f, 22f, true); oc.SetDistance(8.5f, true);
+                yield return new WaitForSecondsRealtime(1.2f);
+                yield return Shot("01_reposo_" + tag);
+                GameObject arm = FindPart();
+                Collider ac = arm.GetComponentInChildren<Collider>();
+                sm.SimulateClickOn(ac != null ? ac.transform : arm.transform);
+                yield return new WaitForSecondsRealtime(1.8f);
+                yield return Shot("02_pieza_inspector_" + tag);
+                if (!ctrl.SidePanel.IsOpen) { chrome.ToggleInspectorPublic(); yield return new WaitForSecondsRealtime(1.2f); yield return Shot("02b_pieza_inspector_manual_" + tag); }
+                ui.ShortcutToggleMode(1); yield return new WaitForSecondsRealtime(0.8f);
+                yield return Shot("03a_inspeccionar_" + tag);
+                Click(root.Q<Button>("ToolPowerBtn")); yield return new WaitForSecondsRealtime(0.8f);
+                yield return Shot("03b_energia_" + tag);
+                Click(root.Q<Button>("ToolPowerBtn"));
+                ui.ShortcutToggleMode(2); yield return new WaitForSecondsRealtime(0.8f);
+                Click(root.Q<Button>("AnalyzeCrossSectionBtn")); yield return new WaitForSecondsRealtime(0.8f);
+                yield return Shot("04a_analizar_corte_" + tag);
+                Click(root.Q<Button>("CrossSectionBackBtn")); yield return new WaitForSecondsRealtime(0.5f);
+                Click(root.Q<Button>("AnalyzeExplodeBtn")); yield return new WaitForSecondsRealtime(0.8f);
+                yield return Shot("04b_analizar_explotar_" + tag);
+                Click(root.Q<Button>("AnalyzeExplodeBtn")); yield return new WaitForSecondsRealtime(0.6f);
+                Click(root.Q<Button>("AnalyzeFilterBtn")); yield return new WaitForSecondsRealtime(0.8f);
+                yield return Shot("04c_analizar_filtro_" + tag);
+                Click(root.Q<Button>("FilterBackBtn")); yield return new WaitForSecondsRealtime(0.4f);
+                ui.ShortcutToggleMode(3); yield return new WaitForSecondsRealtime(1.0f);
+                yield return Shot("05a_estudio_render_" + tag);
+                Click(root.Q<Button>("ShaderMode_Thermal")); yield return new WaitForSecondsRealtime(1.0f);
+                yield return Shot("05b_estudio_termico_" + tag);
+                Click(root.Q<Button>("DkStudioEnv")); yield return new WaitForSecondsRealtime(0.6f);
+                yield return Shot("05c_estudio_entorno_" + tag);
+                ViewModeManager.Instance.SetViewMode(ViewMode.Realistic);
+                ui.ShortcutToggleMode(3); yield return new WaitForSecondsRealtime(0.6f);
+                ctrl.Tree.Open(false); yield return new WaitForSecondsRealtime(0.8f);
+                yield return Shot("06_arbol_" + tag);
+                ctrl.Tree.SetOpen(false);
+                chrome.OpenSettings(); yield return new WaitForSecondsRealtime(0.8f);
+                yield return Shot("07_ajustes_" + tag);
+                chrome.CloseSettings();
+                ctrl.SetHelpOpen(true); yield return new WaitForSecondsRealtime(0.6f);
+                yield return Shot("08_ayuda_" + tag);
+                ctrl.SetHelpOpen(false);
+                File.WriteAllText(Path.Combine(OutputDirectory, "cobertura_" + tag + ".log"), _log.ToString());
+                Application.Quit();
+                yield break;
+            }
+
+            if (ProbeKind == "flow")
+            {
+                DesktopChrome chrome = ctrl.Chrome;
+                sm.SimulateClickOn(null);
+                oc.ResetView(); oc.SetAngles(-30f, 22f, true); oc.SetDistance(8.5f, true);
+                yield return new WaitForSecondsRealtime(1.5f);
+                string posFile = Path.Combine(OutputDirectory, "flow_pos.txt");
+                string[] names = { "DkMode1", "DkMode2", "DkMode3", "DkTree", "DkInspector", "DkSettings", "DkHelp", "DkRailTree", "DkRailInspector",
+                    "ToolHotspotBtn", "ToolPowerBtn", "AnalyzeCrossSectionBtn", "AnalyzeExplodeBtn", "AnalyzeFilterBtn", "CrossSectionPosition", "CrossSectionBackBtn",
+                    "DkStudioRender", "DkStudioEnv", "ShaderMode_Thermal", "EnvPreset_Night", "EnvLightRotation", "DkSettingsClose", "QualityBtn_Low", "DkFocus", "SheetCloseBtn" };
+                GameObject armGo = FindPart();
+                Collider armCol = armGo.GetComponentInChildren<Collider>();
+                Debug.Log("[flow] READY");
+                File.WriteAllText(Path.Combine(OutputDirectory, "flow.ready"), "ready");
+                float endFlow = Time.realtimeSinceStartup + 150f;
+                float us = ctrl.UiScale;
+                while (Time.realtimeSinceStartup < endFlow)
+                {
+                    var sbp = new StringBuilder();
+                    foreach (string n in names)
+                    {
+                        VisualElement e = root.Q<VisualElement>(n);
+                        if (e == null || !Visible(e)) continue;
+                        VisualElement t = e.Q<VisualElement>(className: "unity-base-slider__dragger") ?? e;
+                        Rect r = t.worldBound;
+                        sbp.Append($"{n} {(r.center.x * us).ToString("F0", System.Globalization.CultureInfo.InvariantCulture)} {(r.center.y * us).ToString("F0", System.Globalization.CultureInfo.InvariantCulture)}\n");
+                    }
+                    Vector3 sp = Camera.main.WorldToScreenPoint(armCol.bounds.center);
+                    sbp.Append($"ARM {sp.x.ToString("F0", System.Globalization.CultureInfo.InvariantCulture)} {(Screen.height - sp.y).ToString("F0", System.Globalization.CultureInfo.InvariantCulture)}\n");
+                    try { File.WriteAllText(posFile, sbp.ToString()); } catch (IOException) { }
+                    string mode = root.Q<Button>("DkMode1").ClassListContains("dk-seg-btn--on") ? "1" : root.Q<Button>("DkMode2").ClassListContains("dk-seg-btn--on") ? "2" : root.Q<Button>("DkMode3").ClassListContains("dk-seg-btn--on") ? "3" : "-";
+                    oc.DesktopGetTargets(out Vector3 fc, out float dist);
+                    Slider cutS = root.Q<Slider>("CrossSectionPosition");
+                    Slider envS = root.Q<Slider>("EnvLightRotation");
+                    string step = ""; try { string sf = Path.Combine(OutputDirectory, "flow_step.txt"); if (File.Exists(sf)) step = File.ReadAllText(sf).Trim(); } catch (IOException) { }
+                    Debug.Log($"[flow] step={step} mode={mode} insp={ctrl.SidePanel.IsOpen} tree={ctrl.Tree.IsOpen} settings={chrome.IsSettingsOpen} help={ctrl.IsHelpOpen} sel={(sm.CurrentSelection != null ? sm.CurrentSelection.name : "none")} cut={(cutS != null ? cutS.value : -9f):F2} env={(envS != null ? envS.value : -9f):F0} view={ViewModeManager.Instance.CurrentMode} dist={dist:F2} cam={Camera.main.transform.eulerAngles.y:F1}");
+                    yield return new WaitForSecondsRealtime(0.2f);
+                }
+                Application.Quit();
+                yield break;
+            }
 
             if (ProbeKind == "clean")
             {

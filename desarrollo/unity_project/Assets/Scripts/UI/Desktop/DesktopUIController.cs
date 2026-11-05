@@ -35,6 +35,7 @@ namespace WebGL.UI.Desktop
         private DesktopDisplayPanel _display;
         private DesktopSidePanel _sidePanel;
         private DesktopPartTree _tree;
+        private DesktopChrome _chrome;
         private VisualElement _hint;
         private VisualElement _bottomSheet;
         private bool _ready;
@@ -53,6 +54,7 @@ namespace WebGL.UI.Desktop
         internal DesktopTooltip Tooltip => _tooltip;
         internal DesktopSidePanel SidePanel => _sidePanel;
         internal DesktopPartTree Tree => _tree;
+        internal DesktopChrome Chrome => _chrome;
         internal DesktopHelpOverlay Help => _help;
         internal DesktopUIScaler Scaler => _scaler;
 
@@ -116,6 +118,7 @@ namespace WebGL.UI.Desktop
             _display?.Dispose();
             _sidePanel?.Dispose();
             _tree?.Dispose();
+            _chrome?.Dispose();
             _hint?.RemoveFromHierarchy();
             _scaler?.Restore();
         }
@@ -174,6 +177,7 @@ namespace WebGL.UI.Desktop
             _sidePanel.Tree = _tree;
             if (PCDebugFlags.Has("notree")) _tree.Dispose();
             _display = new DesktopDisplayPanel(_root);
+            if (!PCDebugFlags.Has("oldchrome")) _chrome = new DesktopChrome(_root, this, _tree, _sidePanel);
             _help = new DesktopHelpOverlay(_root);
             BuildHint();
             _tooltip = new DesktopTooltip(_root); // last child: always on top
@@ -184,6 +188,13 @@ namespace WebGL.UI.Desktop
                 {
                     Log("Esc -> help closed");
                     _help.Close();
+                    return true;
+                }
+
+                if (_chrome != null && _chrome.IsSettingsOpen)
+                {
+                    Log("Esc -> settings closed");
+                    _chrome.CloseSettings();
                     return true;
                 }
 
@@ -233,6 +244,7 @@ namespace WebGL.UI.Desktop
             _scaler.Tick();
             _sidePanel.Tick();
             _tree.Tick();
+            _chrome?.Tick(_scaler.LogicalSize.x);
             DesktopWindowSettings.TickMinimumSize();
 
             if (Screen.width != _lastScreenW || Screen.height != _lastScreenH)
@@ -333,6 +345,11 @@ namespace WebGL.UI.Desktop
             else if (Input.GetKeyDown(KeyCode.H)) { Log("key H"); _ui.ShortcutTogglePins(); }
             else if (Input.GetKeyDown(KeyCode.I)) { Log("key I"); _ui.ShortcutToggleIsolation(); }
             else if (Input.GetKeyDown(KeyCode.E)) { Log("key E"); _ui.ShortcutToggleExplode(); }
+            else if (_chrome != null && Input.GetKeyDown(KeyCode.C)) { Log("key C"); _chrome.OpenAnalyzeTool("AnalyzeCrossSectionBtn"); }
+            else if (_chrome != null && Input.GetKeyDown(KeyCode.G)) { Log("key G"); _chrome.OpenAnalyzeTool("AnalyzeFilterBtn"); }
+            else if (_chrome != null && Input.GetKeyDown(KeyCode.V)) { Log("key V"); _chrome.CycleViewMode(); }
+            else if (_chrome != null && (Input.GetKeyDown(KeyCode.T) || (Input.inputString != null && Input.inputString.IndexOf('[') >= 0))) { Log("key ["); _chrome.ToggleTreePublic(); }
+            else if (_chrome != null && (Input.GetKeyDown(KeyCode.P) || (Input.inputString != null && Input.inputString.IndexOf(']') >= 0))) { Log("key ]"); _chrome.ToggleInspectorPublic(); }
         }
 
         // ─────────────────────────── capture demo hook ───────────────────────────

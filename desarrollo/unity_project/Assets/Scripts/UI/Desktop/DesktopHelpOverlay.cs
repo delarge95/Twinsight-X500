@@ -105,6 +105,9 @@ namespace WebGL.UI.Desktop
             AddRow(left, new[] { "H" }, T("Show / hide pins", "Mostrar / ocultar puntos"));
             AddRow(left, new[] { "I" }, T("Isolate selected part", "Aislar la pieza seleccionada"));
             AddRow(left, new[] { "E" }, T("Explode / assemble", "Explosionar / ensamblar"));
+            AddRow(left, new[] { "C" }, T("Cross-section cut", "Corte transversal"));
+            AddRow(left, new[] { "G" }, T("Filter by category", "Filtrar por categoría"));
+            AddRow(left, new[] { "V" }, T("Cycle render modes", "Ciclar modos de render"));
             AddSection(left, T("WINDOW", "VENTANA"));
             AddRow(left, new[] { "F11", "Alt+Enter" }, T("Fullscreen", "Pantalla completa"));
             AddRow(left, new[] { "?", "F1" }, T("This help", "Esta ayuda"));
@@ -115,6 +118,8 @@ namespace WebGL.UI.Desktop
             AddRow(right, new[] { "F" }, T("Focus the selected part", "Enfocar la pieza seleccionada"));
             AddRow(right, new[] { "Home", "R" }, T("Reset the view", "Restablecer la vista"));
             AddRow(right, new[] { "Esc" }, T("Back / deselect", "Atrás / deseleccionar"));
+            AddRow(right, new[] { "T", "P" }, T("Fold parts tree / inspector (also [ ])", "Plegar piezas / inspector (también [ ])"));
+            AddRow(right, new[] { "Ctrl+F", "/" }, T("Search a part", "Buscar una pieza"));
             AddSection(right, T("MOUSE", "RATÓN"));
             AddRow(right, new[] { T("Click", "Clic") }, T("Select a part", "Seleccionar una pieza"));
             AddRow(right, new[] { T("Double click", "Doble clic") }, T("Select and focus", "Seleccionar y enfocar"));

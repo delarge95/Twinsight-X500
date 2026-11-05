@@ -782,3 +782,623 @@
 .desktop-tree-row--group .desktop-tree-rowtitle {
     color: rgba(255, 255, 255, 0.62);
 }
+
+/* ================================================================
+   Phase 4 - desktop chrome (approved mockup docs/unity_pc/maqueta_desktop).
+   Root classes: desktop-ui layout--desktop chrome2 (added by DesktopChrome).
+   Top bar 44 px, rails 40 px, status bar 26 px; the old capsule and cards become a 36 px tool strip and
+   small popovers; the details sheet and the part tree are docked (no margins). 3-class selectors beat the
+   2-class rules above (and the .ui-compact ones).
+   ================================================================ */
+.layout--desktop.chrome2 .top-bar,
+.layout--desktop.chrome2 .actions-row,
+.layout--desktop.chrome2 .info-bar-peek,
+.layout--desktop.chrome2 .info-bar-peek--visible,
+.layout--desktop.chrome2 .info-bar-peek--hidden,
+.layout--desktop.chrome2 .thermal-legend,
+.layout--desktop.chrome2 .desktop-hint {
+    display: none;
+}
+
+/* top bar */
+.dk-top {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 44px;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px;
+    background-color: rgb(14, 17, 22);
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(255, 255, 255, 0.09);
+}
+
+.dk-grow { flex-grow: 1; }
+
+.dk-brand {
+    font-size: 14px;
+    color: rgb(207, 215, 226);
+    margin: 0 0 0 6px;
+}
+
+.dk-brand--accent {
+    color: rgb(191, 234, 255);
+    -unity-font-style: bold;
+    margin-left: 4px;
+    margin-right: 10px;
+}
+
+.dk-crumb {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: rgb(139, 149, 163);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    -unity-text-align: middle-center;
+}
+
+.dk-crumb--has {
+    color: rgb(191, 234, 255);
+    border-color: rgba(70, 175, 255, 0.45);
+    background-color: rgba(70, 175, 255, 0.08);
+}
+
+.dk-seg {
+    flex-direction: row;
+    height: 32px;
+    padding: 2px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.09);
+    border-radius: 16px;
+    background-color: rgb(23, 27, 34);
+}
+
+.dk-seg-btn {
+    flex-direction: row;
+    align-items: center;
+    height: 26px;
+    min-height: 0;
+    margin: 0 1px;
+    padding: 0 12px;
+    border-width: 0;
+    border-radius: 13px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.dk-seg-btn:hover {
+    background-color: rgb(27, 32, 41);
+}
+
+.dk-seg-btn--on,
+.dk-seg-btn--on:hover {
+    background-color: rgba(70, 175, 255, 0.16);
+    border-width: 1px;
+    border-color: rgba(70, 175, 255, 0.55);
+}
+
+.dk-seg-text {
+    font-size: 13px;
+    color: rgb(139, 149, 163);
+}
+
+.dk-seg-btn:hover .dk-seg-text { color: rgb(255, 255, 255); }
+.dk-seg-btn--on .dk-seg-text { color: rgb(191, 234, 255); }
+
+.dk-kbd {
+    font-size: 11px;
+    padding: 1px 5px;
+    margin-left: 7px;
+    color: rgb(139, 149, 163);
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.12);
+    border-radius: 5px;
+    background-color: rgb(11, 13, 17);
+}
+
+.dk-ibtn {
+    width: 30px;
+    height: 30px;
+    min-width: 0;
+    min-height: 0;
+    margin: 0 1px;
+    padding: 0;
+    border-width: 0;
+    border-radius: 15px;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(170, 180, 193);
+    align-items: center;
+    justify-content: center;
+}
+
+.dk-ibtn:hover {
+    background-color: rgb(27, 32, 41);
+    color: rgb(255, 255, 255);
+}
+
+.dk-ibtn--on,
+.dk-ibtn--on:hover {
+    color: rgb(191, 234, 255);
+    border-width: 1px;
+    border-color: rgba(70, 175, 255, 0.5);
+    background-color: rgba(70, 175, 255, 0.08);
+}
+
+.dk-ibtn--small { width: 24px; height: 24px; border-radius: 12px; }
+
+.dk-ibtn .dk-icon { color: rgb(170, 180, 193); }
+.dk-ibtn:hover .dk-icon { color: rgb(255, 255, 255); }
+.dk-ibtn--on .dk-icon { color: rgb(191, 234, 255); }
+
+.dk-sep {
+    width: 1px;
+    height: 18px;
+    margin: 0 6px;
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+.dk-lang {
+    flex-direction: row;
+    padding: 2px;
+    margin-right: 2px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    background-color: rgb(23, 27, 34);
+}
+
+.dk-lang-btn {
+    height: 20px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 8px;
+    border-width: 0;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(139, 149, 163);
+    font-size: 11px;
+}
+
+.dk-lang-btn:hover { color: rgb(255, 255, 255); }
+.dk-lang-btn--on, .dk-lang-btn--on:hover { background-color: rgba(70, 175, 255, 0.2); color: rgb(191, 234, 255); }
+
+/* rails (fold to icons) and status bar */
+.dk-rail {
+    position: absolute;
+    top: 44px;
+    bottom: 26px;
+    width: 40px;
+    padding-top: 8px;
+    align-items: center;
+    background-color: rgb(14, 17, 22);
+}
+
+.dk-rail--left { left: 0; border-right-width: 1px; border-right-color: rgba(255, 255, 255, 0.09); }
+.dk-rail--right { right: 0; border-left-width: 1px; border-left-color: rgba(255, 255, 255, 0.09); }
+
+.dk-status {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 26px;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 12px;
+    background-color: rgb(11, 13, 17);
+    border-top-width: 1px;
+    border-top-color: rgba(255, 255, 255, 0.09);
+}
+
+.dk-status-text {
+    font-size: 12px;
+    color: rgb(139, 149, 163);
+    margin: 0 14px 0 0;
+}
+
+.dk-status-btn {
+    flex-direction: row;
+    align-items: center;
+    height: 20px;
+    min-height: 0;
+    margin: 0;
+    padding: 0 6px;
+    border-width: 0;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.dk-status-btn:hover { background-color: rgb(27, 32, 41); }
+.dk-status-btn .dk-status-text { margin: 0 0 0 6px; }
+.dk-status-btn .dk-kbd { margin-left: 0; }
+
+.dk-tlg { flex-direction: row; align-items: center; margin-right: 14px; }
+.dk-tlg .dk-status-text { margin: 0; }
+.dk-tlg-bar { width: 150px; height: 8px; margin: 0 8px; border-radius: 4px; }
+
+/* tool strip (the old mode cards) */
+.layout--desktop.chrome2 .bottom-bar {
+    top: 52px;
+    bottom: auto;
+    transition-property: left, right;
+}
+
+.layout--desktop.chrome2 .mode-container {
+    position: relative;
+    width: auto;
+    max-width: none;
+    margin: 0;
+    align-self: center;
+    align-items: center;
+}
+
+.layout--desktop.chrome2 .mode-submenu {
+    position: relative;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.layout--desktop.chrome2 #AnalyzeCardGrid.submenu--hidden {
+    display: flex;
+    opacity: 1;
+    scale: 1 1;
+    translate: 0 0;
+}
+
+.dk-strip {
+    flex-direction: row;
+    align-items: center;
+    height: 36px;
+    padding: 3px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.09);
+    border-radius: 18px;
+    background-color: rgba(14, 17, 22, 0.90);
+}
+
+.layout--desktop.chrome2 .dk-strip > .submenu-title { display: none; }
+
+.layout--desktop.chrome2 .dk-strip > .submenu-grid {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: auto;
+    padding: 0;
+    align-self: center;
+}
+
+.layout--desktop.chrome2 .dk-strip .submenu-card {
+    width: auto;
+    height: 28px;
+    margin: 0 1px;
+    padding: 0 12px;
+    flex-direction: row;
+    border-width: 0;
+    border-radius: 14px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.layout--desktop.chrome2 .dk-strip .submenu-card:hover { background-color: rgb(27, 32, 41); }
+
+.layout--desktop.chrome2 .dk-strip .submenu-card.submenu-card--active,
+.layout--desktop.chrome2 .dk-strip .submenu-card.submenu-card--active:hover {
+    border-width: 1px;
+    border-color: rgba(70, 175, 255, 0.55);
+    background-color: rgba(70, 175, 255, 0.16);
+}
+
+.layout--desktop.chrome2 .dk-strip > .submenu-grid .submenu-icon {
+    width: 16px;
+    min-width: 16px;
+    max-width: 16px;
+    height: 16px;
+    min-height: 16px;
+    max-height: 16px;
+    margin: 0 6px 0 0;
+}
+
+.layout--desktop.chrome2 .dk-strip .submenu-label {
+    font-size: 13px;
+    letter-spacing: 0;
+    color: rgb(182, 192, 204);
+    -unity-font-style: normal;
+}
+
+.layout--desktop.chrome2 .dk-strip .submenu-card--active .submenu-label { color: rgb(191, 234, 255); }
+
+.dk-strip-btn {
+    flex-direction: row;
+    align-items: center;
+    height: 28px;
+    min-height: 0;
+    margin: 0 1px;
+    padding: 0 12px;
+    border-width: 0;
+    border-radius: 14px;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(182, 192, 204);
+}
+
+.dk-strip-btn:hover { background-color: rgb(27, 32, 41); color: rgb(255, 255, 255); }
+.dk-strip-btn--on, .dk-strip-btn--on:hover {
+    border-width: 1px;
+    border-color: rgba(70, 175, 255, 0.55);
+    background-color: rgba(70, 175, 255, 0.16);
+    color: rgb(191, 234, 255);
+}
+
+.dk-strip-text { font-size: 13px; margin-left: 6px; margin-right: 0; color: rgb(182, 192, 204); }
+.dk-strip-btn--on .dk-strip-text { color: rgb(191, 234, 255); }
+.dk-strip-btn .dk-icon { color: rgb(182, 192, 204); }
+.dk-strip-btn--on .dk-icon { color: rgb(191, 234, 255); }
+
+/* popovers (CUT, FILTER, EXPLODE, POWER, RENDER / ENVIRONMENT, settings) */
+.layout--desktop.chrome2 .dk-pop {
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    translate: -50% 0;
+    scale: 1 1;
+    width: 300px;
+    margin: 0;
+    padding: 10px 12px 12px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.11);
+    border-radius: 14px;
+    background-color: rgb(18, 21, 27);
+}
+
+.layout--desktop.chrome2 .dk-pop--studio { width: 320px; }
+
+.dk-pop .submenu-title {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    margin: 0 0 8px 0;
+    color: rgb(232, 237, 243);
+    -unity-text-align: middle-left;
+    align-self: flex-start;
+}
+
+.dk-pop .submenu-title--section { margin-top: 0; }
+
+.dk-pop .submenu-back-btn {
+    left: auto;
+    right: 8px;
+    top: 6px;
+    width: 24px;
+    height: 24px;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    font-size: 12px;
+    border-radius: 12px;
+}
+
+.dk-pop .submenu-grid {
+    width: auto;
+    padding: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-self: stretch;
+}
+
+.dk-pop .submenu-card {
+    width: 31.5%;
+    height: 28px;
+    margin: 2px 0.4%;
+    padding: 0 6px;
+    flex-direction: row;
+    border-radius: 14px;
+}
+
+.dk-pop .submenu-card:hover { border-color: rgba(70, 175, 255, 0.4); }
+.dk-pop .submenu-icon { display: none; }
+.dk-pop .submenu-label { font-size: 12px; letter-spacing: 0; color: rgb(201, 210, 221); }
+.dk-pop .submenu-card--active .submenu-label { color: rgb(191, 234, 255); -unity-font-style: normal; }
+.dk-pop .env-cycle-dots { display: none; }
+
+.dk-pop .cross-section-control-row { max-width: none; padding: 0; margin-bottom: 8px; }
+.dk-pop .cross-section-axis-group { gap: 6px; }
+.dk-pop .cross-section-axis-btn { height: 28px; border-radius: 14px; }
+.dk-pop .cross-section-axis-label { font-size: 13px; }
+.dk-pop .cross-section-plane-group { max-width: none; }
+.dk-pop .cross-section-plane-caption { padding: 0; margin-bottom: 2px; font-size: 10px; letter-spacing: 1px; }
+.dk-pop .cross-section-slider-row { max-width: none; padding: 0; }
+.dk-pop .cross-section-slider { height: 28px; min-height: 28px; padding: 0 4px; }
+.dk-pop .cross-section-config-btn { width: 28px; min-width: 28px; height: 28px; min-height: 28px; border-radius: 14px; }
+.dk-pop .cross-section-config-icon { width: 16px; min-width: 16px; max-width: 16px; height: 16px; min-height: 16px; max-height: 16px; }
+.dk-pop .glass-slider { min-height: 28px; }
+.dk-pop .glass-slider .unity-base-slider__dragger { width: 14px; height: 14px; margin-top: -7px; border-width: 2px; }
+.dk-pop .glass-slider .unity-base-slider__dragger:hover { width: 16px; height: 16px; margin-top: -8px; }
+
+.layout--desktop.chrome2 .explode-inline-slider.dk-pop { width: 260px; flex-direction: row; align-items: center; margin-top: 0; padding: 4px 12px; }
+.dk-pop .explosion-value-label { font-size: 12px; min-width: 36px; }
+
+.layout--desktop.chrome2 .inspect-power-panel.dk-pop { width: 280px; min-height: 0; }
+.dk-pop .inspect-power-header { margin-bottom: 4px; }
+.dk-pop .inspect-power-state { font-size: 12px; }
+.dk-pop .inspect-power-value { font-size: 12px; }
+
+.dk-pop .env-slider-group { width: auto; height: 28px; margin: 2px 0 0 0; padding: 0; align-self: stretch; }
+.dk-pop .env-slider-label { font-size: 11px; width: 118px; margin-right: 8px; letter-spacing: 0.5px; }
+.dk-pop .env-slider { min-height: 28px; }
+
+.dk-studio--render #EnvGrid,
+.dk-studio--render .env-slider-group,
+.dk-studio--render .submenu-title--section { display: none; }
+.dk-studio--env #ShaderMenu { display: none; }
+.dk-studio--env #DkTitleRender { display: none; }
+.layout--desktop.chrome2 .dk-studio--none { display: none; }
+
+.dk-pop-head { flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.dk-pop-title { font-size: 13px; color: rgb(232, 237, 243); -unity-font-style: bold; }
+
+.layout--desktop.chrome2 .dk-settings {
+    top: 48px;
+    left: auto;
+    right: 8px;
+    bottom: 34px;
+    translate: 0 0;
+    width: 420px;
+}
+
+.layout--desktop.chrome2 .dk-settings--hidden { display: none; }
+.dk-settings-body { flex-grow: 1; flex-shrink: 1; min-height: 0; }
+
+.layout--desktop.chrome2 .dk-config-embedded {
+    position: relative;
+    left: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    flex-grow: 1;
+    opacity: 1;
+    translate: 0 0;
+    scale: 1 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.dk-config-embedded #SubmenuBackBtn_Config { display: none; }
+
+/* docked inspector (the old bottom sheet) */
+.layout--desktop.chrome2 .details-sheet {
+    top: 44px;
+    bottom: 26px;
+    right: 0;
+    padding: 0;
+    border-width: 0;
+    border-left-width: 1px;
+    border-color: rgba(255, 255, 255, 0.09);
+    border-radius: 0;
+    background-color: rgb(14, 17, 22);
+}
+
+.layout--desktop.chrome2 .sheet-header { padding: 10px 44px 4px 14px; margin-bottom: 0; }
+.layout--desktop.chrome2 .sheet-title { font-size: 15px; letter-spacing: 0; }
+.layout--desktop.chrome2 .sheet-close-btn { top: 8px; right: 10px; width: 24px; height: 24px; border-radius: 12px; }
+.layout--desktop.chrome2 .sheet-close-icon { width: 12px; min-width: 12px; max-width: 12px; height: 12px; min-height: 12px; max-height: 12px; }
+.layout--desktop.chrome2 .sheet-scroll { margin-top: 0; padding: 0 6px 0 14px; }
+.layout--desktop.chrome2 .sheet-description { font-size: 13px; margin-bottom: 8px; color: rgba(255, 255, 255, 0.7); }
+.layout--desktop.chrome2 .sheet-foldout > .unity-foldout__toggle > .unity-toggle__input > .unity-foldout__text { font-size: 12px; letter-spacing: 1.5px; }
+.layout--desktop.chrome2 .data-row { padding: 3px 0; min-height: 28px; }
+.layout--desktop.chrome2 .data-label { font-size: 11px; width: 96px; min-width: 96px; max-width: 96px; margin-right: 8px; }
+.layout--desktop.chrome2 .data-value { font-size: 13px; }
+.layout--desktop.chrome2 .data-value.read-only-text > .unity-text-field__input { font-size: 13px; }
+
+.dk-sheet-footer {
+    flex-direction: row;
+    flex-shrink: 0;
+    padding: 10px 12px;
+    border-top-width: 1px;
+    border-top-color: rgba(255, 255, 255, 0.09);
+}
+
+.dk-btn {
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 28px;
+    min-height: 0;
+    margin: 0 4px;
+    padding: 0 10px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    background-color: rgb(23, 27, 34);
+    color: rgb(201, 210, 221);
+}
+
+.dk-btn:hover { border-color: rgba(70, 175, 255, 0.5); color: rgb(255, 255, 255); }
+.dk-btn .dk-icon { color: rgb(201, 210, 221); }
+.dk-btn-text { font-size: 12px; margin: 0 4px 0 6px; color: rgb(201, 210, 221); }
+
+/* docked parts tree */
+.layout--desktop.chrome2 .desktop-tree {
+    left: 0;
+    top: 44px;
+    bottom: 26px;
+    width: 280px;
+    padding: 6px 4px 8px 10px;
+    border-width: 0;
+    border-right-width: 1px;
+    border-right-color: rgba(255, 255, 255, 0.09);
+    border-radius: 0;
+    background-color: rgb(14, 17, 22);
+}
+
+.layout--desktop.chrome2 .desktop-tree-title { font-size: 14px; letter-spacing: 0; }
+.layout--desktop.chrome2 .desktop-tree-close { width: 24px; height: 24px; border-radius: 12px; }
+.layout--desktop.chrome2 .desktop-tree-searchbox { height: 30px; }
+.layout--desktop.chrome2 .desktop-tree .desktop-tree-search { height: 30px; }
+.layout--desktop.chrome2 .desktop-tree .desktop-tree-search > .unity-base-text-field__input { height: 30px; padding: 0 12px; border-radius: 15px; font-size: 13px; }
+.layout--desktop.chrome2 .desktop-tree-placeholder { left: 12px; font-size: 13px; }
+.layout--desktop.chrome2 .desktop-tree-row { min-height: 28px; padding: 2px 6px 2px 8px; border-radius: 8px; }
+.layout--desktop.chrome2 .desktop-tree-rowtitle { font-size: 13px; }
+.layout--desktop.chrome2 .desktop-tree-row--category .desktop-tree-rowtitle { font-size: 11px; }
+.layout--desktop.chrome2 .desktop-tree-row--selected,
+.layout--desktop.chrome2 .desktop-tree-row--selected:hover {
+    border-color: rgba(191, 234, 255, 0.6);
+    background-color: rgba(70, 175, 255, 0.16);
+}
+
+/* help overlay as a popover (top right), not a full-screen sheet */
+.layout--desktop.chrome2 .desktop-help {
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 50px 10px 34px 10px;
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.layout--desktop.chrome2 .desktop-help-card {
+    width: 760px;
+    max-width: 96%;
+    padding: 14px 22px 12px 22px;
+    border-radius: 14px;
+    background-color: rgb(18, 21, 27);
+    border-color: rgba(255, 255, 255, 0.11);
+}
+
+.layout--desktop.chrome2 .desktop-help-title { font-size: 15px; letter-spacing: 1px; -unity-text-align: middle-left; }
+.layout--desktop.chrome2 .desktop-help-subtitle { font-size: 12px; -unity-text-align: middle-left; margin-bottom: 4px; }
+.layout--desktop.chrome2 .desktop-help-row { min-height: 26px; }
+.layout--desktop.chrome2 .desktop-help-desc { font-size: 13px; }
+.layout--desktop.chrome2 .desktop-help-section { font-size: 11px; margin-top: 6px; }
+.layout--desktop.chrome2 .desktop-help-footer { margin-top: 8px; }
+
+/* settings popover (CONFIG inside the viewer): own base rules (not .dk-pop, whose slider rules are for the tool popovers) */
+.layout--desktop.chrome2 .dk-settings {
+    position: absolute;
+    padding: 10px 12px 12px 12px;
+    flex-direction: column;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.11);
+    border-radius: 14px;
+    background-color: rgb(18, 21, 27);
+}
+
+.dk-config-embedded > .hero-title { display: none; }
+.dk-config-embedded .submenu-scroll { max-width: none; max-height: none; width: 100%; padding: 0; align-self: stretch; flex-grow: 1; overflow: hidden; }
+.dk-config-embedded .config-section-label { -unity-text-align: middle-left; font-size: 11px; margin: 10px 0 6px 0; }
+.dk-config-embedded .config-tier-auto { width: 100%; height: 28px; font-size: 12px; border-radius: 14px; }
+.dk-config-embedded .config-tier-row { max-width: none; margin-bottom: 8px; }
+.dk-config-embedded .config-tier-card { height: 28px; min-height: 0; border-radius: 14px; font-size: 11px; }
+.dk-config-embedded .config-advanced-section { max-width: none; padding: 6px 10px; align-self: stretch; }
+.dk-config-embedded .config-row { margin-top: 2px; margin-bottom: 2px; min-height: 30px; }
+.dk-config-embedded .config-row-label { font-size: 12px; }
+.dk-config-embedded .config-cycle-btn { min-width: 96px; height: 28px; min-height: 0; font-size: 12px; border-radius: 14px; }
+.dk-config-embedded .desktop-display-section { max-width: none; margin-bottom: 8px; padding: 6px 10px; align-self: stretch; }
+.dk-config-embedded .env-slider-label { font-size: 11px; letter-spacing: 0.5px; }
+.dk-config-embedded .env-slider-group,
+.dk-config-embedded .desktop-display-section .env-slider-group { height: auto; min-height: 44px; }
