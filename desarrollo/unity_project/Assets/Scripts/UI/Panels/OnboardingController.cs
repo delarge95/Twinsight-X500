@@ -45,11 +45,10 @@ namespace WebGL.UI.Panels
         private bool _isSwipeTracking;
         private Vector2 _swipeStartPosition;
         private bool _isOpen;
-#if UNITY_STANDALONE
-        // PC build: the 6-step desktop card replaces the 15-step full-screen tutorial (WebGL / mobile keep this one).
-        private readonly WebGL.UI.Desktop.DesktopTutorial _desktop;
-        internal WebGL.UI.Desktop.DesktopTutorial Desktop => _desktop;
-#endif
+        // The 6-step tutorial (card for mouse, bottom sheet for touch) replaces the 15-step full-screen one on every platform;
+        // the old overlay stays in the UXML but is never shown (-pcdbg oldtutorial brings it back on PC).
+        private readonly TutorialOverlay _tutorial;
+        internal TutorialOverlay Tutorial => _tutorial;
 
         private enum StepVisualMode
         {
@@ -321,13 +320,15 @@ namespace WebGL.UI.Panels
             BindSwipeNavigation();
             BuildDots();
 
+            bool useOld = false;
 #if UNITY_STANDALONE
-            if (!WebGL.Core.Managers.PCDebugFlags.Has("oldtutorial"))
-            {
-                _desktop = new WebGL.UI.Desktop.DesktopTutorial(_overlay.parent, _overlay, Dismiss, _isTouchMode);
-                _cleanupActions.Add(() => _desktop.Dispose());
-            }
+            useOld = WebGL.Core.Managers.PCDebugFlags.Has("oldtutorial");
 #endif
+            if (!useOld)
+            {
+                _tutorial = new TutorialOverlay(_overlay.parent, _overlay, Dismiss, Application.isMobilePlatform);
+                _cleanupActions.Add(() => _tutorial.Dispose());
+            }
         }
 
         public void Dispose()
@@ -354,14 +355,13 @@ namespace WebGL.UI.Panels
         public void Show()
         {
             if (_overlay == null) return;
-#if UNITY_STANDALONE
-            if (_desktop != null)
+            if (_tutorial != null)
             {
-                _desktop.Show();
+                _tutorial.Show();
                 _isOpen = true;
                 return;
             }
-#endif
+
             _currentStep = 0;
             UpdateStep();
             _overlay.style.display = DisplayStyle.Flex;
@@ -377,9 +377,7 @@ namespace WebGL.UI.Panels
             if (!_isOpen) return;
 
             _isOpen = false;
-#if UNITY_STANDALONE
-            _desktop?.Hide();
-#endif
+            _tutorial?.Hide();
             _animationView?.SetPlaying(false);
             ResetAnimatedCueState();
             _overlay.AddToClassList("onboard-overlay--hidden");

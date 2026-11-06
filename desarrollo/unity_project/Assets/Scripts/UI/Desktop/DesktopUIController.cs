@@ -245,7 +245,6 @@ namespace WebGL.UI.Desktop
             _sidePanel.Tick();
             _tree.Tick();
             _chrome?.Tick(_scaler.LogicalSize.x);
-            DesktopVectorIcon.RefreshAll();
             DesktopWindowSettings.TickMinimumSize();
 
             if (Screen.width != _lastScreenW || Screen.height != _lastScreenH)

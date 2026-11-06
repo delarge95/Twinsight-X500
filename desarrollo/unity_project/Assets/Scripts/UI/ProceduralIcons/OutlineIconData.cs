@@ -1,10 +1,9 @@
-#if UNITY_STANDALONE
 using System.Collections.Generic;
 
-namespace WebGL.UI.Desktop
+namespace WebGL.UI.ProceduralIcons
 {
     /// <summary>Generated from docs/unity_pc/maqueta_iconos (24 grid, SVG path data; a leading ~ marks a dashed path).</summary>
-    internal static class DesktopIconData
+    public static class OutlineIconData
     {
         public static readonly Dictionary<string, string[]> Paths = new Dictionary<string, string[]>
         {
@@ -54,4 +53,3 @@ namespace WebGL.UI.Desktop
         };
     }
 }
-#endif

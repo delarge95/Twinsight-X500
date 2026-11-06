@@ -229,7 +229,7 @@ namespace WebGL.UI.Desktop
             Click(root.Q<Button>("HeroHelpBtn")); yield return new WaitForSecondsRealtime(1.0f);
             FieldInfo f = typeof(UIManager).GetField("_onboardingController", BindingFlags.NonPublic | BindingFlags.Instance);
             object onboarding = f?.GetValue(ui);
-            var desk = onboarding?.GetType().GetProperty("Desktop", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(onboarding) as DesktopTutorial;
+            var desk = onboarding?.GetType().GetProperty("Tutorial", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(onboarding) as TutorialOverlay;
             Log("tutorial abierto=" + ui.IsOnboardingOpen + " desktop=" + (desk != null));
             for (int i = 0; i < 6; i++)
             {

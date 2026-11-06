@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using WebGL.Core.Managers;
 using WebGL.UI.Panels;
+using WebGL.UI.ProceduralIcons;
 
 namespace WebGL.UI.Desktop
 {
@@ -133,76 +134,35 @@ namespace WebGL.UI.Desktop
         /// <summary>Every icon of the PC UI comes from the one set: the procedural / text glyphs of the shared UXML are replaced here.</summary>
         private void DecorateDesktopControls()
         {
-            var cards = new Dictionary<string, string>
-            {
-                { "ToolHotspotBtn", "pins" }, { "ToolIsolateBtn", "isolate" }, { "ToolPowerBtn", "power" },
-                { "AnalyzeCrossSectionBtn", "cut" }, { "AnalyzeExplodeBtn", "explode" }, { "AnalyzeFilterBtn", "filter" },
-                { "ShaderMode_Realistic", "realistic" }, { "ShaderMode_XRay", "xray" }, { "ShaderMode_Blueprint", "studio" },
-                { "ShaderMode_SolidColor", "solid" }, { "ShaderMode_Wireframe", "wire" }, { "ShaderMode_Ghosted", "ghost" },
-                { "ShaderMode_Thermal", "thermal" },
-                { "EnvPreset_Studio", "env_studio" }, { "EnvPreset_Night", "env_time" }, { "EnvPreset_Blueprint", "env_color" },
-                { "EnvPreset_Neutral", "env_studio" },
-                { "CatBtn_Structure", "solid" }, { "CatBtn_Propulsion", "propulsion" }, { "CatBtn_Avionics", "avionics" },
-                { "CatBtn_Sensors", "sensors" }, { "CatBtn_Power", "battery" }, { "CatBtn_Payload", "fastener" }
-            };
-            foreach (var kv in cards)
-            {
-                Button b = _root.Q<Button>(kv.Key);
-                if (b == null) continue;
-                var ic = NewIcon(kv.Value, 16);
-                ic.AddToClassList("dk-card-icon");
-                b.Insert(0, ic);
-            }
-
+            // The shared UXML already carries the OutlineIcon of every card, close and back button: PC only retints / resizes them by USS.
             foreach (string n in new[] { "CrossSectionBackBtn", "FilterBackBtn" })
             {
-                Button b = _root.Q<Button>(n);
-                if (b == null) continue;
-                b.text = string.Empty;
-                b.Add(NewIcon("close", 16));
+                // popovers close (not go back): same X as the other panels
+                _root.Q<Button>(n)?.Q<OutlineIcon>()?.SetShape("close");
             }
 
-            Button sheetClose = _root.Q<Button>("SheetCloseBtn");
-            if (sheetClose != null) sheetClose.Add(NewIcon("close", 16));
-
-            Button combine = _root.Q<Button>("CrossSectionCombineBtn");
-            if (combine != null) combine.Add(NewIcon("angle", 16));
-            foreach (string n in new[] { "CrossSectionInvertBtnInline", "CrossSectionInvertBtn2Inline" })
-            {
-                Button b = _root.Q<Button>(n);
-                if (b != null) b.Add(NewIcon("invert", 16));
-            }
-
-            Button info = _root.Q<Button>("HeroInfoBtn");
-            if (info != null)
-            {
-                info.text = string.Empty;
-                info.AddToClassList("dk-b");
-                info.AddToClassList("dk-b--icon");
-                info.Add(NewIcon("info", 20));
-            }
-
-            foreach (string n in new[] { "SubmenuBackBtn_Devices", "SubmenuBackBtn_About", "SubmenuBackBtn_Config", "SubmenuBackBtn_Exit" })
+            // hero (PC): button system; icon + text centred as one group
+            foreach (string n in new[] { "HeroInfoBtn", "SubmenuBackBtn_Devices", "SubmenuBackBtn_About", "SubmenuBackBtn_Config", "SubmenuBackBtn_Exit" })
             {
                 Button b = _root.Q<Button>(n);
                 if (b == null) continue;
-                b.text = string.Empty;
                 b.AddToClassList("dk-b");
                 b.AddToClassList("dk-b--icon");
-                b.AddToClassList("dk-b--hero-back");
-                b.Add(NewIcon("back", 24));
+                if (n != "HeroInfoBtn") b.AddToClassList("dk-b--hero-back");
             }
 
-            StyleHeroButton("HeroExploreBtn", "dk-b--primary", null);
+            StyleHeroButton("HeroExploreBtn", "dk-b--primary", "inspect");
             StyleHeroButton("HeroDeviceBtn", "dk-b--secondary", "studio");
             StyleHeroButton("HeroConfigBtn", "dk-b--secondary", "settings");
-            StyleHeroButton("HeroExitBtn", "dk-b--secondary", null);
+            StyleHeroButton("HeroExitBtn", "dk-b--secondary", "power");
             StyleHeroButton("HeroHelpBtn", "dk-b--secondary", "help");
             StyleHeroButton("HeroGithubBtn", "dk-b--ghost", null);
             StyleHeroButton("HeroPerfCaptureBtn", "dk-b--ghost", null);
             StyleHeroButton("ExitConfirmBtn", "dk-b--primary", null);
             StyleHeroButton("ExitCancelBtn", "dk-b--secondary", null);
         }
+
+        private readonly List<KeyValuePair<Button, VisualElement>> _heroLeads = new List<KeyValuePair<Button, VisualElement>>();
 
         private void StyleHeroButton(string name, string variant, string icon)
         {
@@ -215,7 +175,23 @@ namespace WebGL.UI.Desktop
             {
                 var ic = NewIcon(icon, 20);
                 ic.AddToClassList("dk-b-lead");
+                b.AddToClassList("dk-b--lead");
+                b.style.paddingLeft = 50; b.style.paddingRight = 22;
                 b.Add(ic);
+                _heroLeads.Add(new KeyValuePair<Button, VisualElement>(b, ic));
+            }
+        }
+
+        /// <summary>Icon + text as one centred group: the text keeps its centre shifted by half (icon + gap) and the icon sits just left of it.</summary>
+        private void CentreHeroLeads()
+        {
+            foreach (var kv in _heroLeads)
+            {
+                Button b = kv.Key;
+                if (b.resolvedStyle.display == DisplayStyle.None || b.layout.width < 10f) continue;
+                float tw = b.MeasureTextSize(b.text ?? string.Empty, 0f, VisualElement.MeasureMode.Undefined, 0f, VisualElement.MeasureMode.Undefined).x;
+                float total = 20f + 8f + tw;
+                kv.Value.style.left = Mathf.Round((b.layout.width - total) * 0.5f);
             }
         }
 
@@ -510,7 +486,7 @@ namespace WebGL.UI.Desktop
             foreach (string n in new[] { "ShaderMode_Realistic", "ShaderMode_Wireframe", "ShaderMode_Ghosted" })
             {
                 var b = _root.Q<Button>(n);
-                if (b != null) b.style.display = StyleKeyword.Null;
+                if (b != null) b.style.display = DisplayStyle.Flex;
             }
 
             if (_studioContainer != null && _studioPanel != null)
@@ -736,6 +712,7 @@ namespace WebGL.UI.Desktop
                            "Arrastrar fondo: orbitar · Shift+clic der.: desplazar · Rueda: zoom al cursor · Doble clic: enfocar");
             _helpLabel.text = T("Shortcuts", "Atajos");
 
+            CentreHeroLeads();
             foreach (DesktopVectorIcon ic in _icons) ic.Refresh();
         }
 

@@ -417,6 +417,7 @@ namespace WebGL.UI
             AddCleanup(() => _heroController.Dispose());
 
             // ── Onboarding Controller ──
+            OutlineIcon.ReplaceFoldoutArrows(root);
             _onboardingController = new OnboardingController(root);
             _heroController.OnHelpRequested += () => _onboardingController.Show();
             AddCleanup(() => _onboardingController.Dispose());

@@ -398,7 +398,7 @@ namespace WebGL.UI.Panels
             var tagline = _root.Q<Label>("HeroTagline");
             if (tagline != null)
             {
-                tagline.text = spanish ? "GEMELO DIGITAL INTERACTIVO · HOLYBRO X500 V2" : "INTERACTIVE DIGITAL TWIN · HOLYBRO X500 V2";
+                tagline.text = spanish ? "VISOR 3D INTERACTIVO · HOLYBRO X500 V2" : "INTERACTIVE 3D VIEWER · HOLYBRO X500 V2";
             }
 
             var subtitle = _root.Q<Label>("HeroSubtitle");
@@ -407,11 +407,15 @@ namespace WebGL.UI.Panels
                 subtitle.text = spanish ? "Visor WebGL visual-semántico" : "Visual-semantic WebGL viewer";
             }
 
-            var exploreBtn = _root.Q<Button>("HeroExploreBtn");
-            if (exploreBtn != null)
-            {
-                exploreBtn.text = spanish ? "ABRIR VISOR" : "OPEN VIEWER";
-            }
+            // sentence case for every platform (approved button sheet); the PC build adds its own wording below
+            void Txt(string n, string es, string en) { var b = _root.Q<Button>(n); if (b != null) b.text = spanish ? es : en; }
+            Txt("HeroExploreBtn", "Abrir visor", "Open viewer");
+            Txt("HeroDeviceBtn", "Dispositivo", "Device");
+            Txt("HeroConfigBtn", "Configuración", "Settings");
+            Txt("HeroExitBtn", "Salir", "Exit");
+            Txt("HeroHelpBtn", "Ver tutorial", "View tutorial");
+            Txt("ExitConfirmBtn", "Salir de la app", "Exit app");
+            Txt("ExitCancelBtn", "Cancelar", "Cancel");
 
 #if UNITY_STANDALONE
             ApplyDesktopTexts(spanish);

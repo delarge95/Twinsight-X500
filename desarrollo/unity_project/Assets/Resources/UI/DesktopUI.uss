@@ -1535,7 +1535,8 @@
 
 /* hero buttons (PC) */
 .desktop-ui .dk-b--lg.btn-wide { width: 260px; max-width: 260px; height: 40px; margin-bottom: 12px; align-self: center; }
-.desktop-ui .dk-b--lg .dk-b-lead { position: absolute; left: 16px; top: 9px; }
+.desktop-ui .dk-b--lg .dk-b-lead { position: absolute; left: 16px; top: 10px; }
+.desktop-ui .dk-b--lg.dk-b--lead { padding-left: 50px; padding-right: 22px; }
 .desktop-ui .dk-b--lg.dk-b--ghost.about-tool-btn { width: 220px; height: 32px; opacity: 1; font-size: 13px; margin-bottom: 8px; }
 .desktop-ui .hero-info-btn.dk-b { width: 40px; height: 40px; border-radius: 20px; margin-right: 12px; background-color: rgb(23, 27, 34); border-color: rgba(255, 255, 255, 0.09); }
 .desktop-ui .hero-info-btn.dk-b:hover { background-color: rgb(27, 32, 41); border-color: rgba(70, 175, 255, 0.5); }
@@ -1576,11 +1577,10 @@
 .dk-ibtn--small { width: 28px; height: 28px; border-radius: 14px; }
 
 /* cards: vector icons replace the procedural ones (tool strip and popovers) */
-.layout--desktop.chrome2 .dk-strip .submenu-icon,
-.layout--desktop.chrome2 .dk-pop .submenu-icon { display: none; }
-.dk-card-icon { margin-right: 6px; color: rgb(182, 192, 204); }
-.submenu-card:hover .dk-card-icon { color: rgb(255, 255, 255); }
-.submenu-card--active .dk-card-icon, .submenu-card--active:hover .dk-card-icon, .submenu-card:active .dk-card-icon { color: rgb(191, 234, 255); }
+.layout--desktop.chrome2 .dk-pop .submenu-icon { display: flex; width: 16px; min-width: 16px; max-width: 16px; height: 16px; min-height: 16px; max-height: 16px; margin: 0 6px 0 0; }
+.layout--desktop .submenu-card .outline-icon { color: rgb(182, 192, 204); }
+.layout--desktop .submenu-card:hover .outline-icon { color: rgb(255, 255, 255); }
+.layout--desktop .submenu-card--active .outline-icon, .layout--desktop .submenu-card--active:hover .outline-icon, .layout--desktop .submenu-card:active .outline-icon { color: rgb(191, 234, 255); }
 
 .layout--desktop.chrome2 .dk-pop .submenu-card { width: 48.6%; margin: 2px 0.4%; padding: 0 10px; justify-content: flex-start; align-items: center; }
 .layout--desktop.chrome2 .dk-pop #EnvGrid .submenu-card { width: 31.5%; padding: 0 8px; }
@@ -1613,10 +1613,11 @@
 
 .dk-pop .submenu-back-btn { width: 28px; height: 28px; border-radius: 14px; top: 4px; right: 6px; }
 .layout--desktop.chrome2 .sheet-close-btn { width: 28px; height: 28px; border-radius: 14px; top: 6px; right: 8px; }
-.layout--desktop.chrome2 .sheet-close-icon { display: none; }
+.layout--desktop.chrome2 .sheet-close-icon { width: 16px; min-width: 16px; max-width: 16px; height: 16px; min-height: 16px; max-height: 16px; }
+.dk-pop .outline-icon.back-icon { width: 16px; height: 16px; }
 .layout--desktop.chrome2 .desktop-tree-close { width: 28px; height: 28px; border-radius: 14px; }
 
-.dk-pop .cross-section-config-icon { display: none; }
+.dk-pop .cross-section-config-icon { width: 16px; min-width: 16px; max-width: 16px; height: 16px; min-height: 16px; max-height: 16px; }
 .dk-pop .cross-section-config-btn { align-items: center; justify-content: center; }
 .dk-pop .cross-section-config-btn .dk-icon { color: rgb(182, 192, 204); }
 .dk-pop .cross-section-config-btn:hover .dk-icon { color: rgb(255, 255, 255); }
