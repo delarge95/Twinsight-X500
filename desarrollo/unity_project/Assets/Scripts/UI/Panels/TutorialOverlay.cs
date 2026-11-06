@@ -45,19 +45,19 @@ namespace WebGL.UI.Panels
                 {
                     R("orbit", "Orbitar", "Orbit", "Arrastra el fondo|Botón derecho", "Drag the background|Right button"),
                     R("pan", "Desplazar", "Pan", "Shift + clic derecho|Botón central", "Shift + right drag|Middle button"),
-                    R("focus", "Acercar al cursor", "Zoom to cursor", "Rueda del ratón", "Mouse wheel"),
+                    R("zoom", "Acercar al cursor", "Zoom to cursor", "Rueda del ratón", "Mouse wheel"),
                 },
                 Mouse = new[]
                 {
                     R("orbit", "Orbitar", "Orbit", "Botón derecho + arrastrar", "Right button + drag"),
                     R("pan", "Desplazar", "Pan", "Botón central + arrastrar", "Middle button + drag"),
-                    R("focus", "Acercar", "Zoom", "Rueda del ratón", "Mouse wheel"),
+                    R("zoom", "Acercar", "Zoom", "Rueda del ratón", "Mouse wheel"),
                 },
                 Touch = new[]
                 {
                     R("orbit", "Orbitar", "Orbit", "Un dedo", "One finger"),
                     R("pan", "Desplazar", "Pan", "Dos dedos", "Two fingers"),
-                    R("focus", "Acercar", "Zoom", "Pellizco", "Pinch"),
+                    R("zoom", "Acercar", "Zoom", "Pellizco", "Pinch"),
                 },
             },
             new Step
@@ -66,19 +66,19 @@ namespace WebGL.UI.Panels
                 DescEs = "Elige una pieza para ver su ficha.", DescEn = "Pick a part to see its sheet.",
                 Pc = new[]
                 {
-                    R("pins", "Seleccionar", "Select", "Clic en la pieza", "Click the part"),
+                    R("pointer", "Seleccionar", "Select", "Clic en la pieza", "Click the part"),
                     R("focus", "Enfocar", "Focus", "Doble clic|F", "Double click|F"),
                     R("close", "Soltar", "Deselect", "Clic en el fondo|Esc", "Click the background|Esc"),
                 },
                 Mouse = new[]
                 {
-                    R("pins", "Seleccionar", "Select", "Clic en la pieza", "Click the part"),
+                    R("pointer", "Seleccionar", "Select", "Clic en la pieza", "Click the part"),
                     R("isolate", "Aislar", "Isolate", "Doble clic en la pieza", "Double click the part"),
                     R("close", "Soltar", "Deselect", "Clic en el fondo", "Click the background"),
                 },
                 Touch = new[]
                 {
-                    R("pins", "Seleccionar", "Select", "Toca la pieza", "Tap the part"),
+                    R("pointer", "Seleccionar", "Select", "Toca la pieza", "Tap the part"),
                     R("isolate", "Aislar", "Isolate", "Doble toque", "Double tap"),
                     R("close", "Soltar", "Deselect", "Toca el fondo", "Tap the background"),
                 },
@@ -192,6 +192,14 @@ namespace WebGL.UI.Panels
         private readonly Button _prev, _next;
         private readonly Label _prevKey, _nextKey, _skipKey;
         private readonly bool _touchDevice;
+#if UNITY_STANDALONE
+        // PC: animated illustration per step, sliding progress fill, step transitions and on-screen key presses
+        private readonly WebGL.UI.Desktop.TutorialAnim _anim;
+        private readonly VisualElement _fill, _textEl, _cardEl;
+        private readonly System.Collections.Generic.List<VisualElement> _rowEls = new System.Collections.Generic.List<VisualElement>();
+        private readonly System.Collections.Generic.List<Label> _capEls = new System.Collections.Generic.List<Label>();
+        private int _prevStep = -1;
+#endif
         private int _step;
         private bool _touch;
 
@@ -230,6 +238,9 @@ namespace WebGL.UI.Panels
             var card = new VisualElement { name = "DkTutorialCard" };
             card.AddToClassList("dk-tut-card");
             _overlay.Add(card);
+#if UNITY_STANDALONE
+            _cardEl = card;
+#endif
 
             // top: counter, progress, mouse / touch switch, skip
             var top = new VisualElement();
@@ -247,6 +258,11 @@ namespace WebGL.UI.Panels
             }
 
             top.Add(progress);
+#if UNITY_STANDALONE
+            _fill = new VisualElement { pickingMode = PickingMode.Ignore };
+            _fill.AddToClassList("dk-tut-fill");
+            progress.Add(_fill);
+#endif
 
             var sw = new VisualElement { name = "DkTutorialSwitch" };
             sw.AddToClassList("dk-tut-switch");
@@ -285,6 +301,12 @@ namespace WebGL.UI.Panels
             _bigIcon.AddToClassList("dk-tut-bigicon");
             ring.Add(_bigIcon);
             art.Add(ring);
+#if UNITY_STANDALONE
+            ring.style.display = DisplayStyle.None;
+            _anim = new WebGL.UI.Desktop.TutorialAnim();
+            _anim.PhaseChanged = HighlightRow;
+            art.Add(_anim);
+#endif
             body.Add(art);
 
             var text = new VisualElement { pickingMode = PickingMode.Ignore };
@@ -299,6 +321,9 @@ namespace WebGL.UI.Panels
             text.Add(_desc);
             text.Add(_rows);
             body.Add(text);
+#if UNITY_STANDALONE
+            _textEl = text;
+#endif
 
             // foot
             var foot = new VisualElement();
@@ -355,12 +380,19 @@ namespace WebGL.UI.Panels
             Render();
             _overlay.RemoveFromClassList("dk-tut--hidden");
             _overlay.BringToFront();
+#if UNITY_STANDALONE
+            _anim.Play(true);
+            WebGL.UI.Desktop.DesktopMotion.Enter(_cardEl);
+#endif
         }
 
         public void Hide()
         {
             if (IsOpen) Debug.Log("[Tutorial] closed at step " + (_step + 1));
             IsOpen = false;
+#if UNITY_STANDALONE
+            _anim.Play(false);
+#endif
             _overlay.AddToClassList("dk-tut--hidden");
         }
 
@@ -394,6 +426,13 @@ namespace WebGL.UI.Panels
             Render();
         }
 
+#if UNITY_STANDALONE
+        private void HighlightRow(int phase)
+        {
+            for (int i = 0; i < _rowEls.Count; i++) _rowEls[i].EnableInClassList("dk-tut-row--hot", i == phase);
+        }
+#endif
+
         private void Prev()
         {
             if (_step <= 0) return;
@@ -417,6 +456,18 @@ namespace WebGL.UI.Panels
         private void Tick()
         {
             if (!IsOpen) return;
+#if UNITY_STANDALONE
+            // the key hints "press" on screen when the user presses the key
+            if (Input.GetKeyDown(KeyCode.RightArrow)) WebGL.UI.Desktop.DesktopMotion.Flash(_next, "dk-press-sim");
+            else if (Input.GetKeyDown(KeyCode.LeftArrow)) WebGL.UI.Desktop.DesktopMotion.Flash(_prev, "dk-press-sim");
+            else if (Input.GetKeyDown(KeyCode.Escape)) WebGL.UI.Desktop.DesktopMotion.Flash(_skip, "dk-press-sim");
+            string typed = Input.inputString;
+            if (!string.IsNullOrEmpty(typed))
+            {
+                string up = typed.ToUpperInvariant();
+                foreach (Label cap in _capEls) if (up.Contains(cap.text.ToUpperInvariant()) && cap.text.Length == 1) WebGL.UI.Desktop.DesktopMotion.Flash(cap, "dk-press-sim", 200);
+            }
+#endif
             if (Input.GetKeyDown(KeyCode.RightArrow)) Next();
             else if (Input.GetKeyDown(KeyCode.LeftArrow)) Prev();
         }
@@ -444,6 +495,14 @@ namespace WebGL.UI.Panels
             _touchBtn.EnableInClassList("dk-tut-switch-btn--on", _touch);
             _prev.SetEnabled(_step > 0);
             _overlay.EnableInClassList("dk-tut--touch", _touch);
+#if UNITY_STANDALONE
+            _anim.SetStep(_step);
+            _fill.style.width = Length.Percent(100f * (_step + 1) / Steps.Length);
+            if (IsOpen && _prevStep != _step && _prevStep >= 0) WebGL.UI.Desktop.DesktopMotion.Enter(_textEl, 0, _step < _prevStep ? "dk-enter--back" : null);
+            _prevStep = _step;
+            _rowEls.Clear();
+            _capEls.Clear();
+#endif
 
             Row[] rows = _touch ? s.Touch : (StandaloneBuild ? s.Pc : s.Mouse);
             _rows.Clear();
@@ -469,6 +528,10 @@ namespace WebGL.UI.Panels
 
                 row.Add(keys);
                 _rows.Add(row);
+#if UNITY_STANDALONE
+                _rowEls.Add(row);
+                foreach (VisualElement k in keys.Children()) if (k is Label kl) _capEls.Add(kl);
+#endif
             }
         }
     }

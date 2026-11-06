@@ -30,6 +30,7 @@ namespace WebGL.UI.Desktop
         private readonly VisualElement _bar;
         private readonly VisualElement _thermal;
 
+        private float _shift = -100f;
         private bool _open;
         private float _leftShift = -1f;
         internal DesktopPartTree Tree;
@@ -99,7 +100,11 @@ namespace WebGL.UI.Desktop
             // The camera can appear after the UI: keep it informed every frame (cheap).
             float rightOcc = _open ? _width : DesktopChrome.RailWidth;
             float leftOcc = (Tree != null && Tree.IsOpen) ? DesktopPartTree.Width : DesktopChrome.RailWidth;
-            OrbitCameraController.Instance?.SetDesktopViewShiftX((rightOcc - leftOcc) / (2f * logicalWidth));
+            // the camera follows the docking panels smoothly (no jump) unless animations are reduced
+            float target = (rightOcc - leftOcc) / (2f * logicalWidth);
+            if (_shift < -50f || DesktopMotion.Reduce) _shift = target;
+            else _shift = Mathf.Lerp(_shift, target, 1f - Mathf.Exp(-Time.unscaledDeltaTime * 12f * DesktopMotion.Speed));
+            OrbitCameraController.Instance?.SetDesktopViewShiftX(_shift);
             if (_bar != null) _bar.style.right = rightOcc;
             float left = leftOcc;
             if (!Mathf.Approximately(left, _leftShift))

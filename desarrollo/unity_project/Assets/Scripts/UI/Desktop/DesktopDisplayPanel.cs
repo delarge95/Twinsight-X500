@@ -23,6 +23,8 @@ namespace WebGL.UI.Desktop
         private readonly Label _modeLabel;
         private readonly Label _resolutionLabel;
         private readonly Label _vsyncLabel;
+        private readonly Button _motionBtn;
+        private readonly Label _motionLabel;
 
         private List<Vector2Int> _options = new List<Vector2Int>();
 
@@ -63,6 +65,11 @@ namespace WebGL.UI.Desktop
                 Refresh();
             };
 
+            // Reduce animations (saved): zeroes every UI transition and shows the tutorial illustrations still
+            VisualElement motionRow = NewRow(out _motionLabel, "REDUCE ANIMATIONS", out _motionBtn, "DesktopReduceMotionBtn");
+            _section.Add(motionRow);
+            _motionBtn.clicked += () => { DesktopMotion.Reduce = !DesktopMotion.Reduce; Refresh(); };
+
             // UI size (80-150 %) -> AccessibilityManager
             var sliderGroup = new VisualElement();
             sliderGroup.AddToClassList("env-slider-group");
@@ -98,7 +105,7 @@ namespace WebGL.UI.Desktop
             });
 
             // Same input guard as every other button.
-            foreach (Button b in new[] { _modeBtn, _resolutionBtn, _vsyncBtn })
+            foreach (Button b in new[] { _modeBtn, _resolutionBtn, _vsyncBtn, _motionBtn })
             {
                 b.RegisterCallback<PointerDownEvent>(evt => { if (evt.button == 0) InputManager.InputBlocked = true; evt.StopPropagation(); });
                 b.RegisterCallback<PointerUpEvent>(evt => { if (evt.button == 0) InputManager.InputBlocked = false; evt.StopPropagation(); });
@@ -170,6 +177,8 @@ namespace WebGL.UI.Desktop
             _resolutionBtn.text = Screen.width + " x " + Screen.height;
             _resolutionBtn.SetEnabled(!full);
             _vsyncBtn.text = DesktopWindowSettings.VSync ? "ON" : "OFF";
+            _motionLabel.text = AppLanguageManager.IsSpanish ? "REDUCIR ANIMACIONES" : "REDUCE ANIMATIONS";
+            _motionBtn.text = DesktopMotion.Reduce ? "ON" : "OFF";
 
             AccessibilityManager a = AccessibilityManager.Instance;
             float percent = Mathf.Round((a != null ? a.UIScale : 1f) * 100f);

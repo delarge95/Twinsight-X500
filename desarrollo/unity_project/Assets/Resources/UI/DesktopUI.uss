@@ -1760,3 +1760,134 @@
 .dk-config-embedded .config-tier-row { flex-wrap: nowrap; }
 .dk-config-embedded .config-tier-card { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; width: auto; margin: 0 3px; padding: 0 4px; }
 .dk-config-embedded .config-cycle-btn { min-width: 0; flex-shrink: 1; }
+
+/* ================================================================
+   Phase 6 - micro-interactions (PC only). 120-200 ms, ease-out, no bounce.
+   Hover: tint + slight lift/scale; press: scale .96 + 16 % celeste flash; active changes animate; popovers fade + 6 px slide;
+   mode / language pills slide; chevrons rotate; hero and tutorial enter. The code-driven part is in DesktopMotion.cs
+   (speed constant, Reduce animations). .dk-reduce-motion on the root zeroes every duration below.
+   ================================================================ */
+.dk-ibtn,
+.dk-seg-btn,
+.dk-strip-btn,
+.dk-btn,
+.dk-lang-btn,
+.dk-status-btn,
+.desktop-ui .dk-b,
+.layout--desktop.chrome2 .dk-strip .submenu-card,
+.layout--desktop.chrome2 .dk-pop .submenu-card,
+.layout--desktop.chrome2 .dk-pop .cross-section-axis-btn,
+.layout--desktop.chrome2 .dk-pop .cross-section-config-btn,
+.desktop-tree-close,
+.dk-tut-switch-btn,
+.dk-config-embedded .config-cycle-btn,
+.dk-config-embedded .config-tier-card,
+.dk-config-embedded .config-tier-auto,
+.layout--desktop.chrome2 .sheet-close-btn,
+.dk-pop .submenu-back-btn {
+    transition-property: background-color, border-color, color, scale, translate, opacity;
+    transition-duration: 0.14s;
+    transition-timing-function: ease-out;
+}
+
+.dk-ibtn:hover, .dk-lang-btn:hover, .dk-status-btn:hover, .dk-pop .submenu-back-btn:hover, .layout--desktop.chrome2 .sheet-close-btn:hover, .desktop-tree-close:hover { scale: 1.07 1.07; }
+.dk-seg-btn:hover, .dk-strip-btn:hover, .dk-btn:hover, .desktop-ui .dk-b:hover, .layout--desktop.chrome2 .dk-strip .submenu-card:hover, .layout--desktop.chrome2 .dk-pop .submenu-card:hover, .dk-config-embedded .config-cycle-btn:hover, .dk-config-embedded .config-tier-card:hover { scale: 1.03 1.03; translate: 0 -1px; }
+.dk-ibtn:active,
+.dk-seg-btn:active,
+.dk-strip-btn:active,
+.dk-btn:active,
+.dk-lang-btn:active,
+.dk-status-btn:active,
+.desktop-ui .dk-b:active,
+.layout--desktop.chrome2 .dk-strip .submenu-card:active,
+.layout--desktop.chrome2 .dk-pop .submenu-card:active,
+.layout--desktop.chrome2 .dk-pop .cross-section-axis-btn:active,
+.layout--desktop.chrome2 .dk-pop .cross-section-config-btn:active,
+.desktop-tree-close:active,
+.dk-tut-switch-btn:active,
+.dk-config-embedded .config-cycle-btn:active,
+.dk-config-embedded .config-tier-card:active,
+.dk-config-embedded .config-tier-auto:active,
+.layout--desktop.chrome2 .sheet-close-btn:active,
+.dk-pop .submenu-back-btn:active { scale: 0.96 0.96; translate: 0 0; }
+
+.dk-seg, .dk-lang { position: relative; }
+.dk-seg-btn--on, .dk-seg-btn--on:hover { background-color: rgba(0, 0, 0, 0); border-width: 0; }
+.dk-lang-btn--on, .dk-lang-btn--on:hover { background-color: rgba(0, 0, 0, 0); }
+.dk-pill { position: absolute; left: 0; width: 0; opacity: 0; transition-property: left, width, opacity; transition-duration: 0.2s; transition-timing-function: ease-out; }
+.dk-seg-pill { border-radius: 13px; background-color: rgba(70, 175, 255, 0.16); border-width: 1px; border-color: rgba(70, 175, 255, 0.55); }
+.dk-lang-pill { border-radius: 10px; background-color: rgba(70, 175, 255, 0.22); }
+.dk-notrans, .desktop-ui .dk-notrans, .layout--desktop.chrome2 .dk-notrans, .layout--desktop.chrome2 .dk-pop.dk-notrans, .layout--desktop.chrome2 .dk-settings.dk-notrans, .desktop-ui .dk-b.dk-notrans, .dk-pill.dk-notrans { transition-duration: 0s; }
+.dk-enter { opacity: 0; translate: 0 12px; }
+.layout--desktop.chrome2 .dk-pop.dk-enter { opacity: 0; translate: -50% 6px; }
+.layout--desktop.chrome2 .dk-settings.dk-enter { opacity: 0; translate: 0 6px; }
+.layout--desktop.chrome2 .desktop-tree.dk-enter { opacity: 0; translate: -24px 0; }
+.layout--desktop.chrome2 .sheet-title.dk-enter { opacity: 0; translate: 10px 0; }
+.dk-tut-card.dk-enter { opacity: 0; translate: 0 14px; scale: 0.98 0.98; }
+.dk-tut-text.dk-enter { opacity: 0; translate: 18px 0; }
+.dk-tut-text.dk-enter.dk-enter--back { translate: -18px 0; }
+.layout--desktop.chrome2 .dk-pop, .layout--desktop.chrome2 .dk-settings { transition-property: opacity, translate; }
+.layout--desktop.chrome2 .sheet-title { transition-property: opacity, translate; transition-duration: 0.2s; }
+.dk-anim-in { transition-property: opacity, translate; transition-duration: 0.4s; }
+.desktop-ui .dk-b.dk-anim-in { transition-duration: 0.4s; }
+.dk-crumb { transition-property: scale, background-color, border-color, color; transition-duration: 0.2s; }
+.dk-crumb.dk-flash { scale: 1.08 1.08; background-color: rgba(70, 175, 255, 0.3); }
+.desktop-tooltip { translate: 0 4px; transition-property: opacity, translate; transition-duration: 0.14s; }
+.desktop-tooltip--visible { translate: 0 0; }
+.desktop-tree-chevron, .foldout-chev { transition-property: rotate; transition-duration: 0.16s; transition-timing-function: ease-out; }
+.dk-tut-text, .dk-tut-card { transition-property: opacity, translate, scale; transition-duration: 0.22s; transition-timing-function: ease-out; }
+.dk-tut-row { transition-property: background-color, border-color; transition-duration: 0.2s; }
+.dk-tut-row--hot { background-color: rgba(70, 175, 255, 0.12); border-color: rgba(70, 175, 255, 0.5); }
+.dk-kbd, .dk-tut-cap { transition-property: scale, background-color, border-color; transition-duration: 0.1s; }
+.dk-tut-cap.dk-press-sim, .dk-kbd.dk-press-sim { scale: 0.88 0.88; background-color: rgba(70, 175, 255, 0.4); border-color: rgb(70, 175, 255); }
+.desktop-ui .dk-b.dk-press-sim { scale: 0.94 0.94; background-color: rgba(70, 175, 255, 0.28); }
+.dk-tut-progress { position: relative; height: 3px; }
+.dk-tut-fill { position: absolute; left: 0; top: 0; height: 3px; border-radius: 2px; background-color: rgb(70, 175, 255); transition-property: width; transition-duration: 0.3s; transition-timing-function: ease-out; }
+.dk-tut-seg--cur, .dk-tut-seg--done { background-color: rgb(42, 48, 58); }
+.dk-tut-anim { flex-grow: 1; align-self: stretch; }
+
+/* Reduce animations (CONFIG): no transitions, no enter animations */
+.dk-reduce-motion .dk-ibtn,
+.dk-reduce-motion .dk-seg-btn,
+.dk-reduce-motion .dk-strip-btn,
+.dk-reduce-motion .dk-btn,
+.dk-reduce-motion .dk-lang-btn,
+.dk-reduce-motion .dk-status-btn,
+.dk-reduce-motion.desktop-ui .dk-b,
+.dk-reduce-motion.layout--desktop.chrome2 .dk-strip .submenu-card,
+.dk-reduce-motion.layout--desktop.chrome2 .dk-pop .submenu-card,
+.dk-reduce-motion.layout--desktop.chrome2 .dk-pop .cross-section-axis-btn,
+.dk-reduce-motion.layout--desktop.chrome2 .dk-pop .cross-section-config-btn,
+.dk-reduce-motion .desktop-tree-close,
+.dk-reduce-motion .dk-tut-switch-btn,
+.dk-reduce-motion .dk-config-embedded .config-cycle-btn,
+.dk-reduce-motion .dk-config-embedded .config-tier-card,
+.dk-reduce-motion .dk-config-embedded .config-tier-auto,
+.dk-reduce-motion.layout--desktop.chrome2 .sheet-close-btn,
+.dk-reduce-motion .dk-pop .submenu-back-btn,
+.dk-reduce-motion .desktop-tree-row,
+.dk-reduce-motion.layout--desktop.chrome2 .dk-pop,
+.dk-reduce-motion.layout--desktop.chrome2 .dk-settings,
+.dk-reduce-motion.layout--desktop.chrome2 .sheet-title,
+.dk-reduce-motion .dk-crumb,
+.dk-reduce-motion .dk-tut-text,
+.dk-reduce-motion .dk-tut-card,
+.dk-reduce-motion .dk-tut-row,
+.dk-reduce-motion .dk-tut-cap,
+.dk-reduce-motion .dk-kbd,
+.dk-reduce-motion .desktop-tooltip,
+.dk-reduce-motion .dk-anim-in,
+.dk-reduce-motion .dk-pill,
+.dk-reduce-motion .dk-tut-fill,
+.dk-reduce-motion .desktop-tree-chevron,
+.dk-reduce-motion .foldout-chev,
+.dk-reduce-motion.layout--desktop.chrome2 .desktop-tree {
+    transition-duration: 0s;
+}
+
+/* tutorial illustration (TutorialAnim): fills the art box; caption and key caps are small labels over the drawing */
+.dk-tut-art .dk-tut-anim { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.dk-tut-anim-cap { position: absolute; left: 6px; right: 6px; bottom: 6px; font-size: 12px; color: rgb(170, 180, 193); -unity-text-align: middle-center; white-space: normal; }
+.dk-tut-anim-key { position: absolute; padding: 1px 8px; min-width: 22px; font-size: 12px; color: rgb(191, 234, 255); -unity-text-align: middle-center; border-width: 1px; border-color: rgba(255, 255, 255, 0.22); border-radius: 6px; background-color: rgb(11, 13, 17); transition-property: scale, background-color, border-color; transition-duration: 0.1s; }
+.dk-reduce-motion .dk-tut-anim-key { transition-duration: 0s; }
+.dk-tut-art { overflow: hidden; }

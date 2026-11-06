@@ -45,6 +45,10 @@ namespace WebGL.UI.Desktop
         private readonly Button[] _modeSeg = new Button[3];
         private readonly Label[] _modeText = new Label[3];
         private readonly Button[] _modeSrc = new Button[3];
+        private SlidingPill _segPill, _langPill;
+        private Label _sheetTitle;
+        private string _lastCrumb, _lastTitle;
+        private bool _heroWas;
         private Label _crumb;
         private Button _btnPins, _btnIso, _btnTree, _btnInspector, _btnGear, _btnHelp, _btnLangEn, _btnLangEs;
         private Button _railTree, _railSearch, _railInspector;
@@ -275,6 +279,7 @@ namespace WebGL.UI.Desktop
                 _modeText[i] = t;
             }
 
+            _segPill = new SlidingPill(seg, "dk-seg-pill");
             _modeSrc[0] = _root.Q<Button>("ModeToolsBtn");
             _modeSrc[1] = _root.Q<Button>("ModeAnalyzeBtn");
             _modeSrc[2] = _root.Q<Button>("ModeStudioBtn");
@@ -304,6 +309,7 @@ namespace WebGL.UI.Desktop
             _btnLangEs = new Button(() => AppLanguageManager.SetLanguage("es")) { text = "ES" };
             _btnLangEn.AddToClassList("dk-lang-btn");
             _btnLangEs.AddToClassList("dk-lang-btn");
+            _langPill = new SlidingPill(lang, "dk-lang-pill");
             lang.Add(_btnLangEn);
             lang.Add(_btnLangEs);
             _top.Add(lang);
@@ -402,6 +408,7 @@ namespace WebGL.UI.Desktop
             _settings = new VisualElement { name = "DkSettings" };
             _settings.AddToClassList("dk-settings");
             _settings.AddToClassList("dk-settings--hidden");
+            DesktopMotion.WatchVisible(_settings);
 
             var head = new VisualElement();
             head.AddToClassList("dk-pop-head");
@@ -472,8 +479,13 @@ namespace WebGL.UI.Desktop
 
             foreach (string n in new[] { "CrossSectionPanel", "FilterSubPanel", "ExplodeInlineSlider", "ToolPowerLoadPanel" })
             {
-                _root.Q<VisualElement>(n)?.AddToClassList("dk-pop");
+                VisualElement pop = _root.Q<VisualElement>(n);
+                pop?.AddToClassList("dk-pop");
+                DesktopMotion.WatchVisible(pop);
             }
+
+            DesktopMotion.WatchVisible(_root.Q<VisualElement>("StudioPanel"));
+            DesktopMotion.WatchVisible(_root.Q<VisualElement>("DesktopPartTree"));
 
             ClearInlineStyles(_root.Q<VisualElement>("ToolPowerLoadPanel"));
             ClearInlineStyles(_root.Q<VisualElement>("ToolPowerStateLabel"));
@@ -626,12 +638,19 @@ namespace WebGL.UI.Desktop
 
         public void Tick(float logicalWidth)
         {
-            // segmented mode switch mirrors the (hidden) capsule buttons
+            // segmented mode switch mirrors the (hidden) capsule buttons; the pill slides under the active one
+            Button activeSeg = null;
             for (int i = 0; i < 3; i++)
             {
                 bool on = _modeSrc[i] != null && _modeSrc[i].ClassListContains("mode-btn--active");
                 _modeSeg[i].EnableInClassList("dk-seg-btn--on", on);
+                if (on) activeSeg = _modeSeg[i];
             }
+
+            _segPill?.Update(activeSeg);
+            _langPill?.Update(AppLanguageManager.IsSpanish ? _btnLangEs : _btnLangEn);
+            DesktopMotion.TickWatched();
+            TickFeedback();
 
             // crumb: the existing header label already has the localized part name / "select a part"
             Label ctx = _root.Q<Label>("TopContextLabel");
@@ -714,6 +733,41 @@ namespace WebGL.UI.Desktop
 
             CentreHeroLeads();
             foreach (DesktopVectorIcon ic in _icons) ic.Refresh();
+        }
+
+        /// <summary>Selection feedback (part pill, inspector title) and the hero entrance.</summary>
+        private void TickFeedback()
+        {
+            string crumb = _crumb.text;
+            if (crumb != _lastCrumb)
+            {
+                if (_lastCrumb != null) DesktopMotion.Flash(_crumb, "dk-flash", 200);
+                _lastCrumb = crumb;
+            }
+
+            if (_sheetTitle == null) _sheetTitle = _root.Q<Label>("SheetTitle");
+            if (_sheetTitle != null && _sheetTitle.text != _lastTitle)
+            {
+                if (_lastTitle != null) DesktopMotion.Enter(_sheetTitle, 0, "dk-enter--title");
+                _lastTitle = _sheetTitle.text;
+            }
+
+            bool hero = _ui.IsHeroVisible;
+            if (hero && !_heroWas)
+            {
+                string[] names = { "HeroTagline", "HeroTitleContainer", "HeroSubtitle", "HeroExploreBtn", "HeroDeviceBtn", "HeroConfigBtn", "HeroExitBtn", "HeroCornerActions" };
+                for (int i = 0; i < names.Length; i++)
+                {
+                    VisualElement e = _root.Q<VisualElement>(names[i]);
+                    if (e == null) continue;
+                    e.AddToClassList("dk-anim-in");
+                    DesktopMotion.Enter(e, 70 * i);
+                    VisualElement captured = e;
+                    e.schedule.Execute(() => captured.RemoveFromClassList("dk-anim-in")).StartingIn(70 * i + 900);
+                }
+            }
+
+            _heroWas = hero;
         }
 
         private static void SetOn(Button b, bool on)

@@ -162,6 +162,9 @@ namespace WebGL.UI.Desktop
             }
 
             _root.AddToClassList("desktop-ui");
+            DesktopMotion.ApplyCommandLine();
+            _root.EnableInClassList("dk-reduce-motion", DesktopMotion.Reduce);
+            DesktopMotion.Changed += () => _root.EnableInClassList("dk-reduce-motion", DesktopMotion.Reduce);
 
             // "UI size" lives in the AccessibilityManager (not in the scene): create it on the PC.
             if (AccessibilityManager.Instance == null)
@@ -363,6 +366,19 @@ namespace WebGL.UI.Desktop
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length - 1; i++)
             {
+                if (args[i].Equals("-desk-anim", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var anim = gameObject.AddComponent<DesktopCaptureAnim>();
+                    anim.OutputDirectory = args[i + 1];
+                    return;
+                }
+
+                if (args[i].Equals("-desk-fps", StringComparison.OrdinalIgnoreCase))
+                {
+                    gameObject.AddComponent<DesktopFpsProbe>();
+                    continue;
+                }
+
                 if (args[i].Equals("-desk-matshots", StringComparison.OrdinalIgnoreCase))
                 {
                     PCMaterialShots.TryAttach(gameObject);

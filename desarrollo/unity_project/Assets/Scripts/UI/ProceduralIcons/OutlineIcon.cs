@@ -31,6 +31,9 @@ namespace WebGL.UI.ProceduralIcons
             { "filt", "filter" }, { "swap", "invert" }
         };
 
+        /// <summary>How often the tint is polled (ms). The PC build lowers it so USS colour transitions of the icons look smooth.</summary>
+        public static int PollMs = 120;
+
         private string _shape;
 
         [UxmlAttribute("shape")]
@@ -48,7 +51,7 @@ namespace WebGL.UI.ProceduralIcons
             style.flexShrink = 0;
             generateVisualContent += Draw;
             // repaint when the USS tint changes (active state, light background): cheap poll, no hover dependence
-            schedule.Execute(Refresh).Every(120);
+            schedule.Execute(Refresh).Every(PollMs);
         }
 
         private Color _lastColor;
