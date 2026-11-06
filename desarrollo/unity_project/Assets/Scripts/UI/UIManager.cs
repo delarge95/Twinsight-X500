@@ -194,6 +194,12 @@ namespace WebGL.UI
             _modeController?.ToggleExplode();
         }
 
+#if UNITY_STANDALONE
+        public bool FilterActive => _modeController != null && _modeController.IsCategoryFilterActive;
+        public void ShortcutClearFilter() { if (!IsHeroVisible && !IsOnboardingOpen) _modeController?.ClearCategoryFilters(); }
+        public void ShortcutClearExplode() { if (!IsHeroVisible && !IsOnboardingOpen) _modeController?.ClearExplode(); }
+#endif
+
         public void ShortcutFocusSelection()
         {
             if (IsHeroVisible || IsOnboardingOpen) return;

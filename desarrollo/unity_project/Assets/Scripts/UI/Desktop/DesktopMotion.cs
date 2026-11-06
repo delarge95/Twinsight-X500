@@ -27,6 +27,8 @@ namespace WebGL.UI.Desktop
         private static void FastIconPolling()
         {
             OutlineIcon.PollMs = 16;
+            OutlineIcon.AnimateHover = !Reduce;
+            Changed += () => OutlineIcon.AnimateHover = !Reduce;
         }
 
         public static bool Reduce

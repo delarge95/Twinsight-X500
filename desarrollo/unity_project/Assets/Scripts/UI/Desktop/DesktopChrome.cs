@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using WebGL.Core.Content;
 using WebGL.Core.Managers;
 using WebGL.UI.Panels;
 using WebGL.UI.ProceduralIcons;
@@ -45,6 +46,7 @@ namespace WebGL.UI.Desktop
         private readonly Button[] _modeSeg = new Button[3];
         private readonly Label[] _modeText = new Label[3];
         private readonly Button[] _modeSrc = new Button[3];
+        private Button _chipFilter, _chipExplode, _chipCut;
         private SlidingPill _segPill, _langPill;
         private Label _sheetTitle;
         private string _lastCrumb, _lastTitle;
@@ -126,6 +128,34 @@ namespace WebGL.UI.Desktop
             b.RegisterCallback<PointerEnterEvent>(_ => ic.MarkDirtyRepaint());
             b.RegisterCallback<PointerLeaveEvent>(_ => ic.MarkDirtyRepaint());
             return b;
+        }
+
+        /// <summary>Active-effect chip: appears next to the pins button while a filter / exploded view / cut is on; click turns it off.</summary>
+        private Button MakeChip(string shape, string name, Action off)
+        {
+            Button chip = IconButton(shape, name, off);
+            chip.AddToClassList("dk-chip");
+            chip.style.display = DisplayStyle.None;
+            return chip;
+        }
+
+        private static void UpdateChip(Button chip, bool active)
+        {
+            if (chip == null) return;
+            bool live = chip.ClassListContains("dk-chip--live");
+            if (active && !live)
+            {
+                chip.AddToClassList("dk-chip--live");
+                chip.RemoveFromClassList("dk-chip--out");
+                chip.style.display = DisplayStyle.Flex;
+                DesktopMotion.Enter(chip, 0, "dk-enter--chip");
+            }
+            else if (!active && live)
+            {
+                chip.RemoveFromClassList("dk-chip--live");
+                chip.AddToClassList("dk-chip--out");
+                chip.schedule.Execute(() => { if (!chip.ClassListContains("dk-chip--live")) chip.style.display = DisplayStyle.None; }).StartingIn(DesktopMotion.Reduce ? 1 : 200);
+            }
         }
 
         private DesktopVectorIcon NewIcon(string shape, float size)
@@ -286,10 +316,23 @@ namespace WebGL.UI.Desktop
             _top.Add(seg);
             Grow(_top);
 
+            // Top bar zones (keep them when adding things): [home, brand, crumb] [modes 1/2/3] [future mode slot] [view actions: pins + active-effect chips, isolate, reset] [docks] [language, settings, help].
+            // DkTopSlotFuture is an empty, hidden slot where a future Telemetry / Twin mode button can go without re-layout.
+            var futureSlot = new VisualElement { name = "DkTopSlotFuture", pickingMode = PickingMode.Ignore };
+            futureSlot.AddToClassList("dk-top-slot");
+            futureSlot.style.display = DisplayStyle.None;
+            _top.Add(futureSlot);
+
             _btnPins = IconButton("pin", "DkPins", () => _ui.ShortcutTogglePins());
             _btnIso = IconButton("iso", "DkIso", () => _ui.ShortcutToggleIsolation());
             var reset = IconButton("reset", "DkReset", () => _ui.ShortcutResetView());
             _top.Add(_btnPins);
+            _chipFilter = MakeChip("filter", "DkChipFilter", () => _ui.ShortcutClearFilter());
+            _chipExplode = MakeChip("explode", "DkChipExplode", () => _ui.ShortcutClearExplode());
+            _chipCut = MakeChip("cut", "DkChipCut", () => CrossSectionManager.Instance?.DisableCrossSection());
+            _top.Add(_chipFilter);
+            _top.Add(_chipExplode);
+            _top.Add(_chipCut);
             _top.Add(_btnIso);
             _top.Add(reset);
             _top.Add(Sep());
@@ -671,7 +714,13 @@ namespace WebGL.UI.Desktop
             _sheetWasOpen = sheetOpen;
             SetOn(_btnTree, treeOpen);
             SetOn(_btnInspector, sheetOpen);
-            SetOn(_btnPins, _root.Q<Button>("ToolHotspotBtn")?.ClassListContains("submenu-card--active") == true);
+            // pins: the real state is the hotspot manager (the card class can drift after Home / re-entry and used to invert the button)
+            bool pinsVisible = HotspotManager.Instance != null && HotspotManager.Instance.IsVisible;
+            SetOn(_btnPins, pinsVisible);
+            _root.Q<Button>("ToolHotspotBtn")?.EnableInClassList("submenu-card--active", pinsVisible);
+            UpdateChip(_chipFilter, _ui.FilterActive);
+            UpdateChip(_chipExplode, ExplodedViewManager.Instance != null && ExplodedViewManager.Instance.GetExplosionFactor() > 0.001f);
+            UpdateChip(_chipCut, CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled);
             SetOn(_btnIso, _root.Q<Button>("ToolIsolateBtn")?.ClassListContains("submenu-card--active") == true);
             SetOn(_btnGear, _settingsOpen);
             _btnLangEn.EnableInClassList("dk-lang-btn--on", !AppLanguageManager.IsSpanish);
@@ -816,6 +865,9 @@ namespace WebGL.UI.Desktop
             var il = _root.Q<Label>("DkIsolateLabel");
             if (il != null) il.text = T("Isolate", "Aislar");
             _btnPins.tooltip = T("Pins", "Puntos");
+            _chipFilter.tooltip = T("Remove filter", "Quitar filtro");
+            _chipExplode.tooltip = T("Remove exploded view", "Quitar vista explosiva");
+            _chipCut.tooltip = T("Remove cut", "Quitar corte");
             _btnIso.tooltip = T("Isolate selected part", "Aislar la pieza seleccionada");
             _root.Q<Button>("DkReset").tooltip = T("Reset view", "Restablecer vista");
             _btnTree.tooltip = T("Parts tree", "Árbol de piezas");

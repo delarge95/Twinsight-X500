@@ -199,6 +199,7 @@ namespace WebGL.UI.Panels
         private readonly System.Collections.Generic.List<VisualElement> _rowEls = new System.Collections.Generic.List<VisualElement>();
         private readonly System.Collections.Generic.List<Label> _capEls = new System.Collections.Generic.List<Label>();
         private int _prevStep = -1;
+        private int _lockedRow = -1;   // a selected action row plays only its own animation (looping); -1 = the sequence
 #endif
         private int _step;
         private bool _touch;
@@ -427,9 +428,25 @@ namespace WebGL.UI.Panels
         }
 
 #if UNITY_STANDALONE
+        /// <summary>Selecting an action row plays only that action (looping); selecting it again, or pressing Right, resumes the sequence.</summary>
+        /// <summary>Test hooks (-desk-anim): switch the Mouse / Touch variant and lock a row.</summary>
+        public void ForceTouch(bool touch) { SetTouch(touch); }
+        public void LockRow(int row) { if (_lockedRow != row) ToggleRowLock(row); }
+
+        private void ToggleRowLock(int row)
+        {
+            _lockedRow = _lockedRow == row ? -1 : row;
+            _anim.Lock(_lockedRow);
+            HighlightRow(_lockedRow >= 0 ? _lockedRow : _anim.CurrentPhase);
+        }
+
         private void HighlightRow(int phase)
         {
-            for (int i = 0; i < _rowEls.Count; i++) _rowEls[i].EnableInClassList("dk-tut-row--hot", i == phase);
+            for (int i = 0; i < _rowEls.Count; i++)
+            {
+                _rowEls[i].EnableInClassList("dk-tut-row--hot", i == phase);
+                _rowEls[i].EnableInClassList("dk-tut-row--locked", i == _lockedRow);
+            }
         }
 #endif
 
@@ -468,6 +485,9 @@ namespace WebGL.UI.Panels
                 foreach (Label cap in _capEls) if (up.Contains(cap.text.ToUpperInvariant()) && cap.text.Length == 1) WebGL.UI.Desktop.DesktopMotion.Flash(cap, "dk-press-sim", 200);
             }
 #endif
+#if UNITY_STANDALONE
+            if (Input.GetKeyDown(KeyCode.RightArrow) && _lockedRow >= 0) { _lockedRow = -1; _anim.Lock(-1); HighlightRow(_anim.CurrentPhase); return; }
+#endif
             if (Input.GetKeyDown(KeyCode.RightArrow)) Next();
             else if (Input.GetKeyDown(KeyCode.LeftArrow)) Prev();
         }
@@ -496,6 +516,9 @@ namespace WebGL.UI.Panels
             _prev.SetEnabled(_step > 0);
             _overlay.EnableInClassList("dk-tut--touch", _touch);
 #if UNITY_STANDALONE
+            if (_prevStep != _step) _lockedRow = -1;
+            _anim.Touch = _touch;
+            _anim.LockedPhase = _lockedRow;
             _anim.SetStep(_step);
             _fill.style.width = Length.Percent(100f * (_step + 1) / Steps.Length);
             if (IsOpen && _prevStep != _step && _prevStep >= 0) WebGL.UI.Desktop.DesktopMotion.Enter(_textEl, 0, _step < _prevStep ? "dk-enter--back" : null);
@@ -530,9 +553,16 @@ namespace WebGL.UI.Panels
                 _rows.Add(row);
 #if UNITY_STANDALONE
                 _rowEls.Add(row);
+                int rowIndex = _rowEls.Count - 1;
+                row.pickingMode = PickingMode.Position;
+                row.RegisterCallback<PointerDownEvent>(evt => { if (evt.button == 0) { ToggleRowLock(rowIndex); evt.StopPropagation(); } });
                 foreach (VisualElement k in keys.Children()) if (k is Label kl) _capEls.Add(kl);
 #endif
             }
+#if UNITY_STANDALONE
+            HighlightRow(_lockedRow >= 0 ? _lockedRow : 0);
+            _anim.Refresh();
+#endif
         }
     }
 }

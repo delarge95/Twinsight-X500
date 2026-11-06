@@ -163,6 +163,7 @@ namespace WebGL.UI.Desktop
 
             _root.AddToClassList("desktop-ui");
             DesktopMotion.ApplyCommandLine();
+            WebGL.UI.ProceduralIcons.OutlineIcon.AnimateHover = !DesktopMotion.Reduce;
             _root.EnableInClassList("dk-reduce-motion", DesktopMotion.Reduce);
             DesktopMotion.Changed += () => _root.EnableInClassList("dk-reduce-motion", DesktopMotion.Reduce);
 
@@ -366,6 +367,13 @@ namespace WebGL.UI.Desktop
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length - 1; i++)
             {
+                if (args[i].Equals("-desk-check", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var chk = gameObject.AddComponent<DesktopSelfCheck>();
+                    chk.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-desk-anim", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var anim = gameObject.AddComponent<DesktopCaptureAnim>();

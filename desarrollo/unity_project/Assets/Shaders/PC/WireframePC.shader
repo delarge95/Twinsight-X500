@@ -6,15 +6,15 @@ Shader "TwinSight/WireframePC"
     Properties
     {
         _WireColor("Wire Color", Color) = (0.30, 0.80, 1.0, 1.0)
-        _WirePixels("Wire thickness (px)", Range(0.5, 4)) = 1.15
+        _WirePixels("Wire thickness (px)", Range(0.5, 4)) = 0.9
         _AA("Edge softness (px)", Range(0.25, 2)) = 0.7
-        _Intensity("Intensity (HDR)", Range(0.2, 4)) = 1.5
-        _DenseMin("Visibility in dense areas", Range(0, 1)) = 0.18
+        _Intensity("Intensity (HDR)", Range(0.2, 4)) = 0.42
+        _DenseMin("Visibility in dense areas", Range(0, 1)) = 0.12
         _DenseLow("Dense triangle size (px)", Float) = 2.5
         _DenseHigh("Open triangle size (px)", Float) = 11
         _FadeStart("Distance fade start (m)", Float) = 14
         _FadeLength("Distance fade length (m)", Float) = 30
-        _FillAlpha("Faint fill", Range(0, 0.2)) = 0.025
+        _FillAlpha("Faint fill", Range(0, 0.2)) = 0.008
     }
 
     SubShader

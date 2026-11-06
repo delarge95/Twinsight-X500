@@ -19,6 +19,7 @@ namespace WebGL.UI.ProceduralIcons
             public Vector2[] Points;
             public bool Closed;
             public bool Dashed;
+            public Vector2 Centroid;
         }
 
         private static readonly Dictionary<string, List<Stroke>> Cache = new Dictionary<string, List<Stroke>>();
@@ -34,7 +35,13 @@ namespace WebGL.UI.ProceduralIcons
         /// <summary>How often the tint is polled (ms). The PC build lowers it so USS colour transitions of the icons look smooth.</summary>
         public static int PollMs = 120;
 
+        /// <summary>The PC build turns the hover / click micro-animations on (OutlineIconAnim.Specs); WebGL leaves them off.</summary>
+        public static bool AnimateHover;
+
         private string _shape;
+        private Button _host;
+        private float _animStart = -1f;
+        private bool _animClick, _hovered;
 
         [UxmlAttribute("shape")]
         public string Shape
@@ -52,6 +59,43 @@ namespace WebGL.UI.ProceduralIcons
             generateVisualContent += Draw;
             // repaint when the USS tint changes (active state, light background): cheap poll, no hover dependence
             schedule.Execute(Refresh).Every(PollMs);
+            RegisterCallback<AttachToPanelEvent>(OnAttachAnim);
+            RegisterCallback<DetachFromPanelEvent>(OnDetachAnim);
+        }
+
+        private void OnAttachAnim(AttachToPanelEvent e)
+        {
+            OnDetachAnim(null);
+            if (!AnimateHover) return;
+            _host = this.GetFirstAncestorOfType<Button>();
+            if (_host == null) return;
+            _host.RegisterCallback<PointerEnterEvent>(OnHostEnter, TrickleDown.TrickleDown);
+            _host.RegisterCallback<PointerLeaveEvent>(OnHostLeave, TrickleDown.TrickleDown);
+            _host.RegisterCallback<PointerDownEvent>(OnHostDown, TrickleDown.TrickleDown);
+        }
+
+        private void OnDetachAnim(DetachFromPanelEvent e)
+        {
+            if (_host == null) return;
+            _host.UnregisterCallback<PointerEnterEvent>(OnHostEnter, TrickleDown.TrickleDown);
+            _host.UnregisterCallback<PointerLeaveEvent>(OnHostLeave, TrickleDown.TrickleDown);
+            _host.UnregisterCallback<PointerDownEvent>(OnHostDown, TrickleDown.TrickleDown);
+            _host = null;
+        }
+
+        private void OnHostEnter(PointerEnterEvent e) { _hovered = true; StartAnim(false); }
+        private void OnHostLeave(PointerLeaveEvent e) { _hovered = false; }
+        private void OnHostDown(PointerDownEvent e) { if (e.button == 0) StartAnim(true); }
+
+        /// <summary>Plays the hover (or click) animation now (tests and the tutorial).</summary>
+        public void PlayAnim(bool click) => StartAnim(click);
+
+        private void StartAnim(bool click)
+        {
+            if (!AnimateHover || OutlineIconAnim.Get(_shape) == null) return;
+            _animStart = Time.unscaledTime;
+            _animClick = click;
+            MarkDirtyRepaint();
         }
 
         private Color _lastColor;
@@ -61,6 +105,7 @@ namespace WebGL.UI.ProceduralIcons
         {
             Color c = resolvedStyle.color;
             if (c != _lastColor) { _lastColor = c; MarkDirtyRepaint(); }
+            if (_animStart >= 0f) MarkDirtyRepaint();
         }
 
         public void SetShape(string shape) => Shape = shape;
@@ -121,9 +166,41 @@ namespace WebGL.UI.ProceduralIcons
             p.lineCap = LineCap.Round;
             p.lineJoin = LineJoin.Round;
 
-            foreach (Stroke s in strokes)
+            AnimSpec spec = _animStart >= 0f && AnimateHover ? OutlineIconAnim.Get(_shape) : null;
+            float ap = 0f, mul = 1f;
+            if (spec != null)
             {
-                if (s.Points.Length < 2) continue;
+                float dur = Mathf.Max(0.05f, spec.Ms * 0.001f * (_animClick ? OutlineIconAnim.ClickSpeed : 1f));
+                float t = (Time.unscaledTime - _animStart) / dur;
+                if (spec.Loop && _hovered && !_animClick) ap = t % 1f;
+                else if (t >= 1f) { _animStart = -1f; spec = null; }
+                else ap = t;
+                mul = _animClick ? OutlineIconAnim.ClickMul : 1f;
+            }
+
+            int index = 0;
+            foreach (Stroke s0 in strokes)
+            {
+                Stroke s = s0;
+                if (s.Points.Length < 2) { index++; continue; }
+                if (spec != null)
+                {
+                    OutlineIconAnim.Transform(spec, index, s.Centroid, ap, mul, out Vector2 off, out float rot, out float scx, out float scy, out float draw, out Vector2 pivot);
+                    int n = Mathf.Max(2, Mathf.CeilToInt(draw * s.Points.Length));
+                    var np = new Vector2[Mathf.Min(n, s.Points.Length)];
+                    float cr = Mathf.Cos(rot * Mathf.Deg2Rad), sr = Mathf.Sin(rot * Mathf.Deg2Rad);
+                    for (int i = 0; i < np.Length; i++)
+                    {
+                        Vector2 d = s.Points[i] - pivot;
+                        d = new Vector2(d.x * scx, d.y * scx * scy);
+                        np[i] = pivot + new Vector2(d.x * cr - d.y * sr, d.x * sr + d.y * cr) + off;
+                    }
+
+                    s.Points = np;
+                    if (np.Length < s0.Points.Length) s.Closed = false;
+                }
+
+                index++;
                 if (s.Dashed)
                 {
                     DrawDashed(p, s, o, k);
@@ -135,6 +212,19 @@ namespace WebGL.UI.ProceduralIcons
                 for (int i = 1; i < s.Points.Length; i++) p.LineTo(o + s.Points[i] * k);
                 if (s.Closed) p.ClosePath();
                 p.Stroke();
+            }
+
+            if (spec != null && spec.Kind == AnimKind.Slice)
+            {
+                // the blade: a bright diagonal line that sweeps across the icon
+                Vector2 nrm = new Vector2(0.7071f, 0.7071f), dir = new Vector2(0.7071f, -0.7071f);
+                float sw = Mathf.Lerp(-14f, 14f, OutlineIconAnim.Ease(ap));
+                float fade = Mathf.Sin(Mathf.Clamp01(ap) * Mathf.PI);
+                Vector2 c = new Vector2(12f, 12f) + nrm * sw;
+                Color col = resolvedStyle.color; col.a *= Mathf.Clamp01(fade * 1.6f);
+                p.strokeColor = col;
+                p.lineWidth = 1.2f * Mathf.Max(1f, Mathf.Min(r.width, r.height) / 24f);
+                p.BeginPath(); p.MoveTo(o + (c - dir * 11f) * k); p.LineTo(o + (c + dir * 11f) * k); p.Stroke();
             }
         }
 
@@ -191,7 +281,7 @@ namespace WebGL.UI.ProceduralIcons
 
             void Flush(bool closed)
             {
-                if (pts != null && pts.Count > 1) output.Add(new Stroke { Points = pts.ToArray(), Closed = closed, Dashed = dashed });
+                if (pts != null && pts.Count > 1) { Vector2 c = Vector2.zero; foreach (Vector2 q in pts) c += q; c /= pts.Count; output.Add(new Stroke { Points = pts.ToArray(), Closed = closed, Dashed = dashed, Centroid = c }); }
                 pts = null;
             }
 

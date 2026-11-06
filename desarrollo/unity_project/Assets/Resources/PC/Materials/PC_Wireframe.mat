@@ -28,12 +28,12 @@ Material:
     - _AA: 0.7
     - _DenseHigh: 11
     - _DenseLow: 2.5
-    - _DenseMin: 0.18
+    - _DenseMin: 0.12
     - _FadeLength: 30
     - _FadeStart: 14
-    - _FillAlpha: 0.025
-    - _Intensity: 1.5
-    - _WirePixels: 1.15
+    - _FillAlpha: 0.008
+    - _Intensity: 0.42
+    - _WirePixels: 0.9
     m_Colors:
     - _WireColor: {r: 0.29999998, g: 0.8, b: 1, a: 1}
   m_BuildTextureStacks: []

@@ -11,9 +11,9 @@ Shader "TwinSight/XRayPC"
         _RimColor("Rim Color", Color) = (0.5, 0.8, 1.0, 1.0)
         _InnerAlpha("Inner Alpha", Range(0, 1)) = 0.1
         _OuterAlpha("Outer Alpha", Range(0, 1)) = 0.8
-        _Intensity("Intensity (HDR)", Range(0.1, 3)) = 0.75
+        _Intensity("Intensity (HDR)", Range(0.1, 3)) = 0.5
         _BehindColor("Behind Color", Color) = (0.2, 0.5, 0.8, 0.5)
-        _BehindIntensity("Behind Intensity", Range(0, 1)) = 0.5
+        _BehindIntensity("Behind Intensity", Range(0, 1)) = 0.3
     }
 
     SubShader

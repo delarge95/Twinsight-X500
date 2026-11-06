@@ -193,6 +193,25 @@ namespace WebGL.UI.Panels
 
         public bool IsExploded => _isExploded;
 
+#if UNITY_STANDALONE
+        /// <summary>PC top-bar chips: turn the category filter off without opening the Analyze menu.</summary>
+        /// <summary>True when the user narrowed the categories (the full default set is "no filter"; the manager reports it as active).</summary>
+        public bool IsCategoryFilterActive => _activeCategories.Count != DefaultCategories.Length;
+
+        public void ClearCategoryFilters()
+        {
+            ResetToDefaultCategories();
+            ApplyCategoryFilters();
+            UpdateCategoryButtonStates();
+        }
+
+        /// <summary>PC top-bar chips: reassemble the exploded view without opening the Analyze menu.</summary>
+        public void ClearExplode()
+        {
+            if (_isExploded) ToggleExplodePanel();
+        }
+#endif
+
         // ── Category Filters ──
 
         public void SetCategoryFilter(string category, Button clickedBtn, bool exclusiveMode = false)

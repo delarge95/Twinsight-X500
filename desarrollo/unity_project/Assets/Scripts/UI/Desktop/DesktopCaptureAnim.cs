@@ -68,6 +68,7 @@ namespace WebGL.UI.Desktop
         {
             Directory.CreateDirectory(OutputDirectory);
             PlayerPrefs.SetInt("Onboarding_Seen", 1);
+            WebGL.UI.ProceduralIcons.OutlineIcon.AnimateHover = true;
             yield return new WaitForSecondsRealtime(7f);
             UIManager ui = UIManager.Instance;
             VisualElement root = ui.Root;
@@ -79,6 +80,36 @@ namespace WebGL.UI.Desktop
             if (ui.IsOnboardingOpen) { ui.ShortcutBack(); yield return new WaitForSecondsRealtime(1f); }
             OrbitCameraController.Instance.ResetView();
             yield return new WaitForSecondsRealtime(1f);
+
+            // icon micro-animations: hover and click of the set (played from code, 64 px icons)
+            var sheet = new VisualElement { pickingMode = PickingMode.Ignore };
+            sheet.style.position = Position.Absolute; sheet.style.left = 0; sheet.style.top = 0; sheet.style.right = 0; sheet.style.bottom = 0;
+            sheet.style.backgroundColor = new Color(0.055f, 0.067f, 0.086f, 1f);
+            sheet.style.alignItems = Align.Center; sheet.style.justifyContent = Justify.Center;
+            root.Add(sheet);
+            string[] shapes = { "explode", "cut", "inspect", "focus", "isolate", "pins", "reset", "home", "settings", "env_time", "filter", "thermal", "analyze", "panel_l", "language", "help" };
+            foreach (string sh in shapes)
+            {
+                var btn = new Button();
+                btn.style.width = 100; btn.style.height = 100; btn.style.backgroundColor = Color.clear; btn.style.borderTopWidth = 0; btn.style.borderBottomWidth = 0; btn.style.borderLeftWidth = 0; btn.style.borderRightWidth = 0;
+                btn.style.alignItems = Align.Center; btn.style.justifyContent = Justify.Center;
+                var ic = new DesktopVectorIcon(sh, 72);
+                ic.style.color = new Color(0.749f, 0.918f, 1f, 1f);
+                btn.Add(ic);
+                sheet.Add(btn);
+                yield return new WaitForSecondsRealtime(0.3f);
+                ic.PlayAnim(false);
+                yield return Burst("00_icono_" + sh + "_hover", 0.5f - 0.04f, 0.5f - 0.07f, 0.08f, 0.14f, 8, 0.045f, 8, 1);
+                if (sh == "explode" || sh == "cut" || sh == "reset")
+                {
+                    ic.PlayAnim(true);
+                    yield return Burst("00_icono_" + sh + "_clic", 0.5f - 0.04f, 0.5f - 0.07f, 0.08f, 0.14f, 8, 0.04f, 8, 1);
+                }
+
+                btn.RemoveFromHierarchy();
+            }
+
+            sheet.RemoveFromHierarchy();
 
             // hero entrance (home button -> hero)
             Click(root.Q<Button>("HomeBtn"));
@@ -103,6 +134,33 @@ namespace WebGL.UI.Desktop
                     if (tut != null) tut.GoTo(s + 1);
                     yield return Burst("04_tutorial_transicion_" + (s + 1) + "_a_" + (s + 2), 0.2f, 0.2f, 0.6f, 0.6f, 6, 0.025f, 3, 2);
                 }
+            }
+
+            // touch variant (finger glyphs, gestures) and a locked row (only that action loops)
+            if (tut != null)
+            {
+                tut.ForceTouch(true);
+                for (int s2 = 0; s2 < 2; s2++)
+                {
+                    tut.GoTo(s2);
+                    yield return Burst("11_tutorial_tactil_paso" + (s2 + 1), 0.22f, 0.30f, 0.22f, 0.42f, 6, 0.32f, 3, 1);
+                }
+
+                tut.ForceTouch(false);
+                tut.GoTo(2);
+                yield return Burst("12_tutorial_inspeccionar", 0.22f, 0.30f, 0.22f, 0.42f, 8, 0.3f, 4, 1);
+                tut.GoTo(3);
+                tut.LockRow(1);
+                yield return Burst("13_tutorial_fila_bloqueada_explotar", 0.2f, 0.2f, 0.6f, 0.6f, 6, 0.4f, 3, 2);
+                tut.LockRow(1);
+                tut.GoTo(4);
+                tut.LockRow(1);
+                yield return Burst("14_tutorial_entorno_dia_noche_atardecer", 0.22f, 0.30f, 0.22f, 0.42f, 8, 0.32f, 4, 1);
+                tut.LockRow(1);
+                tut.GoTo(0);
+                tut.LockRow(2);
+                yield return Burst("15_tutorial_zoom_centrado", 0.22f, 0.30f, 0.22f, 0.42f, 6, 0.4f, 3, 1);
+                tut.LockRow(2);
             }
 
             ui.ShortcutBack();

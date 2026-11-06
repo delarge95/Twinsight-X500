@@ -241,6 +241,11 @@ namespace WebGL.UI.Panels
         public void ToggleCrossSectionPanel() => _analyze.ToggleCrossSectionPanel();
         public void ToggleCategoryMenu() => _analyze.ToggleCategoryMenu();
         public void ToggleSliderVisibility() => _analyze.ToggleExplodePanel();
+#if UNITY_STANDALONE
+        public void ClearCategoryFilters() => _analyze.ClearCategoryFilters();
+        public bool IsCategoryFilterActive => _analyze.IsCategoryFilterActive;
+        public void ClearExplode() => _analyze.ClearExplode();
+#endif
 
         public void SetSheetOpenState(bool isOpen)
         {

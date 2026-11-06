@@ -1891,3 +1891,19 @@
 .dk-tut-anim-key { position: absolute; padding: 1px 8px; min-width: 22px; font-size: 12px; color: rgb(191, 234, 255); -unity-text-align: middle-center; border-width: 1px; border-color: rgba(255, 255, 255, 0.22); border-radius: 6px; background-color: rgb(11, 13, 17); transition-property: scale, background-color, border-color; transition-duration: 0.1s; }
 .dk-reduce-motion .dk-tut-anim-key { transition-duration: 0s; }
 .dk-tut-art { overflow: hidden; }
+
+/* active-effect chips in the top bar (filter / exploded view / cut): subtle active tint, animated entrance and exit */
+.dk-chip { color: rgb(191, 234, 255); background-color: rgba(70, 175, 255, 0.14); border-width: 1px; border-color: rgba(70, 175, 255, 0.45); transition-property: background-color, border-color, color, scale, translate, opacity; transition-duration: 0.18s; transition-timing-function: ease-out; }
+.dk-chip .dk-icon { color: rgb(191, 234, 255); }
+.dk-chip:hover { background-color: rgba(255, 120, 120, 0.18); border-color: rgba(255, 140, 140, 0.6); }
+.dk-chip:hover .dk-icon { color: rgb(255, 214, 214); }
+.dk-chip.dk-enter { opacity: 0; scale: 0.6 0.6; }
+.dk-chip--out { opacity: 0; scale: 0.6 0.6; }
+.dk-reduce-motion .dk-chip { transition-duration: 0s; }
+.dk-top-slot { flex-direction: row; align-items: center; }
+
+/* tutorial: selectable action rows, part label of the Inspect scene */
+.dk-tut-row { transition-property: background-color, border-color, scale; }
+.dk-tut-row:hover { background-color: rgba(70, 175, 255, 0.07); border-color: rgba(70, 175, 255, 0.35); }
+.dk-tut-row--locked { background-color: rgba(70, 175, 255, 0.2); border-color: rgb(70, 175, 255); }
+.dk-tut-anim-pop { position: absolute; padding: 2px 9px; font-size: 12px; color: rgb(6, 34, 47); background-color: rgb(191, 234, 255); border-radius: 10px; -unity-font-style: bold; }

@@ -25,11 +25,11 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _BehindIntensity: 0.5
+    - _BehindIntensity: 0.3
     - _FresnelIntensity: 1
     - _FresnelPower: 2.2
     - _InnerAlpha: 0.1
-    - _Intensity: 0.75
+    - _Intensity: 0.5
     - _OuterAlpha: 0.8
     m_Colors:
     - _BaseColor: {r: 0.29999998, g: 0.7, b: 1, a: 0.3}

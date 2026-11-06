@@ -478,3 +478,75 @@ Ilustración en bucle por paso (Painter2D + etiquetas, sin vídeo): dron de alam
 - **Ratón real:** el script (`anim.ps1`, con comprobación de ventana en primer plano antes de cada entrada) abortó correctamente porque otro programa (Comet) recupera el foco a los pocos segundos de lanzar el .exe; no se envió ninguna entrada al otro programa. Hover y pulsado reales quedan sin tira de fotogramas; se comprobaron en la ronda anterior (`capturas_iconos/real`) y por USS.
 - **Rendimiento** (`-desk-fps`, 1904x984, vsync): hero, visor en reposo y tutorial animado a 60 fps (16,67 ms) tanto con animaciones como con «Reducir» activado; sin diferencia medible. La asignación gestionada medida es ~19 KB por fotograma en el visor en reposo con y sin animaciones (por tanto no la causan las animaciones; viene de otra parte del proyecto y conviene investigarla aparte). Con el tutorial cerrado no hay ninguna tarea programada de repintado.
 - Pendiente: tira con ratón real (si el usuario no usa otro programa a la vez), cierre animado de popovers, retirar `Procedural*Icon` y el overlay de tutorial antiguo del UXML (el UXML compartido todavía los referencia). `C:\m4` (carpeta accidental) está protegida contra borrado por el sistema; que la borre el usuario.
+
+## 18. Feedback 1 del usuario sobre pc_animaciones (2026-11-06, rama `pc-desktop`, solo PC)
+
+Todo bajo `#if UNITY_STANDALONE`, `DesktopUI.uss` o ficheros de escritorio; WebGL no cambia (el motor de iconos se activa con `OutlineIcon.AnimateHover`, solo PC). Build `E:\TwinSight_builds\pc_feedback1\`, capturas y tiras en `docs/unity_pc/capturas_feedback1/`.
+
+### 18.1 Micro-animaciones de iconos (fuente única: `OutlineIconAnim.cs`)
+Como los `Procedural*Icon` originales (física por icono: explotar se abre, corte con bisturí, etc.), cada icono del set tiene una animación al pasar el cursor (una vez; bucle suave solo donde es natural) y una variante de clic (`ClickMul` = 1,8 veces la amplitud, 0,85 veces la duración). El motor está en `OutlineIcon` (se engancha al botón padre: enter, leave, down), los datos en `OutlineIconAnim.Specs` y se desactivan con «Reducir animaciones». Tipos: Burst (las piezas salen del centro y vuelven; `rebote` = pequeño asentamiento), Pinch (hacia el centro), Slice (cuchilla diagonal que cruza y separa las mitades), Rotate (giro, eased), Tilt (giro y vuelta), Pulse (escala), Shift (desplazamiento por trazo), Draw (se redibuja), Stagger (barras que crecen una tras otra), Float (sube y se asienta), Wobble (oscilación amortiguada). Unidades: cuadrícula de 24; tiempos en ms con suavizado smoothstep. Tiras de cada icono: `00_icono_*_hover.png` y `*_clic.png`. Tabla (generada desde el código):
+
+| Icono | Tipo | Amp. (u) | Giro (°) | ms | Bucle / rebote | Animación al pasar el cursor |
+|---|---|---|---|---|---|---|
+| `explode` | Burst | 3.4 |  | 560 |  rebote | Las piezas salen hacia fuera desde el centro y se reasientan (rebote corto) |
+| `cut` | Slice | 1.5 |  | 520 |  | Una cuchilla cruza el icono en diagonal y las dos mitades se separan al pasar |
+| `inspect` | Pinch | 1.7 |  | 460 |  | Las cuatro esquinas del visor se cierran sobre el punto y vuelven |
+| `focus` | Pinch | 1.5 |  | 460 |  | Las marcas de la mira se cierran hacia el centro y vuelven |
+| `isolate` | Burst | 1.4 |  | 460 |  | Las esquinas se abren y se cierran de nuevo alrededor de la pieza |
+| `analyze` | Stagger | 0.38 |  | 560 |  | Las barras crecen una tras otra |
+| `studio` | Tilt |  | 28 | 480 |  | El cubo se inclina y vuelve |
+| `solid` | Tilt |  | 28 | 480 |  | El cubo se inclina y vuelve |
+| `xray` | Tilt |  | 28 | 480 |  | El cubo transparente se inclina y vuelve |
+| `wire` | Tilt |  | 28 | 480 |  | La malla se inclina y vuelve |
+| `realistic` | Tilt |  | 40 | 520 |  | La esfera gira y el brillo se desplaza |
+| `ghost` | Float | 2.4 |  | 560 |  | El fantasma flota hacia arriba y se asienta |
+| `thermal` | Shift |  |  | 520 |  | El mercurio sube dentro del termómetro |
+| `pins` | Float | 2.8 |  | 520 |  | El marcador salta y cae con un pequeño rebote |
+| `reset` | Rotate |  | -360 | 620 |  | Giro completo en sentido antihorario |
+| `home` | Shift |  |  | 420 |  | El tejado se levanta un instante |
+| `power` | Shift |  |  | 420 |  | La línea de encendido sale hacia arriba y vuelve |
+| `settings` | Shift |  |  | 520 |  | Los deslizadores cruzan en sentido contrario |
+| `language` | Draw |  |  | 700 |  | El globo se dibuja de nuevo |
+| `help` | Pulse | 0.14 |  | 420 |  | Late una vez |
+| `info` | Pulse | 0.14 |  | 420 |  | Late una vez |
+| `parts` | Draw |  |  | 650 |  | El árbol se dibuja rama a rama |
+| `search` | Wobble |  | 16 | 560 |  | La lupa oscila como buscando |
+| `panel_l` | Shift |  |  | 420 |  | El divisor se desplaza como un panel que se pliega |
+| `panel_r` | Shift |  |  | 420 |  | El divisor se desplaza como un panel que se pliega |
+| `close` | Rotate |  | 90 | 360 |  | Giro de 90 grados |
+| `back` | Shift |  |  | 360 |  | La flecha se desplaza hacia atrás |
+| `chevron` | Shift |  |  | 360 |  | El chevrón avanza |
+| `env_studio` | Pulse | 0.1 |  | 420 |  | La pantalla late |
+| `env_time` | Rotate |  | 360 | 2600 | sí | El sol gira despacio mientras se pasa el cursor (bucle suave) |
+| `env_color` | Wobble |  | 14 | 520 |  | La paleta oscila |
+| `filter` | Wobble |  | 12 | 520 |  | El embudo se sacude como tamizando |
+| `invert` | Rotate |  | 180 | 460 |  | Las flechas dan media vuelta |
+| `angle` | Wobble |  | 10 | 520 |  | El ángulo se abre y se cierra |
+| `orbit` | Rotate |  | 360 | 900 |  | El anillo orbita una vuelta |
+| `pan` | Pulse | 0.18 |  | 420 |  | Las flechas se dilatan |
+| `zoom` | Pulse | 0.2 |  | 440 |  | La lupa se acerca |
+| `pointer` | Shift |  |  | 320 |  | El puntero hace clic (baja y vuelve) |
+| `keyboard` | Pulse | 0.08 |  | 320 |  | La tecla se hunde |
+| `check` | Draw |  |  | 420 |  | La marca se dibuja |
+| `propulsion` | Rotate |  | 360 | 900 | sí | La hélice gira mientras se pasa el cursor (bucle suave) |
+| `avionics` | Pulse | 0.12 |  | 420 |  | El chip late |
+| `sensors` | Pulse | 0.16 |  | 480 |  | Las ondas se expanden |
+| `battery` | Pulse | 0.1 |  | 420 |  | La batería late |
+| `fastener` | Tilt |  | 60 | 460 |  | La tuerca da un cuarto de vuelta y vuelve |
+
+### 18.2 Tutorial
+- **Secuencia o acción elegida:** las animaciones se reproducen en secuencia; al pulsar una fila solo se repite (en bucle) la animación de esa acción con la fila resaltada (`dk-tut-row--locked`); volver a pulsarla, o pulsar →, reanuda la secuencia. El interruptor PC/Táctil se mantiene.
+- **Variante táctil (tabletas):** guantes de dedo en lugar de cursor y ratón: un dedo arrastra (orbitar), dos dedos desplazan, pellizco para el zoom, toque, doble toque y toque en el fondo; sin teclas; los pies de ilustración cambian («Un dedo: orbitar», «Toca Inspeccionar», etc.).
+- **Arreglos:** (a) el zoom crece con el dron centrado en el encuadre; (b) la primera fila se resalta en cuanto cambia el paso (`HighlightRow` + `TutorialAnim.Refresh` tras construir las filas; antes el resaltado se perdía porque la fase se anunciaba antes de crear las filas); (c) Inspeccionar rehecho: una lupa recorre el dron, las piezas reciben el aro #bfeaff, aparece su nombre (etiqueta) y entra la hoja de información con reencuadre; (d) Corte: el plano barre, la sección queda visible, el plano se retira y el dron vuelve entero; (e) Explotar: placa superior, batería, placa inferior, brazos, motores y hélices se separan radialmente con huecos y guías, y se recomponen; (f) Entorno: día (sol, cielo claro), noche (luna creciente y estrellas) y atardecer (degradado magenta a naranja, sol bajo) con transición suave en el orden del ciclo TIME.
+### 18.3 Chips de efectos activos en la barra superior
+Junto al botón de puntos aparecen los iconos de filtro, vista explosiva y corte mientras estén activos; clic = desactivar (tooltip «Quitar filtro / vista explosiva / corte» con la tecla G / E / C); entrada y salida animadas, tinte activo y rojo suave al pasar. El estado se lee del motor (`CrossSectionManager.IsEnabled`, `ExplodedViewManager.GetExplosionFactor`, y `UIManager.FilterActive` = el conjunto de categorías ya no es el predeterminado: `HasActiveCategoryFilters` del gestor devuelve verdadero con las seis categorías por defecto y no sirve), así que sigue sincronizado con el popover, los atajos y Restablecer. Apagar usa `ShortcutClearFilter` / `ShortcutClearExplode` / `DisableCrossSection`.
+### 18.4 Botón de puntos invertido
+Causa: `InspectModeHandler._hotspotsEnabled` empieza en verdadero pero `UIManager` llama a `HotspotManager.SetVisible(true/false)` al entrar y volver al menú sin tocarlo, y la clase de la tarjeta se desfasaba. Ahora el botón de la barra y la tarjeta leen `HotspotManager.IsVisible` cada fotograma. Comprobación de regresión: `-desk-check <carpeta>` (`DesktopSelfCheck`) registra 13 líneas PASS/FAIL (puntos al inicio, tras ocultar, tras Inicio y reentrada, chips de corte, explosión y filtro, que no aparezca el filtro con las categorías por defecto); 13/13 PASS.
+### 18.5 Brillo del alambre y rayos X
+`PC_Wireframe`: `_Intensity` 1,5 a 0,42, `_FillAlpha` 0,025 a 0,008, `_WirePixels` 1,15 a 0,9, `_DenseMin` 0,18 a 0,12; `PC_XRay`: `_Intensity` 0,75 a 0,5, `_BehindIntensity` 0,5 a 0,3 (materiales y valores por defecto del shader). Antes y después: `wire_antes/despues.png`, `xray_antes/despues.png`.
+### 18.6 Estructura de la barra superior
+Zonas documentadas en `DesktopChrome.BuildTop`: [inicio, marca, miga] [modos 1/2/3] [hueco futuro `DkTopSlotFuture`, oculto, para un modo Gemelo/Telemetría] [acciones de vista: puntos + chips, aislar, restablecer] [paneles] [idioma, ajustes, ayuda]; añadir un botón o panel no obliga a recolocar nada. No se toca telemetría.
+### 18.7 Para el port a la web (todo parametrizado)
+Tokens: duraciones y easing en el bloque «Phase 6» de `DesktopUI.uss` y `DesktopMotion.Speed`; iconos en `OutlineIconData.cs` (SVG de la hoja) y `OutlineIconAnim.cs` (tabla de arriba); contenido del tutorial (pasos, filas, pistas ratón/táctil/PC, fases de 2,6 s) en `TutorialOverlay.cs` y `TutorialAnim.cs` (escenas dibujadas con trazos de la cuadrícula 210x230). 
+### 18.8 Pendiente
+Tira de hover/pulsado reales con ratón del SO (Comet roba el foco; el script `anim.ps1` aborta si el reproductor no está en primer plano); animación de cierre de popovers; retirar `Procedural*Icon` del UXML compartido.
