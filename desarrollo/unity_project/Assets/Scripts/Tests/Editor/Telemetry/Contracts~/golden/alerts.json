@@ -1,0 +1,448 @@
+{
+  "_doc": "deriveAlerts (src/shared/alerts.ts). id, component and severity are normative; message is Spanish free text, informational (it becomes a translatable code in WP-03), so a client must not compare it. Alerts are returned sorted: critical first, otherwise rule order (per motor: out, temp; then battery rem, battery temp, controller temp, vibration). Frames are complete wire frames. Tolerance 1e-9 on thresholds.",
+  "thresholds": {
+    "batteryLowRem": 0.15,
+    "batteryCritRem": 0.07,
+    "motorTempWarnC": 65,
+    "motorTempCritC": 80,
+    "batteryTempWarnC": 50,
+    "batteryTempCritC": 60,
+    "fcTempWarnC": 70,
+    "vibrationWarn": 20,
+    "vibrationCrit": 30,
+    "motorOutRatio": 0.15
+  },
+  "cases": [
+    {
+      "name": "nominal",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": []
+    },
+    {
+      "name": "motor 3 stopped while flying",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 300, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        {
+          "id": "motor3:out",
+          "component": "motor3",
+          "severity": "critical",
+          "message": "Motor 3: rotor detenido (300 RPM frente a 6500 de media)"
+        }
+      ]
+    },
+    {
+      "name": "same rpm but landed: no motor-out alert",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 300, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": true,
+        "nav": 2
+      },
+      "out": []
+    },
+    {
+      "name": "same rpm but disarmed: no motor-out alert",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 300, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": false,
+        "landed": false,
+        "nav": 2
+      },
+      "out": []
+    },
+    {
+      "name": "others below 1000 rpm mean: no motor-out alert",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [900, 900, 0, 900],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": []
+    },
+    {
+      "name": "motor 2 at the warning threshold (65)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 65, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [{ "id": "motor2:temp", "component": "motor2", "severity": "warning", "message": "Motor 2: 65 °C" }]
+    },
+    {
+      "name": "motor 1 at the critical threshold (80)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [80, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        { "id": "motor1:temp", "component": "motor1", "severity": "critical", "message": "Motor 1: 80 °C" }
+      ]
+    },
+    {
+      "name": "motor 4 at 66.5: toFixed(0) rounds half up (message only)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 66.5, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [{ "id": "motor4:temp", "component": "motor4", "severity": "warning", "message": "Motor 4: 67 °C" }]
+    },
+    {
+      "name": "battery at the low threshold (0.15)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 14.8, "i": 18, "rem": 0.15 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        {
+          "id": "battery:rem",
+          "component": "battery",
+          "severity": "warning",
+          "message": "Batería al 15 % (14.8 V)"
+        }
+      ]
+    },
+    {
+      "name": "battery just above low (0.151)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 14.8, "i": 18, "rem": 0.151 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": []
+    },
+    {
+      "name": "battery at the critical threshold (0.07)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 14.2, "i": 18, "rem": 0.07 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        {
+          "id": "battery:rem",
+          "component": "battery",
+          "severity": "critical",
+          "message": "Batería al 7 % (14.2 V)"
+        }
+      ]
+    },
+    {
+      "name": "battery temperature warning (50)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 50, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        { "id": "battery:temp", "component": "battery", "severity": "warning", "message": "Batería: 50 °C" }
+      ]
+    },
+    {
+      "name": "battery temperature critical (60)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 60, 38],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        {
+          "id": "battery:temp",
+          "component": "battery",
+          "severity": "critical",
+          "message": "Batería: 60 °C"
+        }
+      ]
+    },
+    {
+      "name": "controller temperature (70)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 33, 70],
+        "vib": 4.2,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [{ "id": "fc:temp", "component": "fc", "severity": "warning", "message": "Controladora: 70 °C" }]
+    },
+    {
+      "name": "vibration warning (20)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 20,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        {
+          "id": "fc:vib",
+          "component": "fc",
+          "severity": "warning",
+          "message": "Vibración del acelerómetro: 20.0 m/s²"
+        }
+      ]
+    },
+    {
+      "name": "vibration critical (30)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [6500, 6500, 6500, 6500],
+        "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+        "temp": [41, 42, 40, 41, 33, 38],
+        "vib": 30,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        {
+          "id": "fc:vib",
+          "component": "fc",
+          "severity": "critical",
+          "message": "Vibración del acelerómetro: 30.0 m/s²"
+        }
+      ]
+    },
+    {
+      "name": "several at once (order: critical first, then by rule order)",
+      "frame": {
+        "ts": 100000,
+        "lt": 100,
+        "seg": 0,
+        "q": [1, 0, 0, 0],
+        "p": [3, 1, -5],
+        "v": [0.5, 0, 0],
+        "u": [0.5, 0.5, 0.5, 0.5],
+        "rpm": [300, 6500, 6500, 6500],
+        "bat": { "v": 14.1, "i": 20, "rem": 0.05 },
+        "temp": [41, 66, 40, 41, 52, 71],
+        "vib": 21,
+        "armed": true,
+        "landed": false,
+        "nav": 2
+      },
+      "out": [
+        {
+          "id": "motor1:out",
+          "component": "motor1",
+          "severity": "critical",
+          "message": "Motor 1: rotor detenido (300 RPM frente a 6500 de media)"
+        },
+        {
+          "id": "battery:rem",
+          "component": "battery",
+          "severity": "critical",
+          "message": "Batería al 5 % (14.1 V)"
+        },
+        { "id": "motor2:temp", "component": "motor2", "severity": "warning", "message": "Motor 2: 66 °C" },
+        { "id": "battery:temp", "component": "battery", "severity": "warning", "message": "Batería: 52 °C" },
+        { "id": "fc:temp", "component": "fc", "severity": "warning", "message": "Controladora: 71 °C" },
+        {
+          "id": "fc:vib",
+          "component": "fc",
+          "severity": "warning",
+          "message": "Vibración del acelerómetro: 21.0 m/s²"
+        }
+      ]
+    }
+  ],
+  "alert_summary": [
+    { "in_severities": [], "out": { "count": 0, "worst": null } },
+    { "in_severities": ["warning"], "out": { "count": 1, "worst": "warning" } },
+    { "in_severities": ["warning", "critical"], "out": { "count": 2, "worst": "critical" } },
+    { "in_severities": ["critical"], "out": { "count": 1, "worst": "critical" } }
+  ],
+  "fresh_alert": [
+    {
+      "prev_ids": [],
+      "alerts_from_case": "several at once (order: critical first, then by rule order)",
+      "out_id": "motor1:out"
+    },
+    {
+      "prev_ids": ["motor1:out"],
+      "alerts_from_case": "several at once (order: critical first, then by rule order)",
+      "out_id": "battery:rem"
+    },
+    {
+      "prev_ids": ["motor1:out", "battery:rem", "motor2:temp", "battery:temp", "fc:temp", "fc:vib"],
+      "alerts_from_case": "several at once (order: critical first, then by rule order)",
+      "out_id": null
+    }
+  ]
+}

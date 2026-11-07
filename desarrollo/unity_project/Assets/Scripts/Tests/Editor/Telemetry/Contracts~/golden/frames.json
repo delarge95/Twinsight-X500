@@ -1,0 +1,109 @@
+{
+  "_doc": "NED/FRD -> render world (src/shared/frames.ts). Render world = Three.js: Y up, right-handed, x = East, y = Up, z = South (North is -Z). Unity is left-handed with Y up: the *_unity_* fields are position/vector hints (x = East, y = Up, z = North, i.e. the render z negated), derived by arithmetic and NOT verified inside Unity. The render quaternion depends on the model axes (GLB: nose along -X); a client with a different model orientation should verify body_axes_in_* instead. Tolerance 1e-5.",
+  "tolerance": 0.00001,
+  "ned_to_render_matrix_rows": [[0, 1, 0, 0], [0, 0, -1, 0], [-1, 0, 0, 0], [0, 0, 0, 1]],
+  "model_to_frd_matrix_rows": [[-1, 0, 0, 0], [0, 0, -1, 0], [0, -1, 0, 0], [0, 0, 0, 1]],
+  "positions": [
+    { "ned": [0, 0, 0], "render": [0, 0, 0], "unity_hint": [0, 0, 0] },
+    { "ned": [10, 0, 0], "render": [0, 0, -10], "unity_hint": [0, 0, 10] },
+    { "ned": [0, 10, 0], "render": [10, 0, 0], "unity_hint": [10, 0, 0] },
+    { "ned": [0, 0, -5], "render": [0, 5, 0], "unity_hint": [0, 5, 0] },
+    { "ned": [25, -10, -6], "render": [-10, 6, -25], "unity_hint": [-10, 6, 25] },
+    { "ned": [-3.5, 4.25, 0.4], "render": [4.25, -0.4, 3.5], "unity_hint": [4.25, -0.4, -3.5] }
+  ],
+  "attitude": [
+    {
+      "name": "identity (nose north, level)",
+      "q_px4_wxyz": [1, 0, 0, 0],
+      "euler_deg": { "roll": 0, "pitch": 0, "yaw": 0 },
+      "render_quaternion_xyzw": { "x": 0, "y": 0.707107, "z": 0, "w": -0.707107 },
+      "body_axes_in_render_world": { "forward": [0, 0, -1], "right": [1, 0, 0], "down": [0, -1, 0] },
+      "body_axes_in_unity_world": { "forward": [0, 0, 1], "right": [1, 0, 0], "down": [0, -1, 0] }
+    },
+    {
+      "name": "yaw 90 (nose east)",
+      "q_px4_wxyz": [0.707107, 0, 0, 0.707107],
+      "euler_deg": { "roll": 0, "pitch": 0, "yaw": 90.000035 },
+      "render_quaternion_xyzw": { "x": 0, "y": 1, "z": 0, "w": 0 },
+      "body_axes_in_render_world": { "forward": [1, 0, 0], "right": [0, 0, 1], "down": [0, -1, 0] },
+      "body_axes_in_unity_world": { "forward": [1, 0, 0], "right": [0, 0, -1], "down": [0, -1, 0] }
+    },
+    {
+      "name": "yaw -90 (nose west)",
+      "q_px4_wxyz": [0.707107, 0, 0, -0.707107],
+      "euler_deg": { "roll": 0, "pitch": 0, "yaw": 269.999965 },
+      "render_quaternion_xyzw": { "x": 0, "y": 0, "z": 0, "w": -1 },
+      "body_axes_in_render_world": { "forward": [-1, 0, 0], "right": [0, 0, -1], "down": [0, -1, 0] },
+      "body_axes_in_unity_world": { "forward": [-1, 0, 0], "right": [0, 0, 1], "down": [0, -1, 0] }
+    },
+    {
+      "name": "yaw 180 (nose south)",
+      "q_px4_wxyz": [0, 0, 0, 1],
+      "euler_deg": { "roll": 0, "pitch": 0, "yaw": 180 },
+      "render_quaternion_xyzw": { "x": 0, "y": 0.707107, "z": 0, "w": 0.707107 },
+      "body_axes_in_render_world": { "forward": [0, 0, 1], "right": [-1, 0, 0], "down": [0, -1, 0] },
+      "body_axes_in_unity_world": { "forward": [0, 0, -1], "right": [-1, 0, 0], "down": [0, -1, 0] }
+    },
+    {
+      "name": "pitch 20 (nose up)",
+      "q_px4_wxyz": [0.984808, 0, 0.173648, 0],
+      "euler_deg": { "roll": 0, "pitch": 19.999984, "yaw": 0 },
+      "render_quaternion_xyzw": { "x": -0.122788, "y": 0.696364, "z": 0.122788, "w": -0.696364 },
+      "body_axes_in_render_world": { "forward": [0, 0.34202, -0.939693], "right": [1, 0, 0], "down": [0, -0.939693, -0.34202] },
+      "body_axes_in_unity_world": { "forward": [0, 0.34202, 0.939693], "right": [1, 0, 0], "down": [0, -0.939693, 0.34202] }
+    },
+    {
+      "name": "roll 30 (right side down)",
+      "q_px4_wxyz": [0.965926, 0.258819, 0, 0],
+      "euler_deg": { "roll": 29.999999, "pitch": 0, "yaw": 0 },
+      "render_quaternion_xyzw": { "x": 0.183013, "y": 0.683013, "z": 0.183013, "w": -0.683013 },
+      "body_axes_in_render_world": { "forward": [0, 0, -1], "right": [0.866025, -0.5, 0], "down": [-0.5, -0.866025, 0] },
+      "body_axes_in_unity_world": { "forward": [0, 0, 1], "right": [0.866025, -0.5, 0], "down": [-0.5, -0.866025, 0] }
+    },
+    {
+      "name": "yaw 135 pitch 10 roll -5",
+      "q_px4_wxyz": [0.377352, -0.097074, -0.006824, 0.920943],
+      "euler_deg": { "roll": -4.999972, "pitch": 10.000056, "yaw": 135.000038 },
+      "render_quaternion_xyzw": { "x": -0.063816, "y": 0.918033, "z": -0.073467, "w": 0.384377 },
+      "body_axes_in_render_world": {
+        "forward": [0.696364, 0.173649, 0.696364],
+        "right": [-0.715118, 0.085831, 0.693714],
+        "down": [0.060693, -0.98106, 0.183949]
+      },
+      "body_axes_in_unity_world": {
+        "forward": [0.696364, 0.173649, -0.696364],
+        "right": [-0.715118, 0.085831, -0.693714],
+        "down": [0.060693, -0.98106, -0.183949]
+      }
+    },
+    {
+      "name": "yaw -30 pitch -15 roll 25",
+      "q_px4_wxyz": [0.942274, 0.174294, -0.178629, -0.223234],
+      "euler_deg": { "roll": 24.999969, "pitch": -14.999952, "yaw": 329.999996 },
+      "render_quaternion_xyzw": { "x": 0.249554, "y": 0.508438, "z": -0.003065, "w": -0.824138 },
+      "body_axes_in_render_world": {
+        "forward": [-0.482963, -0.258818, -0.836517],
+        "right": [0.839576, -0.408217, -0.358427],
+        "down": [-0.248713, -0.875427, 0.414451]
+      },
+      "body_axes_in_unity_world": {
+        "forward": [-0.482963, -0.258818, 0.836517],
+        "right": [0.839576, -0.408217, 0.358427],
+        "down": [-0.248713, -0.875427, -0.414451]
+      }
+    }
+  ],
+  "attitude_sign_invariance": {
+    "q_px4_wxyz": [0.377352, -0.097074, -0.006824, 0.920943],
+    "render_quaternion_xyzw": { "x": -0.063816, "y": 0.918033, "z": -0.073467, "w": 0.384377 },
+    "render_quaternion_of_minus_q_is_same_rotation_xyzw": { "x": 0.063816, "y": -0.918033, "z": 0.073467, "w": -0.384377 },
+    "note": "the two quaternions are q and -q of one rotation: compare with abs(dot) = 1, not component-wise"
+  },
+  "rotor_frd_to_model": [
+    { "motor": 1, "frd": [0.18, 0.18, 0], "model": [-0.18, 0, -0.18] },
+    { "motor": 2, "frd": [-0.18, -0.18, 0], "model": [0.18, 0, 0.18] },
+    { "motor": 3, "frd": [0.18, -0.18, 0], "model": [-0.18, 0, 0.18] },
+    { "motor": 4, "frd": [-0.18, 0.18, 0], "model": [0.18, 0, -0.18] },
+    { "motor": 1, "frd": [0.174, 0.174, 0], "model": [-0.174, 0, -0.174] }
+  ]
+}

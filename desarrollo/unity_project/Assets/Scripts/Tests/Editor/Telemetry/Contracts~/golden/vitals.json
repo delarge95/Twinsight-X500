@@ -1,0 +1,85 @@
+{
+  "_doc": "src/shared/vitals.ts. batteryFill of a non-finite value (NaN) is 0; JSON cannot carry NaN so it is not listed.",
+  "cross_layout": [
+    {
+      "rotors": [
+        { "motor": 1, "px": 0.18, "py": 0.18, "km": 0.05 },
+        { "motor": 2, "px": -0.18, "py": -0.18, "km": 0.05 },
+        { "motor": 3, "px": 0.18, "py": -0.18, "km": -0.05 },
+        { "motor": 4, "px": -0.18, "py": 0.18, "km": -0.05 }
+      ],
+      "out": [
+        { "motor": 1, "row": 0, "col": 1 },
+        { "motor": 2, "row": 1, "col": 0 },
+        { "motor": 3, "row": 0, "col": 0 },
+        { "motor": 4, "row": 1, "col": 1 }
+      ]
+    },
+    {
+      "rotors": [
+        { "motor": 1, "px": 0.174, "py": 0.174, "km": 0.05 },
+        { "motor": 2, "px": -0.174, "py": -0.174, "km": 0.05 },
+        { "motor": 3, "px": 0.174, "py": -0.174, "km": -0.05 },
+        { "motor": 4, "px": -0.174, "py": 0.174, "km": -0.05 }
+      ],
+      "out": [
+        { "motor": 1, "row": 0, "col": 1 },
+        { "motor": 2, "row": 1, "col": 0 },
+        { "motor": 3, "row": 0, "col": 0 },
+        { "motor": 4, "row": 1, "col": 1 }
+      ]
+    },
+    {
+      "rotors": [
+        { "motor": 4, "px": -0.18, "py": 0.18, "km": -0.05 },
+        { "motor": 1, "px": 0.18, "py": 0.18, "km": 0.05 },
+        { "motor": 3, "px": 0.18, "py": -0.18, "km": -0.05 },
+        { "motor": 2, "px": -0.18, "py": -0.18, "km": 0.05 }
+      ],
+      "out": [
+        { "motor": 4, "row": 1, "col": 1 },
+        { "motor": 1, "row": 0, "col": 1 },
+        { "motor": 3, "row": 0, "col": 0 },
+        { "motor": 2, "row": 1, "col": 0 }
+      ]
+    }
+  ],
+  "battery_class": [
+    { "rem": 1, "out": "ok" },
+    { "rem": 0.5, "out": "ok" },
+    { "rem": 0.151, "out": "ok" },
+    { "rem": 0.15, "out": "low" },
+    { "rem": 0.1, "out": "low" },
+    { "rem": 0.071, "out": "low" },
+    { "rem": 0.07, "out": "critical" },
+    { "rem": 0.05, "out": "critical" },
+    { "rem": 0, "out": "critical" },
+    { "rem": -0.1, "out": "critical" }
+  ],
+  "battery_fill": [
+    { "rem": 1, "out": 1 },
+    { "rem": 0.5, "out": 0.5 },
+    { "rem": 0.151, "out": 0.151 },
+    { "rem": 0.15, "out": 0.15 },
+    { "rem": 0.1, "out": 0.1 },
+    { "rem": 0.071, "out": 0.071 },
+    { "rem": 0.07, "out": 0.07 },
+    { "rem": 0.05, "out": 0.05 },
+    { "rem": 0, "out": 0 },
+    { "rem": -0.1, "out": 0 },
+    { "rem": 1.4, "out": 1 },
+    { "rem": -0.2, "out": 0 }
+  ],
+  "thresholds": {
+    "batteryLowRem": 0.15,
+    "batteryCritRem": 0.07,
+    "motorTempWarnC": 65,
+    "motorTempCritC": 80,
+    "batteryTempWarnC": 50,
+    "batteryTempCritC": 60,
+    "fcTempWarnC": 70,
+    "vibrationWarn": 20,
+    "vibrationCrit": 30,
+    "motorOutRatio": 0.15
+  }
+}

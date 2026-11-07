@@ -1,0 +1,1 @@
+{ "type": "inject", "kind": "motor_failure", "motor": 2 }

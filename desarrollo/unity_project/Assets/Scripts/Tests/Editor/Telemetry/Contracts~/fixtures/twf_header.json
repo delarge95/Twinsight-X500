@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "fields": [
+    "t",
+    "qw",
+    "qx",
+    "qy",
+    "qz",
+    "x",
+    "y",
+    "z",
+    "vx",
+    "vy",
+    "vz",
+    "u1",
+    "u2",
+    "u3",
+    "u4",
+    "rpm1",
+    "rpm2",
+    "rpm3",
+    "rpm4",
+    "vbat",
+    "ibat",
+    "rem",
+    "temp_m1",
+    "temp_m2",
+    "temp_m3",
+    "temp_m4",
+    "temp_bat",
+    "temp_fc",
+    "vib",
+    "armed",
+    "landed",
+    "nav"
+  ],
+  "rate_hz": 20,
+  "duration_s": 474.55,
+  "frames": { "attitude": "FRD body -> NED (Hamilton, w first)", "position": "local NED metres" },
+  "rotors": [
+    { "motor": 1, "px": 0.18, "py": 0.18, "km": 0.05 },
+    { "motor": 2, "px": -0.18, "py": -0.18, "km": 0.05 },
+    { "motor": 3, "px": 0.18, "py": -0.18, "km": -0.05 },
+    { "motor": 4, "px": -0.18, "py": 0.18, "km": -0.05 }
+  ],
+  "vehicle": {
+    "hardware": "PX4_FMU_V5",
+    "px4_version": "v1.15.4",
+    "sys_autostart": 4019,
+    "bat_cells": 4,
+    "log_duration_s": 474.871
+  },
+  "estimates": {
+    "rpm": "KV * V_bat * u (no-load approximation; the log has no ESC telemetry, DSHOT_TEL_CFG=0)",
+    "temp_m1..4": "RC thermal model, P = I_motor^2 * R_phase, I_motor = I_bat * u^3 / sum(u^3)",
+    "temp_bat": "RC thermal model, P = I_bat^2 * R_int (R_int assumed)",
+    "temp_fc": "measured: vehicle_air_data.baro_temp_celcius",
+    "z": "linear height-drift correction between first and last landed spans"
+  },
+  "thermal": {
+    "motor_kv": 920,
+    "motor_r_phase_ohm": 0.1,
+    "motor_r_th_k_per_w": 5,
+    "motor_c_th_j_per_k": 40,
+    "battery_r_int_ohm": 0.01,
+    "battery_c_th_j_per_k": 1000,
+    "battery_r_th_k_per_w": 3,
+    "ambient_c": 22.87
+  },
+  "privacy": "absolute GPS position not exported; local positions start at (0, 0)",
+  "source": {
+    "log_id": "0f3c4a74-4648-4b99-8992-c7fdc8681f6e",
+    "url": "https://review.px4.io/plot_app?log=0f3c4a74-4648-4b99-8992-c7fdc8681f6e",
+    "dataset": "PX4 Flight Review (public log)"
+  },
+  "frame_count": 9492
+}

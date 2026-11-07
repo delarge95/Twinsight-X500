@@ -1,0 +1,803 @@
+{
+  "_doc": "src/shared/faults.ts. Synthetic faults layered over the REPLAY only. validate_fault: motor null stands for undefined. apply_faults is evaluated at `now` (ms); a fault is active while since <= now < until; ramps are first-order 1 - exp(-t/tau). Tolerance 1e-6.",
+  "tolerance": 0.000001,
+  "constants": {
+    "fault_duration_ms": 30000,
+    "max_active_faults": 3,
+    "fault_kinds": ["motor_failure", "motor_overheat", "battery_sag", "vibration"]
+  },
+  "validate_fault": [
+    { "kind": "motor_failure", "motor": 3, "out": { "kind": "motor_failure", "motor": 3 } },
+    { "kind": "motor_failure", "motor": 7, "out": null },
+    { "kind": "motor_failure", "motor": 0, "out": null },
+    { "kind": "motor_failure", "motor": 2.5, "out": null },
+    { "kind": "motor_failure", "motor": "2", "out": null },
+    { "kind": "motor_failure", "motor": null, "out": null },
+    { "kind": "motor_overheat", "motor": 4, "out": { "kind": "motor_overheat", "motor": 4 } },
+    { "kind": "battery_sag", "motor": 3, "out": { "kind": "battery_sag" } },
+    { "kind": "battery_sag", "motor": null, "out": { "kind": "battery_sag" } },
+    { "kind": "vibration", "motor": null, "out": { "kind": "vibration" } },
+    { "kind": "rm -rf", "motor": null, "out": null },
+    { "kind": 7, "motor": 1, "out": null }
+  ],
+  "add_fault_chain": [
+    {
+      "op": "add",
+      "kind": "vibration",
+      "motor": null,
+      "now": 0,
+      "out_faults": [{ "id": "vibration", "kind": "vibration", "since": 0, "until": 30000 }]
+    },
+    {
+      "op": "add",
+      "kind": "motor_failure",
+      "motor": 1,
+      "now": 1000,
+      "out_faults": [
+        { "id": "vibration", "kind": "vibration", "since": 0, "until": 30000 },
+        { "id": "motor_failure:1", "kind": "motor_failure", "motor": 1, "since": 1000, "until": 31000 }
+      ]
+    },
+    {
+      "op": "add",
+      "kind": "motor_overheat",
+      "motor": 2,
+      "now": 2000,
+      "out_faults": [
+        { "id": "vibration", "kind": "vibration", "since": 0, "until": 30000 },
+        { "id": "motor_failure:1", "kind": "motor_failure", "motor": 1, "since": 1000, "until": 31000 },
+        { "id": "motor_overheat:2", "kind": "motor_overheat", "motor": 2, "since": 2000, "until": 32000 }
+      ]
+    },
+    {
+      "op": "add",
+      "kind": "battery_sag",
+      "motor": null,
+      "now": 3000,
+      "out_faults": [
+        { "id": "motor_failure:1", "kind": "motor_failure", "motor": 1, "since": 1000, "until": 31000 },
+        { "id": "motor_overheat:2", "kind": "motor_overheat", "motor": 2, "since": 2000, "until": 32000 },
+        { "id": "battery_sag", "kind": "battery_sag", "since": 3000, "until": 33000 }
+      ]
+    },
+    {
+      "op": "add",
+      "kind": "motor_failure",
+      "motor": 1,
+      "now": 4000,
+      "out_faults": [
+        { "id": "motor_overheat:2", "kind": "motor_overheat", "motor": 2, "since": 2000, "until": 32000 },
+        { "id": "battery_sag", "kind": "battery_sag", "since": 3000, "until": 33000 },
+        { "id": "motor_failure:1", "kind": "motor_failure", "motor": 1, "since": 4000, "until": 34000 }
+      ]
+    },
+    {
+      "op": "add",
+      "kind": "vibration",
+      "motor": null,
+      "now": 40000,
+      "out_faults": [{ "id": "vibration", "kind": "vibration", "since": 40000, "until": 70000 }]
+    }
+  ],
+  "active_faults": [
+    {
+      "faults": [
+        { "id": "motor_failure:1", "kind": "motor_failure", "motor": 1, "since": 1000, "until": 31000 },
+        { "id": "motor_overheat:2", "kind": "motor_overheat", "motor": 2, "since": 2000, "until": 32000 },
+        { "id": "battery_sag", "kind": "battery_sag", "since": 3000, "until": 33000 }
+      ],
+      "now": 3000,
+      "out_ids": ["motor_failure:1", "motor_overheat:2", "battery_sag"]
+    },
+    {
+      "faults": [
+        { "id": "motor_failure:1", "kind": "motor_failure", "motor": 1, "since": 1000, "until": 31000 },
+        { "id": "motor_overheat:2", "kind": "motor_overheat", "motor": 2, "since": 2000, "until": 32000 },
+        { "id": "battery_sag", "kind": "battery_sag", "since": 3000, "until": 33000 }
+      ],
+      "now": 31000,
+      "out_ids": ["motor_overheat:2", "battery_sag"]
+    },
+    {
+      "faults": [
+        { "id": "motor_failure:1", "kind": "motor_failure", "motor": 1, "since": 1000, "until": 31000 },
+        { "id": "motor_overheat:2", "kind": "motor_overheat", "motor": 2, "since": 2000, "until": 32000 },
+        { "id": "battery_sag", "kind": "battery_sag", "since": 3000, "until": 33000 }
+      ],
+      "now": 99999,
+      "out_ids": []
+    }
+  ],
+  "apply_faults": {
+    "base_frame": {
+      "ts": 100000,
+      "lt": 100,
+      "seg": 0,
+      "q": [1, 0, 0, 0],
+      "p": [3, 1, -5],
+      "v": [0.5, 0, 0],
+      "u": [0.5, 0.5, 0.5, 0.5],
+      "rpm": [6500, 6500, 6500, 6500],
+      "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+      "temp": [41, 42, 40, 41, 33, 38],
+      "vib": 4.2,
+      "armed": true,
+      "landed": false,
+      "nav": 2
+    },
+    "cases": [
+      {
+        "name": "motor_failure motor 2",
+        "faults": [{ "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 }],
+        "now": 99999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_failure motor 2",
+        "faults": [{ "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 }],
+        "now": 100000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_failure motor 2",
+        "faults": [{ "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 }],
+        "now": 101500,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0, 0.5, 0.5],
+          "rpm": [6500, 997, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_failure motor 2",
+        "faults": [{ "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 }],
+        "now": 106000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0, 0.5, 0.5],
+          "rpm": [6500, 4, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_failure motor 2",
+        "faults": [{ "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 }],
+        "now": 129999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0, 0.5, 0.5],
+          "rpm": [6500, 0, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_failure motor 2",
+        "faults": [{ "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 }],
+        "now": 130000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_overheat motor 3",
+        "faults": [
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 }
+        ],
+        "now": 99999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_overheat motor 3",
+        "faults": [
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 }
+        ],
+        "now": 100000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_overheat motor 3",
+        "faults": [
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 }
+        ],
+        "now": 101500,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 56.589941, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_overheat motor 3",
+        "faults": [
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 }
+        ],
+        "now": 106000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 87.409042, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_overheat motor 3",
+        "faults": [
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 }
+        ],
+        "now": 129999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 114.49457, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "motor_overheat motor 3",
+        "faults": [
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 }
+        ],
+        "now": 130000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "battery_sag",
+        "faults": [{ "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 }],
+        "now": 99999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "battery_sag",
+        "faults": [{ "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 }],
+        "now": 100000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "battery_sag",
+        "faults": [{ "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 }],
+        "now": 101500,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 14.082911, "i": 18.2, "rem": 0.430364 },
+          "temp": [41, 42, 40, 41, 38.129126, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "battery_sag",
+        "faults": [{ "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 }],
+        "now": 106000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 13.243958, "i": 18.2, "rem": 0.325495 },
+          "temp": [41, 42, 40, 41, 48.829003, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "battery_sag",
+        "faults": [{ "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 }],
+        "now": 129999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 13.2, "i": 18.2, "rem": 0.32 },
+          "temp": [41, 42, 40, 41, 62.294379, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "battery_sag",
+        "faults": [{ "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 }],
+        "now": 130000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "vibration",
+        "faults": [{ "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }],
+        "now": 99999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "vibration",
+        "faults": [{ "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }],
+        "now": 100000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "vibration",
+        "faults": [{ "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }],
+        "now": 101500,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 21.899376,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "vibration",
+        "faults": [{ "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }],
+        "now": 106000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 31.687162,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "vibration",
+        "faults": [{ "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }],
+        "now": 129999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 32.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "vibration",
+        "faults": [{ "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }],
+        "now": 130000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "all four",
+        "faults": [
+          { "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 },
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 },
+          { "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 },
+          { "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }
+        ],
+        "now": 99999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "all four",
+        "faults": [
+          { "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 },
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 },
+          { "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 },
+          { "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }
+        ],
+        "now": 100000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "all four",
+        "faults": [
+          { "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 },
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 },
+          { "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 },
+          { "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }
+        ],
+        "now": 101500,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0, 0.5, 0.5],
+          "rpm": [6500, 997, 6500, 6500],
+          "bat": { "v": 14.082911, "i": 18.2, "rem": 0.430364 },
+          "temp": [41, 42, 56.589941, 41, 38.129126, 38],
+          "vib": 21.899376,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "all four",
+        "faults": [
+          { "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 },
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 },
+          { "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 },
+          { "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }
+        ],
+        "now": 106000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0, 0.5, 0.5],
+          "rpm": [6500, 4, 6500, 6500],
+          "bat": { "v": 13.243958, "i": 18.2, "rem": 0.325495 },
+          "temp": [41, 42, 87.409042, 41, 48.829003, 38],
+          "vib": 31.687162,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "all four",
+        "faults": [
+          { "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 },
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 },
+          { "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 },
+          { "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }
+        ],
+        "now": 129999,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0, 0.5, 0.5],
+          "rpm": [6500, 0, 6500, 6500],
+          "bat": { "v": 13.2, "i": 18.2, "rem": 0.32 },
+          "temp": [41, 42, 114.49457, 41, 62.294379, 38],
+          "vib": 32.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      },
+      {
+        "name": "all four",
+        "faults": [
+          { "id": "motor_failure:2", "kind": "motor_failure", "motor": 2, "since": 100000, "until": 130000 },
+          { "id": "motor_overheat:3", "kind": "motor_overheat", "motor": 3, "since": 100000, "until": 130000 },
+          { "id": "battery_sag", "kind": "battery_sag", "since": 100000, "until": 130000 },
+          { "id": "vibration", "kind": "vibration", "since": 100000, "until": 130000 }
+        ],
+        "now": 130000,
+        "out": {
+          "ts": 100000,
+          "lt": 100,
+          "seg": 0,
+          "q": [1, 0, 0, 0],
+          "p": [3, 1, -5],
+          "v": [0.5, 0, 0],
+          "u": [0.5, 0.5, 0.5, 0.5],
+          "rpm": [6500, 6500, 6500, 6500],
+          "bat": { "v": 15.6, "i": 18.2, "rem": 0.62 },
+          "temp": [41, 42, 40, 41, 33, 38],
+          "vib": 4.2,
+          "armed": true,
+          "landed": false,
+          "nav": 2
+        }
+      }
+    ]
+  }
+}

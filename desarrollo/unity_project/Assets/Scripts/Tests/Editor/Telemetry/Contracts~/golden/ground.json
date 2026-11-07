@@ -1,0 +1,21 @@
+{
+  "_doc": "GroundReference (src/shared/ground.ts) fed in order, all other frame fields irrelevant. in.z is the raw EKF down coordinate p[2]; out_z is the drawn p[2]. Tolerance 1e-5.",
+  "tolerance": 0.00001,
+  "tau_ms": 2000,
+  "steps": [
+    { "in": { "ts": 0, "seg": 0, "landed": true, "z": -0.4 }, "out_p": [1, 2, 0] },
+    { "in": { "ts": 33, "seg": 0, "landed": true, "z": 0.35 }, "out_p": [1, 2, 0] },
+    { "in": { "ts": 66, "seg": 0, "landed": true, "z": -0.2 }, "out_p": [1, 2, 0] },
+    { "in": { "ts": 100, "seg": 0, "landed": true, "z": 0.5 }, "out_p": [1, 2, 0] },
+    { "in": { "ts": 133, "seg": 0, "landed": true, "z": -0.1 }, "out_p": [1, 2, 0] },
+    { "in": { "ts": 2133, "seg": 0, "landed": true, "z": 0.3 }, "out_p": [1, 2, 0] },
+    { "in": { "ts": 4133, "seg": 0, "landed": true, "z": 0.25 }, "out_p": [1, 2, 0] },
+    { "in": { "ts": 4166, "seg": 0, "landed": false, "z": -0.3 }, "out_p": [1, 2, -0.478352] },
+    { "in": { "ts": 4200, "seg": 0, "landed": false, "z": -2.4 }, "out_p": [1, 2, -2.578352] },
+    { "in": { "ts": 4233, "seg": 0, "landed": false, "z": -5.2 }, "out_p": [1, 2, -5.378352] },
+    { "in": { "ts": 6233, "seg": 0, "landed": false, "z": -5 }, "out_p": [1, 2, -5.178352] },
+    { "in": { "ts": 6266, "seg": 1, "landed": false, "z": -5 }, "out_p": [1, 2, -5] },
+    { "in": { "ts": 6300, "seg": 1, "landed": true, "z": 0.6 }, "out_p": [1, 2, 0] },
+    { "in": { "ts": 6333, "seg": 1, "landed": true, "z": 0.2 }, "out_p": [1, 2, 0] }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "type": "event",
+  "severity": "warning",
+  "text": "PX4: Preflight Fail: Compass 0 uncalibrated",
+  "ts": 1792195330000
+}

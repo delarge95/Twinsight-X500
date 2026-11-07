@@ -1,0 +1,29 @@
+{
+  "type": "hello",
+  "mode": "replay",
+  "rotors": [
+    { "motor": 1, "px": 0.18, "py": 0.18, "km": 0.05 },
+    { "motor": 2, "px": -0.18, "py": -0.18, "km": 0.05 },
+    { "motor": 3, "px": 0.18, "py": -0.18, "km": -0.05 },
+    { "motor": 4, "px": -0.18, "py": 0.18, "km": -0.05 }
+  ],
+  "rateHz": 20,
+  "provenance": {
+    "rpm": "estimated",
+    "motorTemp": "estimated",
+    "batteryTemp": "estimated",
+    "fcTemp": "measured",
+    "batteryCurrent": "measured"
+  },
+  "batteryCells": 4,
+  "ambientC": 22.87,
+  "source": {
+    "label": "Log real de PX4 Flight Review · Holybro X500 V2",
+    "url": "https://review.px4.io/plot_app?log=0f3c4a74-4648-4b99-8992-c7fdc8681f6e",
+    "vehicle": "PX4_FMU_V5 · airframe 4019",
+    "px4": "v1.15.4",
+    "durationS": 474.55
+  },
+  "commands": ["inject", "clear"],
+  "serverTime": 1792195320000
+}

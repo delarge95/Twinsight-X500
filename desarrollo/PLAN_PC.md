@@ -574,3 +574,90 @@ Tira de hover/pulsado reales con ratón del SO (Comet roba el foco; el script `a
 - **C. Dentro de la tira ESTUDIO.** Ventaja: no requiere modo nuevo y la carga alimenta el modo Térmico, que ya vive ahí; desventaja: ESTUDIO es de aspecto, no de simulación, y quedaría con dos significados.
 
 **Recomendación:** A, conservando el chip como indicador y apagado rápido. Tiene el modelo mental más limpio (encender = abrir la sesión) y el chip cubre la visibilidad desde otros modos. El botón original de INSPECCIONAR se retira cuando exista A.
+
+## 20. WP-08: cliente de telemetría de escritorio, sin UI (2026-11-06, rama `pc-desktop`)
+
+Port a C# del contrato WP-01 (`twinsight-web-twin/contracts`, commit `fb5671b`, `protocolVersion` 1.0.0). Sin UI, sin cambios de escena, prefab ni URP, sin paquetes nuevos. Asmdef propio `Telemetry` (`WebGL.Telemetry`, sin referencias), en `Assets/Scripts/Telemetry/`.
+
+### 20.1 Arquitectura y ficheros
+- **JSON** (`Json/TelemetryJson.cs`): lector y escritor propios. `JsonUtility` no distingue un campo ausente de su valor por defecto ni lee `null` o tuplas, y Newtonsoft sería una descarga. Se analiza en dos pasos: primero `type` y después el DTO.
+- **Protocolo** (`Protocol/`): DTO de `hello`, `frames`, `faults`, `event`, `ack`, `inject`, `clear`, `command` (11 nombres) y `manual`, más `Alert`, `AlertSummary`, `ThermalOrigin`, `HealthResponse` y `TwfHeader`. `ProtocolParser` valida todo lo del schema (obligatorios, enums, longitudes de tupla, rangos, enteros).
+  - Modo tolerante (el del cliente): ignora campos desconocidos y lee un `protocolVersion` futuro en `hello` (avisa si cambia la versión mayor).
+  - Modo estricto (tests): además rechaza los campos desconocidos, como `additionalProperties:false`.
+  - Los opcionales llevan una marca `Has*`; `ts` es `double`.
+- **Lógica pura** (`Logic/`, compila en todas las plataformas):
+  - `NedFrames`: NED→Unity `(E, -D, N)`; actitud PX4→Unity `q_u = (x:-y, y:z, z:-x, w)`, porque es la conjugación por una reflexión. Incluye también las variantes de Three.js para comparar con la web.
+  - `Interp`, `InterpolationBuffer`, `PlaybackClock`, `SmoothToward`, `AdvancePhase`, `GroundReference` y `ReconnectPolicy`.
+  - `Alerts`, `Vitals`, `QuadX` y `Faults` (sintéticas, solo en la repetición).
+  - `ThermalField`: fórmula, auto-rango, orígenes y `FormatReadout`, que lanza un error si falta el origen.
+  - Donde importa se respeta la semántica de JS (`Math.round`, `%`).
+- **Repetición** (`Replay/`, esqueleto para WP-09): `TwfFile.Decode` (TWF1), `FlightColumns.FrameFromRow` y `ReplaySchedule` (época 2026-10-17, `FramesBetween`, sin pausa ni salto).
+- **Cliente** (`Client/`): `ITelemetrySource`, `QueuedTelemetrySource` (cola concurrente de eventos de estado, mensaje y log, que se vacía en el hilo principal) y `ManualTelemetrySource`. `TelemetryClient` es una clase normal: se llama a `Update` una vez por fotograma y replica `client.ts`:
+  - búfer de 600 y reloj de 250 ms en la repetición; acercamiento con k = 18 en SITL;
+  - suelo; alertas, con aviso de la nueva; eventos (30, en un anillo); los acks negativos pasan a evento;
+  - fallas; Hz recibidos; historial en un anillo de 1200 fotogramas;
+  - `LinkState` = Disconnected / Connecting / Live / Stale (más de 500 ms sin datos) / Error (caída real tras los 3 fallos silenciosos).
+  - La clasificación sale de la fuente elegida, nunca de `hello.mode`.
+  - Antes de enviar comprueba que `hello.commands` acepta el mensaje.
+- **Red, solo PC** (`#if UNITY_STANDALONE || UNITY_EDITOR`):
+  - `WebSocketTelemetrySource` usa `ClientWebSocket` en una tarea de fondo con `ConfigureAwait(false)`. Conexión con 5 s de espera máxima, mensajes fragmentados, límite de 4 MB por mensaje, cola de envío y máximo de 512 caracteres. Reconexión de 0,5 a 15 s; registro según `ShouldLogFailure`.
+  - `TelemetryBootstrap`: MonoBehaviour opcional. No está en ninguna escena y no conecta salvo con `autoConnect` o con `Connect()`.
+  - `TelemetryEndpoints`: opciones `-replay-url` y `-sitl-url`. Por defecto, `ws://localhost:8787/ws` (wrangler dev, porque el worker no está desplegado) y `ws://localhost:8765`.
+- **Diagnóstico** (solo PC):
+  - `LoopbackWebSocketServer`: RFC 6455 mínimo en 127.0.0.1.
+  - `TelemetryLoopbackCheck`: conectar, hello y fotogramas (Live), Stale, comando y ack, mensaje no válido ignorado, caída (Error), reconexión con un hello nuevo y parada.
+  - `TelemetrySelfCheck`, solo en el reproductor: `exe -tel-selfcheck <fichero>`, o `-tel-probe <ws-url> [-tel-probe-ms N]` contra un servidor real. Sin esas opciones no hace nada.
+- **Etiquetas**: `Resources/TelemetryLabels.json` es una copia byte a byte de `contracts/labels.json` (un test lo comprueba). `HonestyLabels` da el título y el detalle de cada clasificación, la procedencia, el origen térmico, «sintética», «Acerca de» y `navState`. Ningún texto se escribe a mano en C#.
+
+### 20.2 Tests (EditMode, `Assets/Scripts/Tests/Editor/Telemetry/`, asmdef `WebGL.Telemetry.Tests.Editor`)
+- **Datos.** Copia del contrato en `Contracts~/`: Unity no la importa ni entra en las builds. El origen y la receta para refrescarla están en `Contracts~/SOURCE.md`.
+- **TWF completo.** Se busca en `StreamingAssets/Telemetry/` (WP-09), en `%TWINSIGHT_WEB_REPO%/data` y en `E:/twinsight-web-twin/data`; si no aparece, el caso queda *Inconclusive*.
+- **Cómo ejecutarlos.** Menú **TwinSight > Telemetry > Run contract tests**, que escribe `Temp/telemetry_tests.txt` con los recuentos por golden. También desde Window > General > Test Runner > EditMode > `WebGL.Telemetry.Tests.Editor`.
+- **Resultado (2026-11-06, Editor con WebGL activo): 32/32 tests.** Casos por golden:
+
+| Golden o grupo | Casos |
+|---|---|
+| frames (posiciones, ejes en doble precisión, `UnityEngine.Quaternion * Vector3`, render y Euler) | 6 + 8 + 8 + 14 |
+| ground | 14 |
+| interpolation (búfer, `interpolate_frame`, reloj, slerp y `exp_alpha`, `smooth_toward`) | 12 + 4 + 6 + 11 + 5 |
+| reconnect | 76 |
+| alerts (casos; resumen y nueva alerta) | 17 + 7; mensajes informativos idénticos 17/17 |
+| vitals | 27 |
+| quadx | 9 |
+| faults | 51 |
+| replay (calendario, `mini.twf`, fotogramas con el TWF real y su sha256) | 19 + 4 + 17 |
+| thermal | 36 |
+| fixtures del manifiesto, modo estricto | 57 (42 válidos aceptados, 15 inválidos rechazados) |
+| inválidos en modo tolerante | 16 (solo se acepta `frames.extra_field`, por diseño) |
+| mensajes de cliente, ida y vuelta | 17 |
+| prueba en bucle local con `ClientWebSocket` | 15/15 |
+
+  Además: los enums y la versión coinciden con el schema.
+- **`ClientWebSocket` en el reproductor Standalone (Mono, sin stripping): verificado.**
+  - Build mínima con una escena vacía temporal (borrada después) en `E:\TwinSight_builds\wp08_selfcheck\`: `-tel-selfcheck` da **15/15 PASS**, igual que en el Editor.
+  - `-tel-probe` contra un servidor independiente (`ws` de npm con los fixtures de la repetición): Live, 19,7 Hz y 70 fotogramas en 4 s.
+- **Compilación de los scripts del reproductor** (`PlayerBuildInterface.CompilePlayerScripts`): sin errores para WebGL y para Windows64. En WebGL, `Telemetry.dll` no contiene el WebSocket, el servidor de prueba ni la autocomprobación.
+
+### 20.3 Qué pueden usar ya WP-09 y WP-10
+- **WP-09 (repetición local):** heredar de `QueuedTelemetrySource` con `IsLocal = true` y `Classification = Replay`.
+  - En `Tick(localNowMs)`: `ReplaySchedule.FramesBetween(prev, now)` con `ReplaySchedule.WallClockMs()`, después `Faults.Apply`, y publicar con `PostMessage(new FramesMessage{...})`.
+  - Al arrancar, enviar un `hello` construido desde `TwfHeader`, como hace el worker.
+  - En `Send`: `inject` y `clear` con `Faults.Validate`/`Add`, publicando un `FaultsMessage` y un ack. El resto de mensajes recibe un ack negativo.
+  - Comprobar el sha256 de `golden/replay.json`. El test `FullTwf_Frames_And_FramesBetween` ya compara el fotograma g con el golden cuando el TWF está en `StreamingAssets/Telemetry/`.
+- **WP-10 (pose, hélices y alertas):** leer `client.Displayed`, que ya trae corregido el suelo.
+  - Posición y actitud: `NedFrames.NedToUnityVector(p)` y `Px4AttitudeToUnityQuaternion(q)`. Los ejes del cuerpo en Unity son derecha = +X, arriba = +Y y delante = +Z.
+  - Si el morro del modelo apunta a otro eje: `world = q * modeloACuerpo`, con una rotación fija.
+  - Hélices: `Interp.AdvancePhase` con `QuadX.SpinSign` y `hello.rotors` (nunca una geometría fija).
+  - `QuadX.AssignToRotorsUnity` empareja las piezas con los motores. No tiene golden: comprobarlo con el prefab.
+  - Alertas: `client.Alerts`, `AlertSummary` y `FreshAlert`; el `component` (`motor1..4`, `battery`, `fc`) indica qué resaltar.
+
+### 20.4 Límites y riesgos honestos
+- **No probado contra `wrangler dev` ni contra el puente PX4 real**: no están en marcha en esta máquina. Sí contra dos servidores locales, el propio y `ws` de npm.
+- **`wss://` (TLS) sin probar**: el worker no está desplegado.
+- **Build mínima**: el reproductor probado no es la app completa, aunque tiene el mismo runtime Mono y las mismas DLL, sin stripping.
+- **Orientación del modelo sin verificar**: la conversión NED→Unity está comprobada con los ejes del cuerpo; la orientación del modelo importado le corresponde a WP-10.
+- **Mensajes de alerta**: son informativos (texto fijo en español) y no se usan como clave.
+- **Problemas del contrato** (comunicados, no corregidos):
+  1. `golden/quadx.json` `advance_phase`: `in.dt` se imprime redondeado a 6 decimales (0.016667), pero `out` se calculó con 1/60. Con la entrada impresa no se cumple la tolerancia de 1e-6 (el error es de 2e-4). El test lo compensa y comprueba también con el dt exacto.
+  2. `labels.json` no tiene el texto «Sombra digital · reproducción local» que pide P-3. `HonestyLabels.TryLocalReplayText` devuelve `false` hasta que el contrato añada `classification.replay.local`; no se escribe a mano.
+- **Honestidad**: con el enlace caído el chip debe mostrar Error, no «en vivo». La repetición local nunca se rotula «en vivo»: es una sombra digital.

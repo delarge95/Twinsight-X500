@@ -1,0 +1,22 @@
+[
+  {
+    "id": "motor3:out",
+    "component": "motor3",
+    "severity": "critical",
+    "message": "Motor 3: rotor detenido (300 RPM frente a 6500 de media)"
+  },
+  {
+    "id": "battery:rem",
+    "component": "battery",
+    "severity": "critical",
+    "message": "Batería al 5 % (14.1 V)"
+  },
+  { "id": "motor4:temp", "component": "motor4", "severity": "warning", "message": "Motor 4: 66 °C" },
+  { "id": "battery:temp", "component": "battery", "severity": "warning", "message": "Batería: 52 °C" },
+  {
+    "id": "fc:vib",
+    "component": "fc",
+    "severity": "warning",
+    "message": "Vibración del acelerómetro: 21.0 m/s²"
+  }
+]

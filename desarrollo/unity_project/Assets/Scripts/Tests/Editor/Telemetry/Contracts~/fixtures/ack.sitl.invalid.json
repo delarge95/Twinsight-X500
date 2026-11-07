@@ -1,0 +1,1 @@
+{ "type": "ack", "command": "?", "ok": false, "detail": "comando no válido" }

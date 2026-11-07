@@ -1,0 +1,6 @@
+{
+  "type": "event",
+  "severity": "critical",
+  "text": "PX4: Failsafe activated: no manual control",
+  "ts": 1792195330000
+}

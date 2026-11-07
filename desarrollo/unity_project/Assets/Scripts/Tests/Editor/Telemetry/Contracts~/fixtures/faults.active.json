@@ -1,0 +1,13 @@
+{
+  "type": "faults",
+  "faults": [
+    {
+      "id": "motor_failure:2",
+      "kind": "motor_failure",
+      "motor": 2,
+      "since": 1792195320000,
+      "until": 1792195350000
+    },
+    { "id": "vibration", "kind": "vibration", "since": 1792195320500, "until": 1792195350500 }
+  ]
+}

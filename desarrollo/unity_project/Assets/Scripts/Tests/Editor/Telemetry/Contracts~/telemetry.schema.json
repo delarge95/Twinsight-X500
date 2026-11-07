@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:twinsight:contracts:telemetry",
+  "title": "TwinSight telemetry contract",
+  "description": "JSON over WebSocket shared by the Cloudflare worker (24/7 replay, 'Sombra digital'), the local PX4 SITL bridge ('Gemelo digital SITL') and every client (web, Unity desktop). Source of truth in code: src/shared/protocol.ts. The root validates any single wire message (server -> client or client -> server); use '#/$defs/<Name>' to validate a specific type. Units: NED metres, m/s; quaternion Hamilton scalar first rotating body FRD into world NED; u 0..1; rpm; degrees Celsius; ts in ms. Readers must ignore unknown fields (forward compatibility); this schema is strict (additionalProperties false) so that any new field in a server must be declared here first.",
+  "protocolVersion": "1.0.0",
+  "oneOf": [
+    { "$ref": "#/$defs/ServerMessage" },
+    { "$ref": "#/$defs/ClientMessage" }
+  ],
+  "$defs": {
+    "Vec3": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "Quat": {
+      "description": "[w, x, y, z]. Hamilton, scalar first, rotates body FRD into world NED (PX4 vehicle_attitude.q). Unit norm (tolerance 1e-3 after 3-decimal rounding); not enforceable in JSON Schema, checked by the tests.",
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "Quad": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "Unit4": {
+      "description": "Motor commands, 0..1, PX4 motor order 1..4.",
+      "type": "array",
+      "items": { "type": "number", "minimum": 0, "maximum": 1 },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "Temp6": {
+      "description": "Degrees Celsius: [motor 1, motor 2, motor 3, motor 4, battery, flight controller].",
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "RotorGeometry": {
+      "type": "object",
+      "properties": {
+        "motor": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "px": { "description": "Body FRD position, metres (CA_ROTORn_PX): + forward.", "type": "number" },
+        "py": { "description": "Body FRD position, metres (CA_ROTORn_PY): + right.", "type": "number" },
+        "km": { "description": "Moment coefficient: > 0 is CCW seen from above, < 0 is CW (PX4 control_allocator).", "type": "number" }
+      },
+      "required": ["motor", "px", "py", "km"],
+      "additionalProperties": false
+    },
+    "TelemetryFrame": {
+      "type": "object",
+      "properties": {
+        "ts": { "description": "Stream time in ms (wall-clock epoch ms emitted by the server). Monotonic within a connection; the interpolation buffer runs on it.", "type": "number" },
+        "lt": { "description": "Log time (replay) or vehicle boot time (SITL), seconds. Display only.", "type": "number" },
+        "seg": { "description": "Segment id. Changes on discontinuities (replay loop wrap); never interpolate across it.", "type": "integer", "minimum": 0 },
+        "q": { "$ref": "#/$defs/Quat" },
+        "p": { "description": "Local position NED, metres, relative to the EKF origin.", "$ref": "#/$defs/Vec3" },
+        "v": { "description": "Local velocity NED, m/s.", "$ref": "#/$defs/Vec3" },
+        "u": { "$ref": "#/$defs/Unit4" },
+        "rpm": { "description": "Rotor speed, RPM, PX4 motor order 1..4. Origin depends on Provenance.rpm (estimated in replay, 'command' in SITL).", "$ref": "#/$defs/Quad" },
+        "bat": {
+          "type": "object",
+          "properties": {
+            "v": { "description": "Volts.", "type": "number" },
+            "i": { "description": "Amps. Origin: Provenance.batteryCurrent (absent = measured).", "type": "number" },
+            "rem": { "description": "Remaining capacity, fraction 0..1.", "type": "number", "minimum": 0, "maximum": 1 }
+          },
+          "required": ["v", "i", "rem"],
+          "additionalProperties": false
+        },
+        "temp": { "$ref": "#/$defs/Temp6" },
+        "vib": { "description": "Accelerometer vibration metric, m/s^2.", "type": "number" },
+        "armed": { "type": "boolean" },
+        "landed": { "type": "boolean" },
+        "nav": { "description": "PX4 vehicle_status.nav_state (labels in contracts/labels.json navState).", "type": "integer" }
+      },
+      "required": ["ts", "lt", "seg", "q", "p", "v", "u", "rpm", "bat", "temp", "vib", "armed", "landed", "nav"],
+      "additionalProperties": false
+    },
+    "ProvenanceRpm": {
+      "description": "Where rotor speed comes from: measured (ESC telemetry), estimated (model), command (the speed command sent to the simulator).",
+      "enum": ["measured", "estimated", "command"]
+    },
+    "ProvenanceTemp": {
+      "enum": ["measured", "estimated", "unavailable"]
+    },
+    "ProvenanceFcTemp": {
+      "enum": ["measured", "unavailable"]
+    },
+    "ProvenanceCurrent": {
+      "enum": ["measured", "estimated"]
+    },
+    "Provenance": {
+      "description": "Which telemetry channels are measured and which are model estimates. Shown in the UI; no reading may reach the screen without its origin.",
+      "type": "object",
+      "properties": {
+        "rpm": { "$ref": "#/$defs/ProvenanceRpm" },
+        "motorTemp": { "$ref": "#/$defs/ProvenanceTemp" },
+        "batteryTemp": { "$ref": "#/$defs/ProvenanceTemp" },
+        "fcTemp": { "$ref": "#/$defs/ProvenanceFcTemp" },
+        "batteryCurrent": { "description": "Optional: absent for older servers (treat as measured). SITL reports 0 A, so the bridge estimates it from rotor speed.", "$ref": "#/$defs/ProvenanceCurrent" }
+      },
+      "required": ["rpm", "motorTemp", "batteryTemp", "fcTemp"],
+      "additionalProperties": false
+    },
+    "Mode": {
+      "description": "Wire mode of the server. 'replay' = digital shadow (label 'Sombra digital'); 'sitl' = closed-loop PX4 SITL (label 'Gemelo digital SITL').",
+      "enum": ["replay", "sitl"]
+    },
+    "SourceClassification": {
+      "description": "What the UI shows in the classification badge. The two wire modes plus the local 'inspector' source (no telemetry, never sent on the wire). Texts: contracts/labels.json.",
+      "enum": ["replay", "sitl", "inspector"]
+    },
+    "CommandCapability": {
+      "description": "Entries of HelloMessage.commands. Mixed vocabulary, as the servers emit it: message types the server accepts ('inject', 'clear', 'manual') and names of 'command' messages.",
+      "enum": ["inject", "clear", "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "pilot", "manual"]
+    },
+    "HelloMessage": {
+      "description": "First message after connecting. A new hello means a new session: clear buffers, clock and ground reference.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "hello" },
+        "mode": { "$ref": "#/$defs/Mode" },
+        "rotors": { "type": "array", "items": { "$ref": "#/$defs/RotorGeometry" } },
+        "rateHz": { "description": "Nominal frame rate of the source (0 for the local Inspector).", "type": "number", "minimum": 0 },
+        "provenance": { "$ref": "#/$defs/Provenance" },
+        "batteryCells": { "type": "integer", "minimum": 1 },
+        "ambientC": { "description": "Ambient temperature the thermal models start from, degrees Celsius.", "type": "number" },
+        "source": {
+          "type": "object",
+          "properties": {
+            "label": { "description": "Free text, Spanish only today (see README, discrepancias).", "type": "string" },
+            "url": { "type": "string" },
+            "vehicle": { "type": "string" },
+            "px4": { "type": "string" },
+            "durationS": { "type": "number" }
+          },
+          "required": ["label"],
+          "additionalProperties": false
+        },
+        "commands": { "description": "Commands the server accepts from the client.", "type": "array", "items": { "$ref": "#/$defs/CommandCapability" } },
+        "serverTime": { "description": "Server wall clock, epoch ms (0 for the local Inspector).", "type": "number" }
+      },
+      "required": ["type", "mode", "rotors", "rateHz", "provenance", "batteryCells", "ambientC", "source", "commands", "serverTime"],
+      "additionalProperties": false
+    },
+    "FramesMessage": {
+      "description": "Replay: a batch of frames per 100 ms tick (and up to 40 frames of history on connect). SITL: one frame per message at the bridge rate.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "frames" },
+        "frames": { "type": "array", "items": { "$ref": "#/$defs/TelemetryFrame" } }
+      },
+      "required": ["type", "frames"],
+      "additionalProperties": false
+    },
+    "FaultKind": {
+      "enum": ["motor_failure", "motor_overheat", "battery_sag", "vibration"]
+    },
+    "Fault": {
+      "description": "Synthetic fault layered over replayed telemetry (never real). 'motor' is present for motor_failure and motor_overheat only.",
+      "type": "object",
+      "properties": {
+        "id": { "description": "'<kind>:<motor>' or '<kind>'.", "type": "string" },
+        "kind": { "$ref": "#/$defs/FaultKind" },
+        "motor": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "since": { "description": "Stream ms.", "type": "number" },
+        "until": { "description": "Stream ms. Active while since <= now < until.", "type": "number" }
+      },
+      "required": ["id", "kind", "since", "until"],
+      "additionalProperties": false
+    },
+    "FaultsMessage": {
+      "description": "Full list of the active faults; sent on connect and whenever it changes.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "faults" },
+        "faults": { "type": "array", "items": { "$ref": "#/$defs/Fault" } }
+      },
+      "required": ["type", "faults"],
+      "additionalProperties": false
+    },
+    "EventMessage": {
+      "description": "Free-text event (SITL: PX4 STATUSTEXT, prefixed 'PX4: '). Only the bridge emits it today.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "event" },
+        "severity": { "enum": ["info", "warning", "critical"] },
+        "text": { "type": "string" },
+        "ts": { "description": "Epoch ms.", "type": "number" }
+      },
+      "required": ["type", "severity", "text", "ts"],
+      "additionalProperties": false
+    },
+    "AckMessage": {
+      "description": "Answer to a client message. 'command' is the command name (bridge), or the message type (worker: 'inject', 'clear', 'command', 'manual'), or '?' (bridge: message not understood). 'detail' is free text, Spanish only today.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "ack" },
+        "command": { "type": "string" },
+        "ok": { "type": "boolean" },
+        "detail": { "type": "string" }
+      },
+      "required": ["type", "command", "ok"],
+      "additionalProperties": false
+    },
+    "ServerMessage": {
+      "oneOf": [
+        { "$ref": "#/$defs/HelloMessage" },
+        { "$ref": "#/$defs/FramesMessage" },
+        { "$ref": "#/$defs/FaultsMessage" },
+        { "$ref": "#/$defs/EventMessage" },
+        { "$ref": "#/$defs/AckMessage" }
+      ]
+    },
+    "InjectMessage": {
+      "description": "Replay only. motor_failure and motor_overheat need 'motor' (1..4), otherwise the worker answers ack ok=false 'falla no válida'. Rate limit: 1 command per 1.5 s per socket.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "inject" },
+        "kind": { "$ref": "#/$defs/FaultKind" },
+        "motor": { "type": "integer", "minimum": 1, "maximum": 4 }
+      },
+      "required": ["type", "kind"],
+      "if": { "properties": { "kind": { "enum": ["motor_failure", "motor_overheat"] } } },
+      "then": { "required": ["motor"] },
+      "additionalProperties": false
+    },
+    "ClearMessage": {
+      "description": "Replay only: remove every synthetic fault.",
+      "type": "object",
+      "properties": { "type": { "const": "clear" } },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "CommandTakeoff": {
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "takeoff" }, "altitude": { "description": "Metres; the bridge clamps to 1..50.", "type": "number" } },
+      "required": ["type", "name", "altitude"],
+      "additionalProperties": false
+    },
+    "CommandSetAltitude": {
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "set_altitude" }, "altitude": { "description": "Metres; the bridge clamps to 1..50.", "type": "number" } },
+      "required": ["type", "name", "altitude"],
+      "additionalProperties": false
+    },
+    "CommandLand": {
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "land" } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
+    "CommandFlyTo": {
+      "description": "Fly to a local NED point (m, relative to the EKF origin, as TelemetryFrame.p) at 'altitude' m. The bridge clamps the target to 200 m from the origin and rejects |north|,|east| > 1e5.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "command" },
+        "name": { "const": "fly_to" },
+        "north": { "type": "number" },
+        "east": { "type": "number" },
+        "altitude": { "type": "number" }
+      },
+      "required": ["type", "name", "north", "east", "altitude"],
+      "additionalProperties": false
+    },
+    "CommandYaw": {
+      "description": "Turn the heading by 'degrees' (+ clockwise seen from above). The bridge rejects 0 and |degrees| > 180.",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "yaw" }, "degrees": { "type": "number" } },
+      "required": ["type", "name", "degrees"],
+      "additionalProperties": false
+    },
+    "CommandOrbit": {
+      "description": "Circle the current position at 'radius' m (the bridge clamps to 2..50).",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "orbit" }, "radius": { "type": "number" } },
+      "required": ["type", "name", "radius"],
+      "additionalProperties": false
+    },
+    "CommandRtl": {
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "rtl" } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
+    "CommandHold": {
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "hold" } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
+    "CommandMotorOff": {
+      "description": "Real SITL fault: stop motor 1..4 (MAV_CMD_INJECT_FAILURE). PX4 accepts it; Gazebo may not apply it.",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "motor_off" }, "motor": { "type": "integer", "minimum": 1, "maximum": 4 } },
+      "required": ["type", "name", "motor"],
+      "additionalProperties": false
+    },
+    "CommandRestore": {
+      "description": "Undo motor_off on one motor (1..4) or on all (0 / omitted).",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "restore" }, "motor": { "type": "integer", "minimum": 0, "maximum": 4 } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
+    "CommandPilot": {
+      "description": "Switch PX4 to Position mode (POSCTL) so it flies the 'manual' stick stream. Sent once when piloting starts.",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "pilot" } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
+    "CommandMessage": {
+      "oneOf": [
+        { "$ref": "#/$defs/CommandTakeoff" },
+        { "$ref": "#/$defs/CommandSetAltitude" },
+        { "$ref": "#/$defs/CommandLand" },
+        { "$ref": "#/$defs/CommandFlyTo" },
+        { "$ref": "#/$defs/CommandYaw" },
+        { "$ref": "#/$defs/CommandOrbit" },
+        { "$ref": "#/$defs/CommandRtl" },
+        { "$ref": "#/$defs/CommandHold" },
+        { "$ref": "#/$defs/CommandMotorOff" },
+        { "$ref": "#/$defs/CommandRestore" },
+        { "$ref": "#/$defs/CommandPilot" }
+      ]
+    },
+    "ManualMessage": {
+      "description": "Joystick sample streamed at 25-50 Hz while piloting (SITL only). The bridge forwards it as MAVLink MANUAL_CONTROL, clamps and rounds it, rate-limits it to 60 Hz per client and NEVER acks it.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "manual" },
+        "x": { "description": "Pitch, forward +.", "type": "number", "minimum": -1000, "maximum": 1000 },
+        "y": { "description": "Roll, right +.", "type": "number", "minimum": -1000, "maximum": 1000 },
+        "z": { "description": "Throttle, 500 = hold altitude in Position mode.", "type": "number", "minimum": 0, "maximum": 1000 },
+        "r": { "description": "Yaw, clockwise +.", "type": "number", "minimum": -1000, "maximum": 1000 }
+      },
+      "required": ["type", "x", "y", "z", "r"],
+      "additionalProperties": false
+    },
+    "ClientMessage": {
+      "description": "Messages a client may send. The servers drop messages longer than 512 characters or not valid JSON without any answer.",
+      "oneOf": [
+        { "$ref": "#/$defs/InjectMessage" },
+        { "$ref": "#/$defs/ClearMessage" },
+        { "$ref": "#/$defs/CommandMessage" },
+        { "$ref": "#/$defs/ManualMessage" }
+      ]
+    },
+
+    "Alert": {
+      "description": "NOT on the wire: derived client-side by deriveAlerts() (src/shared/alerts.ts) from each displayed frame. 'id' and 'component'/'severity' are normative; 'message' is Spanish free text today and will become a translatable code (WP-03).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^(motor[1-4]:(out|temp)|battery:(rem|temp)|fc:(temp|vib))$" },
+        "component": { "enum": ["motor1", "motor2", "motor3", "motor4", "battery", "fc"] },
+        "severity": { "enum": ["warning", "critical"] },
+        "message": { "type": "string" }
+      },
+      "required": ["id", "component", "severity", "message"],
+      "additionalProperties": false
+    },
+    "AlertSummary": {
+      "description": "NOT on the wire: what the airplane circle shows (alertSummary()).",
+      "type": "object",
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "worst": { "enum": ["warning", "critical", null] }
+      },
+      "required": ["count", "worst"],
+      "additionalProperties": false
+    },
+    "ThermalOrigin": {
+      "description": "NOT on the wire: origin label of a temperature reading in the UI.",
+      "enum": ["measured", "estimated", "simulated"]
+    },
+    "HealthResponse": {
+      "description": "HTTP GET /health of the worker (not a WebSocket message).",
+      "type": "object",
+      "properties": {
+        "ok": { "const": true },
+        "frames": { "type": "integer", "minimum": 1 },
+        "rateHz": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "required": ["ok", "frames", "rateHz"],
+      "additionalProperties": false
+    },
+    "TwfHeader": {
+      "description": "JSON header of the TWF1 file (data/x500v2_flight.twf, src/shared/twf.ts) the worker replays and a desktop client may bundle for the local replay. File layout: 'TWF1', u32 LE header length, UTF-8 JSON header, then frame_count x len(fields) little-endian float32 row-major. Open object: extra keys are allowed.",
+      "type": "object",
+      "properties": {
+        "version": { "const": 1 },
+        "fields": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "rate_hz": { "type": "number", "exclusiveMinimum": 0 },
+        "frame_count": { "type": "integer", "minimum": 1 },
+        "duration_s": { "type": "number" },
+        "rotors": { "type": "array", "items": { "$ref": "#/$defs/RotorGeometry" } },
+        "vehicle": {
+          "type": "object",
+          "properties": {
+            "hardware": { "type": "string" },
+            "px4_version": { "type": "string" },
+            "sys_autostart": { "type": "integer" },
+            "bat_cells": { "type": "integer" }
+          }
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "log_id": { "type": "string" },
+            "url": { "type": "string" },
+            "dataset": { "type": "string" }
+          }
+        }
+      },
+      "required": ["version", "fields", "rate_hz", "frame_count"]
+    }
+  }
+}

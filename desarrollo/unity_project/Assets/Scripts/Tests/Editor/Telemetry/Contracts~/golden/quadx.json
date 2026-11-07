@@ -1,0 +1,50 @@
+{
+  "_doc": "src/shared/quadx.ts. assign_to_rotors: model-space {x,z} of each part -> PX4 motor number by nearest rotor. advance_phase: propeller phase integration.",
+  "quad_x": [
+    { "motor": 1, "px": 0.18, "py": 0.18, "km": 0.05, "spin_sign": 1, "label_es": "delantero derecho" },
+    {
+      "motor": 2,
+      "px": -0.18,
+      "py": -0.18,
+      "km": 0.05,
+      "spin_sign": 1,
+      "label_es": "trasero izquierdo"
+    },
+    {
+      "motor": 3,
+      "px": 0.18,
+      "py": -0.18,
+      "km": -0.05,
+      "spin_sign": -1,
+      "label_es": "delantero izquierdo"
+    },
+    { "motor": 4, "px": -0.18, "py": 0.18, "km": -0.05, "spin_sign": -1, "label_es": "trasero derecho" }
+  ],
+  "assign_to_rotors": {
+    "rotors": [
+      { "motor": 1, "px": 0.18, "py": 0.18, "km": 0.05 },
+      { "motor": 2, "px": -0.18, "py": -0.18, "km": 0.05 },
+      { "motor": 3, "px": 0.18, "py": -0.18, "km": -0.05 },
+      { "motor": 4, "px": -0.18, "py": 0.18, "km": -0.05 }
+    ],
+    "parts": [
+      { "x": -0.15, "z": 0.17 },
+      { "x": -0.17, "z": -0.19 },
+      { "x": 0.22, "z": -0.19 },
+      { "x": 0.2, "z": 0.17 }
+    ],
+    "out_motor_per_part": [3, 1, 4, 2]
+  },
+  "advance_phase": [
+    { "in": { "phase": 0, "rpm": 6000, "spin": 1, "dt": 0.016667, "visual_scale": 1 }, "out": 4.18879 },
+    {
+      "in": { "phase": 6, "rpm": 6000, "spin": -1, "dt": 0.016667, "visual_scale": 1 },
+      "out": -4.471976
+    },
+    {
+      "in": { "phase": 1, "rpm": 6500, "spin": 1, "dt": 0.033333, "visual_scale": 0.04 },
+      "out": 1.907571
+    },
+    { "in": { "phase": 3, "rpm": 0, "spin": 1, "dt": 0.016667, "visual_scale": 1 }, "out": 3 }
+  ]
+}

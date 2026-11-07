@@ -1,0 +1,79 @@
+{
+  "_doc": "Honesty labels and enum texts, copied from src/web/i18n/{es,en}.ts by tools/contracts. Never write these by hand in a client: generate them from this file. A telemetry value is never shown without its origin; the replay is a \"shadow\", only SITL is a \"twin\"; the replay is never called \"live\".",
+  "protocolVersion": "1.0.0",
+  "classification": {
+    "replay": {
+      "title": { "es": "Sombra digital", "en": "Digital shadow" },
+      "detail": {
+        "es": "Repetición 24/7 de un vuelo real de PX4. Datos en un solo sentido; las fallas que inyectes son sintéticas.",
+        "en": "24/7 replay of a real PX4 flight. Data flows one way; the faults you inject are synthetic."
+      },
+      "source": { "es": "24/7 · Cloudflare", "en": "24/7 · Cloudflare" }
+    },
+    "sitl": {
+      "title": { "es": "Gemelo digital SITL", "en": "SITL digital twin" },
+      "detail": {
+        "es": "PX4 SITL en lazo cerrado: el navegador envía comandos MAVLink y el controlador de PX4 responde.",
+        "en": "PX4 SITL in closed loop: the browser sends MAVLink commands and the PX4 controller responds."
+      },
+      "source": { "es": "PX4 SITL local", "en": "PX4 SITL local" }
+    },
+    "inspector": {
+      "title": { "es": "Inspector sin telemetría", "en": "Inspector without telemetry" },
+      "detail": {
+        "es": "Sin enlace de vuelo: POWER y la carga mueven las hélices y la simulación térmica didáctica. Los paneles de vuelo no aplican.",
+        "en": "No flight link: POWER and the load drive the propellers and the didactic thermal simulation. Flight panels do not apply."
+      },
+      "source": { "es": "Inspector", "en": "Inspector" }
+    }
+  },
+  "provenance": {
+    "measured": { "es": "medida", "en": "measured" },
+    "estimated": { "es": "estimada", "en": "estimated" },
+    "command": { "es": "comando", "en": "command" },
+    "unavailable": { "es": "no disponible", "en": "not available" }
+  },
+  "provenanceChannels": {
+    "motorTemp": { "es": "temp. motores", "en": "motor temp." },
+    "batteryTemp": { "es": "temp. batería", "en": "battery temp." },
+    "fcTemp": { "es": "temp. controladora", "en": "controller temp." }
+  },
+  "thermalOrigin": {
+    "measured": { "es": "medido", "en": "measured" },
+    "estimated": { "es": "estimado", "en": "estimated" },
+    "simulated": { "es": "simulado", "en": "simulated" }
+  },
+  "faultSynthetic": { "es": "sintética", "en": "synthetic" },
+  "about": {
+    "line1": {
+      "es": "Modo 24/7: sombra digital, la repetición de un registro ULog real de un X500 V2 (con fallas sintéticas de demostración).",
+      "en": "24/7 mode: digital shadow, the replay of a real ULog from an X500 V2 (with synthetic demo faults)."
+    },
+    "line2": {
+      "es": "Modo SITL: gemelo digital SITL, PX4 simulado en lazo cerrado en tu equipo.",
+      "en": "SITL mode: SITL digital twin, simulated PX4 in a closed loop on your machine."
+    },
+    "line3": {
+      "es": "No es un gemelo de un dron físico. Modelo 3D basado en el CAD de Holybro; sin afiliación con Holybro.",
+      "en": "It is not a twin of a physical drone. 3D model based on the Holybro CAD; not affiliated with Holybro."
+    }
+  },
+  "navState": {
+    "0": "Manual",
+    "1": "Altitude",
+    "2": "Position",
+    "3": "Mission",
+    "4": "Hold",
+    "5": "Return",
+    "10": "Acro",
+    "12": "Descend",
+    "13": "Termination",
+    "14": "Offboard",
+    "15": "Stabilized",
+    "17": "Takeoff",
+    "18": "Land",
+    "19": "Follow",
+    "20": "Precision land",
+    "21": "Orbit"
+  }
+}

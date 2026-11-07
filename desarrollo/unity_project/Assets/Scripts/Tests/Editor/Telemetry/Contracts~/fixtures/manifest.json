@@ -1,0 +1,479 @@
+{
+  "_doc": "Index of the fixtures. `def` is the name in telemetry.schema.json \"$defs\" the file validates against (each: true = array of def). valid=false files MUST be rejected by the schema. kind: wire-server / wire-client = a WebSocket JSON message (also valid against the schema root); derived = computed by the client; http / file = other.",
+  "protocolVersion": "1.0.0",
+  "entries": [
+    {
+      "file": "fixtures/hello.replay.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "hello of the 24/7 replay (Sombra digital), built from the header of data/x500v2_flight.twf as src/worker/index.ts does"
+    },
+    {
+      "file": "fixtures/hello.sitl.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "hello of the SITL bridge (Gemelo digital SITL) once pressure and battery data arrived; tests/python/test_contract.py checks the real bridge produces exactly this (except serverTime)"
+    },
+    {
+      "file": "fixtures/hello.inspector.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": true,
+      "note": "INSPECTOR_HELLO: produced locally by the Inspector source, never sent on the wire (mode is \"replay\"; the badge says \"Inspector\")"
+    },
+    {
+      "file": "fixtures/frames.replay.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "three consecutive replay frames (20 Hz) while flying"
+    },
+    {
+      "file": "fixtures/frames.replay.loopwrap.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "frames across the loop wrap: seg goes 0 -> 1 and lt restarts at 0; never interpolate across it"
+    },
+    {
+      "file": "fixtures/frames.replay.faulted.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "replay frames 3 s after a synthetic motor_failure on motor 2 and a vibration fault, as the worker sends them (applyFaults)"
+    },
+    {
+      "file": "fixtures/frames.sitl.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "one SITL frame per message (30 Hz); rpm is the rotor speed command, battery current is estimated"
+    },
+    {
+      "file": "fixtures/frames.sitl.landed.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "SITL frame on the ground: the EKF height wanders (noise) while landed=true; GroundReference pins the drawn height to 0"
+    },
+    {
+      "file": "fixtures/faults.active.json",
+      "def": "FaultsMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "two synthetic faults; motor is present only for motor_failure / motor_overheat"
+    },
+    {
+      "file": "fixtures/faults.empty.json",
+      "def": "FaultsMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "no active faults (sent on connect and after clear)"
+    },
+    {
+      "file": "fixtures/event.info.json",
+      "def": "EventMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "PX4 STATUSTEXT, info (illustrative text)"
+    },
+    {
+      "file": "fixtures/event.warning.json",
+      "def": "EventMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "PX4 STATUSTEXT, warning (illustrative text)"
+    },
+    {
+      "file": "fixtures/event.critical.json",
+      "def": "EventMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "PX4 STATUSTEXT, critical (illustrative text)"
+    },
+    {
+      "file": "fixtures/ack.sitl.ok.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "command accepted by PX4 (detail = MAV_RESULT)"
+    },
+    {
+      "file": "fixtures/ack.sitl.in_progress.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "IN_PROGRESS counts as ok"
+    },
+    {
+      "file": "fixtures/ack.sitl.failed.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "PX4 refused; the newest STATUSTEXT is appended as the reason (illustrative text)"
+    },
+    {
+      "file": "fixtures/ack.sitl.no_px4.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "bridge up but no MAVLink connection yet"
+    },
+    {
+      "file": "fixtures/ack.sitl.invalid.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "message not understood (unknown command, inject/clear sent to the bridge, bad values): command is \"?\""
+    },
+    {
+      "file": "fixtures/ack.replay.ok.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "inject / clear accepted: ok=true WITHOUT detail"
+    },
+    {
+      "file": "fixtures/ack.replay.cooldown.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "second message within 1.5 s on the same socket (applies to every message type)"
+    },
+    {
+      "file": "fixtures/ack.replay.bad_fault.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "unknown fault kind, or motor missing / out of 1..4"
+    },
+    {
+      "file": "fixtures/ack.replay.no_flight_commands.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "worker",
+      "valid": true,
+      "note": "flight command sent to the replay: command carries the MESSAGE TYPE (\"command\"), not the command name"
+    },
+    {
+      "file": "fixtures/client.inject.motor_failure.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: inject"
+    },
+    {
+      "file": "fixtures/client.inject.vibration.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: inject"
+    },
+    {
+      "file": "fixtures/client.clear.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: clear"
+    },
+    {
+      "file": "fixtures/client.command.takeoff.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command takeoff"
+    },
+    {
+      "file": "fixtures/client.command.set_altitude.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command set_altitude"
+    },
+    {
+      "file": "fixtures/client.command.land.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command land"
+    },
+    {
+      "file": "fixtures/client.command.fly_to.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command fly_to"
+    },
+    {
+      "file": "fixtures/client.command.yaw.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command yaw"
+    },
+    {
+      "file": "fixtures/client.command.orbit.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command orbit"
+    },
+    {
+      "file": "fixtures/client.command.rtl.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command rtl"
+    },
+    {
+      "file": "fixtures/client.command.hold.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command hold"
+    },
+    {
+      "file": "fixtures/client.command.motor_off.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command motor_off"
+    },
+    {
+      "file": "fixtures/client.command.restore.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command restore"
+    },
+    {
+      "file": "fixtures/client.command.restore_all.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command restore"
+    },
+    {
+      "file": "fixtures/client.command.pilot.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command pilot"
+    },
+    {
+      "file": "fixtures/client.manual.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: manual"
+    },
+    {
+      "file": "fixtures/alerts.example.json",
+      "def": "Alert",
+      "kind": "derived",
+      "producer": "web-code",
+      "valid": true,
+      "note": "deriveAlerts() on a frame with a stopped rotor, hot motor 4, warm battery, 5 % battery and vibration; sorted critical first",
+      "each": true
+    },
+    {
+      "file": "fixtures/alert_summary.example.json",
+      "def": "AlertSummary",
+      "kind": "derived",
+      "producer": "web-code",
+      "valid": true,
+      "note": "alertSummary() of the previous list"
+    },
+    {
+      "file": "fixtures/health.json",
+      "def": "HealthResponse",
+      "kind": "http",
+      "producer": "worker",
+      "valid": true,
+      "note": "GET /health of the worker"
+    },
+    {
+      "file": "fixtures/twf_header.json",
+      "def": "TwfHeader",
+      "kind": "file",
+      "producer": "local",
+      "valid": true,
+      "note": "JSON header of data/x500v2_flight.twf (TWF1)"
+    },
+    {
+      "file": "fixtures/invalid/frames.missing_bat.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "frame without the required \"bat\""
+    },
+    {
+      "file": "fixtures/invalid/frames.short_quaternion.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "q has 3 numbers"
+    },
+    {
+      "file": "fixtures/invalid/frames.u_out_of_range.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "u above 1"
+    },
+    {
+      "file": "fixtures/invalid/frames.extra_field.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "undeclared field (a server must declare it in the schema first)"
+    },
+    {
+      "file": "fixtures/invalid/hello.unknown_mode.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "mode \"live\" does not exist"
+    },
+    {
+      "file": "fixtures/invalid/hello.bad_provenance.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "fcTemp cannot be \"estimated\""
+    },
+    {
+      "file": "fixtures/invalid/hello.unknown_command.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "commands lists a name nobody accepts"
+    },
+    {
+      "file": "fixtures/invalid/fault.unknown_kind.json",
+      "def": "FaultsMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "unknown fault kind"
+    },
+    {
+      "file": "fixtures/invalid/ack.missing_ok.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "ack without ok"
+    },
+    {
+      "file": "fixtures/invalid/message.unknown_type.json",
+      "def": "ServerMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "type \"pong\" is not part of the protocol"
+    },
+    {
+      "file": "fixtures/invalid/client.takeoff_without_altitude.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "takeoff without altitude"
+    },
+    {
+      "file": "fixtures/invalid/client.inject_without_motor.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "motor_failure needs a motor (the worker answers \"falla no válida\")"
+    },
+    {
+      "file": "fixtures/invalid/client.unknown_command.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "unknown command name"
+    },
+    {
+      "file": "fixtures/invalid/client.manual_negative_throttle.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "throttle z is 0..1000"
+    },
+    {
+      "file": "fixtures/invalid/client.motor_off_zero.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "motor_off needs 1..4 (0 means \"all\" only for restore)"
+    }
+  ],
+  "bridge_client_fixtures": [
+    "fixtures/client.command.takeoff.json",
+    "fixtures/client.command.set_altitude.json",
+    "fixtures/client.command.land.json",
+    "fixtures/client.command.fly_to.json",
+    "fixtures/client.command.yaw.json",
+    "fixtures/client.command.orbit.json",
+    "fixtures/client.command.rtl.json",
+    "fixtures/client.command.hold.json",
+    "fixtures/client.command.motor_off.json",
+    "fixtures/client.command.restore.json",
+    "fixtures/client.command.restore_all.json",
+    "fixtures/client.command.pilot.json",
+    "fixtures/client.manual.json"
+  ],
+  "motor_needed_fault_kinds": ["motor_failure", "motor_overheat"]
+}

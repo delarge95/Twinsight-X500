@@ -1,0 +1,22 @@
+{
+  "type": "hello",
+  "mode": "replay",
+  "rotors": [
+    { "motor": 1, "px": 0.18, "py": 0.18, "km": 0.05 },
+    { "motor": 2, "px": -0.18, "py": -0.18, "km": 0.05 },
+    { "motor": 3, "px": 0.18, "py": -0.18, "km": -0.05 },
+    { "motor": 4, "px": -0.18, "py": 0.18, "km": -0.05 }
+  ],
+  "rateHz": 0,
+  "provenance": {
+    "rpm": "estimated",
+    "motorTemp": "unavailable",
+    "batteryTemp": "unavailable",
+    "fcTemp": "unavailable"
+  },
+  "batteryCells": 4,
+  "ambientC": 20,
+  "source": { "label": "Inspector (sin telemetría)" },
+  "commands": [],
+  "serverTime": 0
+}

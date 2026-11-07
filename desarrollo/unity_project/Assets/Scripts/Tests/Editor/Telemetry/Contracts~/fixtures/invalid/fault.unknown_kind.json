@@ -1,0 +1,1 @@
+{ "type": "faults", "faults": [{ "id": "x", "kind": "gps_loss", "since": 0, "until": 1 }] }

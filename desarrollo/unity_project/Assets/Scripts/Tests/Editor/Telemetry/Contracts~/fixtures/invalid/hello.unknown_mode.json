@@ -1,0 +1,36 @@
+{
+  "type": "hello",
+  "mode": "live",
+  "rotors": [
+    { "motor": 1, "px": 0.174, "py": 0.174, "km": 0.05 },
+    { "motor": 2, "px": -0.174, "py": -0.174, "km": 0.05 },
+    { "motor": 3, "px": 0.174, "py": -0.174, "km": -0.05 },
+    { "motor": 4, "px": -0.174, "py": 0.174, "km": -0.05 }
+  ],
+  "rateHz": 30,
+  "provenance": {
+    "rpm": "command",
+    "motorTemp": "estimated",
+    "batteryTemp": "estimated",
+    "fcTemp": "measured",
+    "batteryCurrent": "estimated"
+  },
+  "batteryCells": 4,
+  "ambientC": 20,
+  "source": { "label": "PX4 SITL local (gz_x500) vía pymavlink", "vehicle": "gz_x500 · Gazebo Harmonic" },
+  "commands": [
+    "takeoff",
+    "set_altitude",
+    "land",
+    "fly_to",
+    "yaw",
+    "orbit",
+    "rtl",
+    "hold",
+    "motor_off",
+    "restore",
+    "pilot",
+    "manual"
+  ],
+  "serverTime": 1792195320000
+}

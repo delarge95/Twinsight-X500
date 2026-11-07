@@ -1,0 +1,101 @@
+{
+  "_doc": "src/shared/thermal.ts + thermalfield.ts (telemetry thermal field). Formula T(p) = ambient + max_i((T_i - ambient) * exp(-|p - c_i|^2 / r_i^2)). Points are in the drone model space. A temperature is NEVER shown without its origin: format_readout throws when origins is empty. Tolerance 1e-5.",
+  "tolerance": 0.00001,
+  "sources": [
+    { "pos": [0.18, 0, 0.18], "radius": 0.08 },
+    { "pos": [-0.18, 0, -0.18], "radius": 0.08 },
+    { "pos": [0.18, 0, -0.18], "radius": 0.08 },
+    { "pos": [-0.18, 0, 0.18], "radius": 0.08 },
+    { "pos": [0, 0.03, 0], "radius": 0.12 },
+    { "pos": [0.02, 0.06, 0], "radius": 0.05 }
+  ],
+  "temps": [58, 41, 44, 39, 36, 33],
+  "ambient_c": 22.87,
+  "temperature_at": [
+    { "point": [0.18, 0, 0.18], "out": 58 },
+    { "point": [0, 0, 0], "out": 35.204494 },
+    { "point": [0.1, 0.02, 0.1], "out": 27.336278 },
+    { "point": [-0.3, 0, 0.3], "out": 23.049188 },
+    { "point": [0.02, 0.06, 0], "out": 34.866584 },
+    { "point": [1, 1, 1], "out": 22.87 }
+  ],
+  "auto_range": [
+    { "in": { "temps": [58, 41, 44, 39, 36, 33], "ambient_c": 22.87 }, "out": { "min": 19, "max": 63 } },
+    { "in": { "temps": [21, 22, 22.5], "ambient_c": 20 }, "out": { "min": 17, "max": 32 } },
+    { "in": { "temps": [80, 95], "ambient_c": 22 }, "out": { "min": 19, "max": 100 } },
+    { "in": { "temps": [], "ambient_c": 25 }, "out": { "min": 22, "max": 37 } }
+  ],
+  "smooth_range": [
+    {
+      "in": { "current": { "min": 20, "max": 60 }, "target": { "min": 18, "max": 80 }, "dt": 0.1 },
+      "out": { "min": 19.871014, "max": 61.28986 }
+    },
+    {
+      "in": { "current": { "min": 20, "max": 60 }, "target": { "min": 18, "max": 80 }, "dt": 5 },
+      "out": { "min": 18.071348, "max": 79.28652 }
+    }
+  ],
+  "fixed_range": { "min": 20, "max": 100 },
+  "telemetry_origins": [
+    { "provenance": null, "out": ["estimated"] },
+    {
+      "provenance_of": "replay",
+      "provenance": {
+        "rpm": "estimated",
+        "motorTemp": "estimated",
+        "batteryTemp": "estimated",
+        "fcTemp": "measured",
+        "batteryCurrent": "measured"
+      },
+      "out": ["measured", "estimated"]
+    },
+    {
+      "provenance_of": "sitl",
+      "provenance": {
+        "rpm": "command",
+        "motorTemp": "estimated",
+        "batteryTemp": "estimated",
+        "fcTemp": "measured",
+        "batteryCurrent": "estimated"
+      },
+      "out": ["measured", "estimated"]
+    },
+    {
+      "provenance_of": "inspector",
+      "provenance": {
+        "rpm": "estimated",
+        "motorTemp": "unavailable",
+        "batteryTemp": "unavailable",
+        "fcTemp": "unavailable"
+      },
+      "out": []
+    }
+  ],
+  "effective_thermal_source": [
+    { "app_source": "replay", "chosen": "telemetry", "out": "telemetry" },
+    { "app_source": "replay", "chosen": "simulation", "out": "simulation" },
+    { "app_source": "sitl", "chosen": "telemetry", "out": "telemetry" },
+    { "app_source": "sitl", "chosen": "simulation", "out": "simulation" },
+    { "app_source": "inspector", "chosen": "telemetry", "out": "simulation" },
+    { "app_source": "inspector", "chosen": "simulation", "out": "simulation" }
+  ],
+  "has_telemetry_data": [
+    { "app_source": "replay", "connection": "open", "has_frame": true, "out": true },
+    { "app_source": "replay", "connection": "open", "has_frame": false, "out": false },
+    { "app_source": "replay", "connection": "closed", "has_frame": true, "out": false },
+    { "app_source": "sitl", "connection": "connecting", "has_frame": true, "out": false },
+    { "app_source": "inspector", "connection": "open", "has_frame": true, "out": false }
+  ],
+  "is_thermal_no_data": [
+    { "source": "telemetry", "has_telemetry": true, "out": false },
+    { "source": "telemetry", "has_telemetry": false, "out": true },
+    { "source": "simulation", "has_telemetry": true, "out": false },
+    { "source": "simulation", "has_telemetry": false, "out": false }
+  ],
+  "format_readout_es": [
+    { "temp_c": 42.34, "origins": ["estimated"], "out": "42.3 °C · estimado" },
+    { "temp_c": 58, "origins": ["measured", "estimated"], "out": "58.0 °C · medido / estimado" },
+    { "temp_c": 31.05, "origins": ["simulated"], "out": "31.1 °C · simulado" }
+  ],
+  "format_readout_without_origin_throws": true
+}

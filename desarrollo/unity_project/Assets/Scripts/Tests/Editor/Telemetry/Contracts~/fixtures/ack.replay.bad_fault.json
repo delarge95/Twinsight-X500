@@ -1,0 +1,1 @@
+{ "type": "ack", "command": "inject", "ok": false, "detail": "falla no válida" }
