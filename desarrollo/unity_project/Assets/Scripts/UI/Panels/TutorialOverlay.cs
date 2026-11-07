@@ -138,19 +138,19 @@ namespace WebGL.UI.Panels
                 DescEs = "Cambia el render y el entorno.", DescEn = "Change the render and the environment.",
                 Pc = new[]
                 {
-                    R("xray", "Render", "Render", "V cicla los modos", "V cycles modes"),
+                    R("realistic", "Render", "Render", "V cicla los modos", "V cycles modes"),
                     R("env_time", "Entorno", "Environment", "Estudio|Tiempo|Color", "Studio|Time|Color"),
                     R("thermal", "Térmico", "Thermal", "Leyenda en la barra", "Legend in the bar"),
                 },
                 Mouse = new[]
                 {
-                    R("xray", "Render", "Render", "Tarjetas de modo", "Mode cards"),
+                    R("realistic", "Render", "Render", "Tarjetas de modo", "Mode cards"),
                     R("env_time", "Entorno", "Environment", "Estudio|Tiempo|Color", "Studio|Time|Color"),
                     R("thermal", "Térmico", "Thermal", "Leyenda a la derecha", "Legend on the right"),
                 },
                 Touch = new[]
                 {
-                    R("xray", "Render", "Render", "Tarjetas de modo", "Mode cards"),
+                    R("realistic", "Render", "Render", "Tarjetas de modo", "Mode cards"),
                     R("env_time", "Entorno", "Environment", "Estudio|Tiempo|Color", "Studio|Time|Color"),
                     R("thermal", "Térmico", "Thermal", "Leyenda a la derecha", "Legend on the right"),
                 },

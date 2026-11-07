@@ -381,6 +381,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-desk-fb2", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var fb2 = gameObject.AddComponent<DesktopCaptureFeedback2>();
+                    fb2.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-desk-fps", StringComparison.OrdinalIgnoreCase))
                 {
                     gameObject.AddComponent<DesktopFpsProbe>();

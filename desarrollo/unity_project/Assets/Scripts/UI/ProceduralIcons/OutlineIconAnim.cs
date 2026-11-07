@@ -8,7 +8,7 @@ namespace WebGL.UI.ProceduralIcons
         None,
         Burst,    // strokes move away from the icon centre and come back (settle = small overshoot)
         Pinch,    // strokes move towards the centre and come back
-        Slice,    // a blade sweeps across the icon and the strokes split along it
+        Slice,    // a scalpel travels along the cut line leaving a cut, the strokes split along it, the two halves slide apart and close again
         Rotate,   // whole icon turns by Deg (360 = one full turn), eased
         Tilt,     // whole icon turns by Deg and comes back
         Pulse,    // scale 1 -> 1 + Amp -> 1
@@ -16,7 +16,9 @@ namespace WebGL.UI.ProceduralIcons
         Draw,     // strokes are drawn again from 30 % to 100 %
         Stagger,  // strokes grow upwards one after another (bars)
         Float,    // the icon rises Amp units and settles
-        Wobble    // damped swing of Deg degrees
+        Wobble,   // damped swing of Deg degrees
+        Fade,     // strokes with index < From fade towards transparent and back (the others stay: x-ray)
+        DrawFrom  // strokes with index >= From are erased and drawn again (the others stay)
     }
 
     /// <summary>One icon's hover animation (a click replays it stronger and a bit faster). All numbers are in 24-grid units / degrees / ms.</summary>
@@ -28,6 +30,7 @@ namespace WebGL.UI.ProceduralIcons
         public int Ms = 420;
         public bool Loop;
         public bool Settle;
+        public int From;
         public Vector2[] Shifts;
         public string Desc;
     }
@@ -46,20 +49,25 @@ namespace WebGL.UI.ProceduralIcons
             return new AnimSpec { Kind = k, Amp = amp, Deg = deg, Ms = ms, Loop = loop, Settle = settle, Shifts = shifts.Length > 0 ? shifts : null, Desc = desc };
         }
 
+        private static AnimSpec SF(AnimKind k, string desc, int from, float amp = 0f, int ms = 420)
+        {
+            return new AnimSpec { Kind = k, From = from, Amp = amp, Ms = ms, Desc = desc };
+        }
+
         private static Vector2 V(float x, float y) => new Vector2(x, y);
 
         public static readonly Dictionary<string, AnimSpec> Specs = new Dictionary<string, AnimSpec>
         {
             { "explode", S(AnimKind.Burst, "Las piezas salen hacia fuera desde el centro y se reasientan (rebote corto)", 3.4f, 0f, 560, false, true) },
-            { "cut", S(AnimKind.Slice, "Una cuchilla cruza el icono en diagonal y las dos mitades se separan al pasar", 1.5f, 0f, 520) },
+            { "cut", S(AnimKind.Slice, "Un bisturí (hoja y mango) recorre la diagonal dejando una línea de corte; las dos mitades se deslizan a lo largo del corte y se cierran de nuevo", 2.3f, 0f, 760) },
             { "inspect", S(AnimKind.Pinch, "Las cuatro esquinas del visor se cierran sobre el punto y vuelven", 1.7f, 0f, 460) },
             { "focus", S(AnimKind.Pinch, "Las marcas de la mira se cierran hacia el centro y vuelven", 1.5f, 0f, 460) },
             { "isolate", S(AnimKind.Burst, "Las esquinas se abren y se cierran de nuevo alrededor de la pieza", 1.4f, 0f, 460) },
             { "analyze", S(AnimKind.Stagger, "Las barras crecen una tras otra", 0.38f, 0f, 560) },
             { "studio", S(AnimKind.Tilt, "El cubo se inclina y vuelve", 0f, 28f, 480) },
-            { "solid", S(AnimKind.Tilt, "El cubo se inclina y vuelve", 0f, 28f, 480) },
-            { "xray", S(AnimKind.Tilt, "El cubo transparente se inclina y vuelve", 0f, 28f, 480) },
-            { "wire", S(AnimKind.Tilt, "La malla se inclina y vuelve", 0f, 28f, 480) },
+            { "solid", SF(AnimKind.DrawFrom, "Las líneas de sombreado de la cara se borran y se dibujan de nuevo (relleno de la cara)", 4, 0f, 700) },
+            { "xray", SF(AnimKind.Fade, "Las caras delanteras se vuelven casi transparentes y quedan solo las aristas ocultas discontinuas; luego vuelven", 3, 0f, 700) },
+            { "wire", S(AnimKind.Wobble, "La malla oscila como una jaula de alambre", 0f, 14f, 560) },
             { "realistic", S(AnimKind.Tilt, "La esfera gira y el brillo se desplaza", 0f, 40f, 520) },
             { "ghost", S(AnimKind.Float, "El fantasma flota hacia arriba y se asienta", 2.4f, 0f, 560) },
             { "thermal", S(AnimKind.Shift, "El mercurio sube dentro del termómetro", 0f, 0f, 520, false, false, V(0, 0), V(0, -1.8f)) },
@@ -107,9 +115,9 @@ namespace WebGL.UI.ProceduralIcons
         public static float Ease(float x) { x = Mathf.Clamp01(x); return x * x * (3f - 2f * x); }
 
         /// <summary>Per-stroke transform for progress p (0..1): offset, rotation (deg) and scale about the pivot, fraction drawn.</summary>
-        public static void Transform(AnimSpec spec, int index, Vector2 centroid, float p, float mul, out Vector2 off, out float rot, out float sc, out float scy, out float draw, out Vector2 pivot)
+        public static void Transform(AnimSpec spec, int index, Vector2 centroid, float p, float mul, out Vector2 off, out float rot, out float sc, out float scy, out float draw, out Vector2 pivot, out float alpha)
         {
-            off = Vector2.zero; rot = 0f; sc = 1f; scy = 1f; draw = 1f; pivot = new Vector2(12f, 12f);
+            off = Vector2.zero; rot = 0f; sc = 1f; scy = 1f; draw = 1f; alpha = 1f; pivot = new Vector2(12f, 12f);
             float e = Mathf.Sin(Mathf.Clamp01(p) * Mathf.PI);
             if (spec.Settle) e *= 1f + 0.28f * Mathf.Sin(p * Mathf.PI * 4f) * (1f - p);
             switch (spec.Kind)
@@ -123,15 +131,6 @@ namespace WebGL.UI.ProceduralIcons
                     else off = d.normalized * spec.Amp * e * mul * sign;
                     break;
                 }
-                case AnimKind.Slice:
-                {
-                    Vector2 n = new Vector2(0.7071f, 0.7071f);
-                    float s = Mathf.Lerp(-14f, 14f, Ease(p));
-                    float along = Vector2.Dot(centroid - pivot, n);
-                    float near = Mathf.Clamp01(1f - Mathf.Abs(along - s) / 10f);
-                    off = n * (along > s ? 1f : -1f) * spec.Amp * mul * 0.5f * near * e;
-                    break;
-                }
                 case AnimKind.Rotate: rot = spec.Deg * Ease(p); break;
                 case AnimKind.Tilt: rot = spec.Deg * e * (mul > 1f ? 1.4f : 1f); break;
                 case AnimKind.Pulse: sc = 1f + spec.Amp * e * mul; break;
@@ -139,6 +138,12 @@ namespace WebGL.UI.ProceduralIcons
                     if (spec.Shifts != null) off = spec.Shifts[Mathf.Min(index, spec.Shifts.Length - 1)] * e * mul;
                     break;
                 case AnimKind.Draw: draw = Mathf.Lerp(0.3f, 1f, Ease(p)); break;
+                case AnimKind.Fade:
+                    if (index < spec.From) alpha = Mathf.Clamp(1f - 0.62f * e * mul, 0.08f, 1f);
+                    break;
+                case AnimKind.DrawFrom:
+                    if (index >= spec.From) draw = p < 0.15f ? Mathf.Lerp(1f, 0f, p / 0.15f) : Ease((p - 0.15f) / 0.85f);
+                    break;
                 case AnimKind.Stagger:
                     scy = 1f + spec.Amp * mul * Mathf.Sin(Mathf.PI * Mathf.Clamp01(p * 1.3f - index * 0.2f));
                     pivot = new Vector2(12f, 19f);

@@ -46,7 +46,7 @@ namespace WebGL.UI.Desktop
         private readonly Button[] _modeSeg = new Button[3];
         private readonly Label[] _modeText = new Label[3];
         private readonly Button[] _modeSrc = new Button[3];
-        private Button _chipFilter, _chipExplode, _chipCut;
+        private Button _chipFilter, _chipExplode, _chipCut, _chipPower;
         private SlidingPill _segPill, _langPill;
         private Label _sheetTitle;
         private string _lastCrumb, _lastTitle;
@@ -333,6 +333,9 @@ namespace WebGL.UI.Desktop
             _top.Add(_chipFilter);
             _top.Add(_chipExplode);
             _top.Add(_chipCut);
+            // drone power chip (provisional home of the power-off control; see PLAN_PC.md section 19b): visible while the drone is on, click powers it off
+            _chipPower = MakeChip("power", "DkChipPower", () => DroneStateController.Instance?.TurnOff());
+            _top.Add(_chipPower);
             _top.Add(_btnIso);
             _top.Add(reset);
             _top.Add(Sep());
@@ -721,6 +724,7 @@ namespace WebGL.UI.Desktop
             UpdateChip(_chipFilter, _ui.FilterActive);
             UpdateChip(_chipExplode, ExplodedViewManager.Instance != null && ExplodedViewManager.Instance.GetExplosionFactor() > 0.001f);
             UpdateChip(_chipCut, CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled);
+            UpdateChip(_chipPower, DroneStateController.Instance != null && DroneStateController.Instance.IsOn);
             SetOn(_btnIso, _root.Q<Button>("ToolIsolateBtn")?.ClassListContains("submenu-card--active") == true);
             SetOn(_btnGear, _settingsOpen);
             _btnLangEn.EnableInClassList("dk-lang-btn--on", !AppLanguageManager.IsSpanish);
@@ -868,6 +872,7 @@ namespace WebGL.UI.Desktop
             _chipFilter.tooltip = T("Remove filter", "Quitar filtro");
             _chipExplode.tooltip = T("Remove exploded view", "Quitar vista explosiva");
             _chipCut.tooltip = T("Remove cut", "Quitar corte");
+            _chipPower.tooltip = T("Power off drone", "Apagar dron");
             _btnIso.tooltip = T("Isolate selected part", "Aislar la pieza seleccionada");
             _root.Q<Button>("DkReset").tooltip = T("Reset view", "Restablecer vista");
             _btnTree.tooltip = T("Parts tree", "Árbol de piezas");

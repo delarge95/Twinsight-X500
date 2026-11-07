@@ -38,6 +38,10 @@ namespace WebGL.UI.ProceduralIcons
         /// <summary>The PC build turns the hover / click micro-animations on (OutlineIconAnim.Specs); WebGL leaves them off.</summary>
         public static bool AnimateHover;
 
+        /// <summary>Verification aid: when >= 0 the icon is drawn frozen at this animation phase (0..1), as a click when DebugClick.</summary>
+        public float DebugPhase = -1f;
+        public bool DebugClick;
+
         private string _shape;
         private Button _host;
         private float _animStart = -1f;
@@ -168,7 +172,13 @@ namespace WebGL.UI.ProceduralIcons
 
             AnimSpec spec = _animStart >= 0f && AnimateHover ? OutlineIconAnim.Get(_shape) : null;
             float ap = 0f, mul = 1f;
-            if (spec != null)
+            if (DebugPhase >= 0f && AnimateHover)
+            {
+                spec = OutlineIconAnim.Get(_shape);
+                ap = Mathf.Clamp01(DebugPhase);
+                mul = DebugClick ? OutlineIconAnim.ClickMul : 1f;
+            }
+            else if (spec != null)
             {
                 float dur = Mathf.Max(0.05f, spec.Ms * 0.001f * (_animClick ? OutlineIconAnim.ClickSpeed : 1f));
                 float t = (Time.unscaledTime - _animStart) / dur;
@@ -178,16 +188,23 @@ namespace WebGL.UI.ProceduralIcons
                 mul = _animClick ? OutlineIconAnim.ClickMul : 1f;
             }
 
+            if (spec != null && spec.Kind == AnimKind.Slice && strokes.Count > 1)
+            {
+                DrawSlice(p, strokes, spec, o, k, ap, mul, Mathf.Max(1f, Mathf.Min(r.width, r.height) / 24f));
+                return;
+            }
+
+            Color baseColor = resolvedStyle.color;
             int index = 0;
             foreach (Stroke s0 in strokes)
             {
                 Stroke s = s0;
                 if (s.Points.Length < 2) { index++; continue; }
+                float alpha = 1f;
                 if (spec != null)
                 {
-                    OutlineIconAnim.Transform(spec, index, s.Centroid, ap, mul, out Vector2 off, out float rot, out float scx, out float scy, out float draw, out Vector2 pivot);
-                    int n = Mathf.Max(2, Mathf.CeilToInt(draw * s.Points.Length));
-                    var np = new Vector2[Mathf.Min(n, s.Points.Length)];
+                    OutlineIconAnim.Transform(spec, index, s.Centroid, ap, mul, out Vector2 off, out float rot, out float scx, out float scy, out float draw, out Vector2 pivot, out alpha);
+                    var np = new Vector2[s.Points.Length];
                     float cr = Mathf.Cos(rot * Mathf.Deg2Rad), sr = Mathf.Sin(rot * Mathf.Deg2Rad);
                     for (int i = 0; i < np.Length; i++)
                     {
@@ -197,10 +214,17 @@ namespace WebGL.UI.ProceduralIcons
                     }
 
                     s.Points = np;
-                    if (np.Length < s0.Points.Length) s.Closed = false;
+                    if (draw < 0.999f)
+                    {
+                        if (draw <= 0.01f) { index++; continue; }
+                        s.Points = ClipLength(np, s.Closed, draw);
+                        s.Closed = false;
+                    }
                 }
 
                 index++;
+                Color sc = baseColor; sc.a *= alpha;
+                p.strokeColor = sc;
                 if (s.Dashed)
                 {
                     DrawDashed(p, s, o, k);
@@ -213,18 +237,157 @@ namespace WebGL.UI.ProceduralIcons
                 if (s.Closed) p.ClosePath();
                 p.Stroke();
             }
+        }
 
-            if (spec != null && spec.Kind == AnimKind.Slice)
+        /// <summary>Keeps the first <paramref name="frac"/> of the polyline's length (a closed one is first opened).</summary>
+        private static Vector2[] ClipLength(Vector2[] pts, bool closed, float frac)
+        {
+            var list = new List<Vector2>(pts);
+            if (closed) list.Add(pts[0]);
+            float total = 0f;
+            for (int i = 1; i < list.Count; i++) total += Vector2.Distance(list[i - 1], list[i]);
+            float target = total * Mathf.Clamp01(frac);
+            var res = new List<Vector2> { list[0] };
+            float acc = 0f;
+            for (int i = 1; i < list.Count; i++)
             {
-                // the blade: a bright diagonal line that sweeps across the icon
-                Vector2 nrm = new Vector2(0.7071f, 0.7071f), dir = new Vector2(0.7071f, -0.7071f);
-                float sw = Mathf.Lerp(-14f, 14f, OutlineIconAnim.Ease(ap));
-                float fade = Mathf.Sin(Mathf.Clamp01(ap) * Mathf.PI);
-                Vector2 c = new Vector2(12f, 12f) + nrm * sw;
-                Color col = resolvedStyle.color; col.a *= Mathf.Clamp01(fade * 1.6f);
-                p.strokeColor = col;
-                p.lineWidth = 1.2f * Mathf.Max(1f, Mathf.Min(r.width, r.height) / 24f);
-                p.BeginPath(); p.MoveTo(o + (c - dir * 11f) * k); p.LineTo(o + (c + dir * 11f) * k); p.Stroke();
+                float seg = Vector2.Distance(list[i - 1], list[i]);
+                if (acc + seg >= target)
+                {
+                    float t = seg > 1e-5f ? (target - acc) / seg : 0f;
+                    res.Add(Vector2.Lerp(list[i - 1], list[i], t));
+                    return res.ToArray();
+                }
+
+                acc += seg;
+                res.Add(list[i]);
+            }
+
+            return res.ToArray();
+        }
+
+        private static int SideOf(Vector2 q, Vector2 c0, Vector2 nrm) => Vector2.Dot(q - c0, nrm) >= 0f ? 1 : -1;
+
+        /// <summary>
+        /// Cut icon: the LAST stroke is the cut line. A scalpel (blade + handle) travels along it leaving a visible cut; every other stroke is
+        /// split along the line and the two halves slide apart (a little along the cut, a little away from it) behind the blade, then close again.
+        /// </summary>
+        private void DrawSlice(Painter2D p, List<Stroke> strokes, AnimSpec spec, Vector2 o, float k, float ap, float mul, float lwScale)
+        {
+            Stroke line = strokes[strokes.Count - 1];
+            Vector2 la = line.Points[0], lb = line.Points[line.Points.Length - 1];
+            Vector2 c0 = (la + lb) * 0.5f;
+            Vector2 dir = (lb - la).normalized;
+            Vector2 nrm = new Vector2(-dir.y, dir.x);
+            float half = (lb - la).magnitude * 0.5f;
+            const float sweepEnd = 0.62f;
+            float sp = Mathf.Clamp01(ap / sweepEnd);
+            float tip = Mathf.Lerp(-half - 1.5f, half + 5f, OutlineIconAnim.Ease(sp));
+            float gap = spec.Amp * mul * (1f - OutlineIconAnim.Ease((ap - sweepEnd) / (1f - sweepEnd)));
+            Color col = resolvedStyle.color;
+            p.strokeColor = col;
+
+            for (int si = 0; si < strokes.Count - 1; si++)
+            {
+                Stroke s = strokes[si];
+                var pts = new List<Vector2>(s.Points);
+                if (s.Closed) pts.Add(s.Points[0]);
+                var pieces = new List<List<Vector2>>();
+                var sides = new List<int>();
+                var piece = new List<Vector2> { pts[0] };
+                int cur = SideOf(pts[0], c0, nrm);
+                for (int j = 1; j < pts.Count; j++)
+                {
+                    Vector2 a = pts[j - 1], b = pts[j];
+                    int steps = Mathf.Max(1, Mathf.CeilToInt(Vector2.Distance(a, b) / 1.5f));
+                    for (int st = 1; st <= steps; st++)
+                    {
+                        Vector2 q = Vector2.Lerp(a, b, st / (float)steps);
+                        int qs = SideOf(q, c0, nrm);
+                        if (qs != cur)
+                        {
+                            Vector2 prev = piece[piece.Count - 1];
+                            float sprev = Vector2.Dot(prev - c0, nrm), sq = Vector2.Dot(q - c0, nrm);
+                            float tt = Mathf.Abs(sprev - sq) > 1e-6f ? Mathf.Clamp01(sprev / (sprev - sq)) : 0.5f;
+                            Vector2 x = Vector2.Lerp(prev, q, tt);
+                            piece.Add(x);
+                            pieces.Add(piece);
+                            sides.Add(cur);
+                            piece = new List<Vector2> { x };
+                            cur = qs;
+                        }
+
+                        piece.Add(q);
+                    }
+                }
+
+                pieces.Add(piece);
+                sides.Add(cur);
+                if (s.Closed && pieces.Count > 1 && sides[0] == sides[sides.Count - 1])
+                {
+                    List<Vector2> last = pieces[pieces.Count - 1];
+                    for (int j = 1; j < pieces[0].Count; j++) last.Add(pieces[0][j]);
+                    pieces.RemoveAt(0);
+                    sides.RemoveAt(0);
+                }
+
+                for (int pi = 0; pi < pieces.Count; pi++)
+                {
+                    List<Vector2> pc = pieces[pi];
+                    if (pc.Count < 2) continue;
+                    float sd = sides[pi];
+                    p.BeginPath();
+                    for (int j = 0; j < pc.Count; j++)
+                    {
+                        float proj = Vector2.Dot(pc[j] - c0, dir);
+                        float open = OutlineIconAnim.Ease((tip - proj + 0.6f) / 2.4f);
+                        Vector2 pt = pc[j] + sd * gap * open * (nrm * 0.55f + dir * 0.9f);
+                        if (j == 0) p.MoveTo(o + pt * k); else p.LineTo(o + pt * k);
+                    }
+
+                    if (pieces.Count == 1 && s.Closed) p.ClosePath();
+                    p.Stroke();
+                }
+            }
+
+            // the cut line, drawn behind the blade
+            float lineEnd = Mathf.Min(tip, half);
+            if (lineEnd > -half)
+            {
+                p.BeginPath();
+                p.MoveTo(o + la * k);
+                p.LineTo(o + (c0 + dir * lineEnd) * k);
+                p.Stroke();
+            }
+
+            // the scalpel: the tip leads along the line, the blade edge rides on the cut, the handle trails up and back
+            if (sp > 0.001f && sp < 0.999f)
+            {
+                float a = Mathf.Clamp01(sp * 7f) * Mathf.Clamp01((1f - sp) * 4f);
+                float sc = 1f + 0.12f * (mul - 1f);
+                Color bc = col; bc.a *= a;
+                p.strokeColor = bc;
+                p.lineWidth = 1.3f * lwScale;
+                Vector2 tipPoint = c0 + dir * tip;
+
+                // tool frame: tx runs back along the scalpel axis from the tip (up and back, tilted 18 deg from the normal of the cut),
+                // ty is across it, positive on the cutting-edge side (towards the travel direction)
+                const float alpha = 18f * Mathf.Deg2Rad;
+                Vector2 wUp = -nrm;
+                Vector2 axis = Mathf.Cos(alpha) * wUp - Mathf.Sin(alpha) * dir;
+                Vector2 edge = Mathf.Cos(alpha) * dir + Mathf.Sin(alpha) * wUp;
+                Vector2 U(float tx, float ty) => o + (tipPoint + (axis * tx + edge * ty) * sc) * k;
+                p.BeginPath();                  // blade: pointed tip, convex belly on the cutting edge, straight spine
+                p.MoveTo(U(0f, 0f));
+                p.LineTo(U(2.2f, 1.6f));
+                p.LineTo(U(5.4f, 1.5f));
+                p.LineTo(U(5.4f, -1.2f));
+                p.ClosePath();
+                p.Stroke();
+                p.BeginPath();                  // handle
+                p.MoveTo(U(5.4f, 0.2f));
+                p.LineTo(U(13.5f, 0.2f));
+                p.Stroke();
             }
         }
 

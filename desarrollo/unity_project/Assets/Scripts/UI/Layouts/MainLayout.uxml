@@ -268,7 +268,7 @@
                     <ui:Label text="FILTER CATEGORY" class="submenu-title" picking-mode="Ignore"/>
                     <ui:VisualElement class="submenu-grid">
                         <ui:Button name="CatBtn_Structure" class="submenu-card">
-                            <pi:OutlineIcon shape="solid" class="submenu-icon" picking-mode="Ignore"/>
+                            <pi:OutlineIcon shape="studio" class="submenu-icon" picking-mode="Ignore"/>
                             <ui:Label text="AIRFRAME" class="submenu-label" picking-mode="Ignore"/>
                         </ui:Button>
                         <ui:Button name="CatBtn_Propulsion" class="submenu-card">
