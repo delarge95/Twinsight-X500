@@ -1,0 +1,77 @@
+<!doctype html>
+<!-- Plantilla de la imagen para compartir (og.png, 1200×630) y del póster del héroe.
+     Se sirve solo en local: http://127.0.0.1:4340/__tools/og.html  (ver make-images.mjs)
+     ?layer=text → solo fondo y texto (lo captura Edge sin interfaz).
+     ?layer=drone&save=og-drone → solo el dron sobre transparente; lo guarda en .tmp/ (abrir en un navegador con GPU).
+     ?poster=1&save=poster → dron del héroe sobre transparente, 1600×1000. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>og</title>
+<style>
+  @font-face { font-family: "Space Grotesk"; src: url("/landing/fonts/SpaceGrotesk-Medium.woff2") format("woff2"); font-weight: 500; }
+  @font-face { font-family: "Space Grotesk"; src: url("/landing/fonts/SpaceGrotesk-Bold.woff2") format("woff2"); font-weight: 700; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #06080b; }
+  body { position: relative; font-family: "Space Grotesk", system-ui, sans-serif; color: #fff; }
+  body::before { content: ""; position: absolute; inset: 0; background:
+    radial-gradient(52% 70% at 72% 46%, rgba(70, 175, 255, 0.2), transparent 66%),
+    radial-gradient(40% 50% at 0% 100%, rgba(255, 138, 42, 0.07), transparent 60%); }
+  canvas { position: absolute; left: 0; top: 0; width: 1200px; height: 630px; }
+  .poster canvas { width: 1600px; height: 1000px; }
+  .only-drone { background: transparent; }
+  .only-drone::before, .only-drone .ghost, .only-drone .text, .only-drone .url, .only-drone .grain { display: none; }
+  .ghost { position: absolute; right: -30px; top: 50%; transform: translateY(-56%); font: 700 430px/0.8 "Space Grotesk"; letter-spacing: -0.06em; color: transparent; -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.06); }
+  .text { position: absolute; left: 72px; top: 0; bottom: 44px; display: flex; flex-direction: column; justify-content: center; }
+  .brand { display: flex; align-items: center; gap: 14px; font: 500 22px/1 "Space Grotesk"; letter-spacing: 0.16em; text-transform: uppercase; color: #aab4c1; }
+  .brand svg { width: 44px; height: 44px; color: #e6edf3; }
+  h1 { margin: 30px 0 0; font: 500 112px/0.86 "Space Grotesk"; letter-spacing: -0.05em; }
+  h1 span { display: block; color: transparent; -webkit-text-stroke: 2px rgba(255, 255, 255, 0.92); }
+  p { margin: 30px 0 0; font: 500 29px/1.25 "Space Grotesk"; letter-spacing: -0.01em; color: #dbe4ee; }
+  ul { display: flex; gap: 10px; margin: 26px 0 0; padding: 0; list-style: none; }
+  li { padding: 11px 18px; border: 1.5px solid rgba(255, 255, 255, 0.2); border-radius: 99px; font: 500 20px/1 "Space Grotesk"; color: #bfeaff; background: rgba(6, 8, 11, 0.55); }
+  .url { position: absolute; left: 72px; bottom: 40px; font: 500 20px/1 "Space Grotesk"; letter-spacing: 0.04em; color: #8b95a3; }
+  .grain { position: absolute; inset: 0; opacity: 0.08; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .poster .text, .poster .url, .poster .ghost { display: none; }
+</style>
+</head>
+<body>
+  <div class="ghost">X500</div>
+  <canvas id="c"></canvas>
+  <div class="text">
+    <div class="brand">
+      <svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"><path d="M28 28 72 72M72 28 28 72"/><circle cx="24" cy="24" r="15"/><circle cx="76" cy="24" r="15"/><circle cx="24" cy="76" r="15"/><circle cx="76" cy="76" r="15"/></g><rect x="40" y="38" width="20" height="26" rx="6" fill="currentColor"/><path d="M50 24 43 38h14Z" fill="#46afff"/></svg>
+      Digital twin
+    </div>
+    <h1>TwinSight<span>X500</span></h1>
+    <p>Holybro X500 V2 — open it,<br>take it apart, fly it.</p>
+    <ul><li>Three.js</li><li>Unity 6</li><li>PX4 telemetry</li></ul>
+  </div>
+  <div class="url">twinsight.alexwoodcock.me</div>
+  <div class="grain"></div>
+  <script type="module">
+    const q = new URLSearchParams(location.search);
+    const poster = q.has('poster'), layer = q.get('layer'), save = q.get('save');
+    if (poster) document.body.classList.add('poster');
+    if (poster || layer === 'drone') { document.documentElement.style.background = 'transparent'; document.body.classList.add('only-drone'); }
+    const canvas = document.getElementById('c');
+    if (layer === 'text') canvas.remove();
+    else {
+      const { createTwin } = await import('/landing/js/scene.js');
+      const twin = await createTwin(canvas, { modelUrl: '/landing/models/x500.glb', reducedMotion: true, capture: true });
+      twin.setState(poster
+        ? { az: 0.7, el: 0.36, dist: 1.0, sx: 0.19, sy: 0.02, sweep: 0, grid: 0, sway: 0, spin: 0 }
+        : { az: 0.62, el: 0.34, dist: 0.93, sx: 0.235, sy: 0.02, sweep: 0.56, kind: 'xray', grid: 0.55, sway: 0, spin: 0 });
+      twin.snap();
+      await new Promise((r) => setTimeout(r, 600)); // texturas subidas a la GPU
+      twin.renderNow(); twin.renderNow();
+      if (save) {
+        const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
+        const res = await fetch('/__tools/save?name=' + encodeURIComponent(save) + '.png', { method: 'POST', body: blob });
+        document.title = 'saved ' + (await res.text()) + ' ' + canvas.width + 'x' + canvas.height;
+      }
+    }
+    await document.fonts.ready;
+    window.__ready = true;
+  </script>
+</body>
+</html>

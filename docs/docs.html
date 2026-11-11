@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Documentación · TwinSight X500</title>
+  <meta name="description" content="Manuales, arquitectura, shaders, despliegue e instrumentos de validación de TwinSight X500.">
+  <meta name="theme-color" content="#06080b">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:title" content="Documentación · TwinSight X500">
+  <meta property="og:image" content="https://twinsight.alexwoodcock.me/og.jpg">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preload" href="landing/fonts/SpaceGrotesk-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="landing/css/landing.css">
+  <link rel="stylesheet" href="landing/css/docs.css">
+</head>
+<body class="reader">
+  <header class="nav is-stuck">
+    <a class="brand" href="./" aria-label="TwinSight X500">
+      <svg class="brand__mark" viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"><path d="M28 28 72 72M72 28 28 72"/><circle cx="24" cy="24" r="15"/><circle cx="76" cy="24" r="15"/><circle cx="24" cy="76" r="15"/><circle cx="76" cy="76" r="15"/></g><rect x="40" y="38" width="20" height="26" rx="6" fill="currentColor"/><path class="brand__nose" d="M50 24 43 38h14Z"/></svg>
+      <span class="brand__name">TwinSight <b>X500</b></span>
+    </a>
+    <div class="nav__end">
+      <div class="lang" role="group" aria-label="Idioma / Language">
+        <button type="button" data-lang="es" aria-pressed="true">ES</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <a class="btn btn--ghost btn--sm" href="./#docs" id="back">← Inicio</a>
+    </div>
+  </header>
+
+  <div class="reader__layout">
+    <aside class="reader__side">
+      <button class="reader__toggle" type="button" id="toggle" aria-expanded="false"><span id="toggleLabel">Documentos</span><span aria-hidden="true">▾</span></button>
+      <nav id="toc" aria-label="Documentos"></nav>
+    </aside>
+    <main class="reader__main">
+      <p class="reader__notice" id="notice" hidden></p>
+      <article class="prose" id="doc" aria-live="polite"><p class="reader__loading">Cargando…</p></article>
+    </main>
+  </div>
+
+  <script type="module" src="landing/js/docs.js"></script>
+  <noscript><p style="padding:120px 24px;color:#dbe4ee">Esta página necesita JavaScript para mostrar los manuales. También están en la carpeta <a href="manuals/" style="color:#bfeaff">manuals/</a> del repositorio.</p></noscript>
+</body>
+</html>

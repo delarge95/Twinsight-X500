@@ -1,0 +1,49 @@
+/* Lector de documentación de TwinSight X500 (docs.html). Usa los tokens de landing.css. */
+.reader { overflow-x: visible; }
+.reader::before { display: none; }
+.reader .nav { background: rgba(6, 8, 11, 0.86); }
+.reader__layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: clamp(24px, 5vw, 80px); max-width: 1320px; margin: 0 auto; padding: calc(var(--nav-h) + 40px) var(--gutter) 120px; }
+.reader__side { position: sticky; top: calc(var(--nav-h) + 40px); align-self: start; max-height: calc(100vh - var(--nav-h) - 80px); overflow-y: auto; scrollbar-width: thin; }
+.reader__toggle { display: none; }
+#toc h2 { margin: 26px 0 8px; font: 500 10.5px/1 var(--display); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+#toc h2:first-child { margin-top: 0; }
+#toc a { display: block; padding: 9px 12px; margin-left: -12px; border-radius: 8px; font: 500 14px/1.3 var(--display); color: var(--text-2); transition: color 0.2s, background 0.2s; }
+#toc a:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+#toc a[aria-current="page"] { color: var(--highlight); background: rgba(70, 175, 255, 0.12); box-shadow: inset 2px 0 0 var(--accent); }
+.reader__notice { margin-bottom: 28px; padding: 12px 16px; border: 1px solid var(--line-strong); border-left: 2px solid var(--warn); border-radius: 8px; font-size: 13.5px; color: var(--text-2); background: var(--surface); }
+.reader__loading { color: var(--muted); }
+
+.prose { max-width: 76ch; font-size: 16.5px; line-height: 1.72; color: var(--text); overflow-wrap: break-word; }
+.prose > :first-child { margin-top: 0; }
+.prose h1 { margin: 0 0 28px; font: 500 clamp(32px, 4.4vw, 56px)/1.04 var(--display); letter-spacing: -0.035em; color: #fff; text-wrap: balance; }
+.prose h2 { margin: 64px 0 18px; padding-top: 28px; border-top: 1px solid var(--line); font: 500 clamp(22px, 2.4vw, 30px)/1.15 var(--display); letter-spacing: -0.02em; color: #fff; }
+.prose h3 { margin: 40px 0 12px; font: 500 19px/1.25 var(--display); color: #fff; }
+.prose h4, .prose h5 { margin: 30px 0 10px; font: 500 12px/1.3 var(--display); letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-2); }
+.prose p, .prose ul, .prose ol, .prose blockquote, .prose pre, .prose table, .prose figure { margin: 0 0 20px; }
+.prose ul, .prose ol { padding-left: 24px; }
+.prose ul { list-style: disc; } .prose ol { list-style: decimal; }
+.prose li { margin: 6px 0; } .prose li::marker { color: var(--accent); }
+.prose a { color: var(--highlight); border-bottom: 1px solid rgba(191, 234, 255, 0.35); }
+.prose a:hover { border-bottom-color: var(--highlight); }
+.prose strong { color: #fff; font-weight: 600; }
+.prose hr { margin: 48px 0; border: 0; border-top: 1px solid var(--line); }
+.prose blockquote { padding: 14px 20px; border-left: 2px solid var(--accent); border-radius: 0 10px 10px 0; background: rgba(70, 175, 255, 0.06); color: var(--text-2); }
+.prose blockquote > :last-child { margin-bottom: 0; }
+.prose code { padding: 2px 6px; border-radius: 5px; background: rgba(255, 255, 255, 0.07); font: 0.88em/1.4 ui-monospace, "Cascadia Code", Consolas, monospace; color: #e8edf3; }
+.prose pre { padding: 18px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-raise); overflow-x: auto; }
+.prose pre code { padding: 0; background: none; font-size: 13.5px; line-height: 1.6; }
+.prose img, .prose svg { max-width: 100%; height: auto; border-radius: 10px; }
+.prose .table { margin: 0 0 24px; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.prose table { width: 100%; margin: 0; border-collapse: collapse; font-size: 14.5px; line-height: 1.5; }
+.prose th { padding: 12px 14px; text-align: left; font: 500 11.5px/1.3 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); background: var(--surface); white-space: nowrap; }
+.prose td { padding: 11px 14px; border-top: 1px solid var(--line); vertical-align: top; }
+.prose .mermaid { padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-raise); text-align: center; overflow-x: auto; }
+
+@media (max-width: 900px) {
+  .reader__layout { grid-template-columns: 1fr; gap: 20px; padding-top: calc(var(--nav-h) + 20px); }
+  .reader__side { position: static; max-height: none; }
+  .reader__toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 48px; padding: 0 16px; border: 1px solid var(--line-strong); border-radius: 12px; font: 500 14px/1 var(--display); color: #fff; background: var(--surface); }
+  #toc { display: none; padding: 14px 16px; margin-top: 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  #toc.is-open { display: block; }
+  .prose { font-size: 16px; }
+}
