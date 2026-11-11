@@ -14,6 +14,7 @@ const FOV = 28;
 const HEAT_COUNT = 6;
 const TRAIL_POINTS = 70;
 const UNITS_PER_METRE = 0.32; // escala visual de la estela (no es la escala del modelo)
+const TRAIL_LENGTH = 2.1;      // longitud máxima de la estela, en unidades de escena (≈ 6,5 m de vuelo)
 
 export const DEFAULT_STATE = {
   az: 0.7, el: 0.38, dist: 1, sx: 0, sy: 0,
@@ -64,7 +65,7 @@ const OVERLAY_FRAG = /* glsl */ `
 
 const THERMAL_HEAD = /* glsl */ `
   varying vec3 vTwinW;
-  uniform vec4 uClip; uniform float uThermal;
+  uniform vec4 uClip; uniform float uThermal; uniform float uRim;
   uniform vec4 uHeat[${HEAT_COUNT}]; uniform float uHeatSigma[${HEAT_COUNT}];
   vec3 twinRamp(float t) {
     vec3 c = mix(vec3(0.03, 0.07, 0.30), vec3(0.36, 0.10, 0.55), smoothstep(0.0, 0.28, t));
@@ -83,6 +84,11 @@ const THERMAL_HEAD = /* glsl */ `
   }`;
 
 const THERMAL_MIX = /* glsl */ `
+  {
+    // luz de contorno celeste: separa las piezas negras de carbono del fondo oscuro
+    float rim = pow(1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0), 2.4);
+    gl_FragColor.rgb += vec3(0.30, 0.70, 1.0) * rim * uRim * (1.0 - uThermal);
+  }
   if (uThermal > 0.001) {
     float lum = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
     vec3 th = twinRamp(twinHeat(vTwinW)) * (0.5 + 0.85 * lum);
@@ -100,7 +106,8 @@ const GRID_FRAG = /* glsl */ `
     vec2 p = vW.xz + uOff;
     float fade = smoothstep(7.5, 0.6, length(vW.xz));
     float g = gridLine(p * 2.0) * 0.35 + gridLine(p * 0.5) * 0.65;
-    gl_FragColor = vec4(uColor, g * fade * uAlpha);
+    float pool = smoothstep(2.6, 0.0, length(vW.xz)); // charco de luz bajo el dron
+    gl_FragColor = vec4(mix(uColor, vec3(0.30, 0.70, 1.0), pool * 0.6), (g * fade + pool * pool * 0.16) * uAlpha);
   }`;
 
 const SHEET_FRAG = /* glsl */ `
@@ -122,7 +129,7 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
+  renderer.toneMappingExposure = 1.22;
 
   const scene = new Scene();
   const pmrem = new PMREMGenerator(renderer);
@@ -133,7 +140,7 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
   const camera = new PerspectiveCamera(FOV, 1, 0.1, 120);
   const key = new DirectionalLight(0xffffff, 3.0); key.position.set(3, 5, 4);
   const rim = new DirectionalLight(ACCENT, 3.2); rim.position.set(-4, 1.5, -4);
-  scene.add(key, rim, new HemisphereLight(0xcfe3ff, 0x0b0d11, 0.4));
+  scene.add(key, rim, new HemisphereLight(0xcfe3ff, 0x1a2230, 0.85));
 
   // ---- uniforms compartidos ----
   const clipNormal = new Vector3(0.93, 0.31, 0.2).normalize();
@@ -141,6 +148,7 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
   const shared = {
     uClip: { value: clip },
     uThermal: { value: 0 },
+    uRim: { value: 0.55 },
     uHeat: { value: Array.from({ length: HEAT_COUNT }, () => new Vector4(0, 0, 0, 0)) },
     uHeatSigma: { value: new Array(HEAT_COUNT).fill(0.3) },
   };
@@ -291,6 +299,7 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
   const trailPts = Array.from({ length: TRAIL_POINTS }, () => new Vector3());
   const trailPos = new Float32Array(TRAIL_POINTS * 2 * 3);
   const trailCol = new Float32Array(TRAIL_POINTS * 2 * 3);
+  const trailLen = new Float32Array(TRAIL_POINTS);
   const trailIdx = [];
   for (let k = 0; k < TRAIL_POINTS - 1; k++) trailIdx.push(k * 2, k * 2 + 1, k * 2 + 2, k * 2 + 1, k * 2 + 3, k * 2 + 2);
   const trailGeo = new BufferGeometry();
@@ -376,8 +385,9 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
     rig.position.y = 0;
     const north = L(3), east = L(4), alt = L(5);
     const cy = Math.cos(yaw), sy = Math.sin(yaw);
-    // posiciones anteriores relativas a la actual, en el marco del morro (adelante / derecha / arriba)
-    let count = 0;
+    // Estela tipo cometa: solo el último tramo recorrido (longitud acotada), fina y que se desvanece.
+    // Posiciones anteriores relativas a la actual, en el marco del morro (adelante / derecha / arriba).
+    let count = 0, length = 0;
     for (let k = 0; k < TRAIL_POINTS; k++) {
       const idx = i0 - k;
       if (idx < 0) break;
@@ -386,17 +396,22 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
       const fwd = dn * cy + de * sy, rgt = -dn * sy + de * cy;
       trailPts[k].set(0, 0, 0).addScaledVector(nose, fwd * UNITS_PER_METRE).addScaledVector(right, rgt * UNITS_PER_METRE);
       trailPts[k].y = da * UNITS_PER_METRE;
+      if (k > 0) length += trailPts[k].distanceTo(trailPts[k - 1]);
+      trailLen[k] = length;
       count++;
+      if (length > TRAIL_LENGTH) break;
     }
     for (let k = 0; k < count; k++) {
       const p = trailPts[k];
+      const frac = Math.min(1, trailLen[k] / TRAIL_LENGTH);
       const tan = v.copy(trailPts[Math.min(count - 1, k + 1)]).sub(trailPts[Math.max(0, k - 1)]);
-      const side = tan.cross(v2.copy(camera.position).sub(p)).normalize().multiplyScalar(0.022 + 0.05 * (k / TRAIL_POINTS));
+      const side = tan.cross(v2.copy(camera.position).sub(p)).normalize().multiplyScalar(0.013 * (1 - frac) + 0.0015);
       const o = k * 6;
       trailPos[o] = p.x + side.x; trailPos[o + 1] = p.y + side.y; trailPos[o + 2] = p.z + side.z;
       trailPos[o + 3] = p.x - side.x; trailPos[o + 4] = p.y - side.y; trailPos[o + 5] = p.z - side.z;
-      const fade = Math.pow(1 - k / TRAIL_POINTS, 1.5) * Math.min(1, k / 3) * w * 0.7;
-      for (let j = 0; j < 2; j++) { trailCol[o + j * 3] = fade; trailCol[o + j * 3 + 1] = 0.54 * fade; trailCol[o + j * 3 + 2] = 0.16 * fade; }
+      // nace ya fuera del cuerpo del dron y se apaga hacia la cola
+      const fade = Math.pow(1 - frac, 1.7) * Math.min(1, trailLen[k] / 0.5) * w;
+      for (let j = 0; j < 2; j++) { trailCol[o + j * 3] = 0.55 * fade; trailCol[o + j * 3 + 1] = 0.86 * fade; trailCol[o + j * 3 + 2] = fade; }
     }
     trailGeo.setDrawRange(0, Math.max(0, count - 1) * 6);
     trailGeo.attributes.position.needsUpdate = true;

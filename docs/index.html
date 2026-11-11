@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>TwinSight X500 — Gemelo digital del Holybro X500 V2</title>
-  <meta name="description" content="Gemelo digital interactivo del dron Holybro X500 V2: inspección pieza a pieza, vista explosionada, rayos X, térmico de base física y telemetría PX4 en vivo. Web app en Three.js y app de escritorio en Unity 6.">
+  <meta name="description" content="Gemelo digital interactivo del dron Holybro X500 V2: inspección pieza a pieza, vista explosionada, rayos X, térmico de base física y telemetría PX4. Web app en Three.js y app de escritorio en Unity 6.">
   <meta name="author" content="Alexander Woodcock Salomón">
   <meta name="theme-color" content="#06080b">
   <meta name="color-scheme" content="dark">
@@ -33,10 +33,9 @@
   <link rel="manifest" href="site.webmanifest">
 
   <link rel="preload" href="landing/fonts/SpaceGrotesk-Medium.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="landing/fonts/SpaceGrotesk-Bold.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="landing/css/landing.css">
   <link rel="modulepreload" href="landing/js/main.js">
-  <script>document.documentElement.classList.add('js');</script>
+  <script>document.documentElement.classList.add('js', 'is-intro');</script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -53,6 +52,13 @@
 </head>
 <body>
   <a class="skip" href="#producto" data-i18n="skip">Saltar al contenido</a>
+
+  <!-- INTRO: se muestra mientras carga el modelo; al terminar, el dron se ensambla en el héroe -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <svg class="intro__mark" viewBox="0 0 100 100"><g fill="none" stroke-linecap="round"><circle pathLength="1" cx="24" cy="24" r="15"/><circle pathLength="1" cx="76" cy="24" r="15"/><circle pathLength="1" cx="24" cy="76" r="15"/><circle pathLength="1" cx="76" cy="76" r="15"/><path pathLength="1" d="M28 28 72 72"/><path pathLength="1" d="M72 28 28 72"/><rect pathLength="1" x="40" y="38" width="20" height="26" rx="6"/><path class="intro__nose" pathLength="1" d="M50 24 43 38h14Z"/></g></svg>
+    <div class="intro__bar"><i id="introBar"></i></div>
+    <div class="intro__meta"><span>TwinSight X500</span><b id="introPct">000</b></div>
+  </div>
 
   <header class="nav" id="nav">
     <a class="brand" href="#top" aria-label="TwinSight X500">
@@ -71,7 +77,7 @@
         <button type="button" data-lang="es" aria-pressed="true">ES</button>
         <button type="button" data-lang="en" aria-pressed="false">EN</button>
       </div>
-      <a class="btn btn--primary btn--sm" data-link="webapp" href="./Build/"><span data-i18n="ctaWebShort">Abrir app</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+      <button class="btn btn--primary btn--sm" type="button" data-open="app"><span data-i18n="ctaShort">Abrir</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
     </div>
     <div class="nav__progress" aria-hidden="true"><i id="progress"></i></div>
   </header>
@@ -81,7 +87,6 @@
   <div class="labels" id="labels" aria-hidden="true"></div>
 
   <div class="dock" id="dock" hidden>
-    <span class="dock__hint" data-i18n="dockHint">Modo</span>
     <div class="dock__seg" role="group" aria-label="Modo de visualización">
       <button type="button" data-mode="solid" aria-pressed="true" data-i18n="modeSolid">Sólido</button>
       <button type="button" data-mode="wire" aria-pressed="false" data-i18n="modeWire">Malla</button>
@@ -93,111 +98,103 @@
 
   <nav class="rail" id="rail" aria-hidden="true"></nav>
 
+  <!-- PORTAL: la app se abre aquí mismo, sin salir de la página -->
+  <div class="portal" id="portal" hidden>
+    <iframe id="portalFrame" title="TwinSight X500" allow="fullscreen; gamepad; xr-spatial-tracking"></iframe>
+    <div class="portal__veil" id="portalVeil">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"><path d="M28 28 72 72M72 28 28 72"/><circle cx="24" cy="24" r="15"/><circle cx="76" cy="24" r="15"/><circle cx="24" cy="76" r="15"/><circle cx="76" cy="76" r="15"/></g></svg>
+      <span id="portalLabel" role="status"></span>
+    </div>
+    <button class="portal__close" id="portalClose" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg><span data-i18n="portalClose">Volver</span></button>
+  </div>
+
   <main>
     <!-- 00 · HERO -->
     <section class="hero" id="top" data-chapter="hero">
-      <div class="hero__ghost" aria-hidden="true">X500</div>
       <div class="wrap hero__body">
-        <p class="kicker" data-reveal><i class="dot dot--live"></i><span data-i18n="heroKicker">Gemelo digital · Holybro X500 V2</span></p>
-        <h1 class="hero__title"><span class="ln"><span>TwinSight</span></span><span class="ln"><span>X500</span></span></h1>
-        <p class="hero__lead" data-reveal data-i18n="heroLead">Un dron real convertido en un sistema que se puede abrir, desarmar y volar desde el navegador: inspección pieza a pieza, térmico de base física y telemetría PX4 en vivo.</p>
+        <p class="kicker kicker--center" data-reveal><span data-i18n="heroKicker">Gemelo digital · Holybro X500 V2</span></p>
+        <h1 class="hero__title"><span class="ln"><span>TwinSight <em>X500</em></span></span></h1>
+        <p class="hero__tag" data-reveal data-i18n="heroTag">Ábrelo. Desármalo. Vuélalo.</p>
         <div class="hero__cta" data-reveal>
-          <a class="btn btn--primary" data-link="webapp" href="./Build/"><span data-i18n="ctaWeb">Abrir la web app</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
-          <a class="btn btn--ghost" data-link="desktop" href="#apps"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 19.5h14"/></svg><span data-i18n="ctaDesktop">Descargar para escritorio</span></a>
+          <button class="btn btn--primary btn--lg" type="button" data-open="app"><span data-i18n="cta">Abrir TwinSight</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
         </div>
-        <p class="hero__note" data-reveal data-link-note></p>
+        <p class="hero__alt" data-reveal>
+          <button type="button" data-open="legacy" data-i18n="ctaLegacy">Versión legacy</button>
+          <span aria-hidden="true">·</span>
+          <a data-link="desktop" href="#apps"><span data-i18n="ctaDesktop">Descargar escritorio</span></a>
+        </p>
       </div>
-      <div class="wrap hero__foot">
-        <dl class="facts" data-reveal>
-          <div><dt data-i18n="fact1">piezas canónicas</dt><dd>28</dd></div>
-          <div><dt data-i18n="fact2">fichas técnicas</dt><dd>93</dd></div>
-          <div><dt data-i18n="fact3">SUS · usabilidad</dt><dd data-num="91.88" data-dec="2">91,88</dd></div>
-          <div><dt data-i18n="fact4">tesis de grado</dt><dd class="facts__text" data-i18n="fact4v">Meritoria</dd></div>
-        </dl>
-        <a class="scrollhint" href="#producto"><span data-i18n="scroll">Desliza para desarmarlo</span><i></i></a>
-      </div>
-      <div class="loader" id="loader" role="status"><span data-i18n="loading">Cargando modelo 3D</span> <b id="loaderPct">0%</b></div>
+      <a class="scrollhint" href="#producto" data-reveal><span data-i18n="scroll">Desliza</span><i></i></a>
     </section>
 
     <!-- 01 · PIPELINE -->
-    <section class="chapter chapter--left" id="producto" data-chapter="pipeline" data-label="Pipeline">
+    <section class="chapter chapter--left" id="producto" data-chapter="pipeline">
       <div class="wrap">
         <div class="chapter__text">
           <p class="kicker" data-reveal><b>01</b><span data-i18n="c1k">Pipeline 3D</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c1a">De CAD pesado</span></span><span class="ln"><span data-i18n="c1b">a tiempo real.</span></span></h2>
-          <p class="body" data-reveal data-i18n="c1p">El ensamblaje CAD superaba los 6,5 millones de triángulos. Limpieza, retopología y bake lo convirtieron en un modelo que cualquier navegador mueve con fluidez, sin perder la lectura de cada pieza.</p>
+          <p class="body" data-reveal data-i18n="c1p">Un ensamblaje de 6,5 millones de triángulos, convertido en un modelo que cualquier navegador mueve con fluidez.</p>
           <div class="flow" data-reveal>
             <div class="stat"><b><span data-num="6.5" data-dec="1">6,5</span> M</b><span data-i18n="c1s1">triángulos en CAD</span></div>
             <svg class="flow__arrow" viewBox="0 0 48 24" aria-hidden="true"><path d="M2 12h42M36 5l8 7-8 7"/></svg>
-            <div class="stat"><b data-num="78974" data-dec="0">78 974</b><span data-i18n="c1s2">triángulos en la web</span></div>
-            <div class="stat"><b><span data-num="1.9" data-dec="1">1,9</span> MB</b><span data-i18n="c1s3">GLB · meshopt + WebP</span></div>
+            <div class="stat"><b data-num="78974" data-dec="0">78 974</b><span data-i18n="c1s2">en la web · 1,9 MB</span></div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 02 · TAXONOMÍA -->
-    <section class="chapter chapter--right" data-chapter="explode" data-label="Taxonomía">
+    <section class="chapter chapter--right" data-chapter="explode">
       <div class="wrap">
         <div class="chapter__text">
           <p class="kicker" data-reveal><b>02</b><span data-i18n="c2k">Taxonomía</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c2a">Cada pieza</span></span><span class="ln"><span data-i18n="c2b">sabe qué es.</span></span></h2>
-          <p class="body" data-reveal data-i18n="c2p">La malla se convierte en información. Al tocar un motor, la app sabe que pertenece al sistema de propulsión, lo resalta y abre su ficha técnica con identificación, especificaciones y datos de ensamblaje.</p>
+          <p class="body" data-reveal data-i18n="c2p">Toca una pieza: la app la reconoce, la resalta y abre su ficha técnica.</p>
           <div class="flow" data-reveal>
             <div class="stat"><b>28</b><span data-i18n="c2s1">piezas canónicas</span></div>
-            <div class="stat"><b>93</b><span data-i18n="c2s2">fichas técnicas ES / EN</span></div>
-            <div class="stat"><b>30</b><span data-i18n="c2s3">anchors de escena</span></div>
+            <div class="stat"><b>93</b><span data-i18n="c2s2">fichas técnicas</span></div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 03 · MODOS -->
-    <section class="chapter chapter--left" data-chapter="xray" data-label="Rayos X">
+    <section class="chapter chapter--left" data-chapter="xray">
       <div class="wrap">
         <div class="chapter__text">
           <p class="kicker" data-reveal><b>03</b><span data-i18n="c3k">Modos de análisis</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c3a">Ver dentro</span></span><span class="ln"><span data-i18n="c3b">sin desmontar.</span></span></h2>
-          <p class="body" data-reveal data-i18n="c3p">Rayos X, plano técnico, corte transversal y vista explosionada: distintas maneras de leer el mismo ensamblaje. Los modos nacieron como shaders HLSL en Unity y se replicaron en Three.js con paridad visual.</p>
-          <ul class="chips" data-reveal>
-            <li data-i18n="c3m1">Rayos X</li><li>Blueprint</li><li data-i18n="c3m3">Corte transversal</li><li data-i18n="c3m4">Explosión</li><li data-i18n="c3m5">Aislar pieza</li><li data-i18n="c3m6">Filtros por sistema</li>
-          </ul>
+          <p class="body" data-reveal data-i18n="c3p">Rayos X, plano técnico, corte y explosión: cuatro lecturas del mismo ensamblaje.</p>
         </div>
       </div>
     </section>
 
     <!-- 04 · TÉRMICO -->
-    <section class="chapter chapter--right" data-chapter="thermal" data-label="Térmico">
+    <section class="chapter chapter--right" data-chapter="thermal">
       <div class="wrap">
         <div class="chapter__text">
           <p class="kicker" data-reveal><b>04</b><span data-i18n="c4k">Térmico</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c4a">Calor estimado</span></span><span class="ln"><span data-i18n="c4b">con base física.</span></span></h2>
-          <p class="body" data-reveal data-i18n="c4p">Cada pieza guarda su temperatura. Motores, ESC y batería se calientan según la carga, y el calor pasa a las piezas vecinas según el área de contacto y la conductividad del material. Es un modelo simplificado y rotulado como tal: más rápido que un FEA, pensado para verse en vivo.</p>
+          <p class="body" data-reveal data-i18n="c4p">Motores y batería se calientan con la carga, y el calor fluye a las piezas vecinas. Un modelo simplificado, rotulado como tal.</p>
           <div class="legend" data-reveal>
-            <span data-i18n="c4l1">Más frío</span><i></i><span data-i18n="c4l2">Más caliente</span>
+            <span data-i18n="c4l1">Frío</span><i></i><span data-i18n="c4l2">Caliente</span>
           </div>
-          <p class="fine" data-reveal data-i18n="c4n">Vista ilustrativa en esta página. El modelo térmico completo corre en las apps.</p>
+          <p class="fine" data-reveal data-i18n="c4n">Vista ilustrativa. El modelo completo corre en la app.</p>
         </div>
       </div>
     </section>
 
     <!-- 05 · TELEMETRÍA -->
-    <section class="chapter chapter--left chapter--tall" id="telemetria" data-chapter="flight" data-label="Telemetría">
+    <section class="chapter chapter--left chapter--tall" id="telemetria" data-chapter="flight">
       <div class="wrap chapter__grid">
         <div class="chapter__text">
-          <p class="kicker" data-reveal><b>05</b><span data-i18n="c5k">Telemetría en vivo</span></p>
-          <h2 class="title"><span class="ln"><span data-i18n="c5a">Datos reales,</span></span><span class="ln"><span data-i18n="c5b">rotulados con honestidad.</span></span></h2>
-          <p class="body" data-reveal data-i18n="c5p">La web app recibe telemetría de PX4 por WebSocket en dos modos. Cada lectura indica si el dato es medido, estimado o simulado: nada se presenta como lo que no es.</p>
-          <div class="modes" data-reveal>
-            <article>
-              <h3><i class="dot dot--ok"></i><span data-i18n="c5m1t">Sombra digital · 24/7</span></h3>
-              <p data-i18n="c5m1p">Repetición continua de un vuelo real de un X500 V2, tomado de un registro público de PX4 Flight Review y servido por un Worker con Durable Object.</p>
-            </article>
-            <article>
-              <h3><i class="dot dot--sim"></i><span data-i18n="c5m2t">Gemelo SITL</span></h3>
-              <p data-i18n="c5m2p">PX4 y Gazebo en bucle cerrado. Despegue, vuelo a un punto, órbita y retorno se ordenan desde el navegador por MAVLink.</p>
-            </article>
-          </div>
+          <p class="kicker" data-reveal><b>05</b><span data-i18n="c5k">Telemetría</span></p>
+          <h2 class="title"><span class="ln"><span data-i18n="c5a">Datos reales,</span></span><span class="ln"><span data-i18n="c5b">bien rotulados.</span></span></h2>
+          <p class="body" data-reveal data-i18n="c5p">Telemetría de PX4 por WebSocket. Cada lectura dice si es medida, estimada o simulada.</p>
+          <ul class="modes" data-reveal>
+            <li><i class="dot dot--ok"></i><b data-i18n="c5m1t">Sombra digital</b><span data-i18n="c5m1p">Un vuelo real, repetido 24/7.</span></li>
+            <li><i class="dot dot--sim"></i><b data-i18n="c5m2t">Gemelo SITL</b><span data-i18n="c5m2p">PX4 y Gazebo, al mando desde el navegador.</span></li>
+          </ul>
         </div>
 
         <aside class="hud" id="hud" data-reveal aria-label="Telemetría reproducida">
@@ -205,11 +202,18 @@
             <span class="badge"><i class="dot dot--ok"></i><span data-i18n="hudBadge">Vuelo real reproducido</span></span>
             <span class="hud__t" id="hudT">00:00</span>
           </header>
-          <div class="hud__grid">
-            <div class="read"><span data-i18n="hudAlt">Altura</span><b id="hAlt">—</b><i>m</i></div>
-            <div class="read"><span data-i18n="hudSpd">Velocidad</span><b id="hSpd">—</b><i>m/s</i></div>
-            <div class="read"><span data-i18n="hudRoll">Alabeo</span><b id="hRoll">—</b><i>°</i></div>
-            <div class="read"><span data-i18n="hudPitch">Cabeceo</span><b id="hPitch">—</b><i>°</i></div>
+          <div class="hud__main">
+            <svg class="hud__map" id="hudMap" viewBox="0 0 100 100" role="img" aria-label="Trayectoria vista desde arriba">
+              <path id="hudPath" class="hud__path"/>
+              <path id="hudDone" class="hud__done"/>
+              <circle id="hudDot" r="3.2"/>
+            </svg>
+            <div class="hud__grid">
+              <div class="read"><span data-i18n="hudAlt">Altura</span><b id="hAlt">—</b><i>m</i></div>
+              <div class="read"><span data-i18n="hudSpd">Velocidad</span><b id="hSpd">—</b><i>m/s</i></div>
+              <div class="read"><span data-i18n="hudRoll">Alabeo</span><b id="hRoll">—</b><i>°</i></div>
+              <div class="read"><span data-i18n="hudPitch">Cabeceo</span><b id="hPitch">—</b><i>°</i></div>
+            </div>
           </div>
           <div class="hud__row">
             <div class="bat">
@@ -218,14 +222,14 @@
               <div class="bar"><i id="hBatBar"></i></div>
             </div>
             <div class="motors" aria-label="Motores">
-              <span data-i18n="hudMot">Orden a motores</span>
+              <span data-i18n="hudMot">Motores</span>
               <div class="motors__x">
                 <i data-m="2" title="M3"></i><i data-m="0" title="M1"></i><i data-m="1" title="M2"></i><i data-m="3" title="M4"></i>
               </div>
             </div>
           </div>
           <footer>
-            <span data-i18n="hudSrc">60 s a 10 Hz · PX4 v1.15.4</span>
+            <span data-i18n="hudSrc">60 s · 10 Hz · PX4 v1.15.4</span>
             <a href="https://review.px4.io/plot_app?log=0f3c4a74-4648-4b99-8992-c7fdc8681f6e" target="_blank" rel="noopener">Flight Review ↗</a>
           </footer>
         </aside>
@@ -233,32 +237,19 @@
 
       <div class="wrap">
         <div class="arch" data-reveal>
-          <p class="arch__title" data-i18n="archTitle">Cómo llega el dato a la pantalla</p>
           <div class="arch__lanes">
             <div class="lane">
               <span class="lane__tag"><i class="dot dot--ok"></i><span data-i18n="lane1">Sombra digital</span></span>
-              <ol>
-                <li><b>ULog</b><span data-i18n="l1a">vuelo real · X500 V2</span></li>
-                <li><b>.twf</b><span data-i18n="l1b">preprocesado a 20 Hz</span></li>
-                <li><b>Worker + Durable Object</b><span data-i18n="l1c">repetición continua</span></li>
-              </ol>
+              <ol><li><b>ULog</b></li><li><b>.twf · 20 Hz</b></li><li><b>Worker + Durable Object</b></li></ol>
             </div>
             <div class="lane">
               <span class="lane__tag"><i class="dot dot--sim"></i><span data-i18n="lane2">Gemelo SITL</span></span>
-              <ol>
-                <li><b>PX4 v1.17 SITL</b><span data-i18n="l2a">autopiloto real en simulación</span></li>
-                <li><b>Gazebo Harmonic</b><span data-i18n="l2b">física del vehículo</span></li>
-                <li><b>Puente pymavlink</b><span data-i18n="l2c">MAVLink ↔ WebSocket</span></li>
-              </ol>
+              <ol><li><b>PX4 SITL</b></li><li><b>Gazebo Harmonic</b></li><li><b data-i18n="l2c">Puente MAVLink</b></li></ol>
             </div>
             <div class="sink">
               <span class="sink__ws">WebSocket</span>
-              <div class="sink__node">
-                <b data-i18n="sinkA">Web app</b><span data-i18n="sinkAs">integrada</span>
-              </div>
-              <div class="sink__node sink__node--wip">
-                <b data-i18n="sinkB">Escritorio</b><span data-i18n="sinkBs">en integración</span>
-              </div>
+              <div class="sink__node"><b data-i18n="sinkA">Web app</b><span data-i18n="sinkAs">integrada</span></div>
+              <div class="sink__node sink__node--wip"><b data-i18n="sinkB">Escritorio</b><span data-i18n="sinkBs">en integración</span></div>
             </div>
           </div>
         </div>
@@ -266,29 +257,26 @@
     </section>
 
     <!-- 06 · APPS -->
-    <section class="block" id="apps" data-chapter="apps" data-label="Apps">
+    <section class="block" id="apps" data-chapter="apps">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>06</b><span data-i18n="c6k">Dos clientes, un sistema</span></p>
-          <h2 class="title"><span class="ln"><span data-i18n="c6a">Elige cómo</span></span><span class="ln"><span data-i18n="c6b">quieres entrar.</span></span></h2>
+          <p class="kicker" data-reveal><b>06</b><span data-i18n="c6k">Apps</span></p>
+          <h2 class="title"><span class="ln"><span data-i18n="c6a">Dos clientes,</span></span><span class="ln"><span data-i18n="c6b">un sistema.</span></span></h2>
         </header>
 
         <div class="apps">
           <article class="app" data-reveal>
             <div class="app__top">
               <svg class="app__ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 3.9 5.2 3.9 8.5s-1.3 6.1-3.9 8.5c-2.6-2.4-3.9-5.2-3.9-8.5S9.400 5.900 12 3.500Z"/></svg>
-              <span class="status status--ok" data-status="webapp"></span>
+              <span class="status status--ok" data-i18n="stLive">Disponible</span>
             </div>
-            <h3 data-i18n="appWebT">Web app</h3>
-            <p class="app__stack">Three.js · React Three Fiber · TypeScript · Cloudflare Workers</p>
-            <p class="app__lead" data-i18n="appWebP">La puerta de entrada. Abre en cualquier navegador, en escritorio o móvil, sin instalar nada.</p>
-            <ul class="app__list">
-              <li data-i18n="appWeb1">Telemetría en vivo y mando del gemelo SITL</li>
-              <li data-i18n="appWeb2">Inspección, explosión, corte y rayos X</li>
-              <li data-i18n="appWeb3">Térmico con dos fuentes rotuladas</li>
-              <li data-i18n="appWeb4">93 fichas técnicas enlazables por pieza</li>
-            </ul>
-            <a class="btn btn--primary" data-link="webapp" href="./Build/"><span data-i18n="ctaWeb">Abrir la web app</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+            <h3 data-i18n="appWebT">Web</h3>
+            <p class="app__stack">Three.js · React Three Fiber · TypeScript</p>
+            <p class="app__lead" data-i18n="appWebP">En cualquier navegador, sin instalar nada.</p>
+            <div class="app__cta">
+              <button class="btn btn--primary" type="button" data-open="app"><span data-i18n="cta">Abrir TwinSight</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
+              <button class="btn btn--text" type="button" data-open="legacy" data-i18n="ctaLegacyLong">Versión legacy · Unity WebGL</button>
+            </div>
           </article>
 
           <article class="app" data-reveal>
@@ -296,28 +284,21 @@
               <svg class="app__ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16.500V20"/></svg>
               <span class="status" data-status="desktop"></span>
             </div>
-            <h3 data-i18n="appDeskT">App de escritorio</h3>
-            <p class="app__stack">Unity 6 · URP · C# · HLSL · UI Toolkit</p>
-            <p class="app__lead" data-i18n="appDeskP">El inspector técnico a máxima calidad gráfica, con una interfaz rediseñada para ratón y teclado.</p>
-            <ul class="app__list">
-              <li data-i18n="appDesk1">HDRI de estudio, SSAO y sombras 4K</li>
-              <li data-i18n="appDesk2">Árbol de piezas, inspector acoplado y atajos</li>
-              <li data-i18n="appDesk3">Tutorial animado de seis pasos</li>
-              <li data-i18n="appDesk4">Telemetría: cliente en integración</li>
-            </ul>
-            <a class="btn btn--ghost" data-link="desktop" href="#apps"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 19.5h14"/></svg><span data-i18n="ctaDesktop">Descargar para escritorio</span></a>
+            <h3 data-i18n="appDeskT">Escritorio</h3>
+            <p class="app__stack">Unity 6 · URP · C# · HLSL</p>
+            <p class="app__lead" data-i18n="appDeskP">El inspector técnico, a máxima calidad gráfica.</p>
+            <div class="app__cta">
+              <a class="btn btn--ghost" data-link="desktop" href="#apps"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 19.5h14"/></svg><span data-i18n="ctaDesktop">Descargar escritorio</span></a>
+            </div>
           </article>
         </div>
 
-        <div class="bridge" data-reveal>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7H6a5 5 0 0 0 0 10h2M16 7h2a5 5 0 0 1 0 10h-2M8.500 12h7"/></svg>
-          <p><b data-i18n="bridgeT">Una sola fuente de diseño.</b> <span data-i18n="bridgeP">Iconos, tokens, atajos, tutorial y textos se extraen de Unity a datos y se generan para la web. Lo que cambia en un cliente cambia en el otro.</span></p>
-        </div>
+        <p class="bridge" data-reveal><b data-i18n="bridgeT">Una sola fuente de diseño.</b> <span data-i18n="bridgeP">Lo que cambia en un cliente cambia en el otro.</span></p>
       </div>
     </section>
 
     <!-- 07 · EVIDENCIA -->
-    <section class="block" id="evidencia" data-chapter="evidence" data-label="Evidencia">
+    <section class="block" id="evidencia" data-chapter="evidence">
       <div class="wrap">
         <header class="block__head">
           <p class="kicker" data-reveal><b>07</b><span data-i18n="c7k">Evidencia</span></p>
@@ -326,41 +307,38 @@
         <div class="evidence">
           <article class="tile tile--big" data-reveal>
             <b class="num" data-num="91.88" data-dec="2" data-count>91,88</b>
-            <h3>SUS</h3>
-            <p data-i18n="e1">Usabilidad percibida del visor 3D, sobre 100.</p>
+            <h3 data-i18n="e1">SUS · usabilidad sobre 100</h3>
           </article>
           <article class="tile" data-reveal>
-            <h3 data-i18n="e2t">Carga de trabajo · NASA-TLX Raw</h3>
+            <h3 data-i18n="e2t">Carga de trabajo · NASA-TLX</h3>
             <div class="vs">
               <div class="vs__row vs__row--win"><span data-i18n="vs3d">Visor 3D</span><i style="--w:43.7%"></i><b data-num="8.69" data-dec="2">8,69</b></div>
               <div class="vs__row"><span data-i18n="vs2d">Referencia 2D</span><i style="--w:100%"></i><b data-num="19.89" data-dec="2">19,89</b></div>
             </div>
-            <p data-i18n="e2">Menos es mejor: menos de la mitad del esfuerzo percibido.</p>
           </article>
           <article class="tile" data-reveal>
-            <h3 data-i18n="e3t">Tiempo total · tareas T1–T3</h3>
+            <h3 data-i18n="e3t">Tiempo · tareas T1–T3</h3>
             <div class="vs">
               <div class="vs__row vs__row--win"><span data-i18n="vs3d">Visor 3D</span><i style="--w:38.1%"></i><b><span data-num="20.58" data-dec="2">20,58</span> s</b></div>
               <div class="vs__row"><span data-i18n="vs2d">Referencia 2D</span><i style="--w:100%"></i><b>54 s</b></div>
             </div>
-            <p data-i18n="e3">Las mismas tareas de identificación, en menos de la mitad del tiempo.</p>
           </article>
           <article class="tile" data-reveal>
             <b class="num"><span data-num="59.8" data-dec="1" data-count>59,8</span><small>FPS</small></b>
-            <p data-i18n="e4">Escritorio, Chrome, recorrido completo de la build evaluada.</p>
+            <h3 data-i18n="e4">Escritorio · Chrome</h3>
           </article>
           <article class="tile tile--merit" data-reveal>
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9.500" r="5.500"/><path d="M8.500 14 7 21l5-2.500 5 2.500-1.500-7"/></svg>
             <h3 data-i18n="e5t">Mención meritoria</h3>
-            <p data-i18n="e5">Trabajo de grado sustentado en Ingeniería Multimedia, UNAD, 2026.</p>
+            <p data-i18n="e5">Ingeniería Multimedia · UNAD · 2026</p>
           </article>
         </div>
-        <p class="fine" data-reveal data-i18n="eNote">Evaluación formativa con 12 participantes. Resultados descriptivos, sin inferencia poblacional. Instrumentos y protocolo en la documentación.</p>
+        <p class="fine" data-reveal data-i18n="eNote">Evaluación formativa con 12 participantes. Resultados descriptivos.</p>
       </div>
     </section>
 
     <!-- 08 · INGENIERÍA -->
-    <section class="block" data-chapter="engineering" data-label="Ingeniería">
+    <section class="block" data-chapter="engineering">
       <div class="wrap">
         <header class="block__head">
           <p class="kicker" data-reveal><b>08</b><span data-i18n="c8k">Ingeniería</span></p>
@@ -368,42 +346,40 @@
         </header>
         <div class="bento">
           <article class="cell cell--wide" data-reveal>
-            <h3 data-i18n="g1t">Pruebas automáticas</h3>
             <p class="cell__nums"><b>≈800</b><span>Vitest</span><b>130</b><span>pytest</span></p>
-            <p data-i18n="g1">Lógica compartida, contrato de telemetría y puente MAVLink cubiertos por pruebas que corren en cada push con GitHub Actions.</p>
+            <h3 data-i18n="g1t">Pruebas en cada push</h3>
           </article>
           <article class="cell" data-reveal>
             <h3 data-i18n="g2t">Contrato versionado</h3>
-            <p data-i18n="g2">La telemetría tiene esquema, fixtures y casos de referencia. Web y Unity se validan contra los mismos datos.</p>
+            <p data-i18n="g2">Web y Unity se validan contra los mismos datos.</p>
           </article>
           <article class="cell" data-reveal>
             <h3 data-i18n="g3t">Honestidad del dato</h3>
             <ul class="prov">
               <li class="prov--ok" data-i18n="g3a">Medido</li><li class="prov--warn" data-i18n="g3b">Estimado</li><li class="prov--sim" data-i18n="g3c">Simulado</li>
             </ul>
-            <p data-i18n="g3">Cada lectura declara su procedencia en la interfaz.</p>
           </article>
           <article class="cell" data-reveal>
             <h3 data-i18n="g4t">Pipeline de assets</h3>
-            <p data-i18n="g4">CAD → Blender (saneado, retopología, bake) → FBX para Unity y glTF con meshopt y WebP para la web.</p>
+            <p>CAD → Blender → FBX · glTF</p>
           </article>
           <article class="cell" data-reveal>
             <h3 data-i18n="g5t">Shaders propios</h3>
-            <p data-i18n="g5">X-Ray, Blueprint, corte, térmico y PBR adaptado, escritos en HLSL para URP y llevados a Three.js.</p>
+            <p data-i18n="g5">HLSL en Unity, replicados en Three.js.</p>
           </article>
           <article class="cell cell--wide" data-reveal>
-            <h3 data-i18n="g6t">Accesibilidad e interfaz</h3>
-            <p data-i18n="g6">Objetivos táctiles de 44 px, foco visible, movimiento reducido, español e inglés, y una auditoría UX/UI de 29 hallazgos trabajada por lotes.</p>
+            <h3 data-i18n="g6t">Accesible y bilingüe</h3>
+            <p data-i18n="g6">Táctil a 44 px, foco visible, movimiento reducido, ES / EN.</p>
           </article>
         </div>
         <ul class="stack" data-reveal aria-label="Tecnologías">
-          <li>Three.js</li><li>React Three Fiber</li><li>TypeScript</li><li>GLSL</li><li>Unity 6</li><li>URP</li><li>C#</li><li>HLSL</li><li>UI Toolkit</li><li>Blender</li><li>PX4</li><li>MAVLink</li><li>Gazebo</li><li>Python</li><li>Cloudflare Workers</li><li>WebSocket</li><li>GitHub Actions</li>
+          <li>Three.js</li><li>React Three Fiber</li><li>TypeScript</li><li>GLSL</li><li>Unity 6</li><li>URP</li><li>C#</li><li>HLSL</li><li>Blender</li><li>PX4</li><li>MAVLink</li><li>Gazebo</li><li>Python</li><li>Cloudflare Workers</li><li>GitHub Actions</li>
         </ul>
       </div>
     </section>
 
     <!-- 09 · DOCS -->
-    <section class="block" id="docs" data-chapter="docs" data-label="Docs">
+    <section class="block" id="docs" data-chapter="docs">
       <div class="wrap">
         <header class="block__head">
           <p class="kicker" data-reveal><b>09</b><span data-i18n="c9k">Documentación</span></p>
@@ -431,26 +407,24 @@
     </section>
 
     <!-- CIERRE -->
-    <section class="outro" id="contacto" data-chapter="outro" data-label="Contacto">
+    <section class="outro" id="contacto" data-chapter="outro">
       <div class="wrap outro__body">
-        <h2 class="outro__title"><span class="ln"><span data-i18n="oa">Ábrelo.</span></span><span class="ln"><span data-i18n="ob">Desármalo.</span></span><span class="ln"><span data-i18n="oc">Vuélalo.</span></span></h2>
+        <h2 class="outro__title"><span class="ln"><span data-i18n="oa">Tu turno.</span></span></h2>
         <div class="hero__cta" data-reveal>
-          <a class="btn btn--primary" data-link="webapp" href="./Build/"><span data-i18n="ctaWeb">Abrir la web app</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
-          <a class="btn btn--ghost" data-link="desktop" href="#apps"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 11 12 15.5 16.5 11M5 19.5h14"/></svg><span data-i18n="ctaDesktop">Descargar para escritorio</span></a>
+          <button class="btn btn--primary btn--lg" type="button" data-open="app"><span data-i18n="cta">Abrir TwinSight</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
         </div>
       </div>
       <div class="wrap">
         <div class="author" data-reveal>
           <div>
-            <p class="kicker"><span data-i18n="byK">Diseño y desarrollo</span></p>
             <p class="author__name">Alexander Woodcock Salomón</p>
-            <p class="author__role" data-i18n="byRole">Ingeniero Multimedia · 3D en tiempo real para web y escritorio. Abierto a roles remotos.</p>
+            <p class="author__role" data-i18n="byRole">Ingeniero Multimedia · 3D en tiempo real. Abierto a roles remotos.</p>
           </div>
           <ul class="author__links">
             <li><a href="https://www.linkedin.com/in/alexander-woodcock-0132382a6/" target="_blank" rel="noopener me">LinkedIn <span>↗</span></a></li>
             <li><a href="https://github.com/delarge95" target="_blank" rel="noopener me">GitHub <span>↗</span></a></li>
             <li><a href="https://www.artstation.com/alexanderwoodcocksalomon3" target="_blank" rel="noopener me">ArtStation <span>↗</span></a></li>
-            <li><a href="https://services.alexwoodcock.me/cotizador/" target="_blank" rel="noopener me" data-i18n-keep><span data-i18n="byFolio">Portafolio</span> <span>↗</span></a></li>
+            <li><a href="https://services.alexwoodcock.me/cotizador/" target="_blank" rel="noopener me"><span data-i18n="byFolio">Portafolio</span> <span>↗</span></a></li>
             <li><a href="mailto:3d@alexwoodcock.me">3d@alexwoodcock.me</a></li>
           </ul>
         </div>
@@ -460,13 +434,13 @@
 
   <footer class="foot">
     <div class="wrap">
-      <p>© 2026 TwinSight X500 · UNAD · <span data-i18n="fDeg">Ingeniería Multimedia</span></p>
-      <p class="foot__legal" data-i18n="fLegal">Modelo derivado del CAD que Holybro publica para el X500 V2; proyecto no afiliado a Holybro. Telemetría de un registro público de PX4 Flight Review.</p>
-      <p><a href="index-v1.html" data-i18n="fOld">Versión anterior de esta página</a></p>
+      <p>© 2026 TwinSight X500 · UNAD</p>
+      <p class="foot__legal" data-i18n="fLegal">Modelo derivado del CAD público de Holybro; proyecto no afiliado. Telemetría de un registro público de PX4 Flight Review.</p>
+      <p><a href="index-v1.html" data-i18n="fOld">Landing anterior</a></p>
     </div>
   </footer>
 
-  <noscript><style>.loader,.dock,.rail{display:none!important}.hero{background:url("landing/img/poster.webp") center/cover no-repeat}</style></noscript>
+  <noscript><style>.intro,.dock,.rail,.portal{display:none!important}.hero{background:url("landing/img/poster.webp") center/cover no-repeat}</style></noscript>
   <script type="module" src="landing/js/main.js"></script>
 </body>
 </html>

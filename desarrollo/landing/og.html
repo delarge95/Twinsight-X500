@@ -57,9 +57,9 @@
     if (layer === 'text') canvas.remove();
     else {
       const { createTwin } = await import('/landing/js/scene.js');
-      const twin = await createTwin(canvas, { modelUrl: '/landing/models/x500.glb', reducedMotion: true, capture: true });
+      const twin = await createTwin(canvas, { modelUrl: '/models/holybro-x500.glb', reducedMotion: true, capture: true });
       twin.setState(poster
-        ? { az: 0.7, el: 0.36, dist: 1.0, sx: 0.19, sy: 0.02, sweep: 0, grid: 0, sway: 0, spin: 0 }
+        ? { az: 0.7, el: 0.3, dist: 1.06, sx: 0, sy: 0.235, sweep: 0, grid: 0, sway: 0, spin: 0 }
         : { az: 0.62, el: 0.34, dist: 0.93, sx: 0.235, sy: 0.02, sweep: 0.56, kind: 'xray', grid: 0.55, sway: 0, spin: 0 });
       twin.snap();
       await new Promise((r) => setTimeout(r, 600)); // texturas subidas a la GPU

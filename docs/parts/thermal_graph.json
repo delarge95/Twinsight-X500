@@ -1,0 +1,264 @@
+{
+ "schema_version": 1,
+ "source": {
+  "graph": {
+   "file": "Resources/ThermalCanonicalContactGraph.asset",
+   "sha256": "cfcf31e4bf1862b8adbaba6619c1be3f4a1ef3b87b9e147f7cca972fefbfcccb"
+  },
+  "partsDir": "Core/Data/X500V2Generated"
+ },
+ "buildInfo": {
+  "sourceSceneName": "CanonicalDataset",
+  "sourceRootName": "HolybroX500V2Canonical28",
+  "generatedUtc": "2026-03-19T00:00:00Z"
+ },
+ "nodeIds": [
+  "x500v2_bottom_plate",
+  "x500v2_top_plate",
+  "x500v2_arm_FL",
+  "x500v2_arm_FR",
+  "x500v2_arm_BL",
+  "x500v2_arm_BR",
+  "x500v2_landing_gear",
+  "x500v2_platform_board",
+  "x500v2_rails_battery",
+  "x500v2_pdb",
+  "x500v2_power_module",
+  "x500v2_pixhawk6c",
+  "x500v2_gps_m10",
+  "x500v2_telemetry_radio",
+  "x500v2_motor_FL",
+  "x500v2_motor_FR",
+  "x500v2_motor_BL",
+  "x500v2_motor_BR",
+  "x500v2_esc_FL",
+  "x500v2_esc_FR",
+  "x500v2_esc_BL",
+  "x500v2_esc_BR",
+  "x500v2_prop_FL",
+  "x500v2_prop_FR",
+  "x500v2_prop_BL",
+  "x500v2_prop_BR",
+  "x500v2_battery",
+  "x500v2_rc_receiver"
+ ],
+ "links": [
+  {
+   "from": "x500v2_motor_FL",
+   "to": "x500v2_esc_FL",
+   "contactAreaCm2": 2,
+   "pathLengthMm": 4,
+   "conductionScale": 0.6
+  },
+  {
+   "from": "x500v2_motor_FL",
+   "to": "x500v2_arm_FL",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 4,
+   "conductionScale": 0.8
+  },
+  {
+   "from": "x500v2_esc_FL",
+   "to": "x500v2_arm_FL",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 3,
+   "conductionScale": 0.7
+  },
+  {
+   "from": "x500v2_arm_FL",
+   "to": "x500v2_bottom_plate",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 5,
+   "conductionScale": 0.6
+  },
+  {
+   "from": "x500v2_arm_FL",
+   "to": "x500v2_top_plate",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 6,
+   "conductionScale": 0.5
+  },
+  {
+   "from": "x500v2_motor_FR",
+   "to": "x500v2_esc_FR",
+   "contactAreaCm2": 2,
+   "pathLengthMm": 4,
+   "conductionScale": 0.6
+  },
+  {
+   "from": "x500v2_motor_FR",
+   "to": "x500v2_arm_FR",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 4,
+   "conductionScale": 0.8
+  },
+  {
+   "from": "x500v2_esc_FR",
+   "to": "x500v2_arm_FR",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 3,
+   "conductionScale": 0.7
+  },
+  {
+   "from": "x500v2_arm_FR",
+   "to": "x500v2_bottom_plate",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 5,
+   "conductionScale": 0.6
+  },
+  {
+   "from": "x500v2_arm_FR",
+   "to": "x500v2_top_plate",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 6,
+   "conductionScale": 0.5
+  },
+  {
+   "from": "x500v2_motor_BL",
+   "to": "x500v2_esc_BL",
+   "contactAreaCm2": 2,
+   "pathLengthMm": 4,
+   "conductionScale": 0.6
+  },
+  {
+   "from": "x500v2_motor_BL",
+   "to": "x500v2_arm_BL",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 4,
+   "conductionScale": 0.8
+  },
+  {
+   "from": "x500v2_esc_BL",
+   "to": "x500v2_arm_BL",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 3,
+   "conductionScale": 0.7
+  },
+  {
+   "from": "x500v2_arm_BL",
+   "to": "x500v2_bottom_plate",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 5,
+   "conductionScale": 0.6
+  },
+  {
+   "from": "x500v2_arm_BL",
+   "to": "x500v2_top_plate",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 6,
+   "conductionScale": 0.5
+  },
+  {
+   "from": "x500v2_motor_BR",
+   "to": "x500v2_esc_BR",
+   "contactAreaCm2": 2,
+   "pathLengthMm": 4,
+   "conductionScale": 0.6
+  },
+  {
+   "from": "x500v2_motor_BR",
+   "to": "x500v2_arm_BR",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 4,
+   "conductionScale": 0.8
+  },
+  {
+   "from": "x500v2_esc_BR",
+   "to": "x500v2_arm_BR",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 3,
+   "conductionScale": 0.7
+  },
+  {
+   "from": "x500v2_arm_BR",
+   "to": "x500v2_bottom_plate",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 5,
+   "conductionScale": 0.6
+  },
+  {
+   "from": "x500v2_arm_BR",
+   "to": "x500v2_top_plate",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 6,
+   "conductionScale": 0.5
+  },
+  {
+   "from": "x500v2_bottom_plate",
+   "to": "x500v2_top_plate",
+   "contactAreaCm2": 3,
+   "pathLengthMm": 10,
+   "conductionScale": 0.5
+  },
+  {
+   "from": "x500v2_bottom_plate",
+   "to": "x500v2_pdb",
+   "contactAreaCm2": 6,
+   "pathLengthMm": 4,
+   "conductionScale": 0.5
+  },
+  {
+   "from": "x500v2_pdb",
+   "to": "x500v2_power_module",
+   "contactAreaCm2": 1.5,
+   "pathLengthMm": 5,
+   "conductionScale": 0.7
+  },
+  {
+   "from": "x500v2_top_plate",
+   "to": "x500v2_pixhawk6c",
+   "contactAreaCm2": 3,
+   "pathLengthMm": 8,
+   "conductionScale": 0.4
+  },
+  {
+   "from": "x500v2_top_plate",
+   "to": "x500v2_platform_board",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 6,
+   "conductionScale": 0.4
+  },
+  {
+   "from": "x500v2_top_plate",
+   "to": "x500v2_telemetry_radio",
+   "contactAreaCm2": 1.5,
+   "pathLengthMm": 10,
+   "conductionScale": 0.4
+  },
+  {
+   "from": "x500v2_top_plate",
+   "to": "x500v2_rc_receiver",
+   "contactAreaCm2": 1,
+   "pathLengthMm": 10,
+   "conductionScale": 0.4
+  },
+  {
+   "from": "x500v2_top_plate",
+   "to": "x500v2_gps_m10",
+   "contactAreaCm2": 1,
+   "pathLengthMm": 24,
+   "conductionScale": 0.35
+  },
+  {
+   "from": "x500v2_bottom_plate",
+   "to": "x500v2_rails_battery",
+   "contactAreaCm2": 5,
+   "pathLengthMm": 6,
+   "conductionScale": 0.5
+  },
+  {
+   "from": "x500v2_rails_battery",
+   "to": "x500v2_battery",
+   "contactAreaCm2": 8,
+   "pathLengthMm": 5,
+   "conductionScale": 0.35
+  },
+  {
+   "from": "x500v2_bottom_plate",
+   "to": "x500v2_landing_gear",
+   "contactAreaCm2": 4,
+   "pathLengthMm": 6,
+   "conductionScale": 0.4
+  }
+ ]
+}
