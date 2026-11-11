@@ -20,6 +20,8 @@ export const DEFAULT_STATE = {
   az: 0.7, el: 0.38, dist: 1, sx: 0, sy: 0,
   explode: 0, sweep: 0, thermal: 0, flight: 0,
   grid: 0.5, sway: 0.2, spin: 1, labels: 0,
+  fov: 28, // campo de visión vertical, en grados; se anima para igualar la cámara de la web app al abrirla
+  aim: 0,  // 0 = la cámara mira al centro del modelo; 1 = a su origen, como hace la web app
 };
 
 // Piezas que la landing rotula en la vista explosionada. `match` es el prefijo del nodo en el GLB;
@@ -330,6 +332,7 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
 
   const v = new Vector3();
   const v2 = new Vector3();
+  const originN = center.clone().multiplyScalar(-1 / radius); // origen del GLB en la escena normalizada
   const camTarget = new Vector3();
 
   function resize() {
@@ -343,7 +346,7 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
   }
 
   function fitDistance() {
-    const half = MathUtils.degToRad(FOV / 2);
+    const half = MathUtils.degToRad(cur.fov / 2);
     const horizontal = Math.atan(Math.tan(half) * aspect);
     return 1 / Math.sin(Math.min(half, horizontal));
   }
@@ -486,7 +489,10 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
     const el = MathUtils.clamp(cur.el - pcur.y * 0.06, -0.2, 1.45);
     const d = cur.dist * fitDistance();
     camera.position.set(Math.sin(az) * Math.cos(el) * d, Math.sin(el) * d, Math.cos(az) * Math.cos(el) * d);
+    camTarget.copy(originN).multiplyScalar(cur.aim);
+    camera.position.add(camTarget);
     camera.lookAt(camTarget);
+    camera.fov = cur.fov; // setViewOffset recalcula la proyección a continuación
     camera.setViewOffset(width, height, -cur.sx * width, -cur.sy * height, width, height);
 
     renderer.render(scene, camera);
@@ -521,6 +527,10 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
     setVisible(vis) { visible = vis; },
     renderNow() { update(0.016); }, // un cuadro inmediato, sin esperar a requestAnimationFrame
     get state() { return cur; },
+    /** Radio del modelo en metros (el GLB está en metros): la escena lo normaliza a 1. */
+    radiusM: radius,
+    /** Caja del modelo en metros, en el marco del GLB. */
+    sizeM: size.toArray(),
     stats: { triangles: meshes.reduce((n, m) => n + (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3, 0), parts: parts.length },
     dispose() { running = false; renderer.dispose(); },
   };

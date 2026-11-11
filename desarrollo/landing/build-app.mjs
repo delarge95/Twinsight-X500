@@ -1,7 +1,7 @@
 // Compila la web app (twinsight-web-twin, Three.js / R3F) dentro de la landing, en docs/app/.
 //   node desarrollo/landing/build-app.mjs [ruta al repo de la web app]
-// La app pide /parts/*.json y /models/*.glb con ruta absoluta, así que esas dos carpetas se publican
-// en la raíz del sitio (docs/parts, docs/models). El GLB es el mismo que usa la landing: se descarga una vez.
+// La app pide /parts/*.json y /models/*.glb con ruta absoluta, así que esas carpetas se publican
+// en la raíz del sitio (docs/parts, docs/models y docs/data, que lleva el vuelo real de la reproducción local). El GLB es el mismo que usa la landing: se descarga una vez.
 // No modifica el repo de la web app: solo lee su código y escribe en docs/.
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -17,7 +17,7 @@ const vite = path.join(repo, 'node_modules/vite/bin/vite.js');
 const res = spawnSync(process.execPath, [vite, 'build', '--base=./', '--outDir', out, '--emptyOutDir'], { cwd: repo, stdio: 'inherit' });
 if (res.status !== 0) process.exit(res.status ?? 1);
 
-for (const dir of ['parts', 'models']) {
+for (const dir of ['parts', 'models', 'data']) {
   const from = path.join(out, dir), to = path.join(docs, dir);
   fs.rmSync(to, { recursive: true, force: true });
   fs.renameSync(from, to);

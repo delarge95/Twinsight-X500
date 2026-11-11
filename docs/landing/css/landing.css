@@ -406,23 +406,25 @@ html:not(.is-intro) .intro__mark { transform: scale(1.6); opacity: 0; }
 .outro__body { min-height: 78vh; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 9vh; }
 .outro__title { font: 500 clamp(56px, 10vw, 176px)/0.94 var(--display); letter-spacing: -0.05em; }
 
-/* portal: la app se abre dentro de la página. Al lanzarla, la landing se apaga y la cámara entra en el dron */
+/* portal: la app se abre dentro de la página, sin corte. La landing se apaga, su cámara va a la misma vista con la que
+   arranca la app y, cuando la app avisa de que ya dibujó, se funde encima: el dron no desaparece en ningún momento. */
 main, .foot, .rail, .labels { transition: opacity 0.55s var(--ease); }
 .is-launching main, .is-launching .foot, .is-launching .rail, .is-launching .labels, .is-launching .nav { opacity: 0; pointer-events: none; }
+.is-launching body::before { opacity: 0.35; transition: opacity 0.9s var(--ease); }
 .is-portal body { overflow: hidden; }
-.portal { position: fixed; inset: 0; z-index: 70; background: var(--bg); opacity: 0; transition: opacity 0.6s var(--ease); }
+.portal { position: fixed; inset: 0; z-index: 70; }
 .portal[hidden] { display: none; }
-.portal.is-open { opacity: 1; }
-.portal iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--bg); opacity: 0; transition: opacity 0.9s var(--ease); }
+.portal iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity 0.85s var(--ease); }
 .portal.is-ready iframe { opacity: 1; }
-.portal__veil { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 22px; color: #e6edf3; pointer-events: none; transition: opacity 0.6s; }
-.portal.is-ready .portal__veil { opacity: 0; }
-.portal__veil svg { width: 60px; height: 60px; animation: breathe 1.6s ease-in-out infinite; }
-.portal__veil span { font: 500 10.5px/1 var(--display); letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
-@keyframes breathe { 50% { opacity: 0.35; transform: scale(0.93); } }
+.portal.is-closing iframe { opacity: 0; transition-duration: 0.5s; }
+.portal__wait { position: absolute; left: 0; right: 0; bottom: 34px; width: max-content; margin-inline: auto; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-float); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); font: 500 10.5px/1 var(--display); letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-2); opacity: 0; transform: translateY(8px); transition: opacity 0.4s, transform 0.4s var(--ease); pointer-events: none; }
+.portal.is-slow:not(.is-ready) .portal__wait { opacity: 1; transform: none; }
+.portal__wait i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--line-strong); border-top-color: var(--highlight); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .portal__close { position: absolute; z-index: 2; left: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 4px; height: 46px; padding: 0 12px 0 6px; border: 1px solid var(--line-strong); border-left: 0; border-radius: 0 999px 999px 0; background: var(--surface-float); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: var(--text); font: 500 12.5px/1 var(--display); opacity: 0; pointer-events: none; transition: opacity 0.5s 0.5s, color 0.2s; }
 .portal.is-ready .portal__close { opacity: 0.72; pointer-events: auto; }
 .portal.is-ready .portal__close:hover, .portal.is-ready .portal__close:focus-visible { opacity: 1; color: #fff; }
+.portal.is-closing .portal__close { opacity: 0; transition-delay: 0s; }
 .portal__close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .portal__close span { max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width 0.35s var(--ease); }
 .portal__close:hover span, .portal__close:focus-visible span { max-width: 90px; }
@@ -442,5 +444,5 @@ main, .foot, .rail, .labels { transition: opacity 0.55s var(--ease); }
 }
 @media (prefers-reduced-motion: reduce) {
   .intro__mark * { animation: none; stroke-dashoffset: 0; }
-  .portal__veil svg { animation: none; }
+  .portal__wait i { animation: none; }
 }

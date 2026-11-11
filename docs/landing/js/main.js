@@ -9,7 +9,7 @@ import { ES, EN } from './i18n.js';
 //   desktop: URL de descarga del escritorio. Vacío → el enlace dice «próximamente» y no lleva a nada.
 // ─────────────────────────────────────────────────────────────────────────────
 const LINKS = {
-  app: './app/',
+  app: './app/?embed=1', // embed=1: la app salta su pantalla de inicio y avisa cuando ha dibujado
   legacy: './Build/',
   desktop: '',
 };
@@ -71,7 +71,7 @@ function setLang(next, persist = true) {
 
 // ───────────── capítulos ─────────────
 const sections = $$('[data-chapter]');
-const BASE = { az: 0.7, el: 0.3, dist: 1.06, sx: 0, sy: 0.235, explode: 0, sweep: 0, thermal: 0, flight: 0, grid: 0.55, sway: 0.22, spin: 1, labels: 0, o: 1 };
+const BASE = { az: 2.27, el: 0.3, dist: 1.12, sx: 0, sy: 0.26, explode: 0, sweep: 0, thermal: 0, flight: 0, grid: 0.55, sway: 0.22, spin: 1, labels: 0, o: 1, fov: 28, aim: 0 };
 const KEYS = {
   hero: {},
   pipeline: { az: 2.05, el: 0.52, dist: 0.98, sx: 0.2, sy: 0, sweep: 1, kind: 'wire', sway: 0.12, grid: 0.7 },
@@ -86,7 +86,7 @@ const KEYS = {
   outro: { az: 0.45, el: 0.3, dist: 1.02, sx: 0.2, sy: -0.04, o: 1, sway: 0.25 },
 };
 const MOBILE = { // el dron sube y el texto queda abajo
-  hero: { sy: 0.17, dist: 1.08 },
+  hero: { sy: 0.21, dist: 1.16 },
   pipeline: { sy: -0.2 }, explode: { sy: -0.2, dist: 1.7 }, xray: { sy: -0.2 },
   thermal: { sy: -0.2 }, flight: { sy: -0.26, dist: 1.3 }, apps: { sy: -0.2 }, outro: { sy: -0.22, dist: 1.05 },
 };
@@ -99,8 +99,28 @@ const MODES = {
   explode: { sweep: 0, thermal: 0, explode: 1, labels: 1, spin: 0 },
 };
 // Intro: el dron llega desarmado y se ensambla. Lanzamiento: la cámara entra en el dron antes de abrir la app.
-const INTRO_FROM = { az: -0.75, el: 0.95, dist: 2.3, sx: 0, sy: 0.06, explode: 1, sway: 0, spin: 0, grid: 0 };
-const LAUNCH_TO = { az: 0.7, el: 0.26, dist: 0.5, sx: 0, sy: 0.02, explode: 0, sweep: 0, thermal: 0, flight: 0, labels: 0, sway: 0, grid: 0, o: 1 };
+const INTRO_FROM = { az: 0.8, el: 0.95, dist: 2.3, sx: 0, sy: 0.06, explode: 1, sway: 0, spin: 0, grid: 0 };
+// Vista con la que arranca la web app, copiada de su código para que el fundido sea exacto. Si cambia allí, cambiar aquí:
+//   src/web/scene/director.ts  DEFAULT_DIR (1.1, 0.6, 1.3), la cámara mira al origen del dron
+//   src/web/App.tsx            fov 45
+//   src/shared/camera.ts       defaultView(): la distancia que encuadra el modelo (CAM.DEFAULT_VIEW_*)
+const APP_CAMERA = { dir: [1.1, 0.6, 1.3], fov: 45, padding: 1.85, dominant: 2.8, minRatio: 0.18 };
+const LAUNCH_BASE = { sx: 0, sy: 0, explode: 0, sweep: 0, thermal: 0, flight: 0, labels: 0, sway: 0, spin: 0, grid: 0.35, o: 1, aim: 1 };
+/** El estado de la escena que reproduce esa vista: mismo ángulo, mismo campo de visión, misma distancia y mismo punto de mira. */
+function launchPose() {
+  const c = APP_CAMERA;
+  const aspect = innerWidth / innerHeight;
+  const halfV = (c.fov / 2) * (Math.PI / 180), halfH = Math.atan(Math.tan(halfV) * aspect);
+  const [sx, sy, sz] = twin?.sizeM ?? [0.6, 0.25, 0.6];
+  const ex = sx / 2, ey = sy / 2, ez = sz / 2;
+  const framing = Math.max((Math.max(ey / Math.tan(halfV), ex / Math.tan(halfH)) + ez) * c.padding, Math.max(ex, ey, ez) * c.dominant);
+  const metres = Math.max(framing, clamp(Math.max(sx, sy, sz) * c.minRatio, 0.05, 2) + 0.5);
+  const fit = 1 / Math.sin(Math.min(halfV, halfH));
+  const [x, y, z] = c.dir;
+  // La app gira el modelo −90° sobre el eje vertical (src/shared/frames.ts: NED_TO_THREE · MODEL_TO_FRD); aquí el modelo no gira,
+  // así que es la cámara la que suma esos 90°.
+  return { ...LAUNCH_BASE, az: Math.atan2(x, z) + Math.PI / 2, el: Math.asin(y / Math.hypot(x, y, z)), fov: c.fov, dist: metres / (twin?.radiusM ?? 0.4) / fit };
+}
 
 let twin = null;
 let active = 0;
@@ -142,7 +162,7 @@ function compute() {
   const chapter = sections[active].dataset.chapter;
   if (override) { Object.assign(s, MODES[override]); if (MODES[override].kind) kind = MODES[override].kind; }
   if (introT < 1) { const k = 1 - Math.pow(1 - introT, 3); for (const name in INTRO_FROM) s[name] = lerp(INTRO_FROM[name], s[name], k); }
-  if (launching) Object.assign(s, LAUNCH_TO);
+  if (launching) Object.assign(s, launchPose());
   s.kind = kind;
 
   dock.classList.toggle('is-on', DOCK_CHAPTERS.has(chapter) && !!twin && !launching);
@@ -349,31 +369,39 @@ async function endIntro(has3d) {
 }
 
 // ───────────── portal: la app se abre dentro de la página ─────────────
+// Sin corte: la landing apaga su interfaz y lleva la cámara a la vista inicial de la app; la app carga debajo, invisible, y cuando
+// avisa de que ya dibujó su primer cuadro (postMessage 'twinsight:ready') se funde encima. El dron está en pantalla todo el tiempo.
 const portal = { el: $('#portal'), frame: $('#portalFrame'), label: $('#portalLabel'), close: $('#portalClose'), open: false, covered: false, kind: null, opener: null, token: 0 };
+let appReady = null; // resuelve la promesa de «la app ya dibujó»
+addEventListener('message', (e) => {
+  if (e.origin === location.origin && e.source === portal.frame.contentWindow && e.data?.type === 'twinsight:ready') appReady?.();
+});
 async function openPortal(kind, push = true) {
   if (portal.open || !LINKS[kind]) return;
   const token = ++portal.token;
   portal.open = true; portal.kind = kind; portal.opener = document.activeElement;
   portal.label.textContent = t(kind === 'app' ? 'portalApp' : 'portalLegacy');
-  if (kind === 'app') { store.set('tw.heroSeen', '1'); store.set('twinsight.lang', lang); } // la app entra directa al visor, en el mismo idioma
-  // el aviso de carga se escucha antes de poner la dirección: la app puede terminar de cargar durante la transición
-  const ready = new Promise((r) => { portal.frame.addEventListener('load', r, { once: true }); setTimeout(r, 12000); });
-  portal.frame.src = LINKS[kind]; // empieza a cargar mientras la cámara entra en el dron
+  if (kind === 'app') store.set('twinsight.lang', lang); // la app lee esta misma clave: abre en el mismo idioma
+  // Los avisos se escuchan antes de poner la dirección: la app puede terminar de cargar durante la transición.
+  const drawn = new Promise((r) => { appReady = r; });
+  const loaded = new Promise((r) => portal.frame.addEventListener('load', r, { once: true }));
+  portal.el.hidden = false;
+  portal.el.classList.remove('is-ready', 'is-closing', 'is-slow');
+  portal.frame.src = LINKS[kind];
   if (push) history.pushState({ portal: kind }, '', '#' + kind);
   launching = true;
-  root.classList.add('is-launching');
+  root.classList.add('is-launching', 'is-portal');
   compute();
-  await wait(reduced ? 0 : 750);
-  if (token !== portal.token) return;
-  portal.el.hidden = false;
-  portal.el.offsetWidth; // fuerza el estilo inicial antes de la transición
-  root.classList.add('is-portal');
-  portal.el.classList.add('is-open');
-  await Promise.all([ready, wait(700)]);
-  await wait(kind === 'app' ? 500 : 200); // primer cuadro de la app ya dibujado
+  const slow = setTimeout(() => { if (token === portal.token) portal.el.classList.add('is-slow'); }, 1600);
+  // La web app avisa cuando ha dibujado; la versión legacy (Unity) no, así que basta con que cargue su página.
+  const ready = kind === 'app' ? Promise.race([drawn, loaded.then(() => wait(6000))]) : loaded.then(() => wait(300));
+  await Promise.all([Promise.race([ready, wait(15000)]), wait(reduced ? 0 : 1150)]); // 1150 ms: la cámara ya llegó a la vista de la app
+  clearTimeout(slow);
   if (token !== portal.token) return;
   portal.el.classList.add('is-ready');
-  portal.covered = true; // la app ya tapa la landing: se pausa su render
+  await wait(900); // fundido terminado: la app tapa la landing
+  if (token !== portal.token) return;
+  portal.covered = true;
   twin?.setVisible(false);
   portal.frame.focus();
 }
@@ -382,17 +410,22 @@ async function closePortal(pop = false) {
   const token = ++portal.token;
   portal.open = false;
   portal.covered = false;
-  launching = false;
-  root.classList.remove('is-launching', 'is-portal');
-  portal.el.classList.remove('is-open', 'is-ready');
-  compute();
+  appReady = null;
+  twin?.setVisible(true);
+  portal.el.classList.add('is-closing'); // la app se desvanece y deja ver el mismo dron de la landing
   if (!pop && history.state?.portal) history.back();
   else if (!pop) history.replaceState(null, '', location.pathname + location.search);
+  await wait(reduced ? 0 : 450);
+  if (token !== portal.token) return;
+  launching = false;
+  root.classList.remove('is-launching', 'is-portal');
+  compute();
   portal.opener?.focus?.({ preventScroll: true });
-  await wait(650);
+  await wait(200);
   if (token !== portal.token) return;
   portal.frame.src = 'about:blank'; // libera la GPU de la app
   portal.el.hidden = true;
+  portal.el.classList.remove('is-ready', 'is-closing', 'is-slow');
 }
 addEventListener('popstate', () => { if (portal.open) closePortal(true); else if (location.hash === '#app' || location.hash === '#legacy') openPortal(location.hash.slice(1), false); });
 portal.close.addEventListener('click', () => closePortal());
