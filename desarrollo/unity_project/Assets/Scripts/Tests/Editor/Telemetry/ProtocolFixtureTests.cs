@@ -234,6 +234,20 @@ namespace WebGL.Telemetry.Tests
             Assert.AreEqual("Sombra digital · reproducción local", localEs);
             Assert.IsTrue(l.TryLocalReplayText("en", out var localEn));
             Assert.AreEqual("Digital shadow · local replay", localEn);
+            // The flight simulator (web source "sim", approved label): its own texts, neither a digital twin nor a shadow.
+            Assert.IsTrue(l.TrySimText("title", "es", out var simEs));
+            Assert.AreEqual("Simulador de vuelo", simEs);
+            Assert.IsTrue(l.TrySimText("title", "en", out var simEn));
+            Assert.AreEqual("Flight simulator", simEn);
+            Assert.IsTrue(l.TrySimText("detail", "es", out var simDetail));
+            StringAssert.Contains("No es PX4 ni un dron real", simDetail);
+            Assert.IsTrue(l.TrySimText("source", "es", out var simSource));
+            Assert.AreEqual("Simulador (navegador)", simSource);
+            StringAssert.DoesNotContain("gemelo", simEs.ToLowerInvariant());
+            StringAssert.DoesNotContain("sombra", simEs.ToLowerInvariant());
+            Assert.IsFalse(l.TrySimText("nope", "es", out _));
+            Assert.IsTrue(l.TryLocalReplayDetail("es", out var localDetail));
+            StringAssert.Contains("sin servidor", localDetail);
         }
     }
 }

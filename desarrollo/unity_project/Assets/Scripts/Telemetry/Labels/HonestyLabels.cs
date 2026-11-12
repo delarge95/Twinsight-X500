@@ -83,6 +83,24 @@ namespace WebGL.Telemetry
             return text != null;
         }
 
+        /// <summary>Detail text of the local replay (`classification.replay.localDetail`): a real PX4 flight replayed with no server.</summary>
+        public bool TryLocalReplayDetail(string lang, out string text)
+        {
+            text = TryText(lang, "classification", "replay", "localDetail");
+            return text != null;
+        }
+
+        /// <summary>
+        /// Texts of the flight SIMULATOR (web source `sim`, user-approved: "Simulador de vuelo" / "Flight simulator"; not PX4, not a real
+        /// drone, not a shadow). part: title | detail | source (`classification.sim`, from the web dictionaries mode.sim.* / source.sim).
+        /// It rides the wire as mode sitl, so it is NOT a SourceClassification value: the future simulator source shows these texts.
+        /// </summary>
+        public bool TrySimText(string part, string lang, out string text)
+        {
+            text = TryText(lang, "classification", "sim", part);
+            return text != null;
+        }
+
         // ------------------------------------------------------------------------------------------------- lookup
 
         object Node(params string[] path)
@@ -119,6 +137,8 @@ namespace WebGL.Telemetry
                 foreach (var ch in new[] { "motorTemp", "batteryTemp", "fcTemp" }) ProvenanceChannelText(ch, lang);
                 foreach (ThermalOrigin o in Enum.GetValues(typeof(ThermalOrigin))) ThermalOriginText(o, lang);
                 if (!TryLocalReplayText(lang, out _)) throw new KeyNotFoundException("labels.json: missing classification.replay.local");
+                foreach (var part in new[] { "title", "detail", "source" })
+                    if (!TrySimText(part, lang, out _)) throw new KeyNotFoundException("labels.json: missing classification.sim." + part);
                 FaultSynthetic(lang);
                 for (int i = 1; i <= 3; i++) About(i, lang);
             }

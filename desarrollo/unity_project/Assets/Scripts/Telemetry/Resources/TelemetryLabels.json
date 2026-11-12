@@ -9,7 +9,19 @@
         "en": "24/7 replay of a real PX4 flight. Data flows one way; the faults you inject are synthetic."
       },
       "source": { "es": "24/7 · Cloudflare", "en": "24/7 · Cloudflare" },
-      "local": { "es": "Sombra digital · reproducción local", "en": "Digital shadow · local replay" }
+      "local": { "es": "Sombra digital · reproducción local", "en": "Digital shadow · local replay" },
+      "localDetail": {
+        "es": "Un vuelo real de PX4, reproducido en tu navegador sin servidor. Datos en un solo sentido; las fallas que inyectes son sintéticas.",
+        "en": "A real PX4 flight, replayed in your browser with no server. One-way data; any fault you inject is synthetic."
+      }
+    },
+    "sim": {
+      "title": { "es": "Simulador de vuelo", "en": "Flight simulator" },
+      "detail": {
+        "es": "Modelo cinemático que corre en tu navegador para probar el control. No es PX4 ni un dron real: todos sus datos son simulados.",
+        "en": "A kinematic model running in your browser to try the controls. Not PX4 and not a real drone: all of its data is simulated."
+      },
+      "source": { "es": "Simulador (navegador)", "en": "Simulator (browser)" }
     },
     "sitl": {
       "title": { "es": "Gemelo digital SITL", "en": "SITL digital twin" },
