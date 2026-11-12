@@ -48,6 +48,7 @@ namespace WebGL.UI.Panels
             { "STARTING", "INICIANDO" },
             { "IDLE", "REPOSO" },
             { "FLYING", "VUELO" },
+            { "HIGH LOAD (SIMULATED)", "CARGA ALTA (SIMULADO)" },
             { "SHUTDOWN", "APAGANDO" },
             { "CROSS SECTION", "CORTE TRANSVERSAL" },
             { "Cross Section", "Corte transversal" },

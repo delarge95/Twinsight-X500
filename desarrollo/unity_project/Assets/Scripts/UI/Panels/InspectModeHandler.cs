@@ -216,7 +216,12 @@ namespace WebGL.UI.Panels
             {
                 DroneState.StartingUp => "STARTING",
                 DroneState.Idle => "IDLE",
+#if UNITY_STANDALONE
+                // D-6: in the Inspector nothing flies (the drone stays on the bench): the state is a high simulated load.
+                DroneState.Flying => "HIGH LOAD (SIMULATED)",
+#else
                 DroneState.Flying => "FLYING",
+#endif
                 DroneState.ShuttingDown => "SHUTDOWN",
                 _ => "OFF",
             };

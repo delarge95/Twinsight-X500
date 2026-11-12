@@ -354,7 +354,12 @@ namespace WebGL.Core.Managers
             ApplyLoadCommand();
             PlayDroneSound(idleSound);
 
+#if UNITY_STANDALONE
+            // D-6: this is the manual power SIMULATION, not a link: the notice says so (language read from the saved preference, as AppLanguageManager does)
+            NotificationManager.Instance?.ShowNotification(PlayerPrefs.GetString("x500v2_language", "en") == "es" ? "Energía simulada encendida" : "Simulated power on");
+#else
             NotificationManager.Instance?.ShowNotification("Drone is now online");
+#endif
         }
 
         private IEnumerator ShutdownSequence()
@@ -397,7 +402,12 @@ namespace WebGL.Core.Managers
             droneAudioSource.Stop();
             SetState(DroneState.Off);
 
+#if UNITY_STANDALONE
+            // D-6: this is the manual power SIMULATION, not a link: the notice says so (language read from the saved preference, as AppLanguageManager does)
+            NotificationManager.Instance?.ShowNotification(PlayerPrefs.GetString("x500v2_language", "en") == "es" ? "Energía simulada apagada" : "Simulated power off");
+#else
             NotificationManager.Instance?.ShowNotification("Drone is now offline");
+#endif
         }
 
         private void ApplyLoadCommand()
