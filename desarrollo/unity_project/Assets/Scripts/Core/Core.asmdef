@@ -3,7 +3,8 @@
   "rootNamespace": "WebGL.Core",
   "references": [
     "Unity.RenderPipelines.Universal.Runtime",
-    "Unity.RenderPipelines.Core.Runtime"
+    "Unity.RenderPipelines.Core.Runtime",
+    "Telemetry"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

@@ -388,6 +388,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-tel-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var telCap = gameObject.AddComponent<DesktopCaptureTelemetry>();
+                    telCap.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-desk-fps", StringComparison.OrdinalIgnoreCase))
                 {
                     gameObject.AddComponent<DesktopFpsProbe>();

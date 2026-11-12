@@ -56,6 +56,14 @@ namespace WebGL.Core.Managers
         public bool IsOn => currentState != DroneState.Off && currentState != DroneState.ShuttingDown;
         public float LoadCommandNormalized => loadCommandNormalized;
 
+        /// <summary>
+        /// WP-10 (desktop): true while a telemetry session drives the model (TelemetryDroneDriver). The telemetry wins the MOTION: the
+        /// propellers and the root pose come from the frames, so this controller stops spinning the propellers by itself and stops
+        /// hovering / lowering the root. The simulated power state machine (state, lights, sound, thermal load) keeps working; when this
+        /// goes back to false the simulation resumes from the rest pose (the driver restores it).
+        /// </summary>
+        public bool ExternalMotion { get; set; }
+
         public float SystemLoadFactor
         {
             get => systemLoadFactor;
@@ -98,6 +106,13 @@ namespace WebGL.Core.Managers
 
         private void Update()
         {
+            if (ExternalMotion)
+            {
+                // Keep the spin speed in sync so the simulated propellers resume smoothly (no jump) when the telemetry stops.
+                currentPropellerSpeed = Mathf.Lerp(currentPropellerSpeed, targetPropellerSpeed, Time.deltaTime * 5f);
+                return;
+            }
+
             UpdatePropellers();
 
             if (currentState == DroneState.Flying && droneRoot != null)
@@ -352,7 +367,7 @@ namespace WebGL.Core.Managers
                 droneAudioSource.PlayOneShot(shutdownSound);
             }
 
-            if (droneRoot != null && wasFlying)
+            if (droneRoot != null && wasFlying && !ExternalMotion)
             {
                 float timer = 0f;
                 Vector3 startPos = droneRoot.localPosition;

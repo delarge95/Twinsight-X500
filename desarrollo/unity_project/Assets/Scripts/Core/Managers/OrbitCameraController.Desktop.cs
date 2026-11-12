@@ -40,6 +40,36 @@ namespace WebGL.Core.Managers
             _lateralTarget = Mathf.Clamp(ratio, 0f, 0.45f);
         }
 
+        // -- WP-10: keep framing the drone while telemetry moves it --------------------------------------------
+        private bool _telemetryFollow;
+        private bool _telemetryHavePrev;
+        private Vector3 _telemetryPrevTarget;
+
+        /// <summary>
+        /// True while a telemetry session moves the drone root (TelemetryDroneDriver). The view keeps framing whatever the camera
+        /// target is (the drone root, or a part of it while isolating / focusing): the focus point moves WITH the target in the same
+        /// frame instead of easing towards it, so orbit, zoom, pan, Reset and the side-panel shift behave exactly as at rest.
+        /// </summary>
+        public void SetTelemetryFollow(bool on)
+        {
+            _telemetryFollow = on;
+            _telemetryHavePrev = false;
+        }
+
+        private void ApplyDesktopTelemetryFollow()
+        {
+            if (!_telemetryFollow || target == null)
+            {
+                _telemetryHavePrev = false;
+                return;
+            }
+
+            Vector3 p = target.position;
+            if (_telemetryHavePrev) currentFocusPoint += p - _telemetryPrevTarget;
+            _telemetryPrevTarget = p;
+            _telemetryHavePrev = true;
+        }
+
         private Vector3 DesktopLateralShift(Quaternion rotation, float dt)
         {
             _lateralCurrent = Mathf.Lerp(_lateralCurrent, _lateralTarget, 1f - Mathf.Exp(-dampingFactor * 1.4f * dt));

@@ -524,6 +524,10 @@ namespace WebGL.Core.Managers
                 targetFocusPoint = target.position + targetOffset;
             
 #if UNITY_STANDALONE
+            ApplyDesktopTelemetryFollow();
+#endif
+
+#if UNITY_STANDALONE
             currentFocusPoint = Vector3.Lerp(currentFocusPoint, targetFocusPoint, dt * DesktopFocusRate(damp));
 #else
             currentFocusPoint = Vector3.Lerp(currentFocusPoint, targetFocusPoint, dt * damp);

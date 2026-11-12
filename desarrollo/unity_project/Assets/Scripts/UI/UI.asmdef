@@ -2,7 +2,8 @@
     "name": "UI",
     "rootNamespace": "WebGL.UI",
     "references": [
-        "Core"
+        "Core",
+        "Telemetry"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
