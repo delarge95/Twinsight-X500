@@ -1,6 +1,6 @@
 # Copia del contrato de telemetría (WP-01) para los tests EditMode
 
-- Origen: repo web `E:\twinsight-web-twin`, commit `fb5671bf1730b9f7eaf359a43f51841dab0add24`
+- Origen: repo web `E:\twinsight-web-twin`, commit `8e47e15e40fa9c67446c2800631f222e47a1af66` (contrato WP-01 de `fb5671b` + `classification.replay.local` y dt exacto en `golden/quadx.json`)
   (`feat: contrato de telemetria versionado (WP-01)`), `protocolVersion` 1.0.0.
 - Copiado: `contracts/telemetry.schema.json`, `contracts/labels.json`, `contracts/fixtures/**`, `contracts/golden/**`
   y `tests/fixtures/mini.twf` (en `golden/mini.twf`, lo cita `golden/replay.json`).
@@ -8,7 +8,7 @@
   las dos copias sean idénticas.
 - La carpeta acaba en `~`: Unity no la importa (sin `.meta`, no entra en ninguna build). Los tests la leen con `System.IO`.
 - El TWF completo (`data/x500v2_flight.twf`, 1,2 MB) NO se copia: los tests de fotogramas de la repetición lo buscan en
-  `Assets/StreamingAssets/Telemetry/x500v2_flight.twf` (donde lo pondrá WP-09), luego en `%TWINSIGHT_WEB_REPO%/data/` y en
+  `Assets/StreamingAssets/Telemetry/x500v2_flight.twf` (WP-09: ya está ahí; sha256 `883de9a2…594433e`), luego en `%TWINSIGHT_WEB_REPO%/data/` y en
   `E:/twinsight-web-twin/data/`; si no está, esos casos quedan como *Inconclusive*.
 
 ## Refrescar (cuando cambie el contrato)

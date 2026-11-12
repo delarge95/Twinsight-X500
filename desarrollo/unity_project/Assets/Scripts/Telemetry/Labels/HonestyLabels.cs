@@ -73,9 +73,9 @@ namespace WebGL.Telemetry
         }
 
         /// <summary>
-        /// Text for the LOCAL replay (P-3: "Sombra digital · reproducción local"). contracts/labels.json 1.0.0 has no such key, so this
-        /// returns false until the contract adds `classification.replay.local` (reported as a contract gap; WP-03/WP-11a). Callers must not
-        /// hand-write it; until then show ClassificationTitle(Replay) and never "en vivo".
+        /// Text for the LOCAL replay (P-3, user-approved): "Sombra digital · reproducción local" / "Digital shadow · local replay".
+        /// Comes from `classification.replay.local` of labels.json (contract commit 8e47e15); callers must not hand-write it and the
+        /// local replay is never labelled "en vivo".
         /// </summary>
         public bool TryLocalReplayText(string lang, out string text)
         {
@@ -118,6 +118,7 @@ namespace WebGL.Telemetry
                 foreach (var p in new[] { "measured", "estimated", "command", "unavailable" }) ProvenanceText(p, lang);
                 foreach (var ch in new[] { "motorTemp", "batteryTemp", "fcTemp" }) ProvenanceChannelText(ch, lang);
                 foreach (ThermalOrigin o in Enum.GetValues(typeof(ThermalOrigin))) ThermalOriginText(o, lang);
+                if (!TryLocalReplayText(lang, out _)) throw new KeyNotFoundException("labels.json: missing classification.replay.local");
                 FaultSynthetic(lang);
                 for (int i = 1; i <= 3; i++) About(i, lang);
             }

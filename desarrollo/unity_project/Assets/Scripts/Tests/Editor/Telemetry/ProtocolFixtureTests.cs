@@ -230,7 +230,10 @@ namespace WebGL.Telemetry.Tests
             StringAssert.Contains("No es un gemelo de un dron físico", l.About(3, "es"));
             Assert.AreEqual("Hold", l.NavState(4));
             Assert.AreEqual("nav 99", l.NavState(99));
-            Assert.IsFalse(l.TryLocalReplayText("es", out _), "labels.json 1.0.0 has no local-replay text (contract gap reported for WP-03/WP-11a)");
+            Assert.IsTrue(l.TryLocalReplayText("es", out var localEs), "contract 8e47e15 adds classification.replay.local");
+            Assert.AreEqual("Sombra digital · reproducción local", localEs);
+            Assert.IsTrue(l.TryLocalReplayText("en", out var localEn));
+            Assert.AreEqual("Digital shadow · local replay", localEn);
         }
     }
 }

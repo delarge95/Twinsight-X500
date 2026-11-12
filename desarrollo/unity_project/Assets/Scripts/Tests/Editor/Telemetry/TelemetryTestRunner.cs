@@ -1,4 +1,4 @@
-// Runs the telemetry EditMode tests without opening the Test Runner window and writes a summary to
+// Runs the telemetry EditMode tests (and the project EditMode tests, WebGL.Tests.Editor) without opening the Test Runner window and writes a summary to
 // Temp/telemetry_tests.txt (menu: TwinSight > Telemetry > Run contract tests, or TelemetryTestRunner.Run() from code).
 using System.IO;
 using System.Text;
@@ -18,7 +18,7 @@ namespace WebGL.Telemetry.Tests
             File.WriteAllText(OutFile, "RUNNING\n");
             var api = ScriptableObject.CreateInstance<TestRunnerApi>();
             api.RegisterCallbacks(new Callbacks());
-            api.Execute(new ExecutionSettings(new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { "WebGL.Telemetry.Tests.Editor" } }));
+            api.Execute(new ExecutionSettings(new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { "WebGL.Telemetry.Tests.Editor", "WebGL.Tests.Editor" } }));
         }
 
         sealed class Callbacks : ICallbacks

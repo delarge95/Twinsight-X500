@@ -396,14 +396,9 @@ namespace WebGL.Telemetry.Tests
             {
                 cs.Case();
                 var i = C.O(s, "in");
-                // CONTRACT ISSUE (reported): `out` was computed with the exact dt (1/60, 1/30) but `in.dt` is printed rounded to 6
-                // decimals, so the 1e-6 tolerance cannot hold from the printed input. Tolerance = 1e-6 + |omega| * 5e-7 (half a unit of
-                // the 6th decimal of dt times the angular speed).
-                double omega = C.N(i, "rpm") / 60 * 2 * Math.PI * C.N(i, "visual_scale");
-                cs.Near(C.N(s, "out"), Interp.AdvancePhase(C.N(i, "phase"), C.N(i, "rpm"), C.I(i, "spin"), C.N(i, "dt"), C.N(i, "visual_scale")), "phase", 1e-6 + Math.Abs(omega) * 5e-7);
-                // Strict check with the exact dt the golden was computed with (nearest 1/n).
-                double dtExact = 1.0 / Math.Round(1.0 / C.N(i, "dt"));
-                cs.Near(C.N(s, "out"), Interp.AdvancePhase(C.N(i, "phase"), C.N(i, "rpm"), C.I(i, "spin"), dtExact, C.N(i, "visual_scale")), "phase (exact dt)", 1e-6);
+                // Since contract commit 8e47e15 `out` is computed with the same dt the golden prints (6 decimals), so the input
+                // reproduces it with the plain 1e-6 tolerance (before: out used 1/60, a 2e-4 mismatch).
+                cs.Near(C.N(s, "out"), Interp.AdvancePhase(C.N(i, "phase"), C.N(i, "rpm"), C.I(i, "spin"), C.N(i, "dt"), C.N(i, "visual_scale")), "phase", 1e-6);
             }
             cs.Done();
         }

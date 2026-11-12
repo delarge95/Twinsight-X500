@@ -8,7 +8,8 @@
         "es": "Repetición 24/7 de un vuelo real de PX4. Datos en un solo sentido; las fallas que inyectes son sintéticas.",
         "en": "24/7 replay of a real PX4 flight. Data flows one way; the faults you inject are synthetic."
       },
-      "source": { "es": "24/7 · Cloudflare", "en": "24/7 · Cloudflare" }
+      "source": { "es": "24/7 · Cloudflare", "en": "24/7 · Cloudflare" },
+      "local": { "es": "Sombra digital · reproducción local", "en": "Digital shadow · local replay" }
     },
     "sitl": {
       "title": { "es": "Gemelo digital SITL", "en": "SITL digital twin" },

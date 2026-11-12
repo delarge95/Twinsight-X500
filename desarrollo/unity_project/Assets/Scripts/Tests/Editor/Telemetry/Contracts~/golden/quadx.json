@@ -36,14 +36,14 @@
     "out_motor_per_part": [3, 1, 4, 2]
   },
   "advance_phase": [
-    { "in": { "phase": 0, "rpm": 6000, "spin": 1, "dt": 0.016667, "visual_scale": 1 }, "out": 4.18879 },
+    { "in": { "phase": 0, "rpm": 6000, "spin": 1, "dt": 0.016667, "visual_scale": 1 }, "out": 4.189 },
     {
       "in": { "phase": 6, "rpm": 6000, "spin": -1, "dt": 0.016667, "visual_scale": 1 },
-      "out": -4.471976
+      "out": -4.472185
     },
     {
       "in": { "phase": 1, "rpm": 6500, "spin": 1, "dt": 0.033333, "visual_scale": 0.04 },
-      "out": 1.907571
+      "out": 1.907562
     },
     { "in": { "phase": 3, "rpm": 0, "spin": 1, "dt": 0.016667, "visual_scale": 1 }, "out": 3 }
   ]
