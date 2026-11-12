@@ -67,6 +67,10 @@ namespace WebGL.UI.Panels
 
         // ── State ──
         public bool IsSheetOpen { get; private set; } = false;
+#if UNITY_STANDALONE
+        /// <summary>PC: set by the desktop chrome; true while the Flight tab is showing (the sheet then survives a deselection).</summary>
+        public static System.Func<bool> DesktopKeepOpenOnDeselect;
+#endif
         private float _swipeStartY;
         private float _swipeStartX;
         private bool _isSwipingUp;
@@ -551,7 +555,8 @@ namespace WebGL.UI.Panels
 #if UNITY_STANDALONE
                 // Phase 2B: the docked panel never shows stale data; deselecting (background click, Esc,
                 // reset) closes it, and PART INFO opens it again for the next part.
-                if (IsSheetOpen)
+                // The Flight tab (telemetry readings) does not depend on a selection: it stays open.
+                if (IsSheetOpen && !(DesktopKeepOpenOnDeselect != null && DesktopKeepOpenOnDeselect()))
                 {
                     SetSheetState(false);
                 }

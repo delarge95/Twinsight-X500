@@ -198,6 +198,8 @@ namespace WebGL.UI
         public bool FilterActive => _modeController != null && _modeController.IsCategoryFilterActive;
         public void ShortcutClearFilter() { if (!IsHeroVisible && !IsOnboardingOpen) _modeController?.ClearCategoryFilters(); }
         public void ShortcutClearExplode() { if (!IsHeroVisible && !IsOnboardingOpen) _modeController?.ClearExplode(); }
+        /// <summary>Telemetry mode (PC, key 4) is not one of the three UIModeController modes: opening it closes whichever of those is active.</summary>
+        public void ShortcutCloseModes() { if (!IsHeroVisible && !IsOnboardingOpen) _modeController?.DeactivateAllModes(); }
 #endif
 
         public void ShortcutFocusSelection()

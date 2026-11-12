@@ -103,6 +103,22 @@ namespace WebGL.UI.ProceduralIcons
             { "sensors", S(AnimKind.Pulse, "Las ondas se expanden", 0.16f, 0f, 480) },
             { "battery", S(AnimKind.Pulse, "La batería late", 0.1f, 0f, 420) },
             { "fastener", S(AnimKind.Tilt, "La tuerca da un cuarto de vuelta y vuelve", 0f, 60f, 460) },
+            // web telemetry icons (design/icons_new): pasted from design/out/OutlineIconAnimSpecsNew.generated.cs.txt
+            { "light", S(AnimKind.Pulse, "La bombilla late una vez", 0.14f, 0f, 420, false, false) },
+            { "flight", S(AnimKind.Float, "El avión se eleva y vuelve con un pequeño rebote", 2.4f, 0f, 520, false, false) },
+            { "link", S(AnimKind.Shift, "Los dos eslabones se separan un instante y vuelven", 0f, 0f, 420, false, false, V(1.2f, -1.2f), V(-1.2f, 1.2f)) },
+            { "source", S(AnimKind.Draw, "Las ondas se dibujan de nuevo desde la antena", 0f, 0f, 520, false, false) },
+            { "replay", S(AnimKind.Rotate, "Giro completo en sentido antihorario", 0f, -360f, 620, false, false) },
+            { "sitl", S(AnimKind.Pulse, "La pantalla late una vez", 0.1f, 0f, 420, false, false) },
+            { "alert", S(AnimKind.Pulse, "Late una vez", 0.14f, 0f, 420, false, false) },
+            { "events", S(AnimKind.Draw, "Las líneas se dibujan una tras otra", 0f, 0f, 520, false, false) },
+            { "fault", S(AnimKind.Wobble, "El rayo oscila amortiguado", 0f, 10f, 460, false, false) },
+            { "takeoff", S(AnimKind.Shift, "La flecha sube y vuelve", 0f, 0f, 420, false, false, V(0f, -2f), V(0f, -2f), V(0f, 0f)) },
+            { "land", S(AnimKind.Shift, "La flecha baja y vuelve", 0f, 0f, 420, false, false, V(0f, 2f), V(0f, 2f), V(0f, 0f)) },
+            { "rtl", S(AnimKind.Shift, "La flecha se desplaza hacia el punto de partida y vuelve", 0f, 0f, 420, false, false, V(-1.6f, 0f), V(-1.6f, 0f), V(0f, 0f)) },
+            { "hold", S(AnimKind.Pulse, "Late una vez", 0.12f, 0f, 420, false, false) },
+            { "orbit_cmd", S(AnimKind.Rotate, "El dron da una vuelta alrededor del punto", 0f, 360f, 800, false, false) },
+            { "gamepad", S(AnimKind.Tilt, "El mando se inclina y vuelve", 0f, 8f, 420, false, false) },
         };
 
         public static AnimSpec Get(string shape)

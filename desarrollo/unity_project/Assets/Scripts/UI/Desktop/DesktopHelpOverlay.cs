@@ -106,9 +106,10 @@ namespace WebGL.UI.Desktop
             VisualElement left = NewColumn(columns);
             left.AddToClassList("desktop-help-column--narrow");
             AddSection(left, T("MODES", "MODOS"));
-            AddRow(left, new[] { "1" }, T("Inspect (pins, isolate, power)", "Inspeccionar (puntos, aislar, energía)"));
+            AddRow(left, new[] { "1" }, T("Inspect (pins, isolate, simulated power)", "Inspeccionar (puntos, aislar, energía simulada)"));
             AddRow(left, new[] { "2" }, T("Analyze (cut, explode, filter)", "Analizar (corte, explosión, filtro)"));
             AddRow(left, new[] { "3" }, T("Studio (render modes, light)", "Estudio (modos de render, luz)"));
+            AddRow(left, new[] { "4" }, T("Telemetry (power, source, alerts, faults)", "Telemetría (encendido, fuente, alertas, fallas)"));
             AddSection(left, T("TOOLS", "HERRAMIENTAS"));
             AddRow(left, new[] { "H" }, T("Show / hide pins", "Mostrar / ocultar puntos"));
             AddRow(left, new[] { "I" }, T("Isolate selected part", "Aislar la pieza seleccionada"));
@@ -116,6 +117,9 @@ namespace WebGL.UI.Desktop
             AddRow(left, new[] { "C" }, T("Cross-section cut", "Corte transversal"));
             AddRow(left, new[] { "G" }, T("Filter by category", "Filtrar por categoría"));
             AddRow(left, new[] { "V" }, T("Cycle render modes", "Ciclar modos de render"));
+            AddSection(left, T("TELEMETRY", "TELEMETRÍA"));
+            AddRow(left, new[] { "L" }, T("Data source", "Fuente de datos"));
+            AddRow(left, new[] { "Shift+A" }, T("Alerts", "Alertas"));
             AddSection(left, T("WINDOW", "VENTANA"));
             AddRow(left, new[] { "F11", "Alt+Enter" }, T("Fullscreen", "Pantalla completa"));
             AddRow(left, new[] { "?", "F1" }, T("This help", "Esta ayuda"));

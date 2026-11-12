@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using WebGL.Core.Content;
 using WebGL.Core.Managers;
+using WebGL.Telemetry;
 using WebGL.UI.Panels;
 using WebGL.UI.ProceduralIcons;
 
@@ -27,6 +28,7 @@ namespace WebGL.UI.Desktop
         public const float StatusHeight = 26f;
         public const float RailWidth = 40f;
         public const float AutoOpenMinLogicalWidth = 1600f;
+        public const float NarrowBarLogicalWidth = 1600f;
 
         private readonly VisualElement _root;
         private readonly DesktopUIController _ctrl;
@@ -43,8 +45,9 @@ namespace WebGL.UI.Desktop
         private VisualElement _cfgOriginalParent;
         private int _cfgOriginalIndex;
 
-        private readonly Button[] _modeSeg = new Button[3];
-        private readonly Label[] _modeText = new Label[3];
+        private readonly Button[] _modeSeg = new Button[4];
+        private readonly Label[] _modeText = new Label[4];
+        private DesktopTelemetryUI _tel;
         private readonly Button[] _modeSrc = new Button[3];
         private Button _chipFilter, _chipExplode, _chipCut, _chipPower;
         private SlidingPill _segPill, _langPill;
@@ -76,6 +79,7 @@ namespace WebGL.UI.Desktop
         };
 
         public bool IsSettingsOpen => _settingsOpen;
+        internal DesktopTelemetryUI Telemetry => _tel;
 
         public DesktopChrome(VisualElement root, DesktopUIController ctrl, DesktopPartTree tree, DesktopSidePanel side)
         {
@@ -92,6 +96,7 @@ namespace WebGL.UI.Desktop
             BuildSettings();
             PrepareModePanels();
             BuildSheetFooter();
+            _tel.BuildMode();
             AppLanguageManager.LanguageChanged += OnLanguage;
             OnLanguage(null);
         }
@@ -101,6 +106,7 @@ namespace WebGL.UI.Desktop
             AppLanguageManager.LanguageChanged -= OnLanguage;
             CloseSettings();
             _top?.RemoveFromHierarchy();
+            _tel?.Dispose();
             _railL?.RemoveFromHierarchy();
             _railR?.RemoveFromHierarchy();
             _status?.RemoveFromHierarchy();
@@ -157,6 +163,10 @@ namespace WebGL.UI.Desktop
                 chip.schedule.Execute(() => { if (!chip.ClassListContains("dk-chip--live")) chip.style.display = DisplayStyle.None; }).StartingIn(DesktopMotion.Reduce ? 1 : 200);
             }
         }
+
+        internal Button MakeChipPublic(string shape, string name, Action off) => MakeChip(shape, name, off);
+        internal DesktopVectorIcon NewIconPublic(string shape, float size) => NewIcon(shape, size);
+        internal Button IconButtonPublic(string shape, string name, Action onClick, float icon = 16f) => IconButton(shape, name, onClick, icon);
 
         private DesktopVectorIcon NewIcon(string shape, float size)
         {
@@ -289,15 +299,17 @@ namespace WebGL.UI.Desktop
             _top.Add(_crumb);
             Grow(_top);
 
+            _tel = new DesktopTelemetryUI(_root, this, _ui);
             var seg = new VisualElement();
             seg.AddToClassList("dk-seg");
-            string[] keys = { "1", "2", "3" };
-            for (int i = 0; i < 3; i++)
+            string[] keys = { "1", "2", "3", "4" };
+            for (int i = 0; i < 4; i++)
             {
                 int mode = i + 1;
-                var b = new Button(() => _ui.ShortcutToggleMode(mode)) { name = "DkMode" + mode };
+                // mode 4 (Telemetry, WP-11) is not one of the three UIModeController modes: it lives in DesktopTelemetryUI
+                var b = new Button(() => { if (mode == 4) _tel.ToggleMode(); else _ui.ShortcutToggleMode(mode); }) { name = "DkMode" + mode };
                 b.AddToClassList("dk-seg-btn");
-                var segIcon = new DesktopVectorIcon(mode == 1 ? "inspect" : mode == 2 ? "analyze" : "studio", 16);
+                var segIcon = new DesktopVectorIcon(mode == 1 ? "inspect" : mode == 2 ? "analyze" : mode == 3 ? "studio" : "flight", 16);
                 _icons.Add(segIcon);
                 b.Add(segIcon);
                 var t = new Label { pickingMode = PickingMode.Ignore };
@@ -316,11 +328,11 @@ namespace WebGL.UI.Desktop
             _top.Add(seg);
             Grow(_top);
 
-            // Top bar zones (keep them when adding things): [home, brand, crumb] [modes 1/2/3] [future mode slot] [view actions: pins + active-effect chips, isolate, reset] [docks] [language, settings, help].
-            // DkTopSlotFuture is an empty, hidden slot where a future Telemetry / Twin mode button can go without re-layout.
+            // Top bar zones (keep them when adding things): [home, brand, crumb] [modes 1/2/3/4] [telemetry status chip: DkTopSlotFuture] [view actions: pins + active-effect chips, isolate, reset] [docks] [language, settings, help].
+            // DkTopSlotFuture holds the telemetry status chip (WP-11): link dot + honest badge text, click opens mode 4.
             var futureSlot = new VisualElement { name = "DkTopSlotFuture", pickingMode = PickingMode.Ignore };
             futureSlot.AddToClassList("dk-top-slot");
-            futureSlot.style.display = DisplayStyle.None;
+            futureSlot.Add(_tel.StatusChip);
             _top.Add(futureSlot);
 
             _btnPins = IconButton("pin", "DkPins", () => _ui.ShortcutTogglePins());
@@ -336,6 +348,8 @@ namespace WebGL.UI.Desktop
             // drone power chip (provisional home of the power-off control; see PLAN_PC.md section 19b): visible while the drone is on, click powers it off
             _chipPower = MakeChip("power", "DkChipPower", () => DroneStateController.Instance?.TurnOff());
             _top.Add(_chipPower);
+            // second chip: an active telemetry session (same chip style; click = stop the session)
+            _top.Add(_tel.SessionChip);
             _top.Add(_btnIso);
             _top.Add(reset);
             _top.Add(Sep());
@@ -686,12 +700,18 @@ namespace WebGL.UI.Desktop
         {
             // segmented mode switch mirrors the (hidden) capsule buttons; the pill slides under the active one
             Button activeSeg = null;
+            bool anyOfThree = false;
             for (int i = 0; i < 3; i++)
             {
                 bool on = _modeSrc[i] != null && _modeSrc[i].ClassListContains("mode-btn--active");
                 _modeSeg[i].EnableInClassList("dk-seg-btn--on", on);
-                if (on) activeSeg = _modeSeg[i];
+                if (on) { activeSeg = _modeSeg[i]; anyOfThree = true; }
             }
+
+            // mode 4 (Telemetry): exclusive with the other three
+            if (anyOfThree && _tel.ModeOpen) _tel.CloseMode();
+            _modeSeg[3].EnableInClassList("dk-seg-btn--on", _tel.ModeOpen);
+            if (_tel.ModeOpen) activeSeg = _modeSeg[3];
 
             _segPill?.Update(activeSeg);
             _langPill?.Update(AppLanguageManager.IsSpanish ? _btnLangEs : _btnLangEn);
@@ -704,7 +724,8 @@ namespace WebGL.UI.Desktop
             string text = ctx != null ? ctx.text : string.Empty;
             if (_crumb.text != text) _crumb.text = text;
             _crumb.EnableInClassList("dk-crumb--has", hasSel);
-            _crumb.style.display = string.IsNullOrEmpty(text) ? DisplayStyle.None : DisplayStyle.Flex;
+            // narrow windows: the "select a part" placeholder gives its room to the telemetry chips; a real part name stays (truncated)
+            _crumb.style.display = string.IsNullOrEmpty(text) || (logicalWidth < NarrowBarLogicalWidth && !hasSel) ? DisplayStyle.None : DisplayStyle.Flex;
 
             bool treeOpen = _tree.IsOpen;
             bool sheetOpen = _side.IsOpen;
@@ -725,6 +746,10 @@ namespace WebGL.UI.Desktop
             UpdateChip(_chipExplode, ExplodedViewManager.Instance != null && ExplodedViewManager.Instance.GetExplosionFactor() > 0.001f);
             UpdateChip(_chipCut, CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled);
             UpdateChip(_chipPower, DroneStateController.Instance != null && DroneStateController.Instance.IsOn);
+            _tel.Tick();
+            RelabelPowerCard();
+            // narrow windows (1280x720 = 1391 logical px): the mode keys, a long part name and the status chip give way so the bar never overlaps
+            _root.EnableInClassList("dk-narrowbar", logicalWidth < NarrowBarLogicalWidth);
             SetOn(_btnIso, _root.Q<Button>("ToolIsolateBtn")?.ClassListContains("submenu-card--active") == true);
             SetOn(_btnGear, _settingsOpen);
             _btnLangEn.EnableInClassList("dk-lang-btn--on", !AppLanguageManager.IsSpanish);
@@ -786,6 +811,37 @@ namespace WebGL.UI.Desktop
 
             CentreHeroLeads();
             foreach (DesktopVectorIcon ic in _icons) ic.Refresh();
+        }
+
+        private Label _powerCardLabel, _powerNote;
+
+        /// <summary>
+        /// D-6 / WP-11: the Inspector's power card is the MANUAL SIMULATION ("Energia (simulada)"), not the telemetry session (the session
+        /// switch "Encendido" is in mode 4). The simulation popover says so; its FLYING state reads "Carga alta (simulado)" (InspectModeHandler).
+        /// </summary>
+        private void RelabelPowerCard()
+        {
+            if (_powerCardLabel == null)
+            {
+                _powerCardLabel = _root.Q<Button>("ToolPowerBtn")?.Q<Label>(className: "submenu-label");
+                VisualElement panel = _root.Q<VisualElement>("ToolPowerLoadPanel");
+                if (panel != null && _powerNote == null)
+                {
+                    _powerNote = new Label { name = "DkPowerNote", pickingMode = PickingMode.Ignore };
+                    _powerNote.AddToClassList("dk-note");
+                    _powerNote.AddToClassList("dk-note--muted");
+                    panel.Add(_powerNote);
+                }
+            }
+
+            string lang = AppLanguageManager.IsSpanish ? "es" : "en";
+            string t = TelemetryStrings.T("power.sim", lang);
+            if (_powerCardLabel != null && _powerCardLabel.text != t) _powerCardLabel.text = t;
+            Button powerBtn = _root.Q<Button>("ToolPowerBtn");
+            string tip = TelemetryStrings.T("power.sim.tip", lang);
+            if (powerBtn != null && powerBtn.tooltip != tip) powerBtn.tooltip = tip;
+            string n = TelemetryStrings.T("power.sim.note", lang);
+            if (_powerNote != null && _powerNote.text != n) _powerNote.text = n;
         }
 
         /// <summary>Selection feedback (part pill, inspector title) and the hero entrance.</summary>
@@ -861,6 +917,7 @@ namespace WebGL.UI.Desktop
             _modeText[0].text = T("Inspect", "Inspeccionar");
             _modeText[1].text = T("Analyze", "Analizar");
             _modeText[2].text = T("Studio", "Estudio");
+            _modeText[3].text = T("Telemetry", "Telemetría");
             _root.Q<Label>("DkSettingsTitle").text = T("Settings", "Ajustes");
             var envLabel = _root.Q<Label>("DkEnvLabel");
             if (envLabel != null) envLabel.text = T("Environment", "Entorno");
@@ -872,7 +929,7 @@ namespace WebGL.UI.Desktop
             _chipFilter.tooltip = T("Remove filter", "Quitar filtro");
             _chipExplode.tooltip = T("Remove exploded view", "Quitar vista explosiva");
             _chipCut.tooltip = T("Remove cut", "Quitar corte");
-            _chipPower.tooltip = T("Power off drone", "Apagar dron");
+            _chipPower.tooltip = T("Switch off simulated power", "Apagar energía simulada");
             _btnIso.tooltip = T("Isolate selected part", "Aislar la pieza seleccionada");
             _root.Q<Button>("DkReset").tooltip = T("Reset view", "Restablecer vista");
             _btnTree.tooltip = T("Parts tree", "Árbol de piezas");
@@ -882,7 +939,8 @@ namespace WebGL.UI.Desktop
             _railTree.tooltip = T("Parts tree", "Árbol de piezas");
             _railSearch.tooltip = T("Search part", "Buscar pieza");
             _railInspector.tooltip = T("Part inspector", "Inspector de pieza");
-            _modeSeg[0].tooltip = T("Inspect: pins, isolate, power", "Inspeccionar: puntos, aislar, energía");
+            _modeSeg[0].tooltip = T("Inspect: pins, isolate, simulated power", "Inspeccionar: puntos, aislar, energía simulada");
+            _modeSeg[3].tooltip = T("Telemetry: power, source, alerts and faults", "Telemetría: encendido, fuente, alertas y fallas");
             _modeSeg[1].tooltip = T("Analyze: cut, explode, filter", "Analizar: corte, explosión, filtro");
             _modeSeg[2].tooltip = T("Studio: render and environment", "Estudio: render y entorno");
         }

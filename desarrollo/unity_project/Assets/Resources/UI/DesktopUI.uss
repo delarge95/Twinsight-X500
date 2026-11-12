@@ -1907,3 +1907,184 @@
 .dk-tut-row:hover { background-color: rgba(70, 175, 255, 0.07); border-color: rgba(70, 175, 255, 0.35); }
 .dk-tut-row--locked { background-color: rgba(70, 175, 255, 0.2); border-color: rgb(70, 175, 255); }
 .dk-tut-anim-pop { position: absolute; padding: 2px 9px; font-size: 12px; color: rgb(6, 34, 47); background-color: rgb(191, 234, 255); border-radius: 10px; -unity-font-style: bold; }
+
+/* ================================================================
+   Phase 7 - telemetry (WP-11, PC only): mode 4 strip + popovers, status chip, "Vuelo" tab of the inspector.
+   Colours only from design/tokens.json: accent rgb(70,175,255), highlight rgb(191,234,255), surfaces rgb(11,13,17) / rgb(18,21,27) / rgb(23,27,34) /
+   rgb(27,32,41), lines rgba(255,255,255,.09|.16), texts rgb(255,255,255) / rgb(232,237,243) / rgb(219,228,238) / rgb(182,192,204) / rgb(139,149,163),
+   states ok rgb(63,191,138), warn rgb(245,185,66), crit rgb(255,77,77). Origin tags: measured = ok, estimated = warn, simulated = accent.
+   ================================================================ */
+
+/* status chip (top bar, DkTopSlotFuture): link-state dot + the honest badge text; click opens mode 4 */
+.dk-stchip {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 1;
+    height: 28px;
+    min-height: 0;
+    max-width: 320px;
+    margin: 0 4px;
+    padding: 0 12px 0 10px;
+    border-width: 1px;
+    border-radius: 14px;
+    border-color: rgba(255, 255, 255, 0.09);
+    background-color: rgb(23, 27, 34);
+    overflow: hidden;
+    transition-property: background-color, border-color, color, scale, translate, opacity;
+    transition-duration: 0.14s;
+    transition-timing-function: ease-out;
+}
+.dk-stchip:hover { background-color: rgb(27, 32, 41); border-color: rgba(70, 175, 255, 0.5); scale: 1.03 1.03; }
+.dk-stchip:active { background-color: rgba(70, 175, 255, 0.22); border-color: rgba(70, 175, 255, 0.7); scale: 0.96 0.96; }
+.dk-stchip--on { background-color: rgba(70, 175, 255, 0.08); border-color: rgba(70, 175, 255, 0.45); }
+.dk-stchip.dk-flash { scale: 1.06 1.06; background-color: rgba(70, 175, 255, 0.3); }
+.dk-keynav .dk-stchip:focus { border-width: 2px; border-color: rgb(70, 175, 255); }
+.dk-stchip-text { flex-shrink: 1; margin: 0; padding: 0; font-size: 12.5px; color: rgb(219, 228, 238); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-stchip--on .dk-stchip-text { color: rgb(191, 234, 255); }
+
+/* link-state dot (chip, tab, alert rows) */
+.dk-dot { width: 8px; height: 8px; min-width: 8px; border-radius: 4px; margin: 0 7px 0 0; flex-shrink: 0; background-color: rgb(139, 149, 163); transition-property: opacity, background-color; transition-duration: 0.5s; transition-timing-function: ease-out; }
+.dk-dot--off { background-color: rgb(139, 149, 163); }
+.dk-dot--live { background-color: rgb(63, 191, 138); }
+.dk-dot--connecting, .dk-dot--stale, .dk-dot--warn { background-color: rgb(245, 185, 66); }
+.dk-dot--error, .dk-dot--crit { background-color: rgb(255, 77, 77); }
+.dk-dot--dim { opacity: 0.3; }
+
+/* mode 4 strip */
+.dk-strip-state { margin: 0 0 0 8px; font-size: 11.5px; color: rgb(139, 149, 163); }
+.dk-strip-state--live { color: rgb(63, 191, 138); }
+.dk-strip-state--warn { color: rgb(245, 185, 66); }
+.dk-strip-state--crit { color: rgb(255, 77, 77); }
+.dk-strip--tel .dk-sep { margin: 0 5px; }
+.dk-strip--tel .dk-kbd { margin-left: 8px; }
+.dk-count { display: none; min-width: 16px; height: 16px; margin: 0 0 0 7px; padding: 0 5px; font-size: 11px; color: rgb(11, 13, 17); -unity-font-style: bold; -unity-text-align: middle-center; border-radius: 8px; background-color: rgb(139, 149, 163); }
+.dk-count--warn { background-color: rgb(245, 185, 66); }
+.dk-count--crit { background-color: rgb(255, 77, 77); }
+.dk-strip-btn--alert .dk-icon { color: rgb(245, 185, 66); }
+
+/* popovers of the strip */
+.layout--desktop.chrome2 .dk-pop.dk-pop--w360 { width: 360px; }
+.layout--desktop.chrome2 .dk-pop.dk-pop--w340 { width: 340px; }
+.dk-note { margin: 2px 0 4px 0; padding: 0; font-size: 12px; color: rgb(182, 192, 204); white-space: normal; }
+.dk-note--muted { font-size: 11.5px; color: rgb(139, 149, 163); }
+.dk-note--warn { color: rgb(245, 185, 66); }
+.dk-field-label { margin: 6px 0 3px 0; font-size: 11px; letter-spacing: 0.5px; color: rgb(139, 149, 163); }
+
+.dk-src-row {
+    flex-direction: row;
+    align-items: flex-start;
+    margin: 0 0 4px 0;
+    padding: 8px 10px;
+    border-width: 1px;
+    border-radius: 10px;
+    border-color: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0);
+    transition-property: background-color, border-color, scale, opacity;
+    transition-duration: 0.14s;
+    transition-timing-function: ease-out;
+}
+.dk-src-row:hover { background-color: rgb(27, 32, 41); border-color: rgba(70, 175, 255, 0.4); }
+.dk-src-row:active { background-color: rgba(70, 175, 255, 0.22); scale: 0.99 0.99; }
+.dk-src-row--on, .dk-src-row--on:hover { background-color: rgba(70, 175, 255, 0.16); border-color: rgba(70, 175, 255, 0.55); }
+.dk-src-row--disabled, .dk-src-row--disabled:hover, .dk-src-row--disabled:active { opacity: 0.45; background-color: rgba(0, 0, 0, 0); border-color: rgba(0, 0, 0, 0); scale: 1 1; }
+.dk-keynav .dk-src-row:focus, .dk-keynav .dk-alert-row:focus, .dk-keynav .dk-tab:focus { border-width: 2px; border-color: rgb(70, 175, 255); }
+.dk-src-icon { margin: 2px 10px 0 0; }
+.dk-src-row .dk-icon { color: rgb(182, 192, 204); }
+.dk-src-row--on .dk-icon { color: rgb(191, 234, 255); }
+.dk-src-col { flex-grow: 1; flex-shrink: 1; flex-basis: 0; }
+.dk-src-title { margin: 0; font-size: 13px; color: rgb(232, 237, 243); -unity-font-style: bold; }
+.dk-src-sub { margin: 1px 0 0 0; font-size: 12px; color: rgb(139, 149, 163); white-space: normal; }
+.dk-src-badge { margin: 1px 0 0 0; font-size: 12px; color: rgb(191, 234, 255); white-space: normal; }
+.dk-src-detail { margin: 2px 0 0 0; font-size: 11.5px; color: rgb(139, 149, 163); white-space: normal; }
+.dk-sitl-block { margin: 0 0 2px 0; padding: 6px 10px 8px 10px; border-width: 1px; border-radius: 10px; border-color: rgba(255, 255, 255, 0.09); background-color: rgb(11, 13, 17); }
+.dk-sitl-line { flex-direction: row; align-items: center; margin-top: 2px; }
+.dk-sitl-field { flex-grow: 1; flex-shrink: 1; margin: 0 8px 0 0; height: 28px; }
+.dk-sitl-field .unity-base-text-field__input { height: 28px; padding: 0 8px; font-size: 12.5px; color: rgb(219, 228, 238); border-width: 1px; border-radius: 8px; border-color: rgba(255, 255, 255, 0.16); background-color: rgb(23, 27, 34); }
+.dk-sitl-field .unity-base-text-field__input:focus { border-color: rgb(70, 175, 255); }
+
+/* alerts popover */
+.dk-alert-list { max-height: 250px; margin-bottom: 4px; }
+.dk-alert-row { flex-direction: row; align-items: flex-start; margin: 0 0 3px 0; padding: 7px 8px; border-width: 1px; border-radius: 10px; border-color: rgba(0, 0, 0, 0); background-color: rgba(0, 0, 0, 0); transition-property: background-color, border-color, scale; transition-duration: 0.14s; transition-timing-function: ease-out; }
+.dk-alert-row:hover { background-color: rgb(27, 32, 41); border-color: rgba(70, 175, 255, 0.4); }
+.dk-alert-row:active { background-color: rgba(70, 175, 255, 0.22); scale: 0.99 0.99; }
+.dk-alert-row .dk-dot { margin: 5px 9px 0 0; }
+.dk-alert-col { flex-grow: 1; flex-shrink: 1; flex-basis: 0; }
+.dk-alert-msg { margin: 0; font-size: 12.5px; color: rgb(219, 228, 238); white-space: normal; }
+.dk-alert-meta { margin: 1px 0 0 0; font-size: 11px; color: rgb(139, 149, 163); }
+
+/* faults popover */
+.dk-fault-tagrow { flex-direction: row; margin: 0 0 4px 0; }
+.dk-fault-motor { flex-direction: row; align-items: center; margin: 2px 0 6px 0; }
+.dk-fault-motor .dk-field-label { margin: 0 4px 0 0; }
+.layout--desktop.chrome2 .dk-fault-mbtn, .desktop-ui .dk-b.dk-fault-mbtn { width: 30px; height: 26px; margin: 0 0 0 6px; padding: 0; }
+.dk-fault-grid { flex-direction: row; flex-wrap: wrap; margin-bottom: 4px; }
+.desktop-ui .dk-b.dk-fault-btn { width: 48.8%; height: 28px; margin: 2px 0.6%; padding: 0 6px; font-size: 12px; }
+.dk-fault-active { margin-bottom: 4px; }
+.dk-fault-row { margin: 1px 0; font-size: 12px; color: rgb(219, 228, 238); }
+
+/* origin tags: measured = ok green, estimated = warn amber, simulated = celeste, command / not available = muted */
+.dk-tag { margin: 0; padding: 1px 7px; font-size: 10.5px; color: rgb(139, 149, 163); -unity-text-align: middle-center; border-width: 1px; border-radius: 9px; border-color: rgba(255, 255, 255, 0.16); }
+.dk-tag--measured { color: rgb(63, 191, 138); border-color: rgba(63, 191, 138, 0.5); background-color: rgba(63, 191, 138, 0.12); }
+.dk-tag--estimated { color: rgb(245, 185, 66); border-color: rgba(245, 185, 66, 0.5); background-color: rgba(245, 185, 66, 0.12); }
+.dk-tag--simulated { color: rgb(191, 234, 255); border-color: rgba(70, 175, 255, 0.55); background-color: rgba(70, 175, 255, 0.14); }
+.dk-tag--command, .dk-tag--na { color: rgb(139, 149, 163); border-color: rgba(255, 255, 255, 0.16); background-color: rgba(0, 0, 0, 0); }
+
+/* inspector tabs: Pieza | Vuelo */
+.dk-sheet-tabs { flex-direction: row; flex-shrink: 0; padding: 8px 44px 2px 12px; }
+.dk-tab { flex-direction: row; align-items: center; height: 26px; min-height: 0; margin: 0 4px 0 0; padding: 0 12px; border-width: 1px; border-radius: 13px; border-color: rgba(0, 0, 0, 0); background-color: rgba(0, 0, 0, 0); transition-property: background-color, border-color, color, scale, translate; transition-duration: 0.14s; transition-timing-function: ease-out; }
+.dk-tab:hover { background-color: rgb(27, 32, 41); scale: 1.03 1.03; translate: 0 -1px; }
+.dk-tab:active { scale: 0.96 0.96; translate: 0 0; }
+.dk-tab-text { margin: 0; font-size: 13px; color: rgb(139, 149, 163); }
+.dk-tab:hover .dk-tab-text { color: rgb(255, 255, 255); }
+.dk-tab--on, .dk-tab--on:hover { background-color: rgba(70, 175, 255, 0.16); border-color: rgba(70, 175, 255, 0.55); }
+.dk-tab--on .dk-tab-text, .dk-tab--on:hover .dk-tab-text { color: rgb(191, 234, 255); }
+.dk-tab .dk-dot { margin: 0 6px 0 0; }
+
+/* "Vuelo" tab content */
+.dk-flight { display: none; flex-grow: 1; flex-shrink: 1; }
+.dk-flight .unity-scroll-view__content-container { padding: 0 10px 10px 14px; }
+.layout--desktop.chrome2 .dk-sheet--flight .dk-flight { display: flex; }
+.layout--desktop.chrome2 .dk-sheet--flight #SheetContent_Details,
+.layout--desktop.chrome2 .dk-sheet--flight .sheet-header,
+.layout--desktop.chrome2 .dk-sheet--flight .dk-sheet-footer { display: none; }
+.dk-fl-empty { align-items: center; padding: 30px 8px 10px 8px; }
+.dk-fl-empty-icon { margin-bottom: 8px; color: rgb(139, 149, 163); }
+.dk-fl-empty .dk-icon { color: rgb(139, 149, 163); }
+.dk-fl-empty-title { margin: 0 0 6px 0; font-size: 14px; color: rgb(232, 237, 243); -unity-font-style: bold; }
+.dk-fl-empty .dk-note { -unity-text-align: upper-center; }
+.dk-fl-badge { margin: 4px 0 2px 0; font-size: 14px; color: rgb(191, 234, 255); -unity-font-style: bold; white-space: normal; }
+.dk-fl-sec { margin: 12px 0 4px 0; padding: 0 0 3px 0; font-size: 11px; letter-spacing: 1px; color: rgb(139, 149, 163); -unity-font-style: bold; border-bottom-width: 1px; border-bottom-color: rgba(255, 255, 255, 0.09); }
+.dk-reading { flex-direction: row; align-items: center; min-height: 22px; }
+.dk-reading-name { flex-grow: 1; flex-shrink: 1; margin: 0; font-size: 12.5px; color: rgb(139, 149, 163); }
+.dk-reading-value { flex-shrink: 1; margin: 0 8px; font-size: 13px; color: rgb(255, 255, 255); -unity-text-align: middle-right; white-space: normal; }
+.dk-reading .dk-tag { min-width: 62px; }
+.dk-bat-bar { height: 4px; margin: 3px 0 4px 0; border-radius: 2px; background-color: rgba(255, 255, 255, 0.09); }
+.dk-bat-fill { height: 4px; border-radius: 2px; background-color: rgb(63, 191, 138); }
+.dk-bat-fill--low { background-color: rgb(245, 185, 66); }
+.dk-bat-fill--crit { background-color: rgb(255, 77, 77); }
+.dk-motor-heads { flex-direction: row; align-items: center; margin: 2px 0 4px 0; }
+.dk-motor-heads .dk-reading-name { flex-grow: 0; margin-right: 6px; }
+.dk-motor-heads .dk-tag { margin-right: 14px; }
+.dk-motor { margin-bottom: 5px; }
+.dk-motor-line { flex-direction: row; align-items: center; }
+.dk-motor-name { flex-grow: 1; flex-shrink: 1; margin: 0; font-size: 12px; color: rgb(182, 192, 204); }
+.dk-motor-val { width: 60px; margin: 0; font-size: 12.5px; color: rgb(255, 255, 255); -unity-text-align: middle-right; }
+.dk-motor-u { height: 3px; margin-top: 2px; border-radius: 2px; background-color: rgba(255, 255, 255, 0.07); }
+.dk-motor-ufill { height: 3px; border-radius: 2px; background-color: rgb(70, 175, 255); }
+
+/* left-aligned text inside the popover rows (Button children inherit the centred text of the button) */
+.dk-src-title, .dk-src-sub, .dk-src-badge, .dk-src-detail, .dk-alert-msg, .dk-alert-meta, .dk-note, .dk-field-label, .dk-fault-row { -unity-text-align: upper-left; }
+.dk-fl-empty .dk-note { -unity-text-align: upper-center; }
+.desktop-ui .dk-b--pill.dk-b--on, .desktop-ui .dk-b--pill.dk-b--on:hover { background-color: rgba(70, 175, 255, 0.16); border-color: rgba(70, 175, 255, 0.55); color: rgb(191, 234, 255); }
+
+/* narrow windows: the top bar gives up the key caps of the modes, truncates a long part name and the status chip */
+.dk-narrowbar .dk-seg-btn .dk-kbd { display: none; }
+.dk-narrowbar .dk-seg-btn { padding: 0 10px; }
+.dk-narrowbar .dk-crumb { flex-shrink: 1; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dk-narrowbar .dk-stchip { max-width: 320px; flex-shrink: 0; }
+
+.dk-reduce-motion .dk-stchip,
+.dk-reduce-motion .dk-dot,
+.dk-reduce-motion .dk-src-row,
+.dk-reduce-motion .dk-alert-row,
+.dk-reduce-motion .dk-tab { transition-duration: 0s; }

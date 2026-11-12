@@ -50,6 +50,19 @@ namespace WebGL.Core.Managers
         public Transform MotorPart(int motor) => motor >= 1 && motor <= 4 ? motorPart[motor] : null;
         public int LastMotorOfPart(string partName) => motorOfPart.TryGetValue(partName, out int m) ? m : 0;
 
+        /// <summary>
+        /// The part an alert component (motor1..4, battery, fc) names, for the alerts list click (WP-11): select / focus it. Null while no
+        /// session has engaged the model. The battery has no body in the model: its pad stands for it (same as the red pulse).
+        /// </summary>
+        public Transform PartFor(string component)
+        {
+            if (root == null || string.IsNullOrEmpty(component)) return null;
+            if (component.StartsWith("motor", StringComparison.Ordinal) && int.TryParse(component.Substring(5), out int m) && m >= 1 && m <= 4) return motorPart[m];
+            if (component == "battery") return FindDeep(root, BatteryParts[0]);
+            if (component == "fc") return FindDeep(root, FcParts[0]);
+            return null;
+        }
+
         Transform root;
         DronePose.Rest rest;
         DroneStateController drone;
@@ -92,10 +105,18 @@ namespace WebGL.Core.Managers
                 return;
             }
 
+            // No frame yet (a source that just started or was switched, or a link that never opened): the drone is at rest, never frozen
+            // in the last pose of the previous session (WP-11: switching from the replay to SITL while it connects).
+            var f = client.Displayed;
+            if (f == null)
+            {
+                if (Engaged) Disengage();
+                return;
+            }
+
             if (!Engaged && !TryEngage()) return;
             if (client.Hello != null && !ReferenceEquals(client.Hello, mappedHello)) BuildMapping(client.Hello);
-            var f = client.Displayed;
-            if (f == null || root == null) return;
+            if (root == null) return;
 
             ApplyPose(f);
             if (ground != null) ground.Follow(DronePose.BodyPosition(rest, f.p));

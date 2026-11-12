@@ -16,6 +16,8 @@ namespace WebGL.UI.Desktop
     ///
     /// | Key             | Action                                       |
     /// | 1 / 2 / 3       | Inspect / Analyze / Studio (toggle)           |
+    /// | 4               | Telemetry mode (WP-11)                        |
+    /// | L / Shift+A     | Data source popover / alerts popover (WP-11)  |
     /// | F               | Focus the selected part (no selection: reset) |
     /// | Home or R       | Reset the view                                |
     /// | H / I / E       | Pins / Isolate / Explode                      |
@@ -202,6 +204,12 @@ namespace WebGL.UI.Desktop
                     return true;
                 }
 
+                if (_chrome != null && _chrome.Telemetry != null && _chrome.Telemetry.HandleBack())
+                {
+                    Log("Esc -> telemetry");
+                    return true;
+                }
+
                 if (_tree != null && _tree.IsOpen && _tree.HandleBack())
                 {
                     Log("Esc -> part tree");
@@ -348,6 +356,9 @@ namespace WebGL.UI.Desktop
             if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)) { Log("key 1"); _ui.ShortcutToggleMode(1); }
             else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2)) { Log("key 2"); _ui.ShortcutToggleMode(2); }
             else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3)) { Log("key 3"); _ui.ShortcutToggleMode(3); }
+            else if (_chrome != null && (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))) { Log("key 4"); _chrome.Telemetry.ToggleMode(); }
+            else if (_chrome != null && Input.GetKeyDown(KeyCode.L)) { Log("key L"); _chrome.Telemetry.OpenSourcePopover(); }
+            else if (_chrome != null && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) && Input.GetKeyDown(KeyCode.A)) { Log("key Shift+A"); _chrome.Telemetry.OpenAlertsPopover(); }
             else if (Input.GetKeyDown(KeyCode.F)) { Log("key F"); _ui.ShortcutFocusSelection(); }
             else if (Input.GetKeyDown(KeyCode.Home) || Input.GetKeyDown(KeyCode.R)) { Log("key Home/R"); _ui.ShortcutResetView(); }
             else if (Input.GetKeyDown(KeyCode.H)) { Log("key H"); _ui.ShortcutTogglePins(); }
@@ -385,6 +396,13 @@ namespace WebGL.UI.Desktop
                 {
                     var fb2 = gameObject.AddComponent<DesktopCaptureFeedback2>();
                     fb2.OutputDirectory = args[i + 1];
+                    return;
+                }
+
+                if (args[i].Equals("-tel-ui", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var telUi = gameObject.AddComponent<DesktopCaptureTelemetryUI>();
+                    telUi.OutputDirectory = args[i + 1];
                     return;
                 }
 
