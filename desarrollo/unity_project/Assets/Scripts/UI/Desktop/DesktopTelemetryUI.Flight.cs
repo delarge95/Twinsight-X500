@@ -59,6 +59,8 @@ namespace WebGL.UI.Desktop
         }
 
         public bool FlightTabActive => _flightTab;
+        /// <summary>One of the telemetry tabs (Vuelo, Analisis) is shown: the inspector stays open without a selection.</summary>
+        public bool TelemetryTabActive => _flightTab || _analysisTab;
 
         // ───────────────────────── build ─────────────────────────
 
@@ -71,12 +73,14 @@ namespace WebGL.UI.Desktop
             _tabs.AddToClassList("dk-sheet-tabs");
             _tabPart = MakeTab("DkTabPart", () => ShowFlightTab(false));
             _tabFlight = MakeTab("DkTabFlight", () => ShowFlightTab(true));
+            _tabAnalysis = MakeTab("DkTabAnalysis", () => ShowAnalysisTab());
             _tabDot = new VisualElement { name = "DkTabDot", pickingMode = PickingMode.Ignore };
             _tabDot.AddToClassList("dk-dot");
             _tabDot.AddToClassList("dk-dot--off");
             _tabFlight.Insert(0, _tabDot);
             _tabs.Add(_tabPart);
             _tabs.Add(_tabFlight);
+            _tabs.Add(_tabAnalysis);
 
             // top of the sheet, under the (absolute) handle and before the title
             VisualElement header = _sheet.Q<VisualElement>(className: "sheet-header");
@@ -90,6 +94,7 @@ namespace WebGL.UI.Desktop
             int di = details != null ? _sheet.IndexOf(details) + 1 : _sheet.childCount;
             _sheet.Insert(di, _flightPanel);
             BuildFlightBody();
+            BuildAnalysisTab();
             _lastSelection = SelectionManager.Instance != null ? SelectionManager.Instance.CurrentSelection : null;
         }
 
@@ -215,26 +220,50 @@ namespace WebGL.UI.Desktop
 
         private void DisposeFlightTab()
         {
+            DisposeAnalysisTab();
             _tabs?.RemoveFromHierarchy();
             _flightPanel?.RemoveFromHierarchy();
             _sheet?.RemoveFromClassList("dk-sheet--flight");
+            _sheet?.RemoveFromClassList("dk-sheet--analysis");
         }
 
         // ───────────────────────── tab control ─────────────────────────
 
         /// <summary>Selects the tab of the inspector. flight = true also opens the inspector (the readings need no selection).</summary>
-        public void ShowFlightTab(bool flight)
+        public void ShowFlightTab(bool flight) => ShowTab(flight ? 1 : 0);
+
+        /// <summary>The Analysis tab (charts of the last minute); opens the inspector like the Flight tab does.</summary>
+        public void ShowAnalysisTab() => ShowTab(2);
+
+        /// <summary>0 = Pieza, 1 = Vuelo, 2 = Analisis.</summary>
+        private void ShowTab(int tab)
         {
             if (_sheet == null) return;
-            _flightTab = flight;
-            _sheet.EnableInClassList("dk-sheet--flight", flight);
-            _tabFlight.EnableInClassList("dk-tab--on", flight);
-            _tabPart.EnableInClassList("dk-tab--on", !flight);
-            if (flight)
+            bool wasAnalysis = _analysisTab;
+            _flightTab = tab == 1;
+            _analysisTab = tab == 2;
+            ApplyTabClasses();
+            if (tab != 0)
             {
                 UIDetailsSheet.Instance?.ShowInfo();
                 _nextFlight = 0f;
+                _nextAnalysis = 0f;
+                _anForce = true;
             }
+
+            if (_analysisTab && !wasAnalysis && !DesktopMotion.Reduce)
+            {
+                for (int i = 0; i < _anCells.Count; i++) DesktopMotion.Enter(_anCells[i].Root, 25 + i * 35);
+            }
+        }
+
+        private void ApplyTabClasses()
+        {
+            _sheet.EnableInClassList("dk-sheet--flight", _flightTab);
+            _sheet.EnableInClassList("dk-sheet--analysis", _analysisTab);
+            _tabFlight.EnableInClassList("dk-tab--on", _flightTab);
+            _tabAnalysis.EnableInClassList("dk-tab--on", _analysisTab);
+            _tabPart.EnableInClassList("dk-tab--on", !_flightTab && !_analysisTab);
         }
 
         /// <summary>Hook kept in Tick: a new selection brings the Part tab back (the user clicked a part to read about it).</summary>
@@ -245,14 +274,12 @@ namespace WebGL.UI.Desktop
             if (sel != _lastSelection)
             {
                 _lastSelection = sel;
-                if (sel != null && _flightTab) ShowFlightTab(false);
+                if (sel != null && (_flightTab || _analysisTab)) ShowFlightTab(false);
             }
 
             // the sheet closed by itself (close button, Esc): nothing to show on the flight tab any more
-            if (_flightTab && _sheet.ClassListContains("details-sheet--hidden") && !ModeOpen) _flightTab = false;
-            _sheet.EnableInClassList("dk-sheet--flight", _flightTab);
-            _tabFlight.EnableInClassList("dk-tab--on", _flightTab);
-            _tabPart.EnableInClassList("dk-tab--on", !_flightTab);
+            if ((_flightTab || _analysisTab) && _sheet.ClassListContains("details-sheet--hidden") && !ModeOpen) { _flightTab = false; _analysisTab = false; }
+            ApplyTabClasses();
         }
 
         // ───────────────────────── texts ─────────────────────────
@@ -262,6 +289,7 @@ namespace WebGL.UI.Desktop
             if (_tabs == null) return;
             ((Label)_tabPart[0]).text = T("tab.part");
             ((Label)_tabFlight[1]).text = T("tab.flight");
+            RelabelAnalysisTab();
             _flEmptyTitle.text = T("fl.empty.title");
             _flEmptyText.text = T("fl.empty");
             _flWaiting.text = T("fl.waiting");

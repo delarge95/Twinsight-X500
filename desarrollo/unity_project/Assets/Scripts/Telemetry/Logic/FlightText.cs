@@ -288,6 +288,34 @@ namespace WebGL.Telemetry
             { "fl.source", new[] { "Fuente:", "Source:" } },                                                          // prov.source
             { "fl.propnote", new[] { "Las hélices giran en pantalla a escala 1:25 para que se vean a 60 fps.", "Propellers spin on screen at 1:25 scale so they read at 60 fps." } }, // motors.note n=25 (1/0.04)
 
+            // analysis tab (E-4; charts.* of the web dictionaries: title "Análisis", hint "últimos 60 s", altitude, speed, voltage = "Batería", throttle = "Orden a motores", vibration)
+            { "tab.analysis", new[] { "Análisis", "Analysis" } },
+            { "an.hint", new[] { "últimos 60 s", "last 60 s" } },                                                      // charts.hint
+            { "an.empty", new[] { "Las gráficas muestran el último minuto de la sesión: altura, velocidad, batería, orden a motores, RPM y vibración, cada una con su origen. Enciende una fuente en el modo Telemetría (tecla 4).",
+                                  "The charts show the last minute of the session: altitude, speed, battery, motor command, RPM and vibration, each with its origin. Turn a source on in Telemetry mode (key 4)." } },
+            { "an.collecting", new[] { "Recogiendo muestras…", "Collecting samples…" } },
+            { "an.altitude", new[] { "Altura", "Altitude" } },                                                         // charts.altitude
+            { "an.speed", new[] { "Velocidad", "Speed" } },                                                            // charts.speed
+            { "an.hspeed", new[] { "horiz.", "horiz." } },
+            { "an.vspeed", new[] { "vert.", "vert." } },
+            { "an.voltage", new[] { "Batería · tensión", "Battery · voltage" } },                                       // charts.voltage "Batería"
+            { "an.level", new[] { "Batería · carga", "Battery · charge" } },
+            { "an.throttle", new[] { "Orden a motores (media)", "Motor command (mean)" } },                             // charts.throttle
+            { "an.rpm", new[] { "RPM por motor", "RPM per motor" } },
+            { "an.m1", new[] { "M1", "M1" } },
+            { "an.m2", new[] { "M2", "M2" } },
+            { "an.m3", new[] { "M3", "M3" } },
+            { "an.m4", new[] { "M4", "M4" } },
+            { "an.vibration", new[] { "Vibración", "Vibration" } },                                                    // charts.vibration
+            { "an.markers", new[] { "Alertas y fallas", "Alerts and faults" } },
+            { "an.markers.none", new[] { "sin alertas ni fallas en este minuto", "no alerts or faults in this minute" } },
+            { "an.now", new[] { "ahora", "now" } },
+            { "an.cursor", new[] { "hace {s} s", "{s} s ago" } },
+            { "an.gap", new[] { "sin datos", "no data" } },
+            { "an.alert.critical", new[] { "Alerta crítica", "Critical alert" } },
+            { "an.alert.warning", new[] { "Aviso", "Warning" } },
+            { "an.hover", new[] { "Pasa el cursor por las gráficas para leer cada valor.", "Hover the charts to read each value." } },
+
             // status bar
             { "st.link", new[] { "Enlace", "Link" } },
         };

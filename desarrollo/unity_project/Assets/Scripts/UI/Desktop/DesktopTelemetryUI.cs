@@ -38,7 +38,7 @@ namespace WebGL.UI.Desktop
         // mode 4 strip
         private VisualElement _container;
         private VisualElement _strip;
-        private Button _btnPower, _btnSource, _btnAlerts, _btnFaults;
+        private Button _btnPower, _btnSource, _btnAlerts, _btnFaults;   // + _btnAnalysis (DesktopTelemetryUI.Analysis.cs)
         private Label _powerLabel, _stateLabel, _sourceLabel, _alertsLabel, _alertsCount, _faultsLabel;
         private VisualElement _bar2;
 
@@ -146,6 +146,9 @@ namespace WebGL.UI.Desktop
             _btnFaults = StripButton("DkTelFaults", "fault", out _faultsLabel, () => TogglePopover("faults"));
             _strip.Add(_btnFaults);
 
+            _btnAnalysis = StripButton("DkTelAnalysis", "analyze", out _analysisLabel, () => { if (_analysisTab) ShowFlightTab(true); else ShowAnalysisTab(); });
+            _strip.Add(_btnAnalysis);
+
             _container.Add(_strip);
             BuildPopovers();
             // after the Studio container: keeps the other modes' order
@@ -153,7 +156,7 @@ namespace WebGL.UI.Desktop
             DesktopMotion.WatchVisible(_container);
 
             BuildSheetTabs();
-            UIDetailsSheet.DesktopKeepOpenOnDeselect = () => FlightTabActive;
+            UIDetailsSheet.DesktopKeepOpenOnDeselect = () => TelemetryTabActive;
             BuildStatusBarItem();
             OnLanguage(null);
         }
@@ -406,10 +409,11 @@ namespace WebGL.UI.Desktop
                 _btnPower.tooltip = T(running ? "power.switch.stop" : "power.switch.start");
                 _sourceLabel.text = SourceButtonText();
                 UpdatePulse(running && link == LinkState.Connecting);
-                if (started && ModeOpen) ShowFlightTab(true);
+                if (started && ModeOpen && !_analysisTab) ShowFlightTab(true); // the Analysis tab stays when a session starts under it
             }
 
             UIDetailsSheetFlightSync();
+            TickAnalysisRecorder();
             UpdateChipVisibility(_sessionChip, running);
             _stateLabel.text = running ? LinkText(link) : T("link.off");
             _stateLabel.EnableInClassList("dk-strip-state--live", running && link == LinkState.Live);
@@ -446,6 +450,7 @@ namespace WebGL.UI.Desktop
             if (Time.unscaledTime >= _nextSlowTick) _nextSlowTick = Time.unscaledTime + 0.1f;
             TickPopovers();
             TickFlightTab();
+            TickAnalysisTab();
         }
 
         private static void UpdateChipVisibility(Button chip, bool active)
