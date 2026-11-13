@@ -12,20 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c73690adaf8894f87851a149e0fb6a, type: 3}
   m_Name: x500v2_motor_BL
   m_EditorClassIdentifier: 
-  partName: Motor 2216 KV920 BL
+  partName: "Motor 4 \xB7 rear-right (2216 KV920)"
   id: x500v2_motor_BL
   partType: Motor
   description: 'Brushless outrunner 2216 motor, KV920. Supports LiPo 3-4S and 1045
     propellers. Approximate 4S current range: 3.5-16.2 A, peak power about 240 W.
     CNC aluminum housing, steel shaft, copper windings. Mounting pattern 16x16 and
-    19x19 mm. Position: Back-Left (CCW).'
+    19x19 mm. Position: Back-Right (CW).'
   weightKg: 0.063
   dimensions: "\u230028 mm \xD7 ~32 mm"
-  function: Primary thrust generation (CCW)
+  function: Primary thrust generation (CW)
   materialType: CNC aluminum alloy, steel shaft, enamelled copper windings
   materialProperties: Heat dissipation through metal housing, N52 magnets
   manufacturer: Holybro
-  partNumber: 2216-920KV-CCW
+  partNumber: 2216-920KV-CW
   powerConsumption: 240
   maxLoad: 1200
   operatingTemp: 80
@@ -54,7 +54,7 @@ MonoBehaviour:
   - Loctite
   safetyWarnings: []
   installationTips: Preinstalled on the arm. If replaced, apply Loctite to the four
-    M3 screws. Back-Left uses CCW rotation.
+    M3 screws. Back-Right uses CW rotation.
   installationTimeMinutes: 5
   difficultyLevel: 2
   torqueSpec: 

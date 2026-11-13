@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c73690adaf8894f87851a149e0fb6a, type: 3}
   m_Name: x500v2_esc_BL
   m_EditorClassIdentifier: 
-  partName: ESC BLHeli-S 20A BL
+  partName: ESC BLHeli-S 20A BR
   id: x500v2_esc_BL
   partType: ESC
-  description: ESC BLHeli-S 20A. Position BL.
+  description: ESC BLHeli-S 20A. Position BR.
   weightKg: 0.007
   dimensions: "~25 \xD7 13 \xD7 5 mm"
-  function: Control de velocidad del motor BL
+  function: Control de velocidad del motor 4
   materialType: PCB FR4 con MOSFETs y cobre
   materialProperties: 
   manufacturer: Holybro

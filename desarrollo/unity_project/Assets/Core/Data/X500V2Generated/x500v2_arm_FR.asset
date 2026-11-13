@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c73690adaf8894f87851a149e0fb6a, type: 3}
   m_Name: x500v2_arm_FR
   m_EditorClassIdentifier: 
-  partName: Arm Tube Front-Right
+  partName: Arm Tube Front-Left
   id: x500v2_arm_FR
   partType: Arm
   description: '16 mm carbon fiber arm tube with reinforced nylon connectors. Includes
     preinstalled 2216 motor and BLHeli-S 20A ESC, with internal XT30 wiring routed
-    toward the PDB. Position: front-right, quad-X configuration.'
+    toward the PDB. Position: front-left, quad-X configuration.'
   weightKg: 0.03
   dimensions: "\u230016 mm \xD7 ~220 mm"
   function: Motor and ESC support; wiring conduit; thrust transfer to the frame

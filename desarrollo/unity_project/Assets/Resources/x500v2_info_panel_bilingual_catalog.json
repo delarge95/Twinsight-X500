@@ -734,7 +734,7 @@
         "specifications": [
           {
             "label": "Canonical groups",
-            "value": "Arm Tube Front-Left, Arm Tube Front-Right, Arm Tube Back-Left, Arm Tube Back-Right, Motor 2216 KV920 FL, Motor 2216 KV920 FR, Motor 2216 KV920 BL, Motor 2216 KV920 BR"
+            "value": "Arm Tube Front-Right, Arm Tube Front-Left, Arm Tube Back-Right, Arm Tube Back-Left, Motor 1 · front-right (2216 KV920), Motor 3 · front-left (2216 KV920), Motor 4 · rear-right (2216 KV920), Motor 2 · rear-left (2216 KV920)"
           },
           {
             "label": "Data source",
@@ -744,14 +744,14 @@
         "relationship": {
           "title": "Contained Parts",
           "items": [
-            "Arm Tube Front-Left",
             "Arm Tube Front-Right",
-            "Arm Tube Back-Left",
+            "Arm Tube Front-Left",
             "Arm Tube Back-Right",
-            "Motor 2216 KV920 FL",
-            "Motor 2216 KV920 FR",
-            "Motor 2216 KV920 BL",
-            "Motor 2216 KV920 BR"
+            "Arm Tube Back-Left",
+            "Motor 1 · front-right (2216 KV920)",
+            "Motor 3 · front-left (2216 KV920)",
+            "Motor 4 · rear-right (2216 KV920)",
+            "Motor 2 · rear-left (2216 KV920)"
           ]
         },
         "assembly": [
@@ -796,7 +796,7 @@
         "specifications": [
           {
             "label": "Grupos canónicos",
-            "value": "Brazo frontal izquierdo, Brazo frontal derecho, Brazo posterior izquierdo, Brazo posterior derecho, Motor 2216 KV920 FL, Motor 2216 KV920 FR, Motor 2216 KV920 BL, Motor 2216 KV920 BR"
+            "value": "Brazo frontal derecho, Brazo frontal izquierdo, Brazo posterior derecho, Brazo posterior izquierdo, Motor 1 · delantero derecho (2216 KV920), Motor 3 · delantero izquierdo (2216 KV920), Motor 4 · trasero derecho (2216 KV920), Motor 2 · trasero izquierdo (2216 KV920)"
           },
           {
             "label": "Fuente de datos",
@@ -806,14 +806,14 @@
         "relationship": {
           "title": "Piezas contenidas",
           "items": [
-            "Brazo frontal izquierdo",
             "Brazo frontal derecho",
-            "Brazo posterior izquierdo",
+            "Brazo frontal izquierdo",
             "Brazo posterior derecho",
-            "Motor 2216 KV920 FL",
-            "Motor 2216 KV920 FR",
-            "Motor 2216 KV920 BL",
-            "Motor 2216 KV920 BR"
+            "Brazo posterior izquierdo",
+            "Motor 1 · delantero derecho (2216 KV920)",
+            "Motor 3 · delantero izquierdo (2216 KV920)",
+            "Motor 4 · trasero derecho (2216 KV920)",
+            "Motor 2 · trasero izquierdo (2216 KV920)"
           ]
         },
         "assembly": [
@@ -918,10 +918,10 @@
         "relationship": {
           "title": "Contained Parts",
           "items": [
-            "Arm Tube Front-Left",
             "Arm Tube Front-Right",
-            "Arm Tube Back-Left",
+            "Arm Tube Front-Left",
             "Arm Tube Back-Right",
+            "Arm Tube Back-Left",
             "Tube Frame Clamp Connector",
             "Arm Tube Motor Mount (Top Hub)",
             "Arm Tube Motor Mount (Bottom)",
@@ -982,10 +982,10 @@
         "relationship": {
           "title": "Piezas contenidas",
           "items": [
-            "Brazo frontal izquierdo",
             "Brazo frontal derecho",
-            "Brazo posterior izquierdo",
+            "Brazo frontal izquierdo",
             "Brazo posterior derecho",
+            "Brazo posterior izquierdo",
             "Conector de abrazadera de brazo al frame",
             "Hub superior de montura de motor",
             "Montura inferior de motor para tubo de brazo",
@@ -1021,216 +1021,6 @@
         "x500v2_arm_BL"
       ],
       "canonicalPartId": "x500v2_arm_BL",
-      "parentIds": [],
-      "childIds": [],
-      "aliases": [
-        "Arm Tube Back-Left"
-      ],
-      "sourceConfidence": "official_source_plus_runtime_model_data",
-      "sourceRefs": [
-        "runtime_parts_data",
-        "runtime_selection_hierarchy",
-        "runtime_parent_subpieces",
-        "holybro_x500v2_docs",
-        "holybro_x500v2_downloads"
-      ],
-      "sectionOrder": [
-        "title",
-        "summary",
-        "identification",
-        "specifications",
-        "relationship",
-        "assembly",
-        "keyReferences"
-      ],
-      "uiImportance": {
-        "keyReferences": "secondary"
-      },
-      "en": {
-        "title": "Arm Tube Back-Left",
-        "summary": "Back-left carbon-fiber arm assembly. It carries a motor and ESC, routes power toward the PDB, and transfers thrust loads into the central frame.",
-        "identification": [
-          {
-            "label": "Technical role",
-            "value": "Arm support, internal wiring route and thrust-load transfer"
-          },
-          {
-            "label": "System category",
-            "value": "Structure"
-          },
-          {
-            "label": "Manufacturer",
-            "value": "Holybro"
-          },
-          {
-            "label": "Quadrant",
-            "value": "back-left"
-          }
-        ],
-        "specifications": [
-          {
-            "label": "Category",
-            "value": "Structure"
-          },
-          {
-            "label": "Type",
-            "value": "Arm"
-          },
-          {
-            "label": "Material",
-            "value": "Carbon-fiber tube with reinforced nylon connectors"
-          },
-          {
-            "label": "Dimensions",
-            "value": "⌀16 mm × ~220 mm"
-          },
-          {
-            "label": "Model mass estimate",
-            "value": "30 g (project estimate)"
-          },
-          {
-            "label": "Operating temperature",
-            "value": "-20 to 80 °C"
-          }
-        ],
-        "relationship": {
-          "title": "Contained Parts",
-          "items": [
-            "Arm Tube Motor Mount (Bottom)",
-            "Tube Positioning Stopper",
-            "Tube Frame Clamp Connector",
-            "Arm Tube Motor Mount (Top Hub)",
-            "Motor Mount Base Plate",
-            "PROPELLER",
-            "PROP",
-            "Socket Cap Screw M2.5 x 10 mm x2",
-            "Socket Cap Screw M2.5 x 12 mm x2",
-            "Socket Cap Screw M2.5 x 6 mm x4",
-            "Socket Cap Screw M3 x 38 mm x4",
-            "Flange Nut M3 x4"
-          ]
-        },
-        "assembly": [
-          "The X500 V2 kit documents preinstalled motors and ESCs on the arms with XT30 power plugs.",
-          "Check quadrant orientation before connecting motor/ESC wiring.",
-          "Required tools: M3 hex key"
-        ],
-        "keyReferences": [
-          {
-            "label": "Runtime ID",
-            "value": "x500v2_arm_BL"
-          },
-          {
-            "label": "CAD / Blender key",
-            "value": "Not applicable"
-          },
-          {
-            "label": "Manufacturer",
-            "value": "Holybro"
-          },
-          {
-            "label": "Part / SKU",
-            "value": "#510177"
-          }
-        ]
-      },
-      "es": {
-        "title": "Brazo posterior izquierdo",
-        "summary": "Conjunto de brazo posterior izquierdo de fibra de carbono. Sostiene motor y ESC, conduce potencia hacia la PDB y transfiere cargas de empuje al frame central.",
-        "identification": [
-          {
-            "label": "Rol técnico",
-            "value": "Soporte de motor y ESC; conducto de cableado; transferencia de empuje al chasis"
-          },
-          {
-            "label": "Categoría del sistema",
-            "value": "Estructura"
-          },
-          {
-            "label": "Fabricante",
-            "value": "Holybro"
-          },
-          {
-            "label": "Cuadrante",
-            "value": "posterior izquierdo"
-          }
-        ],
-        "specifications": [
-          {
-            "label": "Categoría",
-            "value": "Estructura"
-          },
-          {
-            "label": "Tipo",
-            "value": "Brazo"
-          },
-          {
-            "label": "Material",
-            "value": "Fibra de carbono con conectores de nylon reforzado"
-          },
-          {
-            "label": "Dimensiones",
-            "value": "⌀16 mm × ~220 mm"
-          },
-          {
-            "label": "Estimación de masa del modelo",
-            "value": "30 g (estimación del proyecto)"
-          },
-          {
-            "label": "Temperatura de operación",
-            "value": "-20 a 80 °C"
-          }
-        ],
-        "relationship": {
-          "title": "Piezas contenidas",
-          "items": [
-            "Montura inferior de motor para tubo de brazo",
-            "Tope posicionador de tubo",
-            "Conector de abrazadera de brazo al frame",
-            "Hub superior de montura de motor",
-            "Placa base de montura de motor",
-            "PROPELLER",
-            "PROP",
-            "Tornillo de cabeza cilíndrica M2.5 x 10 mm x2",
-            "Tornillo de cabeza cilíndrica M2.5 x 12 mm x2",
-            "Tornillo de cabeza cilíndrica M2.5 x 6 mm x4",
-            "Tornillo de cabeza cilíndrica M3 x 38 mm x4",
-            "Tuerca con brida M3 x4"
-          ]
-        },
-        "assembly": [
-          "El kit X500 V2 documenta motores y ESC preinstalados en los brazos con conectores XT30.",
-          "Verificar la orientación del cuadrante antes de conectar cableado de motor/ESC.",
-          "Herramientas requeridas: Llave hexagonal M3"
-        ],
-        "keyReferences": [
-          {
-            "label": "ID de ejecución",
-            "value": "x500v2_arm_BL"
-          },
-          {
-            "label": "Clave CAD / Blender",
-            "value": "No aplica"
-          },
-          {
-            "label": "Fabricante",
-            "value": "Holybro"
-          },
-          {
-            "label": "Pieza / SKU",
-            "value": "#510177"
-          }
-        ]
-      },
-      "notes": []
-    },
-    {
-      "entryId": "x500v2_arm_BR",
-      "entryType": "mother_part",
-      "selectionIds": [
-        "x500v2_arm_BR"
-      ],
-      "canonicalPartId": "x500v2_arm_BR",
       "parentIds": [],
       "childIds": [],
       "aliases": [
@@ -1328,7 +1118,7 @@
         "keyReferences": [
           {
             "label": "Runtime ID",
-            "value": "x500v2_arm_BR"
+            "value": "x500v2_arm_BL"
           },
           {
             "label": "CAD / Blender key",
@@ -1416,7 +1206,7 @@
         "keyReferences": [
           {
             "label": "ID de ejecución",
-            "value": "x500v2_arm_BR"
+            "value": "x500v2_arm_BL"
           },
           {
             "label": "Clave CAD / Blender",
@@ -1435,16 +1225,16 @@
       "notes": []
     },
     {
-      "entryId": "x500v2_arm_FL",
+      "entryId": "x500v2_arm_BR",
       "entryType": "mother_part",
       "selectionIds": [
-        "x500v2_arm_FL"
+        "x500v2_arm_BR"
       ],
-      "canonicalPartId": "x500v2_arm_FL",
+      "canonicalPartId": "x500v2_arm_BR",
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "Arm Tube Front-Left"
+        "Arm Tube Back-Left"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -1467,8 +1257,8 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "Arm Tube Front-Left",
-        "summary": "Front-left carbon-fiber arm assembly. It carries a motor and ESC, routes power toward the PDB, and transfers thrust loads into the central frame.",
+        "title": "Arm Tube Back-Left",
+        "summary": "Back-left carbon-fiber arm assembly. It carries a motor and ESC, routes power toward the PDB, and transfers thrust loads into the central frame.",
         "identification": [
           {
             "label": "Technical role",
@@ -1484,7 +1274,7 @@
           },
           {
             "label": "Quadrant",
-            "value": "front-left"
+            "value": "back-left"
           }
         ],
         "specifications": [
@@ -1524,7 +1314,7 @@
             "PROPELLER",
             "PROP",
             "Socket Cap Screw M2.5 x 10 mm x2",
-            "Socket Cap Screw M2.5 x 12 mm x3",
+            "Socket Cap Screw M2.5 x 12 mm x2",
             "Socket Cap Screw M2.5 x 6 mm x4",
             "Socket Cap Screw M3 x 38 mm x4",
             "Flange Nut M3 x4"
@@ -1533,13 +1323,12 @@
         "assembly": [
           "The X500 V2 kit documents preinstalled motors and ESCs on the arms with XT30 power plugs.",
           "Check quadrant orientation before connecting motor/ESC wiring.",
-          "Required tools: M3 hex key",
-          "Safety: Verify CW/CCW orientation of the preinstalled motor"
+          "Required tools: M3 hex key"
         ],
         "keyReferences": [
           {
             "label": "Runtime ID",
-            "value": "x500v2_arm_FL"
+            "value": "x500v2_arm_BR"
           },
           {
             "label": "CAD / Blender key",
@@ -1556,8 +1345,8 @@
         ]
       },
       "es": {
-        "title": "Brazo frontal izquierdo",
-        "summary": "Conjunto de brazo frontal izquierdo de fibra de carbono. Sostiene motor y ESC, conduce potencia hacia la PDB y transfiere cargas de empuje al frame central.",
+        "title": "Brazo posterior izquierdo",
+        "summary": "Conjunto de brazo posterior izquierdo de fibra de carbono. Sostiene motor y ESC, conduce potencia hacia la PDB y transfiere cargas de empuje al frame central.",
         "identification": [
           {
             "label": "Rol técnico",
@@ -1573,7 +1362,7 @@
           },
           {
             "label": "Cuadrante",
-            "value": "frontal izquierdo"
+            "value": "posterior izquierdo"
           }
         ],
         "specifications": [
@@ -1613,7 +1402,7 @@
             "PROPELLER",
             "PROP",
             "Tornillo de cabeza cilíndrica M2.5 x 10 mm x2",
-            "Tornillo de cabeza cilíndrica M2.5 x 12 mm x3",
+            "Tornillo de cabeza cilíndrica M2.5 x 12 mm x2",
             "Tornillo de cabeza cilíndrica M2.5 x 6 mm x4",
             "Tornillo de cabeza cilíndrica M3 x 38 mm x4",
             "Tuerca con brida M3 x4"
@@ -1622,13 +1411,12 @@
         "assembly": [
           "El kit X500 V2 documenta motores y ESC preinstalados en los brazos con conectores XT30.",
           "Verificar la orientación del cuadrante antes de conectar cableado de motor/ESC.",
-          "Herramientas requeridas: Llave hexagonal M3",
-          "Seguridad: Verificar orientación CW/CCW del motor preinstalado"
+          "Herramientas requeridas: Llave hexagonal M3"
         ],
         "keyReferences": [
           {
             "label": "ID de ejecución",
-            "value": "x500v2_arm_FL"
+            "value": "x500v2_arm_BR"
           },
           {
             "label": "Clave CAD / Blender",
@@ -1647,12 +1435,12 @@
       "notes": []
     },
     {
-      "entryId": "x500v2_arm_FR",
+      "entryId": "x500v2_arm_FL",
       "entryType": "mother_part",
       "selectionIds": [
-        "x500v2_arm_FR"
+        "x500v2_arm_FL"
       ],
-      "canonicalPartId": "x500v2_arm_FR",
+      "canonicalPartId": "x500v2_arm_FL",
       "parentIds": [],
       "childIds": [],
       "aliases": [
@@ -1736,7 +1524,7 @@
             "PROPELLER",
             "PROP",
             "Socket Cap Screw M2.5 x 10 mm x2",
-            "Socket Cap Screw M2.5 x 12 mm x2",
+            "Socket Cap Screw M2.5 x 12 mm x3",
             "Socket Cap Screw M2.5 x 6 mm x4",
             "Socket Cap Screw M3 x 38 mm x4",
             "Flange Nut M3 x4"
@@ -1751,7 +1539,7 @@
         "keyReferences": [
           {
             "label": "Runtime ID",
-            "value": "x500v2_arm_FR"
+            "value": "x500v2_arm_FL"
           },
           {
             "label": "CAD / Blender key",
@@ -1786,6 +1574,218 @@
           {
             "label": "Cuadrante",
             "value": "frontal derecho"
+          }
+        ],
+        "specifications": [
+          {
+            "label": "Categoría",
+            "value": "Estructura"
+          },
+          {
+            "label": "Tipo",
+            "value": "Brazo"
+          },
+          {
+            "label": "Material",
+            "value": "Fibra de carbono con conectores de nylon reforzado"
+          },
+          {
+            "label": "Dimensiones",
+            "value": "⌀16 mm × ~220 mm"
+          },
+          {
+            "label": "Estimación de masa del modelo",
+            "value": "30 g (estimación del proyecto)"
+          },
+          {
+            "label": "Temperatura de operación",
+            "value": "-20 a 80 °C"
+          }
+        ],
+        "relationship": {
+          "title": "Piezas contenidas",
+          "items": [
+            "Montura inferior de motor para tubo de brazo",
+            "Tope posicionador de tubo",
+            "Conector de abrazadera de brazo al frame",
+            "Hub superior de montura de motor",
+            "Placa base de montura de motor",
+            "PROPELLER",
+            "PROP",
+            "Tornillo de cabeza cilíndrica M2.5 x 10 mm x2",
+            "Tornillo de cabeza cilíndrica M2.5 x 12 mm x3",
+            "Tornillo de cabeza cilíndrica M2.5 x 6 mm x4",
+            "Tornillo de cabeza cilíndrica M3 x 38 mm x4",
+            "Tuerca con brida M3 x4"
+          ]
+        },
+        "assembly": [
+          "El kit X500 V2 documenta motores y ESC preinstalados en los brazos con conectores XT30.",
+          "Verificar la orientación del cuadrante antes de conectar cableado de motor/ESC.",
+          "Herramientas requeridas: Llave hexagonal M3",
+          "Seguridad: Verificar orientación CW/CCW del motor preinstalado"
+        ],
+        "keyReferences": [
+          {
+            "label": "ID de ejecución",
+            "value": "x500v2_arm_FL"
+          },
+          {
+            "label": "Clave CAD / Blender",
+            "value": "No aplica"
+          },
+          {
+            "label": "Fabricante",
+            "value": "Holybro"
+          },
+          {
+            "label": "Pieza / SKU",
+            "value": "#510177"
+          }
+        ]
+      },
+      "notes": []
+    },
+    {
+      "entryId": "x500v2_arm_FR",
+      "entryType": "mother_part",
+      "selectionIds": [
+        "x500v2_arm_FR"
+      ],
+      "canonicalPartId": "x500v2_arm_FR",
+      "parentIds": [],
+      "childIds": [],
+      "aliases": [
+        "Arm Tube Front-Left"
+      ],
+      "sourceConfidence": "official_source_plus_runtime_model_data",
+      "sourceRefs": [
+        "runtime_parts_data",
+        "runtime_selection_hierarchy",
+        "runtime_parent_subpieces",
+        "holybro_x500v2_docs",
+        "holybro_x500v2_downloads"
+      ],
+      "sectionOrder": [
+        "title",
+        "summary",
+        "identification",
+        "specifications",
+        "relationship",
+        "assembly",
+        "keyReferences"
+      ],
+      "uiImportance": {
+        "keyReferences": "secondary"
+      },
+      "en": {
+        "title": "Arm Tube Front-Left",
+        "summary": "Front-left carbon-fiber arm assembly. It carries a motor and ESC, routes power toward the PDB, and transfers thrust loads into the central frame.",
+        "identification": [
+          {
+            "label": "Technical role",
+            "value": "Arm support, internal wiring route and thrust-load transfer"
+          },
+          {
+            "label": "System category",
+            "value": "Structure"
+          },
+          {
+            "label": "Manufacturer",
+            "value": "Holybro"
+          },
+          {
+            "label": "Quadrant",
+            "value": "front-left"
+          }
+        ],
+        "specifications": [
+          {
+            "label": "Category",
+            "value": "Structure"
+          },
+          {
+            "label": "Type",
+            "value": "Arm"
+          },
+          {
+            "label": "Material",
+            "value": "Carbon-fiber tube with reinforced nylon connectors"
+          },
+          {
+            "label": "Dimensions",
+            "value": "⌀16 mm × ~220 mm"
+          },
+          {
+            "label": "Model mass estimate",
+            "value": "30 g (project estimate)"
+          },
+          {
+            "label": "Operating temperature",
+            "value": "-20 to 80 °C"
+          }
+        ],
+        "relationship": {
+          "title": "Contained Parts",
+          "items": [
+            "Arm Tube Motor Mount (Bottom)",
+            "Tube Positioning Stopper",
+            "Tube Frame Clamp Connector",
+            "Arm Tube Motor Mount (Top Hub)",
+            "Motor Mount Base Plate",
+            "PROPELLER",
+            "PROP",
+            "Socket Cap Screw M2.5 x 10 mm x2",
+            "Socket Cap Screw M2.5 x 12 mm x2",
+            "Socket Cap Screw M2.5 x 6 mm x4",
+            "Socket Cap Screw M3 x 38 mm x4",
+            "Flange Nut M3 x4"
+          ]
+        },
+        "assembly": [
+          "The X500 V2 kit documents preinstalled motors and ESCs on the arms with XT30 power plugs.",
+          "Check quadrant orientation before connecting motor/ESC wiring.",
+          "Required tools: M3 hex key",
+          "Safety: Verify CW/CCW orientation of the preinstalled motor"
+        ],
+        "keyReferences": [
+          {
+            "label": "Runtime ID",
+            "value": "x500v2_arm_FR"
+          },
+          {
+            "label": "CAD / Blender key",
+            "value": "Not applicable"
+          },
+          {
+            "label": "Manufacturer",
+            "value": "Holybro"
+          },
+          {
+            "label": "Part / SKU",
+            "value": "#510177"
+          }
+        ]
+      },
+      "es": {
+        "title": "Brazo frontal izquierdo",
+        "summary": "Conjunto de brazo frontal izquierdo de fibra de carbono. Sostiene motor y ESC, conduce potencia hacia la PDB y transfiere cargas de empuje al frame central.",
+        "identification": [
+          {
+            "label": "Rol técnico",
+            "value": "Soporte de motor y ESC; conducto de cableado; transferencia de empuje al chasis"
+          },
+          {
+            "label": "Categoría del sistema",
+            "value": "Estructura"
+          },
+          {
+            "label": "Fabricante",
+            "value": "Holybro"
+          },
+          {
+            "label": "Cuadrante",
+            "value": "frontal izquierdo"
           }
         ],
         "specifications": [
@@ -2312,10 +2312,10 @@
         "relationship": {
           "title": "Contained Parts",
           "items": [
-            "ESC BLHeli-S 20A FL",
             "ESC BLHeli-S 20A FR",
-            "ESC BLHeli-S 20A BL",
-            "ESC BLHeli-S 20A BR"
+            "ESC BLHeli-S 20A FL",
+            "ESC BLHeli-S 20A BR",
+            "ESC BLHeli-S 20A BL"
           ]
         },
         "assembly": [
@@ -2371,10 +2371,10 @@
         "relationship": {
           "title": "Piezas contenidas",
           "items": [
-            "ESC BLHeli-S 20A FL",
             "ESC BLHeli-S 20A FR",
-            "ESC BLHeli-S 20A BL",
-            "ESC BLHeli-S 20A BR"
+            "ESC BLHeli-S 20A FL",
+            "ESC BLHeli-S 20A BR",
+            "ESC BLHeli-S 20A BL"
           ]
         },
         "assembly": [
@@ -2405,197 +2405,6 @@
         "x500v2_esc_BL"
       ],
       "canonicalPartId": "x500v2_esc_BL",
-      "parentIds": [],
-      "childIds": [],
-      "aliases": [
-        "ESC BLHeli-S 20A BL"
-      ],
-      "sourceConfidence": "official_source_plus_runtime_model_data",
-      "sourceRefs": [
-        "runtime_parts_data",
-        "runtime_selection_hierarchy",
-        "runtime_parent_subpieces",
-        "holybro_x500v2_docs"
-      ],
-      "sectionOrder": [
-        "title",
-        "summary",
-        "identification",
-        "specifications",
-        "relationship",
-        "assembly",
-        "keyReferences"
-      ],
-      "uiImportance": {
-        "keyReferences": "secondary"
-      },
-      "en": {
-        "title": "ESC BLHeli-S 20A BL",
-        "summary": "BLHeli-S 20A ESC for the back-left quadrant. It drives the brushless motor from flight-controller commands and battery power.",
-        "identification": [
-          {
-            "label": "Technical role",
-            "value": "Electronic speed controller for the brushless motor"
-          },
-          {
-            "label": "System category",
-            "value": "Propulsion"
-          },
-          {
-            "label": "Manufacturer",
-            "value": "Holybro"
-          },
-          {
-            "label": "Quadrant",
-            "value": "back-left"
-          }
-        ],
-        "specifications": [
-          {
-            "label": "Category",
-            "value": "Propulsion"
-          },
-          {
-            "label": "Type",
-            "value": "ESC"
-          },
-          {
-            "label": "Material",
-            "value": "FR4 PCB with MOSFETs and copper traces"
-          },
-          {
-            "label": "Dimensions",
-            "value": "~25 × 13 × 5 mm"
-          },
-          {
-            "label": "Model mass estimate",
-            "value": "7 g (project estimate)"
-          },
-          {
-            "label": "ESC rating",
-            "value": "20 A, compatible with 4S battery in the X500 V2 kit context"
-          },
-          {
-            "label": "Power connector",
-            "value": "XT30 plug"
-          }
-        ],
-        "relationship": {
-          "title": "Contained Parts",
-          "items": [
-            "ESC"
-          ]
-        },
-        "assembly": [
-          "Assembly guidance is not individually specified in the available English sources."
-        ],
-        "keyReferences": [
-          {
-            "label": "Runtime ID",
-            "value": "x500v2_esc_BL"
-          },
-          {
-            "label": "CAD / Blender key",
-            "value": "Not applicable"
-          },
-          {
-            "label": "Manufacturer",
-            "value": "Holybro"
-          },
-          {
-            "label": "Part / SKU",
-            "value": "BLHeli-S ESC 20A"
-          }
-        ]
-      },
-      "es": {
-        "title": "ESC BLHeli-S 20A BL",
-        "summary": "ESC BLHeli-S 20A del cuadrante posterior izquierdo. Acciona el motor brushless a partir de comandos del controlador de vuelo y potencia de batería.",
-        "identification": [
-          {
-            "label": "Rol técnico",
-            "value": "Control de velocidad del motor BL"
-          },
-          {
-            "label": "Categoría del sistema",
-            "value": "Propulsión"
-          },
-          {
-            "label": "Fabricante",
-            "value": "Holybro"
-          },
-          {
-            "label": "Cuadrante",
-            "value": "posterior izquierdo"
-          }
-        ],
-        "specifications": [
-          {
-            "label": "Categoría",
-            "value": "Propulsión"
-          },
-          {
-            "label": "Tipo",
-            "value": "ESC"
-          },
-          {
-            "label": "Material",
-            "value": "PCB FR4 con MOSFETs y cobre"
-          },
-          {
-            "label": "Dimensiones",
-            "value": "~25 × 13 × 5 mm"
-          },
-          {
-            "label": "Estimación de masa del modelo",
-            "value": "7 g (estimación del proyecto)"
-          },
-          {
-            "label": "Capacidad ESC",
-            "value": "20 A, compatible con batería 4S en el contexto del kit X500 V2"
-          },
-          {
-            "label": "Conector de potencia",
-            "value": "XT30"
-          }
-        ],
-        "relationship": {
-          "title": "Piezas contenidas",
-          "items": [
-            "ESC"
-          ]
-        },
-        "assembly": [
-          "La guía de ensamblaje individual no está especificada en las fuentes disponibles."
-        ],
-        "keyReferences": [
-          {
-            "label": "ID de ejecución",
-            "value": "x500v2_esc_BL"
-          },
-          {
-            "label": "Clave CAD / Blender",
-            "value": "No aplica"
-          },
-          {
-            "label": "Fabricante",
-            "value": "Holybro"
-          },
-          {
-            "label": "Pieza / SKU",
-            "value": "BLHeli-S ESC 20A"
-          }
-        ]
-      },
-      "notes": []
-    },
-    {
-      "entryId": "x500v2_esc_BR",
-      "entryType": "mother_part",
-      "selectionIds": [
-        "x500v2_esc_BR"
-      ],
-      "canonicalPartId": "x500v2_esc_BR",
       "parentIds": [],
       "childIds": [],
       "aliases": [
@@ -2683,7 +2492,7 @@
         "keyReferences": [
           {
             "label": "Runtime ID",
-            "value": "x500v2_esc_BR"
+            "value": "x500v2_esc_BL"
           },
           {
             "label": "CAD / Blender key",
@@ -2705,7 +2514,7 @@
         "identification": [
           {
             "label": "Rol técnico",
-            "value": "Control de velocidad del motor BR"
+            "value": "Control de velocidad del motor 4"
           },
           {
             "label": "Categoría del sistema",
@@ -2718,6 +2527,197 @@
           {
             "label": "Cuadrante",
             "value": "posterior derecho"
+          }
+        ],
+        "specifications": [
+          {
+            "label": "Categoría",
+            "value": "Propulsión"
+          },
+          {
+            "label": "Tipo",
+            "value": "ESC"
+          },
+          {
+            "label": "Material",
+            "value": "PCB FR4 con MOSFETs y cobre"
+          },
+          {
+            "label": "Dimensiones",
+            "value": "~25 × 13 × 5 mm"
+          },
+          {
+            "label": "Estimación de masa del modelo",
+            "value": "7 g (estimación del proyecto)"
+          },
+          {
+            "label": "Capacidad ESC",
+            "value": "20 A, compatible con batería 4S en el contexto del kit X500 V2"
+          },
+          {
+            "label": "Conector de potencia",
+            "value": "XT30"
+          }
+        ],
+        "relationship": {
+          "title": "Piezas contenidas",
+          "items": [
+            "ESC"
+          ]
+        },
+        "assembly": [
+          "La guía de ensamblaje individual no está especificada en las fuentes disponibles."
+        ],
+        "keyReferences": [
+          {
+            "label": "ID de ejecución",
+            "value": "x500v2_esc_BL"
+          },
+          {
+            "label": "Clave CAD / Blender",
+            "value": "No aplica"
+          },
+          {
+            "label": "Fabricante",
+            "value": "Holybro"
+          },
+          {
+            "label": "Pieza / SKU",
+            "value": "BLHeli-S ESC 20A"
+          }
+        ]
+      },
+      "notes": []
+    },
+    {
+      "entryId": "x500v2_esc_BR",
+      "entryType": "mother_part",
+      "selectionIds": [
+        "x500v2_esc_BR"
+      ],
+      "canonicalPartId": "x500v2_esc_BR",
+      "parentIds": [],
+      "childIds": [],
+      "aliases": [
+        "ESC BLHeli-S 20A BL"
+      ],
+      "sourceConfidence": "official_source_plus_runtime_model_data",
+      "sourceRefs": [
+        "runtime_parts_data",
+        "runtime_selection_hierarchy",
+        "runtime_parent_subpieces",
+        "holybro_x500v2_docs"
+      ],
+      "sectionOrder": [
+        "title",
+        "summary",
+        "identification",
+        "specifications",
+        "relationship",
+        "assembly",
+        "keyReferences"
+      ],
+      "uiImportance": {
+        "keyReferences": "secondary"
+      },
+      "en": {
+        "title": "ESC BLHeli-S 20A BL",
+        "summary": "BLHeli-S 20A ESC for the back-left quadrant. It drives the brushless motor from flight-controller commands and battery power.",
+        "identification": [
+          {
+            "label": "Technical role",
+            "value": "Electronic speed controller for the brushless motor"
+          },
+          {
+            "label": "System category",
+            "value": "Propulsion"
+          },
+          {
+            "label": "Manufacturer",
+            "value": "Holybro"
+          },
+          {
+            "label": "Quadrant",
+            "value": "back-left"
+          }
+        ],
+        "specifications": [
+          {
+            "label": "Category",
+            "value": "Propulsion"
+          },
+          {
+            "label": "Type",
+            "value": "ESC"
+          },
+          {
+            "label": "Material",
+            "value": "FR4 PCB with MOSFETs and copper traces"
+          },
+          {
+            "label": "Dimensions",
+            "value": "~25 × 13 × 5 mm"
+          },
+          {
+            "label": "Model mass estimate",
+            "value": "7 g (project estimate)"
+          },
+          {
+            "label": "ESC rating",
+            "value": "20 A, compatible with 4S battery in the X500 V2 kit context"
+          },
+          {
+            "label": "Power connector",
+            "value": "XT30 plug"
+          }
+        ],
+        "relationship": {
+          "title": "Contained Parts",
+          "items": [
+            "ESC"
+          ]
+        },
+        "assembly": [
+          "Assembly guidance is not individually specified in the available English sources."
+        ],
+        "keyReferences": [
+          {
+            "label": "Runtime ID",
+            "value": "x500v2_esc_BR"
+          },
+          {
+            "label": "CAD / Blender key",
+            "value": "Not applicable"
+          },
+          {
+            "label": "Manufacturer",
+            "value": "Holybro"
+          },
+          {
+            "label": "Part / SKU",
+            "value": "BLHeli-S ESC 20A"
+          }
+        ]
+      },
+      "es": {
+        "title": "ESC BLHeli-S 20A BL",
+        "summary": "ESC BLHeli-S 20A del cuadrante posterior izquierdo. Acciona el motor brushless a partir de comandos del controlador de vuelo y potencia de batería.",
+        "identification": [
+          {
+            "label": "Rol técnico",
+            "value": "Control de velocidad del motor 2"
+          },
+          {
+            "label": "Categoría del sistema",
+            "value": "Propulsión"
+          },
+          {
+            "label": "Fabricante",
+            "value": "Holybro"
+          },
+          {
+            "label": "Cuadrante",
+            "value": "posterior izquierdo"
           }
         ],
         "specifications": [
@@ -2790,7 +2790,7 @@
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "ESC BLHeli-S 20A FL"
+        "ESC BLHeli-S 20A FR"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -2812,8 +2812,8 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "ESC BLHeli-S 20A FL",
-        "summary": "BLHeli-S 20A ESC for the front-left quadrant. It drives the brushless motor from flight-controller commands and battery power.",
+        "title": "ESC BLHeli-S 20A FR",
+        "summary": "BLHeli-S 20A ESC for the front-right quadrant. It drives the brushless motor from flight-controller commands and battery power.",
         "identification": [
           {
             "label": "Technical role",
@@ -2829,7 +2829,7 @@
           },
           {
             "label": "Quadrant",
-            "value": "front-left"
+            "value": "front-right"
           }
         ],
         "specifications": [
@@ -2897,12 +2897,12 @@
         ]
       },
       "es": {
-        "title": "ESC BLHeli-S 20A FL",
-        "summary": "ESC BLHeli-S 20A del cuadrante frontal izquierdo. Acciona el motor brushless a partir de comandos del controlador de vuelo y potencia de batería.",
+        "title": "ESC BLHeli-S 20A FR",
+        "summary": "ESC BLHeli-S 20A del cuadrante frontal derecho. Acciona el motor brushless a partir de comandos del controlador de vuelo y potencia de batería.",
         "identification": [
           {
             "label": "Rol técnico",
-            "value": "Control de velocidad del motor FL; conmutación de potencia"
+            "value": "Control de velocidad del motor 1; conmutación de potencia"
           },
           {
             "label": "Categoría del sistema",
@@ -2914,7 +2914,7 @@
           },
           {
             "label": "Cuadrante",
-            "value": "frontal izquierdo"
+            "value": "frontal derecho"
           }
         ],
         "specifications": [
@@ -2993,7 +2993,7 @@
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "ESC BLHeli-S 20A FR"
+        "ESC BLHeli-S 20A FL"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -3015,8 +3015,8 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "ESC BLHeli-S 20A FR",
-        "summary": "BLHeli-S 20A ESC for the front-right quadrant. It drives the brushless motor from flight-controller commands and battery power.",
+        "title": "ESC BLHeli-S 20A FL",
+        "summary": "BLHeli-S 20A ESC for the front-left quadrant. It drives the brushless motor from flight-controller commands and battery power.",
         "identification": [
           {
             "label": "Technical role",
@@ -3032,7 +3032,7 @@
           },
           {
             "label": "Quadrant",
-            "value": "front-right"
+            "value": "front-left"
           }
         ],
         "specifications": [
@@ -3095,12 +3095,12 @@
         ]
       },
       "es": {
-        "title": "ESC BLHeli-S 20A FR",
-        "summary": "ESC BLHeli-S 20A del cuadrante frontal derecho. Acciona el motor brushless a partir de comandos del controlador de vuelo y potencia de batería.",
+        "title": "ESC BLHeli-S 20A FL",
+        "summary": "ESC BLHeli-S 20A del cuadrante frontal izquierdo. Acciona el motor brushless a partir de comandos del controlador de vuelo y potencia de batería.",
         "identification": [
           {
             "label": "Rol técnico",
-            "value": "Control de velocidad del motor FR"
+            "value": "Control de velocidad del motor 3"
           },
           {
             "label": "Categoría del sistema",
@@ -3112,7 +3112,7 @@
           },
           {
             "label": "Cuadrante",
-            "value": "frontal derecho"
+            "value": "frontal izquierdo"
           }
         ],
         "specifications": [
@@ -3859,7 +3859,7 @@
         "specifications": [
           {
             "label": "Repeated instances",
-            "value": "Four motor positions: front-left, front-right, back-left and back-right"
+            "value": "Four motor positions: front-right, front-left, back-right and back-left"
           },
           {
             "label": "Kit motor reference",
@@ -3873,10 +3873,10 @@
         "relationship": {
           "title": "Contained Parts",
           "items": [
-            "Motor 2216 KV920 FL",
-            "Motor 2216 KV920 FR",
-            "Motor 2216 KV920 BL",
-            "Motor 2216 KV920 BR",
+            "Motor 1 · front-right (2216 KV920)",
+            "Motor 3 · front-left (2216 KV920)",
+            "Motor 4 · rear-right (2216 KV920)",
+            "Motor 2 · rear-left (2216 KV920)",
             "Holybro 2216 KV920 Motor CAD Body"
           ]
         },
@@ -3923,7 +3923,7 @@
         "specifications": [
           {
             "label": "Instancias repetidas",
-            "value": "Cuatro posiciones de motor: frontal izquierda, frontal derecha, posterior izquierda y posterior derecha"
+            "value": "Cuatro posiciones de motor: frontal derecha, frontal izquierda, posterior derecha y posterior izquierda"
           },
           {
             "label": "Referencia de motor del kit",
@@ -3937,10 +3937,10 @@
         "relationship": {
           "title": "Piezas contenidas",
           "items": [
-            "Motor 2216 KV920 FL",
-            "Motor 2216 KV920 FR",
-            "Motor 2216 KV920 BL",
-            "Motor 2216 KV920 BR",
+            "Motor 1 · delantero derecho (2216 KV920)",
+            "Motor 3 · delantero izquierdo (2216 KV920)",
+            "Motor 4 · trasero derecho (2216 KV920)",
+            "Motor 2 · trasero izquierdo (2216 KV920)",
             "Cuerpo CAD del motor Holybro 2216 KV920"
           ]
         },
@@ -3979,7 +3979,7 @@
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "Motor 2216 KV920 BL"
+        "Motor 4 · rear-right (2216 KV920)"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -4002,195 +4002,7 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "Motor 2216 KV920 BL",
-        "summary": "Holybro 2216 KV920 motor for the back-left propulsion quadrant. It converts ESC output into propeller rotation and thrust.",
-        "identification": [
-          {
-            "label": "Technical role",
-            "value": "Brushless motor converting ESC drive into propeller rotation"
-          },
-          {
-            "label": "System category",
-            "value": "Propulsion"
-          },
-          {
-            "label": "Manufacturer",
-            "value": "Holybro"
-          },
-          {
-            "label": "Quadrant",
-            "value": "back-left"
-          }
-        ],
-        "specifications": [
-          {
-            "label": "Category",
-            "value": "Propulsion"
-          },
-          {
-            "label": "Type",
-            "value": "Motor"
-          },
-          {
-            "label": "Material",
-            "value": "CNC aluminum alloy, steel and enamelled copper"
-          },
-          {
-            "label": "Dimensions",
-            "value": "⌀28 mm × ~32 mm"
-          },
-          {
-            "label": "Model mass estimate",
-            "value": "63 g (project estimate)"
-          }
-        ],
-        "relationship": {
-          "title": "Contained Parts",
-          "items": [
-            "Holybro 2216 KV880 Motor",
-            "Socket Cap Screw M3 x 6 mm x4"
-          ]
-        },
-        "assembly": [
-          "Assembly guidance is not individually specified in the available English sources.",
-          "Required tools: M3 socket wrench, Loctite"
-        ],
-        "keyReferences": [
-          {
-            "label": "Runtime ID",
-            "value": "x500v2_motor_BL"
-          },
-          {
-            "label": "CAD / Blender key",
-            "value": "Not applicable"
-          },
-          {
-            "label": "Manufacturer",
-            "value": "Holybro"
-          },
-          {
-            "label": "Part / SKU",
-            "value": "2216-920KV-CCW"
-          },
-          {
-            "label": "Trace note",
-            "value": "Local CAD key may include KV880, but the X500 V2 kit documentation identifies the installed motor as 2216 KV920."
-          }
-        ]
-      },
-      "es": {
-        "title": "Motor 2216 KV920 BL",
-        "summary": "Motor Holybro 2216 KV920 del cuadrante posterior izquierdo de propulsión. Convierte la salida del ESC en rotación de hélice y empuje.",
-        "identification": [
-          {
-            "label": "Rol técnico",
-            "value": "Generación de empuje principal (CCW)"
-          },
-          {
-            "label": "Categoría del sistema",
-            "value": "Propulsión"
-          },
-          {
-            "label": "Fabricante",
-            "value": "Holybro"
-          },
-          {
-            "label": "Cuadrante",
-            "value": "posterior izquierdo"
-          }
-        ],
-        "specifications": [
-          {
-            "label": "Categoría",
-            "value": "Propulsión"
-          },
-          {
-            "label": "Tipo",
-            "value": "Motor"
-          },
-          {
-            "label": "Material",
-            "value": "Aleación de aluminio CNC, acero, cobre esmaltado"
-          },
-          {
-            "label": "Dimensiones",
-            "value": "⌀28 mm × ~32 mm"
-          },
-          {
-            "label": "Estimación de masa del modelo",
-            "value": "63 g (estimación del proyecto)"
-          }
-        ],
-        "relationship": {
-          "title": "Piezas contenidas",
-          "items": [
-            "Motor Holybro 2216 KV920",
-            "Tornillo de cabeza cilíndrica M3 x 6 mm x4"
-          ]
-        },
-        "assembly": [
-          "La guía de ensamblaje individual no está especificada en las fuentes disponibles.",
-          "Herramientas requeridas: Llave de vaso M3, Loctite"
-        ],
-        "keyReferences": [
-          {
-            "label": "ID de ejecución",
-            "value": "x500v2_motor_BL"
-          },
-          {
-            "label": "Clave CAD / Blender",
-            "value": "No aplica"
-          },
-          {
-            "label": "Fabricante",
-            "value": "Holybro"
-          },
-          {
-            "label": "Pieza / SKU",
-            "value": "2216-920KV-CCW"
-          },
-          {
-            "label": "Nota de trazabilidad",
-            "value": "La clave CAD local puede incluir KV880, pero la documentación del kit X500 V2 identifica el motor instalado como 2216 KV920."
-          }
-        ]
-      },
-      "notes": []
-    },
-    {
-      "entryId": "x500v2_motor_BR",
-      "entryType": "mother_part",
-      "selectionIds": [
-        "x500v2_motor_BR"
-      ],
-      "canonicalPartId": "x500v2_motor_BR",
-      "parentIds": [],
-      "childIds": [],
-      "aliases": [
-        "Motor 2216 KV920 BR"
-      ],
-      "sourceConfidence": "official_source_plus_runtime_model_data",
-      "sourceRefs": [
-        "runtime_parts_data",
-        "runtime_selection_hierarchy",
-        "runtime_parent_subpieces",
-        "holybro_x500v2_docs",
-        "holybro_x500v2_downloads"
-      ],
-      "sectionOrder": [
-        "title",
-        "summary",
-        "identification",
-        "specifications",
-        "relationship",
-        "assembly",
-        "keyReferences"
-      ],
-      "uiImportance": {
-        "keyReferences": "secondary"
-      },
-      "en": {
-        "title": "Motor 2216 KV920 BR",
+        "title": "Motor 4 · rear-right (2216 KV920)",
         "summary": "Holybro 2216 KV920 motor for the back-right propulsion quadrant. It converts ESC output into propeller rotation and thrust.",
         "identification": [
           {
@@ -4246,7 +4058,7 @@
         "keyReferences": [
           {
             "label": "Runtime ID",
-            "value": "x500v2_motor_BR"
+            "value": "x500v2_motor_BL"
           },
           {
             "label": "CAD / Blender key",
@@ -4267,7 +4079,7 @@
         ]
       },
       "es": {
-        "title": "Motor 2216 KV920 BR",
+        "title": "Motor 4 · trasero derecho (2216 KV920)",
         "summary": "Motor Holybro 2216 KV920 del cuadrante posterior derecho de propulsión. Convierte la salida del ESC en rotación de hélice y empuje.",
         "identification": [
           {
@@ -4323,7 +4135,7 @@
         "keyReferences": [
           {
             "label": "ID de ejecución",
-            "value": "x500v2_motor_BR"
+            "value": "x500v2_motor_BL"
           },
           {
             "label": "Clave CAD / Blender",
@@ -4346,16 +4158,16 @@
       "notes": []
     },
     {
-      "entryId": "x500v2_motor_FL",
+      "entryId": "x500v2_motor_BR",
       "entryType": "mother_part",
       "selectionIds": [
-        "x500v2_motor_FL"
+        "x500v2_motor_BR"
       ],
-      "canonicalPartId": "x500v2_motor_FL",
+      "canonicalPartId": "x500v2_motor_BR",
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "Motor 2216 KV920 FL"
+        "Motor 2 · rear-left (2216 KV920)"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -4378,8 +4190,8 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "Motor 2216 KV920 FL",
-        "summary": "Holybro 2216 KV920 motor for the front-left propulsion quadrant. It converts ESC output into propeller rotation and thrust.",
+        "title": "Motor 2 · rear-left (2216 KV920)",
+        "summary": "Holybro 2216 KV920 motor for the back-left propulsion quadrant. It converts ESC output into propeller rotation and thrust.",
         "identification": [
           {
             "label": "Technical role",
@@ -4395,7 +4207,195 @@
           },
           {
             "label": "Quadrant",
-            "value": "front-left"
+            "value": "back-left"
+          }
+        ],
+        "specifications": [
+          {
+            "label": "Category",
+            "value": "Propulsion"
+          },
+          {
+            "label": "Type",
+            "value": "Motor"
+          },
+          {
+            "label": "Material",
+            "value": "CNC aluminum alloy, steel and enamelled copper"
+          },
+          {
+            "label": "Dimensions",
+            "value": "⌀28 mm × ~32 mm"
+          },
+          {
+            "label": "Model mass estimate",
+            "value": "63 g (project estimate)"
+          }
+        ],
+        "relationship": {
+          "title": "Contained Parts",
+          "items": [
+            "Holybro 2216 KV880 Motor",
+            "Socket Cap Screw M3 x 6 mm x4"
+          ]
+        },
+        "assembly": [
+          "Assembly guidance is not individually specified in the available English sources.",
+          "Required tools: M3 socket wrench, Loctite"
+        ],
+        "keyReferences": [
+          {
+            "label": "Runtime ID",
+            "value": "x500v2_motor_BR"
+          },
+          {
+            "label": "CAD / Blender key",
+            "value": "Not applicable"
+          },
+          {
+            "label": "Manufacturer",
+            "value": "Holybro"
+          },
+          {
+            "label": "Part / SKU",
+            "value": "2216-920KV-CCW"
+          },
+          {
+            "label": "Trace note",
+            "value": "Local CAD key may include KV880, but the X500 V2 kit documentation identifies the installed motor as 2216 KV920."
+          }
+        ]
+      },
+      "es": {
+        "title": "Motor 2 · trasero izquierdo (2216 KV920)",
+        "summary": "Motor Holybro 2216 KV920 del cuadrante posterior izquierdo de propulsión. Convierte la salida del ESC en rotación de hélice y empuje.",
+        "identification": [
+          {
+            "label": "Rol técnico",
+            "value": "Generación de empuje principal (CCW)"
+          },
+          {
+            "label": "Categoría del sistema",
+            "value": "Propulsión"
+          },
+          {
+            "label": "Fabricante",
+            "value": "Holybro"
+          },
+          {
+            "label": "Cuadrante",
+            "value": "posterior izquierdo"
+          }
+        ],
+        "specifications": [
+          {
+            "label": "Categoría",
+            "value": "Propulsión"
+          },
+          {
+            "label": "Tipo",
+            "value": "Motor"
+          },
+          {
+            "label": "Material",
+            "value": "Aleación de aluminio CNC, acero, cobre esmaltado"
+          },
+          {
+            "label": "Dimensiones",
+            "value": "⌀28 mm × ~32 mm"
+          },
+          {
+            "label": "Estimación de masa del modelo",
+            "value": "63 g (estimación del proyecto)"
+          }
+        ],
+        "relationship": {
+          "title": "Piezas contenidas",
+          "items": [
+            "Motor Holybro 2216 KV920",
+            "Tornillo de cabeza cilíndrica M3 x 6 mm x4"
+          ]
+        },
+        "assembly": [
+          "La guía de ensamblaje individual no está especificada en las fuentes disponibles.",
+          "Herramientas requeridas: Llave de vaso M3, Loctite"
+        ],
+        "keyReferences": [
+          {
+            "label": "ID de ejecución",
+            "value": "x500v2_motor_BR"
+          },
+          {
+            "label": "Clave CAD / Blender",
+            "value": "No aplica"
+          },
+          {
+            "label": "Fabricante",
+            "value": "Holybro"
+          },
+          {
+            "label": "Pieza / SKU",
+            "value": "2216-920KV-CCW"
+          },
+          {
+            "label": "Nota de trazabilidad",
+            "value": "La clave CAD local puede incluir KV880, pero la documentación del kit X500 V2 identifica el motor instalado como 2216 KV920."
+          }
+        ]
+      },
+      "notes": []
+    },
+    {
+      "entryId": "x500v2_motor_FL",
+      "entryType": "mother_part",
+      "selectionIds": [
+        "x500v2_motor_FL"
+      ],
+      "canonicalPartId": "x500v2_motor_FL",
+      "parentIds": [],
+      "childIds": [],
+      "aliases": [
+        "Motor 1 · front-right (2216 KV920)"
+      ],
+      "sourceConfidence": "official_source_plus_runtime_model_data",
+      "sourceRefs": [
+        "runtime_parts_data",
+        "runtime_selection_hierarchy",
+        "runtime_parent_subpieces",
+        "holybro_x500v2_docs",
+        "holybro_x500v2_downloads"
+      ],
+      "sectionOrder": [
+        "title",
+        "summary",
+        "identification",
+        "specifications",
+        "relationship",
+        "assembly",
+        "keyReferences"
+      ],
+      "uiImportance": {
+        "keyReferences": "secondary"
+      },
+      "en": {
+        "title": "Motor 1 · front-right (2216 KV920)",
+        "summary": "Holybro 2216 KV920 motor for the front-right propulsion quadrant. It converts ESC output into propeller rotation and thrust.",
+        "identification": [
+          {
+            "label": "Technical role",
+            "value": "Brushless motor converting ESC drive into propeller rotation"
+          },
+          {
+            "label": "System category",
+            "value": "Propulsion"
+          },
+          {
+            "label": "Manufacturer",
+            "value": "Holybro"
+          },
+          {
+            "label": "Quadrant",
+            "value": "front-right"
           }
         ],
         "specifications": [
@@ -4451,7 +4451,7 @@
           },
           {
             "label": "Part / SKU",
-            "value": "2216-920KV-CW"
+            "value": "2216-920KV-CCW"
           },
           {
             "label": "Trace note",
@@ -4460,12 +4460,12 @@
         ]
       },
       "es": {
-        "title": "Motor 2216 KV920 FL",
-        "summary": "Motor Holybro 2216 KV920 del cuadrante frontal izquierdo de propulsión. Convierte la salida del ESC en rotación de hélice y empuje.",
+        "title": "Motor 1 · delantero derecho (2216 KV920)",
+        "summary": "Motor Holybro 2216 KV920 del cuadrante frontal derecho de propulsión. Convierte la salida del ESC en rotación de hélice y empuje.",
         "identification": [
           {
             "label": "Rol técnico",
-            "value": "Generación de empuje principal (CW)"
+            "value": "Generación de empuje principal (CCW)"
           },
           {
             "label": "Categoría del sistema",
@@ -4477,7 +4477,7 @@
           },
           {
             "label": "Cuadrante",
-            "value": "frontal izquierdo"
+            "value": "frontal derecho"
           }
         ],
         "specifications": [
@@ -4533,7 +4533,7 @@
           },
           {
             "label": "Pieza / SKU",
-            "value": "2216-920KV-CW"
+            "value": "2216-920KV-CCW"
           },
           {
             "label": "Nota de trazabilidad",
@@ -4553,7 +4553,7 @@
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "Motor 2216 KV920 FR"
+        "Motor 3 · front-left (2216 KV920)"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -4576,8 +4576,8 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "Motor 2216 KV920 FR",
-        "summary": "Holybro 2216 KV920 motor for the front-right propulsion quadrant. It converts ESC output into propeller rotation and thrust.",
+        "title": "Motor 3 · front-left (2216 KV920)",
+        "summary": "Holybro 2216 KV920 motor for the front-left propulsion quadrant. It converts ESC output into propeller rotation and thrust.",
         "identification": [
           {
             "label": "Technical role",
@@ -4593,7 +4593,7 @@
           },
           {
             "label": "Quadrant",
-            "value": "front-right"
+            "value": "front-left"
           }
         ],
         "specifications": [
@@ -4649,7 +4649,7 @@
           },
           {
             "label": "Part / SKU",
-            "value": "2216-920KV-CCW"
+            "value": "2216-920KV-CW"
           },
           {
             "label": "Trace note",
@@ -4658,12 +4658,12 @@
         ]
       },
       "es": {
-        "title": "Motor 2216 KV920 FR",
-        "summary": "Motor Holybro 2216 KV920 del cuadrante frontal derecho de propulsión. Convierte la salida del ESC en rotación de hélice y empuje.",
+        "title": "Motor 3 · delantero izquierdo (2216 KV920)",
+        "summary": "Motor Holybro 2216 KV920 del cuadrante frontal izquierdo de propulsión. Convierte la salida del ESC en rotación de hélice y empuje.",
         "identification": [
           {
             "label": "Rol técnico",
-            "value": "Generación de empuje principal (CCW)"
+            "value": "Generación de empuje principal (CW)"
           },
           {
             "label": "Categoría del sistema",
@@ -4675,7 +4675,7 @@
           },
           {
             "label": "Cuadrante",
-            "value": "frontal derecho"
+            "value": "frontal izquierdo"
           }
         ],
         "specifications": [
@@ -4731,7 +4731,7 @@
           },
           {
             "label": "Pieza / SKU",
-            "value": "2216-920KV-CCW"
+            "value": "2216-920KV-CW"
           },
           {
             "label": "Nota de trazabilidad",
@@ -5648,10 +5648,10 @@
         "relationship": {
           "title": "Contained Parts",
           "items": [
-            "Propeller 1045 FL",
-            "Propeller 1045 FR",
-            "Propeller 1045 BL",
-            "Propeller 1045 BR"
+            "Propeller 1 · front-right (1045)",
+            "Propeller 3 · front-left (1045)",
+            "Propeller 4 · rear-right (1045)",
+            "Propeller 2 · rear-left (1045)"
           ]
         },
         "assembly": [
@@ -5707,10 +5707,10 @@
         "relationship": {
           "title": "Piezas contenidas",
           "items": [
-            "Hélice 1045 FL",
-            "Hélice 1045 FR",
-            "Hélice 1045 BL",
-            "Hélice 1045 BR"
+            "Hélice 1 · delantero derecho (1045)",
+            "Hélice 3 · delantero izquierdo (1045)",
+            "Hélice 4 · trasero derecho (1045)",
+            "Hélice 2 · trasero izquierdo (1045)"
           ]
         },
         "assembly": [
@@ -5744,7 +5744,7 @@
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "Propeller 1045 BL"
+        "Propeller 4 · rear-right (1045)"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -5766,198 +5766,7 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "Propeller 1045 BL",
-        "summary": "1045 propeller for the back-left quadrant. It converts motor rotation into aerodynamic lift and must match the motor rotation direction.",
-        "identification": [
-          {
-            "label": "Technical role",
-            "value": "Aerodynamic propeller converting motor rotation into lift"
-          },
-          {
-            "label": "System category",
-            "value": "Propulsion"
-          },
-          {
-            "label": "Manufacturer",
-            "value": "Holybro"
-          },
-          {
-            "label": "Quadrant",
-            "value": "back-left"
-          }
-        ],
-        "specifications": [
-          {
-            "label": "Category",
-            "value": "Propulsion"
-          },
-          {
-            "label": "Type",
-            "value": "Propeller"
-          },
-          {
-            "label": "Material",
-            "value": "Compuesto plástico reforzado"
-          },
-          {
-            "label": "Dimensions",
-            "value": "⌀254 mm, pitch 114 mm"
-          },
-          {
-            "label": "Model mass estimate",
-            "value": "8 g (project estimate)"
-          },
-          {
-            "label": "Propeller size",
-            "value": "1045"
-          },
-          {
-            "label": "Kit quantity",
-            "value": "6 propellers with retainer documented in the kit"
-          }
-        ],
-        "relationship": {
-          "title": "Contained Parts",
-          "items": [
-            "No separate contained parts are configured for this selection."
-          ]
-        },
-        "assembly": [
-          "Assembly guidance is not individually specified in the available English sources."
-        ],
-        "keyReferences": [
-          {
-            "label": "Runtime ID",
-            "value": "x500v2_prop_BL"
-          },
-          {
-            "label": "CAD / Blender key",
-            "value": "Not applicable"
-          },
-          {
-            "label": "Manufacturer",
-            "value": "Holybro"
-          },
-          {
-            "label": "Part / SKU",
-            "value": "1045 CCW"
-          }
-        ]
-      },
-      "es": {
-        "title": "Propeller 1045 BL",
-        "summary": "Hélice 1045 del cuadrante posterior izquierdo. Convierte la rotación del motor en sustentación aerodinámica y debe coincidir con la dirección de giro del motor.",
-        "identification": [
-          {
-            "label": "Rol técnico",
-            "value": "Conversión de par motor en empuje vertical (CCW)"
-          },
-          {
-            "label": "Categoría del sistema",
-            "value": "Propulsión"
-          },
-          {
-            "label": "Fabricante",
-            "value": "Holybro"
-          },
-          {
-            "label": "Cuadrante",
-            "value": "posterior izquierdo"
-          }
-        ],
-        "specifications": [
-          {
-            "label": "Categoría",
-            "value": "Propulsión"
-          },
-          {
-            "label": "Tipo",
-            "value": "Hélice"
-          },
-          {
-            "label": "Material",
-            "value": "Compuesto plástico reforzado"
-          },
-          {
-            "label": "Dimensiones",
-            "value": "⌀254 mm, pitch 114 mm"
-          },
-          {
-            "label": "Estimación de masa del modelo",
-            "value": "8 g (estimación del proyecto)"
-          },
-          {
-            "label": "Tamaño de hélice",
-            "value": "1045"
-          },
-          {
-            "label": "Cantidad del kit",
-            "value": "6 hélices con retenedor documentadas en el kit"
-          }
-        ],
-        "relationship": {
-          "title": "Piezas contenidas",
-          "items": [
-            "No hay piezas contenidas independientes configuradas para esta selección."
-          ]
-        },
-        "assembly": [
-          "La guía de ensamblaje individual no está especificada en las fuentes disponibles."
-        ],
-        "keyReferences": [
-          {
-            "label": "ID de ejecución",
-            "value": "x500v2_prop_BL"
-          },
-          {
-            "label": "Clave CAD / Blender",
-            "value": "No aplica"
-          },
-          {
-            "label": "Fabricante",
-            "value": "Holybro"
-          },
-          {
-            "label": "Pieza / SKU",
-            "value": "1045 CCW"
-          }
-        ]
-      },
-      "notes": []
-    },
-    {
-      "entryId": "x500v2_prop_BR",
-      "entryType": "mother_part",
-      "selectionIds": [
-        "x500v2_prop_BR"
-      ],
-      "canonicalPartId": "x500v2_prop_BR",
-      "parentIds": [],
-      "childIds": [],
-      "aliases": [
-        "Propeller 1045 BR"
-      ],
-      "sourceConfidence": "official_source_plus_runtime_model_data",
-      "sourceRefs": [
-        "runtime_parts_data",
-        "runtime_selection_hierarchy",
-        "runtime_parent_subpieces",
-        "holybro_x500v2_docs"
-      ],
-      "sectionOrder": [
-        "title",
-        "summary",
-        "identification",
-        "specifications",
-        "relationship",
-        "assembly",
-        "keyReferences"
-      ],
-      "uiImportance": {
-        "keyReferences": "secondary"
-      },
-      "en": {
-        "title": "Propeller 1045 BR",
+        "title": "Propeller 4 · rear-right (1045)",
         "summary": "1045 propeller for the back-right quadrant. It converts motor rotation into aerodynamic lift and must match the motor rotation direction.",
         "identification": [
           {
@@ -6019,7 +5828,7 @@
         "keyReferences": [
           {
             "label": "Runtime ID",
-            "value": "x500v2_prop_BR"
+            "value": "x500v2_prop_BL"
           },
           {
             "label": "CAD / Blender key",
@@ -6036,7 +5845,7 @@
         ]
       },
       "es": {
-        "title": "Propeller 1045 BR",
+        "title": "Hélice 4 · trasero derecho (1045)",
         "summary": "Hélice 1045 del cuadrante posterior derecho. Convierte la rotación del motor en sustentación aerodinámica y debe coincidir con la dirección de giro del motor.",
         "identification": [
           {
@@ -6098,7 +5907,7 @@
         "keyReferences": [
           {
             "label": "ID de ejecución",
-            "value": "x500v2_prop_BR"
+            "value": "x500v2_prop_BL"
           },
           {
             "label": "Clave CAD / Blender",
@@ -6117,16 +5926,16 @@
       "notes": []
     },
     {
-      "entryId": "x500v2_prop_FL",
+      "entryId": "x500v2_prop_BR",
       "entryType": "mother_part",
       "selectionIds": [
-        "x500v2_prop_FL"
+        "x500v2_prop_BR"
       ],
-      "canonicalPartId": "x500v2_prop_FL",
+      "canonicalPartId": "x500v2_prop_BR",
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "Propeller 1045 FL"
+        "Propeller 2 · rear-left (1045)"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -6148,8 +5957,8 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "Propeller 1045 FL",
-        "summary": "1045 propeller for the front-left quadrant. It converts motor rotation into aerodynamic lift and must match the motor rotation direction.",
+        "title": "Propeller 2 · rear-left (1045)",
+        "summary": "1045 propeller for the back-left quadrant. It converts motor rotation into aerodynamic lift and must match the motor rotation direction.",
         "identification": [
           {
             "label": "Technical role",
@@ -6165,7 +5974,198 @@
           },
           {
             "label": "Quadrant",
-            "value": "front-left"
+            "value": "back-left"
+          }
+        ],
+        "specifications": [
+          {
+            "label": "Category",
+            "value": "Propulsion"
+          },
+          {
+            "label": "Type",
+            "value": "Propeller"
+          },
+          {
+            "label": "Material",
+            "value": "Compuesto plástico reforzado"
+          },
+          {
+            "label": "Dimensions",
+            "value": "⌀254 mm, pitch 114 mm"
+          },
+          {
+            "label": "Model mass estimate",
+            "value": "8 g (project estimate)"
+          },
+          {
+            "label": "Propeller size",
+            "value": "1045"
+          },
+          {
+            "label": "Kit quantity",
+            "value": "6 propellers with retainer documented in the kit"
+          }
+        ],
+        "relationship": {
+          "title": "Contained Parts",
+          "items": [
+            "No separate contained parts are configured for this selection."
+          ]
+        },
+        "assembly": [
+          "Assembly guidance is not individually specified in the available English sources."
+        ],
+        "keyReferences": [
+          {
+            "label": "Runtime ID",
+            "value": "x500v2_prop_BR"
+          },
+          {
+            "label": "CAD / Blender key",
+            "value": "Not applicable"
+          },
+          {
+            "label": "Manufacturer",
+            "value": "Holybro"
+          },
+          {
+            "label": "Part / SKU",
+            "value": "1045 CCW"
+          }
+        ]
+      },
+      "es": {
+        "title": "Hélice 2 · trasero izquierdo (1045)",
+        "summary": "Hélice 1045 del cuadrante posterior izquierdo. Convierte la rotación del motor en sustentación aerodinámica y debe coincidir con la dirección de giro del motor.",
+        "identification": [
+          {
+            "label": "Rol técnico",
+            "value": "Conversión de par motor en empuje vertical (CCW)"
+          },
+          {
+            "label": "Categoría del sistema",
+            "value": "Propulsión"
+          },
+          {
+            "label": "Fabricante",
+            "value": "Holybro"
+          },
+          {
+            "label": "Cuadrante",
+            "value": "posterior izquierdo"
+          }
+        ],
+        "specifications": [
+          {
+            "label": "Categoría",
+            "value": "Propulsión"
+          },
+          {
+            "label": "Tipo",
+            "value": "Hélice"
+          },
+          {
+            "label": "Material",
+            "value": "Compuesto plástico reforzado"
+          },
+          {
+            "label": "Dimensiones",
+            "value": "⌀254 mm, pitch 114 mm"
+          },
+          {
+            "label": "Estimación de masa del modelo",
+            "value": "8 g (estimación del proyecto)"
+          },
+          {
+            "label": "Tamaño de hélice",
+            "value": "1045"
+          },
+          {
+            "label": "Cantidad del kit",
+            "value": "6 hélices con retenedor documentadas en el kit"
+          }
+        ],
+        "relationship": {
+          "title": "Piezas contenidas",
+          "items": [
+            "No hay piezas contenidas independientes configuradas para esta selección."
+          ]
+        },
+        "assembly": [
+          "La guía de ensamblaje individual no está especificada en las fuentes disponibles."
+        ],
+        "keyReferences": [
+          {
+            "label": "ID de ejecución",
+            "value": "x500v2_prop_BR"
+          },
+          {
+            "label": "Clave CAD / Blender",
+            "value": "No aplica"
+          },
+          {
+            "label": "Fabricante",
+            "value": "Holybro"
+          },
+          {
+            "label": "Pieza / SKU",
+            "value": "1045 CCW"
+          }
+        ]
+      },
+      "notes": []
+    },
+    {
+      "entryId": "x500v2_prop_FL",
+      "entryType": "mother_part",
+      "selectionIds": [
+        "x500v2_prop_FL"
+      ],
+      "canonicalPartId": "x500v2_prop_FL",
+      "parentIds": [],
+      "childIds": [],
+      "aliases": [
+        "Propeller 1 · front-right (1045)"
+      ],
+      "sourceConfidence": "official_source_plus_runtime_model_data",
+      "sourceRefs": [
+        "runtime_parts_data",
+        "runtime_selection_hierarchy",
+        "runtime_parent_subpieces",
+        "holybro_x500v2_docs"
+      ],
+      "sectionOrder": [
+        "title",
+        "summary",
+        "identification",
+        "specifications",
+        "relationship",
+        "assembly",
+        "keyReferences"
+      ],
+      "uiImportance": {
+        "keyReferences": "secondary"
+      },
+      "en": {
+        "title": "Propeller 1 · front-right (1045)",
+        "summary": "1045 propeller for the front-right quadrant. It converts motor rotation into aerodynamic lift and must match the motor rotation direction.",
+        "identification": [
+          {
+            "label": "Technical role",
+            "value": "Aerodynamic propeller converting motor rotation into lift"
+          },
+          {
+            "label": "System category",
+            "value": "Propulsion"
+          },
+          {
+            "label": "Manufacturer",
+            "value": "Holybro"
+          },
+          {
+            "label": "Quadrant",
+            "value": "front-right"
           }
         ],
         "specifications": [
@@ -6224,17 +6224,17 @@
           },
           {
             "label": "Part / SKU",
-            "value": "1045 CW"
+            "value": "1045 CCW"
           }
         ]
       },
       "es": {
-        "title": "Propeller 1045 FL",
-        "summary": "Hélice 1045 del cuadrante frontal izquierdo. Convierte la rotación del motor en sustentación aerodinámica y debe coincidir con la dirección de giro del motor.",
+        "title": "Hélice 1 · delantero derecho (1045)",
+        "summary": "Hélice 1045 del cuadrante frontal derecho. Convierte la rotación del motor en sustentación aerodinámica y debe coincidir con la dirección de giro del motor.",
         "identification": [
           {
             "label": "Rol técnico",
-            "value": "Conversión de par motor en empuje vertical (CW)"
+            "value": "Conversión de par motor en empuje vertical (CCW)"
           },
           {
             "label": "Categoría del sistema",
@@ -6246,7 +6246,7 @@
           },
           {
             "label": "Cuadrante",
-            "value": "frontal izquierdo"
+            "value": "frontal derecho"
           }
         ],
         "specifications": [
@@ -6305,7 +6305,7 @@
           },
           {
             "label": "Pieza / SKU",
-            "value": "1045 CW"
+            "value": "1045 CCW"
           }
         ]
       },
@@ -6321,7 +6321,7 @@
       "parentIds": [],
       "childIds": [],
       "aliases": [
-        "Propeller 1045 FR"
+        "Propeller 3 · front-left (1045)"
       ],
       "sourceConfidence": "official_source_plus_runtime_model_data",
       "sourceRefs": [
@@ -6343,8 +6343,8 @@
         "keyReferences": "secondary"
       },
       "en": {
-        "title": "Propeller 1045 FR",
-        "summary": "1045 propeller for the front-right quadrant. It converts motor rotation into aerodynamic lift and must match the motor rotation direction.",
+        "title": "Propeller 3 · front-left (1045)",
+        "summary": "1045 propeller for the front-left quadrant. It converts motor rotation into aerodynamic lift and must match the motor rotation direction.",
         "identification": [
           {
             "label": "Technical role",
@@ -6360,7 +6360,7 @@
           },
           {
             "label": "Quadrant",
-            "value": "front-right"
+            "value": "front-left"
           }
         ],
         "specifications": [
@@ -6418,17 +6418,17 @@
           },
           {
             "label": "Part / SKU",
-            "value": "1045 CCW"
+            "value": "1045 CW"
           }
         ]
       },
       "es": {
-        "title": "Propeller 1045 FR",
-        "summary": "Hélice 1045 del cuadrante frontal derecho. Convierte la rotación del motor en sustentación aerodinámica y debe coincidir con la dirección de giro del motor.",
+        "title": "Hélice 3 · delantero izquierdo (1045)",
+        "summary": "Hélice 1045 del cuadrante frontal izquierdo. Convierte la rotación del motor en sustentación aerodinámica y debe coincidir con la dirección de giro del motor.",
         "identification": [
           {
             "label": "Rol técnico",
-            "value": "Conversión de par motor en empuje vertical (CCW)"
+            "value": "Conversión de par motor en empuje vertical (CW)"
           },
           {
             "label": "Categoría del sistema",
@@ -6440,7 +6440,7 @@
           },
           {
             "label": "Cuadrante",
-            "value": "frontal derecho"
+            "value": "frontal izquierdo"
           }
         ],
         "specifications": [
@@ -6498,7 +6498,7 @@
           },
           {
             "label": "Pieza / SKU",
-            "value": "1045 CCW"
+            "value": "1045 CW"
           }
         ]
       },
@@ -7349,7 +7349,7 @@
           },
           {
             "label": "Parent assembly",
-            "value": "Arm Assembly Quadrant, Arm Tube Back-Left, Arm Tube Back-Right, Arm Tube Front-Left, Arm Tube Front-Right"
+            "value": "Arm Assembly Quadrant, Arm Tube Back-Right, Arm Tube Back-Left, Arm Tube Front-Right, Arm Tube Front-Left"
           }
         ],
         "specifications": [
@@ -7363,7 +7363,7 @@
           },
           {
             "label": "Model mass estimate",
-            "value": "Context-normalized estimate: Arm Tube Back-Left: 3.6 g; Arm Tube Back-Right: 3.6 g; Arm Tube Front-Left: 3.6 g; Arm Tube Front-Right: 3.6 g"
+            "value": "Context-normalized estimate: Arm Tube Back-Right: 3.6 g; Arm Tube Back-Left: 3.6 g; Arm Tube Front-Right: 3.6 g; Arm Tube Front-Left: 3.6 g"
           },
           {
             "label": "Quantity in scene",
@@ -7374,10 +7374,10 @@
           "title": "Parent Assembly",
           "items": [
             "Arm Assembly Quadrant",
-            "Arm Tube Back-Left",
             "Arm Tube Back-Right",
-            "Arm Tube Front-Left",
-            "Arm Tube Front-Right"
+            "Arm Tube Back-Left",
+            "Arm Tube Front-Right",
+            "Arm Tube Front-Left"
           ]
         },
         "assembly": [
@@ -7417,7 +7417,7 @@
           },
           {
             "label": "Pieza madre",
-            "value": "Conjunto de brazo, Brazo posterior izquierdo, Brazo posterior derecho, Brazo frontal izquierdo, Brazo frontal derecho"
+            "value": "Conjunto de brazo, Brazo posterior derecho, Brazo posterior izquierdo, Brazo frontal derecho, Brazo frontal izquierdo"
           }
         ],
         "specifications": [
@@ -7431,7 +7431,7 @@
           },
           {
             "label": "Estimación de masa del modelo",
-            "value": "Estimación normalizada por contexto: Brazo posterior izquierdo: 3,6 g; Brazo posterior derecho: 3,6 g; Brazo frontal izquierdo: 3,6 g; Brazo frontal derecho: 3,6 g"
+            "value": "Estimación normalizada por contexto: Brazo posterior derecho: 3,6 g; Brazo posterior izquierdo: 3,6 g; Brazo frontal derecho: 3,6 g; Brazo frontal izquierdo: 3,6 g"
           },
           {
             "label": "Cantidad en escena",
@@ -7442,10 +7442,10 @@
           "title": "Pieza madre",
           "items": [
             "Conjunto de brazo",
-            "Brazo posterior izquierdo",
             "Brazo posterior derecho",
-            "Brazo frontal izquierdo",
-            "Brazo frontal derecho"
+            "Brazo posterior izquierdo",
+            "Brazo frontal derecho",
+            "Brazo frontal izquierdo"
           ]
         },
         "assembly": [
@@ -8674,7 +8674,7 @@
           },
           {
             "label": "Parent assembly",
-            "value": "Motor 2216 Quadrant, Motor 2216 KV920 BL, Motor 2216 KV920 BR, Motor 2216 KV920 FL, Motor 2216 KV920 FR"
+            "value": "Motor 2216 Quadrant, Motor 4 · rear-right (2216 KV920), Motor 2 · rear-left (2216 KV920), Motor 1 · front-right (2216 KV920), Motor 3 · front-left (2216 KV920)"
           }
         ],
         "specifications": [
@@ -8688,7 +8688,7 @@
           },
           {
             "label": "Model mass estimate",
-            "value": "Context-normalized estimate: Motor 2216 KV920 BL: 63.0 g; Motor 2216 KV920 BR: 63.0 g; Motor 2216 KV920 FL: 63.0 g; Motor 2216 KV920 FR: 63.0 g"
+            "value": "Context-normalized estimate: Motor 4 · rear-right (2216 KV920): 63.0 g; Motor 2 · rear-left (2216 KV920): 63.0 g; Motor 1 · front-right (2216 KV920): 63.0 g; Motor 3 · front-left (2216 KV920): 63.0 g"
           },
           {
             "label": "Quantity in scene",
@@ -8699,10 +8699,10 @@
           "title": "Parent Assembly",
           "items": [
             "Motor 2216 Quadrant",
-            "Motor 2216 KV920 BL",
-            "Motor 2216 KV920 BR",
-            "Motor 2216 KV920 FL",
-            "Motor 2216 KV920 FR"
+            "Motor 4 · rear-right (2216 KV920)",
+            "Motor 2 · rear-left (2216 KV920)",
+            "Motor 1 · front-right (2216 KV920)",
+            "Motor 3 · front-left (2216 KV920)"
           ]
         },
         "assembly": [
@@ -8742,7 +8742,7 @@
           },
           {
             "label": "Pieza madre",
-            "value": "Motor 2216, Motor 2216 KV920 BL, Motor 2216 KV920 BR, Motor 2216 KV920 FL, Motor 2216 KV920 FR"
+            "value": "Motor 2216, Motor 4 · trasero derecho (2216 KV920), Motor 2 · trasero izquierdo (2216 KV920), Motor 1 · delantero derecho (2216 KV920), Motor 3 · delantero izquierdo (2216 KV920)"
           }
         ],
         "specifications": [
@@ -8756,7 +8756,7 @@
           },
           {
             "label": "Estimación de masa del modelo",
-            "value": "Estimación normalizada por contexto: Motor 2216 KV920 BL: 63,0 g; Motor 2216 KV920 BR: 63,0 g; Motor 2216 KV920 FL: 63,0 g; Motor 2216 KV920 FR: 63,0 g"
+            "value": "Estimación normalizada por contexto: Motor 4 · trasero derecho (2216 KV920): 63,0 g; Motor 2 · trasero izquierdo (2216 KV920): 63,0 g; Motor 1 · delantero derecho (2216 KV920): 63,0 g; Motor 3 · delantero izquierdo (2216 KV920): 63,0 g"
           },
           {
             "label": "Cantidad en escena",
@@ -8767,10 +8767,10 @@
           "title": "Pieza madre",
           "items": [
             "Motor 2216",
-            "Motor 2216 KV920 BL",
-            "Motor 2216 KV920 BR",
-            "Motor 2216 KV920 FL",
-            "Motor 2216 KV920 FR"
+            "Motor 4 · trasero derecho (2216 KV920)",
+            "Motor 2 · trasero izquierdo (2216 KV920)",
+            "Motor 1 · delantero derecho (2216 KV920)",
+            "Motor 3 · delantero izquierdo (2216 KV920)"
           ]
         },
         "assembly": [
@@ -9998,7 +9998,7 @@
           },
           {
             "label": "Parent assembly",
-            "value": "Arm Assembly Quadrant, Arm Tube Back-Left, Arm Tube Back-Right, Arm Tube Front-Left, Arm Tube Front-Right"
+            "value": "Arm Assembly Quadrant, Arm Tube Back-Right, Arm Tube Back-Left, Arm Tube Front-Right, Arm Tube Front-Left"
           }
         ],
         "specifications": [
@@ -10012,7 +10012,7 @@
           },
           {
             "label": "Model mass estimate",
-            "value": "Context-normalized estimate: Arm Tube Back-Left: 8.6 g; Arm Tube Back-Right: 8.6 g; Arm Tube Front-Left: 8.6 g; Arm Tube Front-Right: 8.6 g"
+            "value": "Context-normalized estimate: Arm Tube Back-Right: 8.6 g; Arm Tube Back-Left: 8.6 g; Arm Tube Front-Right: 8.6 g; Arm Tube Front-Left: 8.6 g"
           },
           {
             "label": "Quantity in scene",
@@ -10023,10 +10023,10 @@
           "title": "Parent Assembly",
           "items": [
             "Arm Assembly Quadrant",
-            "Arm Tube Back-Left",
             "Arm Tube Back-Right",
-            "Arm Tube Front-Left",
-            "Arm Tube Front-Right"
+            "Arm Tube Back-Left",
+            "Arm Tube Front-Right",
+            "Arm Tube Front-Left"
           ]
         },
         "assembly": [
@@ -10066,7 +10066,7 @@
           },
           {
             "label": "Pieza madre",
-            "value": "Conjunto de brazo, Brazo posterior izquierdo, Brazo posterior derecho, Brazo frontal izquierdo, Brazo frontal derecho"
+            "value": "Conjunto de brazo, Brazo posterior derecho, Brazo posterior izquierdo, Brazo frontal derecho, Brazo frontal izquierdo"
           }
         ],
         "specifications": [
@@ -10080,7 +10080,7 @@
           },
           {
             "label": "Estimación de masa del modelo",
-            "value": "Estimación normalizada por contexto: Brazo posterior izquierdo: 8,6 g; Brazo posterior derecho: 8,6 g; Brazo frontal izquierdo: 8,6 g; Brazo frontal derecho: 8,6 g"
+            "value": "Estimación normalizada por contexto: Brazo posterior derecho: 8,6 g; Brazo posterior izquierdo: 8,6 g; Brazo frontal derecho: 8,6 g; Brazo frontal izquierdo: 8,6 g"
           },
           {
             "label": "Cantidad en escena",
@@ -10091,10 +10091,10 @@
           "title": "Pieza madre",
           "items": [
             "Conjunto de brazo",
-            "Brazo posterior izquierdo",
             "Brazo posterior derecho",
-            "Brazo frontal izquierdo",
-            "Brazo frontal derecho"
+            "Brazo posterior izquierdo",
+            "Brazo frontal derecho",
+            "Brazo frontal izquierdo"
           ]
         },
         "assembly": [
@@ -10174,7 +10174,7 @@
           },
           {
             "label": "Parent assembly",
-            "value": "Arm Assembly Quadrant, Arm Tube Back-Left, Arm Tube Back-Right, Arm Tube Front-Left, Arm Tube Front-Right"
+            "value": "Arm Assembly Quadrant, Arm Tube Back-Right, Arm Tube Back-Left, Arm Tube Front-Right, Arm Tube Front-Left"
           }
         ],
         "specifications": [
@@ -10188,7 +10188,7 @@
           },
           {
             "label": "Model mass estimate",
-            "value": "Context-normalized estimate: Arm Tube Back-Left: 1.4 g; Arm Tube Back-Right: 1.4 g; Arm Tube Front-Left: 1.4 g; Arm Tube Front-Right: 1.4 g"
+            "value": "Context-normalized estimate: Arm Tube Back-Right: 1.4 g; Arm Tube Back-Left: 1.4 g; Arm Tube Front-Right: 1.4 g; Arm Tube Front-Left: 1.4 g"
           },
           {
             "label": "Quantity in scene",
@@ -10199,10 +10199,10 @@
           "title": "Parent Assembly",
           "items": [
             "Arm Assembly Quadrant",
-            "Arm Tube Back-Left",
             "Arm Tube Back-Right",
-            "Arm Tube Front-Left",
-            "Arm Tube Front-Right"
+            "Arm Tube Back-Left",
+            "Arm Tube Front-Right",
+            "Arm Tube Front-Left"
           ]
         },
         "assembly": [
@@ -10242,7 +10242,7 @@
           },
           {
             "label": "Pieza madre",
-            "value": "Conjunto de brazo, Brazo posterior izquierdo, Brazo posterior derecho, Brazo frontal izquierdo, Brazo frontal derecho"
+            "value": "Conjunto de brazo, Brazo posterior derecho, Brazo posterior izquierdo, Brazo frontal derecho, Brazo frontal izquierdo"
           }
         ],
         "specifications": [
@@ -10256,7 +10256,7 @@
           },
           {
             "label": "Estimación de masa del modelo",
-            "value": "Estimación normalizada por contexto: Brazo posterior izquierdo: 1,4 g; Brazo posterior derecho: 1,4 g; Brazo frontal izquierdo: 1,4 g; Brazo frontal derecho: 1,4 g"
+            "value": "Estimación normalizada por contexto: Brazo posterior derecho: 1,4 g; Brazo posterior izquierdo: 1,4 g; Brazo frontal derecho: 1,4 g; Brazo frontal izquierdo: 1,4 g"
           },
           {
             "label": "Cantidad en escena",
@@ -10267,10 +10267,10 @@
           "title": "Pieza madre",
           "items": [
             "Conjunto de brazo",
-            "Brazo posterior izquierdo",
             "Brazo posterior derecho",
-            "Brazo frontal izquierdo",
-            "Brazo frontal derecho"
+            "Brazo posterior izquierdo",
+            "Brazo frontal derecho",
+            "Brazo frontal izquierdo"
           ]
         },
         "assembly": [
@@ -10350,7 +10350,7 @@
           },
           {
             "label": "Parent assembly",
-            "value": "Arm Assembly Quadrant, Arm Tube Back-Left, Arm Tube Back-Right, Arm Tube Front-Left, Arm Tube Front-Right"
+            "value": "Arm Assembly Quadrant, Arm Tube Back-Right, Arm Tube Back-Left, Arm Tube Front-Right, Arm Tube Front-Left"
           }
         ],
         "specifications": [
@@ -10364,7 +10364,7 @@
           },
           {
             "label": "Model mass estimate",
-            "value": "Context-normalized estimate: Arm Tube Back-Left: 10.7 g; Arm Tube Back-Right: 10.7 g; Arm Tube Front-Left: 10.7 g; Arm Tube Front-Right: 10.7 g"
+            "value": "Context-normalized estimate: Arm Tube Back-Right: 10.7 g; Arm Tube Back-Left: 10.7 g; Arm Tube Front-Right: 10.7 g; Arm Tube Front-Left: 10.7 g"
           },
           {
             "label": "Quantity in scene",
@@ -10375,10 +10375,10 @@
           "title": "Parent Assembly",
           "items": [
             "Arm Assembly Quadrant",
-            "Arm Tube Back-Left",
             "Arm Tube Back-Right",
-            "Arm Tube Front-Left",
-            "Arm Tube Front-Right"
+            "Arm Tube Back-Left",
+            "Arm Tube Front-Right",
+            "Arm Tube Front-Left"
           ]
         },
         "assembly": [
@@ -10418,7 +10418,7 @@
           },
           {
             "label": "Pieza madre",
-            "value": "Conjunto de brazo, Brazo posterior izquierdo, Brazo posterior derecho, Brazo frontal izquierdo, Brazo frontal derecho"
+            "value": "Conjunto de brazo, Brazo posterior derecho, Brazo posterior izquierdo, Brazo frontal derecho, Brazo frontal izquierdo"
           }
         ],
         "specifications": [
@@ -10432,7 +10432,7 @@
           },
           {
             "label": "Estimación de masa del modelo",
-            "value": "Estimación normalizada por contexto: Brazo posterior izquierdo: 10,7 g; Brazo posterior derecho: 10,7 g; Brazo frontal izquierdo: 10,7 g; Brazo frontal derecho: 10,7 g"
+            "value": "Estimación normalizada por contexto: Brazo posterior derecho: 10,7 g; Brazo posterior izquierdo: 10,7 g; Brazo frontal derecho: 10,7 g; Brazo frontal izquierdo: 10,7 g"
           },
           {
             "label": "Cantidad en escena",
@@ -10443,10 +10443,10 @@
           "title": "Pieza madre",
           "items": [
             "Conjunto de brazo",
-            "Brazo posterior izquierdo",
             "Brazo posterior derecho",
-            "Brazo frontal izquierdo",
-            "Brazo frontal derecho"
+            "Brazo posterior izquierdo",
+            "Brazo frontal derecho",
+            "Brazo frontal izquierdo"
           ]
         },
         "assembly": [
@@ -10526,7 +10526,7 @@
           },
           {
             "label": "Parent assembly",
-            "value": "Arm Assembly Quadrant, Arm Tube Back-Left, Arm Tube Back-Right, Arm Tube Front-Left, Arm Tube Front-Right"
+            "value": "Arm Assembly Quadrant, Arm Tube Back-Right, Arm Tube Back-Left, Arm Tube Front-Right, Arm Tube Front-Left"
           }
         ],
         "specifications": [
@@ -10540,7 +10540,7 @@
           },
           {
             "label": "Model mass estimate",
-            "value": "Context-normalized estimate: Arm Tube Back-Left: 5.7 g; Arm Tube Back-Right: 5.7 g; Arm Tube Front-Left: 5.7 g; Arm Tube Front-Right: 5.7 g"
+            "value": "Context-normalized estimate: Arm Tube Back-Right: 5.7 g; Arm Tube Back-Left: 5.7 g; Arm Tube Front-Right: 5.7 g; Arm Tube Front-Left: 5.7 g"
           },
           {
             "label": "Quantity in scene",
@@ -10551,10 +10551,10 @@
           "title": "Parent Assembly",
           "items": [
             "Arm Assembly Quadrant",
-            "Arm Tube Back-Left",
             "Arm Tube Back-Right",
-            "Arm Tube Front-Left",
-            "Arm Tube Front-Right"
+            "Arm Tube Back-Left",
+            "Arm Tube Front-Right",
+            "Arm Tube Front-Left"
           ]
         },
         "assembly": [
@@ -10594,7 +10594,7 @@
           },
           {
             "label": "Pieza madre",
-            "value": "Conjunto de brazo, Brazo posterior izquierdo, Brazo posterior derecho, Brazo frontal izquierdo, Brazo frontal derecho"
+            "value": "Conjunto de brazo, Brazo posterior derecho, Brazo posterior izquierdo, Brazo frontal derecho, Brazo frontal izquierdo"
           }
         ],
         "specifications": [
@@ -10608,7 +10608,7 @@
           },
           {
             "label": "Estimación de masa del modelo",
-            "value": "Estimación normalizada por contexto: Brazo posterior izquierdo: 5,7 g; Brazo posterior derecho: 5,7 g; Brazo frontal izquierdo: 5,7 g; Brazo frontal derecho: 5,7 g"
+            "value": "Estimación normalizada por contexto: Brazo posterior derecho: 5,7 g; Brazo posterior izquierdo: 5,7 g; Brazo frontal derecho: 5,7 g; Brazo frontal izquierdo: 5,7 g"
           },
           {
             "label": "Cantidad en escena",
@@ -10619,10 +10619,10 @@
           "title": "Pieza madre",
           "items": [
             "Conjunto de brazo",
-            "Brazo posterior izquierdo",
             "Brazo posterior derecho",
-            "Brazo frontal izquierdo",
-            "Brazo frontal derecho"
+            "Brazo posterior izquierdo",
+            "Brazo frontal derecho",
+            "Brazo frontal izquierdo"
           ]
         },
         "assembly": [
@@ -13528,10 +13528,10 @@
         "relationship": {
           "title": "Parent Assembly",
           "items": [
-            "Arm Tube Front-Left x2",
             "Arm Tube Front-Right x2",
-            "Arm Tube Back-Left x2",
-            "Arm Tube Back-Right x2"
+            "Arm Tube Front-Left x2",
+            "Arm Tube Back-Right x2",
+            "Arm Tube Back-Left x2"
           ]
         },
         "assembly": [
@@ -13607,10 +13607,10 @@
         "relationship": {
           "title": "Pieza madre",
           "items": [
-            "Brazo frontal izquierdo x2",
             "Brazo frontal derecho x2",
-            "Brazo posterior izquierdo x2",
-            "Brazo posterior derecho x2"
+            "Brazo frontal izquierdo x2",
+            "Brazo posterior derecho x2",
+            "Brazo posterior izquierdo x2"
           ]
         },
         "assembly": [
@@ -13729,10 +13729,10 @@
           "title": "Parent Assembly",
           "items": [
             "Rail System & Battery Mount x4",
-            "Arm Tube Front-Left x3",
-            "Arm Tube Front-Right x2",
-            "Arm Tube Back-Left x2",
-            "Arm Tube Back-Right x2"
+            "Arm Tube Front-Right x3",
+            "Arm Tube Front-Left x2",
+            "Arm Tube Back-Right x2",
+            "Arm Tube Back-Left x2"
           ]
         },
         "assembly": [
@@ -13809,10 +13809,10 @@
           "title": "Pieza madre",
           "items": [
             "Sistema de railes y soporte de batería x4",
-            "Brazo frontal izquierdo x3",
-            "Brazo frontal derecho x2",
-            "Brazo posterior izquierdo x2",
-            "Brazo posterior derecho x2"
+            "Brazo frontal derecho x3",
+            "Brazo frontal izquierdo x2",
+            "Brazo posterior derecho x2",
+            "Brazo posterior izquierdo x2"
           ]
         },
         "assembly": [
@@ -13931,10 +13931,10 @@
           "title": "Parent Assembly",
           "items": [
             "Carbon Fiber Bottom Plate x8",
-            "Arm Tube Front-Left x4",
             "Arm Tube Front-Right x4",
-            "Arm Tube Back-Left x4",
-            "Arm Tube Back-Right x4"
+            "Arm Tube Front-Left x4",
+            "Arm Tube Back-Right x4",
+            "Arm Tube Back-Left x4"
           ]
         },
         "assembly": [
@@ -14011,10 +14011,10 @@
           "title": "Pieza madre",
           "items": [
             "Placa inferior de fibra de carbono x8",
-            "Brazo frontal izquierdo x4",
             "Brazo frontal derecho x4",
-            "Brazo posterior izquierdo x4",
-            "Brazo posterior derecho x4"
+            "Brazo frontal izquierdo x4",
+            "Brazo posterior derecho x4",
+            "Brazo posterior izquierdo x4"
           ]
         },
         "assembly": [
@@ -14515,10 +14515,10 @@
           "items": [
             "Carbon Fiber Bottom Plate",
             "Carbon Fiber Top Plate",
-            "Arm Tube Front-Left x4",
             "Arm Tube Front-Right x4",
-            "Arm Tube Back-Left x4",
-            "Arm Tube Back-Right x4"
+            "Arm Tube Front-Left x4",
+            "Arm Tube Back-Right x4",
+            "Arm Tube Back-Left x4"
           ]
         },
         "assembly": [
@@ -14596,10 +14596,10 @@
           "items": [
             "Placa inferior de fibra de carbono",
             "Placa superior de fibra de carbono",
-            "Brazo frontal izquierdo x4",
             "Brazo frontal derecho x4",
-            "Brazo posterior izquierdo x4",
-            "Brazo posterior derecho x4"
+            "Brazo frontal izquierdo x4",
+            "Brazo posterior derecho x4",
+            "Brazo posterior izquierdo x4"
           ]
         },
         "assembly": [
@@ -14716,10 +14716,10 @@
         "relationship": {
           "title": "Parent Assembly",
           "items": [
-            "Motor 2216 KV920 FL x4",
-            "Motor 2216 KV920 FR x4",
-            "Motor 2216 KV920 BL x4",
-            "Motor 2216 KV920 BR x4"
+            "Motor 1 · front-right (2216 KV920) x4",
+            "Motor 3 · front-left (2216 KV920) x4",
+            "Motor 4 · rear-right (2216 KV920) x4",
+            "Motor 2 · rear-left (2216 KV920) x4"
           ]
         },
         "assembly": [
@@ -14795,10 +14795,10 @@
         "relationship": {
           "title": "Pieza madre",
           "items": [
-            "Motor 2216 KV920 FL x4",
-            "Motor 2216 KV920 FR x4",
-            "Motor 2216 KV920 BL x4",
-            "Motor 2216 KV920 BR x4"
+            "Motor 1 · delantero derecho (2216 KV920) x4",
+            "Motor 3 · delantero izquierdo (2216 KV920) x4",
+            "Motor 4 · trasero derecho (2216 KV920) x4",
+            "Motor 2 · trasero izquierdo (2216 KV920) x4"
           ]
         },
         "assembly": [
@@ -15490,10 +15490,10 @@
           "title": "Parent Assembly",
           "items": [
             "Carbon Fiber Bottom Plate",
-            "Arm Tube Front-Left x4",
             "Arm Tube Front-Right x4",
-            "Arm Tube Back-Left x4",
-            "Arm Tube Back-Right x4"
+            "Arm Tube Front-Left x4",
+            "Arm Tube Back-Right x4",
+            "Arm Tube Back-Left x4"
           ]
         },
         "assembly": [
@@ -15570,10 +15570,10 @@
           "title": "Pieza madre",
           "items": [
             "Placa inferior de fibra de carbono",
-            "Brazo frontal izquierdo x4",
             "Brazo frontal derecho x4",
-            "Brazo posterior izquierdo x4",
-            "Brazo posterior derecho x4"
+            "Brazo frontal izquierdo x4",
+            "Brazo posterior derecho x4",
+            "Brazo posterior izquierdo x4"
           ]
         },
         "assembly": [

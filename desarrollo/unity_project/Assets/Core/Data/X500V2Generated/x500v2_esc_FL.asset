@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c73690adaf8894f87851a149e0fb6a, type: 3}
   m_Name: x500v2_esc_FL
   m_EditorClassIdentifier: 
-  partName: ESC BLHeli-S 20A FL
+  partName: ESC BLHeli-S 20A FR
   id: x500v2_esc_FL
   partType: ESC
   description: "ESC BLHeli-S, MCU EFM8BB21. 20A continuo, 30A r\xE1faga (~10s). LiPo
     2\u20134S. Sin BEC. PWM/Oneshot/DShot. 500k eRPM max. Formato compacto ~25\xD713
-    mm. Preinstalled on the arm con XT30. Position FL."
+    mm. Preinstalled on the arm con XT30. Position FR."
   weightKg: 0.007
   dimensions: "~25 \xD7 13 \xD7 5 mm"
-  function: "Control de velocidad del motor FL; conmutaci\xF3n de potencia"
+  function: "Control de velocidad del motor 1; conmutaci\xF3n de potencia"
   materialType: PCB FR4 con MOSFETs de silicio y pistas de cobre
   materialProperties: 
   manufacturer: Holybro

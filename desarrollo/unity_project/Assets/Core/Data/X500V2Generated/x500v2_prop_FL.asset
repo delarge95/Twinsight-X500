@@ -12,18 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c73690adaf8894f87851a149e0fb6a, type: 3}
   m_Name: x500v2_prop_FL
   m_EditorClassIdentifier: 
-  partName: Propeller 1045 FL
+  partName: "Propeller 1 \xB7 front-right (1045)"
   id: x500v2_prop_FL
   partType: Propeller
   description: "H\xE9lice fija 1045 (10\" di\xE1metro, 4.5\" pitch). Compuesto pl\xE1stico
-    reforzado. CW. Kit trae 6 piezas (4+2 repuesto)."
+    reforzado. CCW. Kit trae 6 piezas (4+2 repuesto)."
   weightKg: 0.008
   dimensions: "\u2300254 mm (10 in), pitch 114 mm (4.5 in)"
-  function: "Conversi\xF3n de par motor en empuje vertical (CW)"
+  function: "Conversi\xF3n de par motor en empuje vertical (CCW)"
   materialType: "Compuesto pl\xE1stico reforzado (nylon/ABS)"
   materialProperties: "Resistente a fatiga, balanceo de f\xE1brica"
   manufacturer: Holybro
-  partNumber: 1045 CW
+  partNumber: 1045 CCW
   powerConsumption: 0
   maxLoad: 0
   operatingTemp: 70
