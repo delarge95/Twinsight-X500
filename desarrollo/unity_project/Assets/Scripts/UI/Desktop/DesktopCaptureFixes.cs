@@ -646,11 +646,26 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(2.5f);
             Check("replay running (local, read-only)", DesktopTelemetry.IsLocalReplay);
 
-            // card before any fault: replay text, approved, with the honest label
+            // PLAN_PC 28.1: discreet. Nothing is open: the explanation is a collapsed section of the docked inspector
+            Check("the docked explanation exists in the Flight tab and is COLLAPSED by default", Tel.FaultDock != null && !Tel.DockOpen && !Shown(Root.Q<VisualElement>("DkFxDockBody")));
+            Check("there is no fault banner any more", Root.Q<VisualElement>("DkFaultBanner") == null);
+
             Click(B("DkTelFaults"));
             yield return new WaitForSecondsRealtime(0.6f);
-            var card = Tel.FaultsCard;
-            Check("faults popover shows the explanation card (default: motor cut)", Shown(card.Root) && Tel.ExplainTopic == FaultTopic.MotorFailure);
+            float popPct = PopCoverage("DkPopFaults");
+            Log("Faults popover (replay, controls shown) covers " + popPct.ToString("F2") + " % of the canvas");
+            Check("Faults popover is compact: covers <= 6 % of the canvas (" + popPct.ToString("F2") + " %)", popPct > 0f && popPct <= 6.0f);
+            Check("opening the popover did NOT open the explanation", !Tel.DockOpen);
+            Check("the popover holds no explanation card", Root.Q<VisualElement>("DkPopFaults").Query<VisualElement>(className: "dk-fx-card").ToList().Count == 0);
+            Check("the popover has the small «Explicación» button", B("DkFaultExplain") != null && B("DkFaultExplain").text == T("fx.open"));
+            yield return Shot("C1_popover_compacto", 0.2f);
+
+            // the explicit action opens the docked card
+            Click(B("DkFaultExplain"));
+            yield return new WaitForSecondsRealtime(0.6f);
+            var card = Tel.DockCard;
+            Check("«Explicación» opens the docked section on the Flight tab (default: motor cut)", Tel.DockOpen && Tel.FlightTabActive && Shown(card.Root) && Tel.ExplainTopic == FaultTopic.MotorFailure);
+            Check("the card lives inside the docked inspector, not in a popover", IsInside(card.Root, Root.Q<VisualElement>("BottomSheet")) && !IsInside(card.Root, Root.Q<VisualElement>("DkPopFaults")));
             Check("card is labelled «Explicación didáctica» and 'not a measurement'", card.TitleText == T("fx.title") && card.DisclaimerText == T("fx.disclaimer"));
             Check("card means / controller are the approved texts", card.MeansText == FaultExplain.Means(FaultTopic.MotorFailure, lang) && card.ControllerText == FaultExplain.Controller(FaultTopic.MotorFailure, lang));
             Check("card 'in this source' (replay): the trajectory does not react, the other motors do not compensate",
@@ -658,15 +673,17 @@ namespace WebGL.UI.Desktop
             Check("card source badge = the honest replay badge", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang));
             Check("card affected readings carry their origin (" + card.ReadingTags + " tags)", card.ReadingTags >= 1 && (card.ReadingTagText(0) ?? string.Empty).Contains(" · "));
             Check("card 'what is happening' says none active", card.WhatText == T("fx.what.none"));
-            yield return Shot("C1_tarjeta_repeticion_sin_falla", 0.2f);
+            yield return Shot("C2_explicacion_en_inspector_sin_falla", 0.2f);
+            Tel.SetDockOpen(false);
             Tel.CloseAllPopovers();
+            yield return Frames(3);
+            Check("the section collapses again on request", !Tel.DockOpen && !Shown(Root.Q<VisualElement>("DkFxDockBody")));
 
-            // inject motor 3 failure: banner, marker, countdown
+            // inject motor 3 failure: ONLY the marker and the compact status. Nothing opens.
             Tel.FaultMotorSelect(3);
             Tel.Inject(FaultKind.MotorFailure);
-            yield return new WaitForSecondsRealtime(1.2f);
-            Check("banner appears on the injection with the fault name and «falla sintética»", Tel.BannerVisible && Tel.BannerTextNow.Contains("Motor 3") && Tel.BannerTextNow.Contains(AlertText.SyntheticFault(lang, labels)));
-            Check("banner action reads «Ver qué pasa»", Tel.BannerViewButton.text == T("fx.banner.view"));
+            yield return new WaitForSecondsRealtime(1.5f);
+            Check("injection opens NOTHING: no banner, the explanation stays collapsed, no popover", Root.Q<VisualElement>("DkFaultBanner") == null && !Tel.DockOpen && Tel.OpenPopover == null);
             var mk = Tel.FaultMarkers;
             string mkKey = null;
             foreach (string k in mk.Keys) if (k.StartsWith("f:")) mkKey = k;
@@ -674,25 +691,29 @@ namespace WebGL.UI.Desktop
             Check("marker label: motor 3, stopped, synthetic", mkKey != null && mk.LabelOf(mkKey).Contains("Motor 3") && mk.LabelOf(mkKey).Contains(AlertText.SyntheticFault(lang, labels)));
             var scr = mk.ScreenOf(mkKey ?? "none");
             Check("marker is on screen (" + (scr.HasValue ? scr.Value.ToString() : "n/a") + ")", scr.HasValue && scr.Value.x > 0 && scr.Value.x < Screen.width && scr.Value.y > 0 && scr.Value.y < Screen.height);
-            var drv = TelemetryDroneDriver.Instance;
-            yield return Shot("C2_banner_marcador_motor3", 0.2f);
+            yield return Shot("C3_inyeccion_solo_marcador", 0.2f);
 
-            // open the card from the banner
-            Click(Tel.BannerViewButton);
+            // the compact status in the popover, then the explicit action
+            Click(B("DkTelFaults"));
             yield return new WaitForSecondsRealtime(0.6f);
-            Check("«Ver qué pasa» opens the Faults popover on that fault", Tel.OpenPopover == "faults" && !Tel.BannerVisible && Tel.ExplainTopic == FaultTopic.MotorFailure);
-            card = Tel.FaultsCard;
-            Check("card 'what is happening': the fault with its countdown (seconds of 30 s)", card.WhatText.Contains(lang == "es" ? "Motor 3 cortado" : "Motor 3 cut off") && card.WhatText.Contains(" s "));
+            float popPct2 = PopCoverage("DkPopFaults");
+            Check("Faults popover with an active fault still covers <= 6 % (" + popPct2.ToString("F2") + " %)", popPct2 <= 6.0f);
+            yield return Shot("C4_popover_con_falla_activa", 0.2f);
+            Click(B("DkFaultExplain"));
+            yield return new WaitForSecondsRealtime(0.6f);
+            card = Tel.DockCard;
+            Check("«Explicación» now shows the fault with its countdown (seconds of 30 s)", Tel.DockOpen && card.WhatText.Contains(lang == "es" ? "Motor 3 cortado" : "Motor 3 cut off") && card.WhatText.Contains(" s "));
             string w1 = card.WhatText;
             Log("what (t0): " + w1.Replace("\n", " | "));
-            yield return Shot("C3_tarjeta_repeticion_motor3_activa", 0.2f);
+            yield return Shot("C5_explicacion_motor3_activa", 0.2f);
             yield return new WaitForSecondsRealtime(2.6f);
-            Log("what (t0+2.6s): " + Tel.FaultsCard.WhatText.Replace("\n", " | "));
-            Check("the countdown went down", ParseSeconds(Tel.FaultsCard.WhatText) < ParseSeconds(w1));
-            Check("with the alert: the card also carries the alert sentence with its origin (RPM ... estimated/simulated)", Tel.FaultsCard.WhatText.Contains("RPM") || Tel.FaultsCard.WhatText.Contains("Motor 3:"));
+            Log("what (t0+2.6s): " + Tel.DockCard.WhatText.Replace("\n", " | "));
+            Check("the countdown went down", ParseSeconds(Tel.DockCard.WhatText) < ParseSeconds(w1));
+            Check("with the alert: the card also carries the alert sentence with its origin (RPM ... estimated/simulated)", Tel.DockCard.WhatText.Contains("RPM") || Tel.DockCard.WhatText.Contains("Motor 3:"));
+            Tel.SetDockOpen(false);
             Tel.CloseAllPopovers();
 
-            // alerts popover: expanded card under the alert
+            // alerts popover: an alert is expanded only by the user and its explanation goes to the docked panel
             yield return new WaitForSecondsRealtime(1.0f);
             var alerts = DesktopTelemetry.Client.Alerts;
             string aid = null;
@@ -700,30 +721,38 @@ namespace WebGL.UI.Desktop
             Log("alerts now: " + alerts.Count + " (motor3:out " + (aid != null ? "present" : "absent") + ")");
             Check("the fault raised the 'motor 3 stopped' alert", aid != null);
             Check("the existing red highlight of the part is still there (motor 3)", TelemetryDroneDriver.Instance != null && new List<string>(TelemetryDroneDriver.Instance.HighlightedComponents).Contains("motor3"));
-            Tel.OpenAlertCard(aid ?? "motor3:out");
+            Check("the critical alert did not open anything by itself", !Tel.DockOpen && Tel.OpenPopover == null && Root.Q<VisualElement>("DkFaultBanner") == null);
+            Click(B("DkTelAlerts"));
             yield return new WaitForSecondsRealtime(0.8f);
-            Check("alerts popover shows the card expanded under the alert", Tel.OpenPopover == "alerts" && Tel.AlertExpanded("motor3:out") && Tel.AlertCards.Count > 0 && Shown(Tel.AlertCards[0].Root));
-            bool okCard = false;
-            foreach (var ac in Tel.AlertCards) if (Shown(ac.Root) && ac.WhatText.Contains(AlertText.SyntheticFault(lang, labels)) && ac.SourceText.Contains(lang == "es" ? "Falla sintética" : "Synthetic fault")) okCard = true;
-            Check("alert card: synthetic suffix in the data block and the approved replay text", okCard);
-            yield return Shot("C4_alertas_tarjeta_expandida", 0.2f);
+            Check("alerts popover is open with the list, collapsed explanation (nothing inside the popover)", Tel.OpenPopover == "alerts" && !Tel.DockOpen && Root.Q<VisualElement>("DkPopAlerts").Query<VisualElement>(className: "dk-fx-card").ToList().Count == 0);
+            Log("Alerts popover covers " + PopCoverage("DkPopAlerts").ToString("F2") + " % of the canvas");
+            yield return Shot("C6_alertas_lista", 0.2f);
+            var expandBtn = Root.Q<VisualElement>("DkPopAlerts").Q<Button>("DkAlertExpand");
+            Check("an alert has the small «Explicación» button", expandBtn != null && expandBtn.text == T("fx.open"));
+            Click(expandBtn);
+            yield return new WaitForSecondsRealtime(0.8f);
+            Check("the alert's explanation opens in the docked inspector (Flight tab) for that alert", Tel.DockOpen && Tel.FlightTabActive && Tel.DockAlertId == aid && Tel.AlertExpanded(aid));
+            card = Tel.DockCard;
+            Check("alert card: synthetic suffix in the data block and the approved replay text", card.WhatText.Contains(AlertText.SyntheticFault(lang, labels)) && card.SourceText.Contains(lang == "es" ? "Falla sintética" : "Synthetic fault"));
+            yield return Shot("C7_alerta_explicacion_en_inspector", 0.2f);
+            Tel.SetDockOpen(false);
             Tel.CloseAllPopovers();
 
-            // the other approved texts through the picker
+            // the other approved texts through the picker of the docked section
             FaultKind[] kinds = { FaultKind.MotorOverheat, FaultKind.BatterySag, FaultKind.Vibration };
             FaultTopic[] topics = { FaultTopic.MotorOverheat, FaultTopic.BatterySag, FaultTopic.Vibration };
-            Click(B("DkTelFaults"));
+            Tel.ShowFaultExplanation(FaultTopic.MotorFailure, 3, null);
             yield return new WaitForSecondsRealtime(0.4f);
             for (int i = 0; i < 3; i++)
             {
                 Click(B("DkFxPick_" + WireNames.Of(kinds[i])));
                 yield return new WaitForSecondsRealtime(0.5f);
-                card = Tel.FaultsCard;
+                card = Tel.DockCard;
                 Check(kinds[i] + ": card shows the approved means / controller / replay text", Tel.ExplainTopic == topics[i] && card.MeansText == FaultExplain.Means(topics[i], lang) && card.ControllerText == FaultExplain.Controller(topics[i], lang)
                       && card.SourceText == FaultExplain.InSource(topics[i], ExplainSource.LocalReplay, 3, lang));
-                if (i == 0) yield return Shot("C5_tarjeta_sobrecalentamiento", 0.2f);
+                if (i == 0) yield return Shot("C8_explicacion_sobrecalentamiento", 0.2f);
             }
-            Tel.CloseAllPopovers();
+            Tel.SetDockOpen(false);
             Tel.ClearFaults();
             yield return new WaitForSecondsRealtime(1.0f);
             Check("clearing the faults removes the markers", Tel.FaultMarkers.Count == 0 || AllAlertMarkers(Tel.FaultMarkers));
@@ -733,33 +762,52 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(1.5f);
             Click(B("DkTelFaults"));
             yield return new WaitForSecondsRealtime(0.6f);
-            card = Tel.FaultsCard;
+            Check("simulator: the Faults popover is read-only (no injection buttons) and still compact", !Shown(Root.Q<VisualElement>("DkFaultControls")) && PopCoverage("DkPopFaults") <= 6.0f);
+            Click(B("DkFaultExplain"));
+            yield return new WaitForSecondsRealtime(0.6f);
+            card = Tel.DockCard;
             Check("simulator: the card says the simulator does not inject faults", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Simulator, 3, lang) && card.SourceText.Contains(lang == "es" ? "no inyecta fallas" : "does not inject faults"));
             Check("simulator: the card badge is the simulator's, never SITL", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang) && !card.SourceBadgeText.ToUpperInvariant().Contains("SITL"));
             Check("simulator: no markers (no fault can exist here)", Tel.FaultMarkers.Count == 0);
-            yield return Shot("C6_tarjeta_simulador", 0.2f);
+            yield return Shot("C9_explicacion_simulador", 0.2f);
             Click(B("DkFxPick_battery_sag"));
             yield return new WaitForSecondsRealtime(0.5f);
-            Check("simulator + battery: its own approved text (drains, does not react to low charge)", Tel.FaultsCard.SourceText == FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Simulator, 3, lang));
+            Check("simulator + battery: its own approved text (drains, does not react to low charge)", Tel.DockCard.SourceText == FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Simulator, 3, lang));
+            Tel.SetDockOpen(false);
             Tel.CloseAllPopovers();
 
             // PX4 SITL: a session that never connects (nothing listens): the card still says what PX4 / Gazebo do
             Tel.StartSitl("ws://127.0.0.1:9");
             yield return new WaitForSecondsRealtime(1.2f);
             Check("SITL session started (not connected)", DesktopTelemetry.IsRunning && DesktopTelemetry.Client.Classification == SourceClassification.Sitl);
-            Click(B("DkTelFaults"));
+            Tel.ShowFaultExplanation(FaultTopic.MotorFailure, 3, null);
             yield return new WaitForSecondsRealtime(0.6f);
-            Click(B("DkFxPick_motor_failure"));
-            yield return new WaitForSecondsRealtime(0.5f);
-            card = Tel.FaultsCard;
+            card = Tel.DockCard;
             Check("SITL: the card has the Gazebo caveat and says the RPM are PX4's command", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Sitl, 3, lang)
                   && card.SourceText.Contains("MAV_CMD_INJECT_FAILURE") && card.SourceText.Contains(lang == "es" ? "Gazebo puede no detener el rotor" : "Gazebo may not stop the rotor") && card.SourceText.Contains(lang == "es" ? "orden de PX4" : "PX4's command"));
             Check("SITL: the card badge is the SITL one from labels.json", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang));
-            yield return Shot("C7_tarjeta_sitl", 0.2f);
+            yield return Shot("C10_explicacion_sitl", 0.2f);
+            Tel.SetDockOpen(false);
             Tel.CloseAllPopovers();
             Tel.StopSession();
             Tel.CloseMode();
             yield return Frames(3);
+        }
+
+        /// <summary>Percentage of the window a popover covers (its own box, physical pixels), 0 when it is not shown.</summary>
+        private float PopCoverage(string name)
+        {
+            var e = Root.Q<VisualElement>(name);
+            if (!Shown(e)) return 0f;
+            float s = DesktopUIController.Instance.UiScale;
+            Rect r = e.worldBound;
+            return 100f * (r.width * s) * (r.height * s) / (Screen.width * (float)Screen.height);
+        }
+
+        private static bool IsInside(VisualElement e, VisualElement ancestor)
+        {
+            for (var p = e; p != null; p = p.parent) if (p == ancestor) return true;
+            return false;
         }
 
         private static bool AllAlertMarkers(DesktopFaultMarkers m)

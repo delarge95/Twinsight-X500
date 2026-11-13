@@ -35,7 +35,8 @@ namespace WebGL.UI.Desktop
         private Label _faultNote, _faultOff, _faultMotorLabel, _faultActiveTitle, _faultAck, _faultSyntheticTag;
         private readonly Button[] _motorBtns = new Button[5];
         private readonly Button[] _kindBtns = new Button[4];
-        private Button _faultClear;
+        private Button _faultClear, _faultExplain;
+        private VisualElement _faultFoot;
         private VisualElement _faultControls;
         private VisualElement _faultActiveList;
         private readonly List<Label> _faultActiveRows = new List<Label>();
@@ -50,7 +51,6 @@ namespace WebGL.UI.Desktop
             public VisualElement Dot;
             public Label Message, Meta;
             public string Id, Component;
-            public DesktopFaultCard Card;
         }
 
         // ───────────────────────── build ─────────────────────────
@@ -179,13 +179,12 @@ namespace WebGL.UI.Desktop
 
         private void BuildFaultsPopover()
         {
-            _popFaults = NewPopover("DkPopFaults", "dk-pop--w440", out _flTitle);
+            _popFaults = NewPopover("DkPopFaults", "dk-pop--w300", out _flTitle);
             var tagRow = new VisualElement();
             tagRow.AddToClassList("dk-fault-tagrow");
             _faultSyntheticTag = Text("dk-tag", tagRow);
             _faultSyntheticTag.AddToClassList("dk-tag--simulated");
             _popFaults.Add(tagRow);
-            _faultNote = Text("dk-note", _popFaults);
             _faultOff = Text("dk-note", _popFaults);
             _faultOff.AddToClassList("dk-note--warn");
 
@@ -220,10 +219,6 @@ namespace WebGL.UI.Desktop
             }
 
             _faultControls.Add(grid);
-            _faultClear = new Button(() => ClearFaults()) { name = "DkFaultClear" };
-            _faultClear.AddToClassList("dk-b");
-            _faultClear.AddToClassList("dk-b--ghost");
-            _faultControls.Add(_faultClear);
             _popFaults.Add(_faultControls);
             _faultActiveTitle = Text("dk-field-label", _popFaults);
             _faultActiveList = new VisualElement();
@@ -231,7 +226,20 @@ namespace WebGL.UI.Desktop
             _popFaults.Add(_faultActiveList);
             _faultAck = Text("dk-note", _popFaults);
             _faultAck.AddToClassList("dk-note--muted");
-            BuildFaultExplain(_popFaults); // PLAN_PC 27.3: the explanation card (picker + four blocks)
+            // foot: Clear (only where faults can be injected) and «Explicación», which opens the docked explanation (never opened by itself)
+            _faultFoot = new VisualElement { name = "DkFaultFoot" };
+            _faultFoot.AddToClassList("dk-fault-foot");
+            _faultClear = new Button(() => ClearFaults()) { name = "DkFaultClear" };
+            _faultClear.AddToClassList("dk-b");
+            _faultClear.AddToClassList("dk-b--ghost");
+            _faultClear.AddToClassList("dk-fault-footbtn");
+            _faultFoot.Add(_faultClear);
+            _faultExplain = new Button(() => ShowFaultExplanation(_fxTopic, _faultMotor, null)) { name = "DkFaultExplain" };
+            _faultExplain.AddToClassList("dk-b");
+            _faultExplain.AddToClassList("dk-b--secondary");
+            _faultExplain.AddToClassList("dk-fault-footbtn");
+            _faultFoot.Add(_faultExplain);
+            _popFaults.Add(_faultFoot);
             RefreshMotorButtons();
         }
 
@@ -306,7 +314,7 @@ namespace WebGL.UI.Desktop
             _flTitle.text = T("faults.title");
             RelabelFaultExplain();
             _faultSyntheticTag.text = labels.FaultSynthetic(lang);
-            _faultNote.text = T("faults.note");
+            _faultExplain.text = T("fx.open");
             _faultMotorLabel.text = T("faults.motor");
             _faultActiveTitle.text = T("faults.active");
             _faultClear.text = T("faults.clear");
@@ -407,19 +415,9 @@ namespace WebGL.UI.Desktop
                 row.Dot.EnableInClassList("dk-dot--warn", a.severity != AlertSeverity.Critical);
                 row.Root.tooltip = row.Meta.text;
 
-                // PLAN_PC 27.3: the explanation card, expanded under the alert (didactic; the first block is this alert's own sentence with its origin)
-                bool open = _alertOpen.Contains(a.id);
-                row.Expand.text = T_(open ? "fx.collapse" : "fx.expand");
-                row.Expand.EnableInClassList("dk-fx-expand--on", open);
-                row.Card.Show(open);
-                if (open)
-                {
-                    FaultTopic topic = FaultExplain.TopicOfAlert(a.id);
-                    string what = row.Message.text;
-                    Fault af = FaultExplain.IsApproved(topic) ? ActiveFaultOf(client, topic, MotorOfComponent(a.component), now) : null;
-                    if (af != null && AlertText.FaultHitsComponent(af, a.component)) what += "\n" + FaultExplain.FaultLine(af, now, lang);
-                    row.Card.Set(CardInput(topic, MotorOfComponent(a.component), a.id, what), lang, labels);
-                }
+                // PLAN_PC 28.1: «Explicación» opens the didactic card in the docked inspector (never over the canvas, never by itself)
+                row.Expand.text = T_("fx.open");
+                row.Expand.EnableInClassList("dk-fx-expand--on", AlertExpanded(a.id));
             }
         }
 
@@ -457,12 +455,9 @@ namespace WebGL.UI.Desktop
             r.Expand.AddToClassList("dk-b");
             r.Expand.AddToClassList("dk-b--pill");
             r.Expand.AddToClassList("dk-fx-expand");
-            r.Expand.clicked += () => ToggleAlertCard(captured.Id);
+            r.Expand.clicked += () => ShowFaultExplanation(FaultExplain.TopicOfAlert(captured.Id), MotorOfComponent(captured.Component), captured.Id);
             line.Add(r.Expand);
             r.Wrap.Add(line);
-            r.Card = new DesktopFaultCard("DkFxCardAlert");
-            r.Card.Show(false);
-            r.Wrap.Add(r.Card.Root);
             _alertList.Add(r.Wrap);
             return r;
         }
@@ -493,7 +488,7 @@ namespace WebGL.UI.Desktop
             string off = client == null ? T("faults.off") : simulator ? T("faults.sim") : sitl ? T("faults.sitl") : !canInject && !local ? T("faults.off") : string.Empty;
             _faultOff.text = off;
             _faultOff.style.display = string.IsNullOrEmpty(off) ? DisplayStyle.None : DisplayStyle.Flex;
-            _faultNote.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
+            _faultClear.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
             _faultActiveTitle.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
 
             // active faults with the seconds left
@@ -508,9 +503,8 @@ namespace WebGL.UI.Desktop
                 l.RegisterCallback<ClickEvent>(_ =>
                 {
                     if (!(captured.userData is Fault ff)) return;
-                    _fxTopic = FaultExplain.TopicOf(ff.kind);
-                    if (ff.HasMotor && ff.motor >= 1) { _faultMotor = ff.motor; RefreshMotorButtons(); }
-                    _nextPopTick = 0f;
+                    // a click on an active fault is an explicit request: its explanation opens in the docked inspector
+                    ShowFaultExplanation(FaultExplain.TopicOf(ff.kind), ff.HasMotor ? ff.motor : 0, null);
                 });
                 _faultActiveList.Add(l);
                 _faultActiveRows.Add(l);
@@ -533,8 +527,6 @@ namespace WebGL.UI.Desktop
 
             _faultAck.text = canInject ? _ackText : string.Empty;
             _faultAck.style.display = canInject && !string.IsNullOrEmpty(_ackText) ? DisplayStyle.Flex : DisplayStyle.None;
-            TickFaultCard(client);
-            FitScroll(_fxScroll, 8f);
         }
 
         /// <summary>Synthetic injection on the local replay: validated like the web (Faults.Validate), sent as a normal client message.</summary>

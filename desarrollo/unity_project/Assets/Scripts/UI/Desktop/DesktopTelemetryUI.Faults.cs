@@ -10,123 +10,142 @@ using WebGL.UI.ProceduralIcons;
 namespace WebGL.UI.Desktop
 {
     /// <summary>
-    /// PC only (PLAN_PC 27.3): what the user sees and reads when a fault happens.
-    ///  - the explanation card (<see cref="DesktopFaultCard"/>) inside the Faults popover (with a picker of the four faults, so every source can read
-    ///    what it does with each one), expanded under an alert in the Alerts popover, and opened from the banner;
-    ///  - a banner when a synthetic fault is injected or a critical alert appears, with «Ver qué pasa»;
-    ///  - a marker pinned on the affected part (<see cref="DesktopFaultMarkers"/>) while the fault is active or a critical alert stands on it.
+    /// PC only (PLAN_PC 27.3, reworked in 28.1): what the user sees and reads when a fault happens.
+    ///  - INJECTION is discreet: a small marker pinned on the affected part (<see cref="DesktopFaultMarkers"/>) and the compact status in the Faults
+    ///    popover. Nothing opens by itself: no banner, no toast, no auto-opened card.
+    ///  - the EXPLANATION card (<see cref="DesktopFaultCard"/>, same approved texts) lives in the docked inspector, as a collapsible section at the
+    ///    top of the «Vuelo» tab, COLLAPSED by default. Only an explicit action opens it: the «Explicación» button of the Faults popover, the
+    ///    «Explicación» button of an alert, or the section header itself. It never covers the canvas.
     /// Honesty: the card is labelled «Explicación didáctica · no es una medición»; «falla sintética» only for the local replay's own faults; the
     /// simulator injects no faults and in PX4 SITL the card says what PX4 / Gazebo really do (approved wording, PLAN_CONTROL_REAL_Y_ENTORNOS 2.4).
     /// </summary>
     internal sealed partial class DesktopTelemetryUI
     {
-        private DesktopFaultCard _cardFaults;
-        private VisualElement _fxPickRow;
-        private ScrollView _fxScroll;
+        // docked explanation (a section of the Flight tab)
+        private VisualElement _fxDock, _fxDockBody, _fxPickRow;
+        private Button _fxDockHead;
+        private Label _fxDockTitle, _fxDockState, _fxDockHint;
+        private DesktopFaultCard _cardDock;
         private readonly Button[] _fxPickBtns = new Button[4];
         private static readonly FaultTopic[] FxTopics = { FaultTopic.MotorFailure, FaultTopic.MotorOverheat, FaultTopic.BatterySag, FaultTopic.Vibration };
         private FaultTopic _fxTopic = FaultTopic.MotorFailure;
-
-        private readonly HashSet<string> _alertOpen = new HashSet<string>();
-
-        private VisualElement _banner;
-        private Label _bannerText;
-        private Button _bannerView;
-        private float _bannerUntil;
-        private Func<string, string> _bannerMake;
-        private string _bannerLang;
-        private bool _bannerIsFault;
-        private FaultTopic _bannerTopic;
-        private int _bannerMotor;
-        private string _bannerAlertId;
-        private string _bannerComponent;
-        private float _bannerFaultAt = -100f;
-        private readonly HashSet<string> _bnFaults = new HashSet<string>();
-        private readonly HashSet<string> _bnAlerts = new HashSet<string>();
-        private readonly List<string> _bnGone = new List<string>();
+        private bool _dockOpen;
+        private string _dockAlertId;
 
         private DesktopFaultMarkers _markers;
         private readonly List<DesktopFaultMarkers.Target> _fxTargets = new List<DesktopFaultMarkers.Target>();
 
         // ── read by the verification harness ──
-        public DesktopFaultCard FaultsCard => _cardFaults;
-        public bool BannerVisible => _banner != null && _banner.style.display != DisplayStyle.None;
-        public string BannerTextNow => _bannerText?.text;
-        public Button BannerViewButton => _bannerView;
+        public DesktopFaultCard FaultsCard => _cardDock;
+        public DesktopFaultCard DockCard => _cardDock;
+        public bool DockOpen => _dockOpen;
+        public string DockAlertId => _dockAlertId;
+        public VisualElement FaultDock => _fxDock;
         public DesktopFaultMarkers FaultMarkers => _markers;
         public FaultTopic ExplainTopic => _fxTopic;
-        public bool AlertExpanded(string id) => _alertOpen.Contains(id);
-        public IReadOnlyList<DesktopFaultCard> AlertCards
-        {
-            get
-            {
-                var l = new List<DesktopFaultCard>();
-                foreach (AlertRow r in _alertRows) if (r.Card != null) l.Add(r.Card);
-                return l;
-            }
-        }
+        public bool AlertExpanded(string id) => _dockOpen && _dockAlertId == id;
 
         // ───────────────────────── build ─────────────────────────
 
         private void BuildFaultVisuals()
         {
-            _banner = new VisualElement { name = "DkFaultBanner", pickingMode = PickingMode.Position };
-            _banner.AddToClassList("dk-fx-banner");
-            _banner.style.display = DisplayStyle.None;
-            var icon = new DesktopVectorIcon("fault", 16) { pickingMode = PickingMode.Ignore };
-            icon.AddToClassList("dk-fx-bannericon");
-            _banner.Add(icon);
-            _bannerText = new Label { name = "DkFaultBannerText", pickingMode = PickingMode.Ignore };
-            _bannerText.AddToClassList("dk-fx-bannertext");
-            _banner.Add(_bannerText);
-            _bannerView = new Button(OnBannerView) { name = "DkFaultBannerView" };
-            _bannerView.AddToClassList("dk-b");
-            _bannerView.AddToClassList("dk-b--primary");
-            _bannerView.AddToClassList("dk-fx-bannerbtn");
-            _banner.Add(_bannerView);
-            var close = _chrome.IconButtonPublic("close", "DkFaultBannerClose", HideBanner, 14);
-            close.AddToClassList("dk-ibtn--small");
-            _banner.Add(close);
-            // a click on the banner never reaches the 3D scene (same guard as the shortcuts pill)
-            _banner.RegisterCallback<PointerDownEvent>(evt => { if (evt.button == 0) InputManager.InputBlocked = true; evt.StopPropagation(); });
-            _banner.RegisterCallback<PointerUpEvent>(evt => { if (evt.button == 0) InputManager.InputBlocked = false; evt.StopPropagation(); });
-            _root.Add(_banner);
             _markers = new DesktopFaultMarkers(_root);
         }
 
         private void DisposeFaultVisuals()
         {
-            _banner?.RemoveFromHierarchy();
             _markers?.Dispose();
+            _fxDock?.RemoveFromHierarchy();
         }
 
-        /// <summary>The explanation block of the Faults popover: a picker of the four faults and the card (scrolls when the window is short).</summary>
-        private void BuildFaultExplain(VisualElement pop)
+        /// <summary>
+        /// The docked explanation: a collapsible section at the top of the Flight tab (collapsed by default). Header = title + «Mostrar/Ocultar»;
+        /// body = a picker of the four faults, the replay note and the card. Built after the sheet tabs (it lives inside the Flight panel).
+        /// </summary>
+        private void BuildFaultDock()
         {
-            _fxScroll = new ScrollView(ScrollViewMode.Vertical) { name = "DkFxScroll" };
-            _fxScroll.AddToClassList("dk-fx-scroll");
+            if (_flightPanel == null) return;
+            _fxDock = new VisualElement { name = "DkFxDock", pickingMode = PickingMode.Ignore };
+            _fxDock.AddToClassList("dk-fxdock");
+
+            _fxDockHead = new Button(() => SetDockOpen(!_dockOpen)) { name = "DkFxDockHead" };
+            _fxDockHead.AddToClassList("dk-fxdock-head");
+            var icon = new DesktopVectorIcon("fault", 14) { pickingMode = PickingMode.Ignore };
+            icon.AddToClassList("dk-fxdock-icon");
+            _fxDockHead.Add(icon);
+            _fxDockTitle = new Label { pickingMode = PickingMode.Ignore };
+            _fxDockTitle.AddToClassList("dk-fxdock-title");
+            _fxDockHead.Add(_fxDockTitle);
+            _fxDockState = new Label { pickingMode = PickingMode.Ignore };
+            _fxDockState.AddToClassList("dk-fxdock-state");
+            _fxDockHead.Add(_fxDockState);
+            _fxDock.Add(_fxDockHead);
+
+            _fxDockBody = new VisualElement { name = "DkFxDockBody", pickingMode = PickingMode.Ignore };
+            _fxDockBody.AddToClassList("dk-fxdock-body");
+            _fxDockBody.style.display = DisplayStyle.None;
+            _fxDockHint = Text("dk-note", _fxDockBody);
+            _fxDockHint.AddToClassList("dk-note--muted");
+            _faultNote = Text("dk-note", _fxDockBody);
+            _faultNote.AddToClassList("dk-note--muted");
             _fxPickRow = new VisualElement { name = "DkFxPick" };
             _fxPickRow.AddToClassList("dk-fx-pick");
             for (int i = 0; i < 4; i++)
             {
                 FaultTopic t = FxTopics[i];
-                var b = new Button(() => { _fxTopic = t; _nextPopTick = 0f; }) { name = "DkFxPick_" + WireNames.Of(FaultExplain.KindOf(t)) };
+                var b = new Button(() => { _fxTopic = t; _dockAlertId = null; TickFaultDock(DesktopTelemetry.Client); }) { name = "DkFxPick_" + WireNames.Of(FaultExplain.KindOf(t)) };
                 b.AddToClassList("dk-b");
                 b.AddToClassList("dk-b--pill");
                 b.AddToClassList("dk-fx-pickbtn");
                 _fxPickRow.Add(b);
                 _fxPickBtns[i] = b;
             }
-            _fxScroll.Add(_fxPickRow);
-            _cardFaults = new DesktopFaultCard("DkFxCardFaults");
-            _fxScroll.Add(_cardFaults.Root);
-            pop.Add(_fxScroll);
+
+            _fxDockBody.Add(_fxPickRow);
+            _cardDock = new DesktopFaultCard("DkFxCardDock");
+            _fxDockBody.Add(_cardDock.Root);
+            _fxDock.Add(_fxDockBody);
+            _flightPanel.Insert(0, _fxDock);
             RelabelFaultExplain();
         }
 
         private void RelabelFaultExplain()
         {
+            if (_fxDock == null) return;
             for (int i = 0; i < 4; i++) if (_fxPickBtns[i] != null) _fxPickBtns[i].text = FaultExplain.KindTab(FxTopics[i], Lang);
+            _fxDockTitle.text = T("fx.dock.title");
+            _fxDockState.text = T(_dockOpen ? "fx.collapse" : "fx.show");
+            _fxDockHint.text = T("fx.dock.hint");
+            _faultNote.text = T("faults.note");
+            TickFaultDock(DesktopTelemetry.Client);
+        }
+
+        // ───────────────────────── open / close the docked explanation ─────────────────────────
+
+        /// <summary>Opens or closes the docked section. Never called by the telemetry itself: only a click or an explicit action does.</summary>
+        public void SetDockOpen(bool open)
+        {
+            if (_fxDock == null) return;
+            _dockOpen = open;
+            _fxDockBody.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+            _fxDockHead.EnableInClassList("dk-fxdock-head--on", open);
+            _fxDockState.text = T(open ? "fx.collapse" : "fx.show");
+            if (open) TickFaultDock(DesktopTelemetry.Client);
+        }
+
+        /// <summary>
+        /// The explicit actions («Explicación» in the Faults popover or on an alert): selects the topic (and the alert, when it came from one),
+        /// opens the inspector on the Flight tab and expands the section. The canvas is not touched.
+        /// </summary>
+        public void ShowFaultExplanation(FaultTopic topic, int motor, string alertId)
+        {
+            _fxTopic = topic;
+            if (motor >= 1 && motor <= 4) { _faultMotor = motor; RefreshMotorButtons(); }
+            _dockAlertId = alertId;
+            ShowFlightTab(true);
+            SetDockOpen(true);
+            if (_flightPanel != null) _flightPanel.scrollOffset = Vector2.zero;
+            _alertSig = null;
         }
 
         // ───────────────────────── card content ─────────────────────────
@@ -219,9 +238,21 @@ namespace WebGL.UI.Desktop
             return string.Join("\n", parts);
         }
 
+        /// <summary>The first block when the section was opened from one alert: the alert's own sentence (with origin) plus the synthetic fault line that hits its part.</summary>
+        private string WhatForAlert(TelemetryClient client, Alert a, FaultTopic topic, double now)
+        {
+            string lang = Lang;
+            var labels = HonestyLabels.Load();
+            bool synthetic = DesktopTelemetry.IsLocalReplay && AlertText.IsSynthetic(a, client.Faults, now);
+            string what = AlertText.Build(a, client.Displayed, client.Hello, client.Classification, synthetic, lang, labels);
+            Fault af = FaultExplain.IsApproved(topic) ? ActiveFaultOf(client, topic, MotorOfComponent(a.component), now) : null;
+            if (af != null && AlertText.FaultHitsComponent(af, a.component)) what += "\n" + FaultExplain.FaultLine(af, now, lang);
+            return what;
+        }
+
         /// <summary>
-        /// A scrolling block of a popover (the fault card, the alert list) takes ALL the room left under its top edge, down to the status bar: in a short
-        /// window the approved texts (above all «En esta fuente») are as visible as the window allows and the rest scrolls.
+        /// A scrolling block of a popover (the alert list) takes ALL the room left under its top edge, down to the status bar: in a short
+        /// window the list is as visible as the window allows and the rest scrolls.
         /// </summary>
         private void FitScroll(VisualElement scroll, float reserveBelow)
         {
@@ -232,89 +263,38 @@ namespace WebGL.UI.Desktop
             if (scroll.style.maxHeight.keyword != StyleKeyword.Undefined || Mathf.Abs(scroll.style.maxHeight.value.value - want) > 1f) scroll.style.maxHeight = want;
         }
 
-        /// <summary>Updates the card of the Faults popover (called by TickFaults).</summary>
-        private void TickFaultCard(TelemetryClient client)
+        /// <summary>Updates the docked card (called by the Flight tab tick; costs nothing while the section is collapsed).</summary>
+        private void TickFaultDock(TelemetryClient client)
         {
-            if (_cardFaults == null) return;
+            if (_cardDock == null || !_dockOpen) return;
+            _faultNote.style.display = DesktopTelemetry.IsLocalReplay ? DisplayStyle.Flex : DisplayStyle.None;
+
+            double now = client != null && client.Displayed != null ? client.Displayed.ts : ReplaySchedule.WallClockMs();
+            string what;
+            int motor;
+            string alertId = null;
+            Alert from = null;
+            if (!string.IsNullOrEmpty(_dockAlertId) && client != null)
+            {
+                var list = client.Alerts;
+                for (int i = 0; i < list.Count; i++) if (list[i].id == _dockAlertId) { from = list[i]; break; }
+                if (from == null) _dockAlertId = null; // the alert went away: the card keeps the topic and falls back to «ninguna activa»
+            }
+
+            if (from != null && client.Displayed != null)
+            {
+                alertId = from.id;
+                _fxTopic = FaultExplain.TopicOfAlert(from.id);
+                motor = MotorOfComponent(from.component);
+                what = WhatForAlert(client, from, _fxTopic, now);
+            }
+            else
+            {
+                what = WhatNow(client, _fxTopic, _faultMotor, out motor);
+            }
+
             for (int i = 0; i < 4; i++) _fxPickBtns[i].EnableInClassList("dk-b--on", FxTopics[i] == _fxTopic);
-            string what = WhatNow(client, _fxTopic, _faultMotor, out int motor);
-            _cardFaults.Set(CardInput(_fxTopic, motor != 0 ? motor : _faultMotor, null, what), Lang, HonestyLabels.Load());
-        }
-
-        // ───────────────────────── open the card ─────────────────────────
-
-        /// <summary>Opens the Faults popover on the explanation of a fault (the banner's «Ver qué pasa»).</summary>
-        public void OpenFaultCard(FaultTopic topic, int motor)
-        {
-            _fxTopic = topic;
-            if (motor >= 1 && motor <= 4) { _faultMotor = motor; RefreshMotorButtons(); }
-            OpenMode();
-            if (!ModeOpen) return;
-            if (_openPop != "faults") TogglePopover("faults");
-            _nextPopTick = 0f;
-            TickPopovers(true);
-        }
-
-        /// <summary>Opens the Alerts popover with that alert expanded (the banner's «Ver qué pasa» for a critical alert).</summary>
-        public void OpenAlertCard(string alertId)
-        {
-            if (!string.IsNullOrEmpty(alertId)) _alertOpen.Add(alertId);
-            OpenMode();
-            if (!ModeOpen) return;
-            if (_openPop != "alerts") TogglePopover("alerts");
-            _alertSig = null;
-            TickPopovers(true);
-        }
-
-        public void ToggleAlertCard(string alertId)
-        {
-            if (string.IsNullOrEmpty(alertId)) return;
-            if (!_alertOpen.Remove(alertId)) _alertOpen.Add(alertId);
-            _nextPopTick = 0f;
-        }
-
-        // ───────────────────────── banner ─────────────────────────
-
-        private void ShowBanner(Func<string, string> make, bool isFault, FaultTopic topic, int motor, string alertId, string component)
-        {
-            _bannerMake = make;
-            _bannerIsFault = isFault;
-            _bannerTopic = topic;
-            _bannerMotor = motor;
-            _bannerAlertId = alertId;
-            _bannerComponent = component;
-            _bannerLang = null;
-            _bannerUntil = Time.unscaledTime + 10f;
-            _banner.style.display = DisplayStyle.Flex;
-            _banner.EnableInClassList("dk-fx-banner--fault", isFault);
-            _banner.EnableInClassList("dk-fx-banner--in", DesktopMotion.Reduce);
-            if (!DesktopMotion.Reduce) { _banner.RemoveFromClassList("dk-fx-banner--in"); _banner.schedule.Execute(() => _banner.AddToClassList("dk-fx-banner--in")).StartingIn(30); }
-            _banner.BringToFront();
-            RefreshBannerText();
-            Debug.Log("[Faults] banner: " + _bannerText.text);
-        }
-
-        private void RefreshBannerText()
-        {
-            string lang = Lang;
-            if (_banner == null || _bannerMake == null || _bannerLang == lang) return;
-            _bannerLang = lang;
-            _bannerText.text = _bannerMake(lang);
-            _bannerView.text = TelemetryStrings.T("fx.banner.view", lang);
-        }
-
-        public void HideBanner()
-        {
-            if (_banner == null) return;
-            _banner.style.display = DisplayStyle.None;
-            _banner.RemoveFromClassList("dk-fx-banner--in");
-        }
-
-        private void OnBannerView()
-        {
-            if (_bannerIsFault) OpenFaultCard(_bannerTopic, _bannerMotor);
-            else OpenAlertCard(_bannerAlertId);
-            HideBanner();
+            _cardDock.Set(CardInput(_fxTopic, motor != 0 ? motor : _faultMotor, alertId, what), Lang, HonestyLabels.Load());
         }
 
         private static string FaultComponent(Fault f)
@@ -328,18 +308,15 @@ namespace WebGL.UI.Desktop
             }
         }
 
-        // ───────────────────────── per frame: banner triggers and part markers ─────────────────────────
+        // ───────────────────────── per frame: the markers pinned on the parts (no banner, no toast, nothing opens) ─────────────────────────
 
         private void TickFaultVisuals()
         {
-            if (_banner == null) return;
+            if (_markers == null) return;
             var client = DesktopTelemetry.Client;
             bool viewer = !_ui.IsHeroVisible && !_ui.IsOnboardingOpen;
             if (client == null)
             {
-                if (BannerVisible) HideBanner();
-                if (_bnFaults.Count > 0) _bnFaults.Clear();
-                if (_bnAlerts.Count > 0) _bnAlerts.Clear();
                 if (_fxTargets.Count > 0 || _markers.Count > 0) { _fxTargets.Clear(); _markers.SetTargets(_fxTargets); }
                 return;
             }
@@ -349,7 +326,7 @@ namespace WebGL.UI.Desktop
             double now = disp != null ? disp.ts : ReplaySchedule.WallClockMs();
             _fxTargets.Clear();
 
-            // synthetic faults (only the local replay has them): a marker while active and a banner the first time they are seen
+            // synthetic faults (only the local replay has them): a marker while they are active
             List<string> coveredComponents = null;
             if (DesktopTelemetry.IsLocalReplay && client.Faults.Count > 0)
             {
@@ -357,70 +334,35 @@ namespace WebGL.UI.Desktop
                 foreach (Fault ft in Faults.Active(client.Faults, now))
                 {
                     string comp = FaultComponent(ft);
-                    string key = ft.id + "@" + ft.since;
                     coveredComponents.Add(comp);
                     _fxTargets.Add(new DesktopFaultMarkers.Target
                     {
-                        Key = "f:" + key,
+                        Key = "f:" + ft.id + "@" + ft.since,
                         Component = comp,
                         Label = FaultExplain.PinName(ft.kind, ft.motor, lang) + " · " + AlertText.SyntheticFault(lang, HonestyLabels.Load()),
                         Synthetic = true,
                     });
-                    if (_bnFaults.Add(key))
-                    {
-                        Fault captured = ft.Clone();
-                        _bannerFaultAt = Time.unscaledTime;
-                        ShowBanner(l => TelemetryStrings.F("fx.banner.fault", l, "name", FaultExplain.StateName(captured.kind, captured.motor, l), "syn", AlertText.SyntheticFault(l, HonestyLabels.Load())),
-                                   true, FaultExplain.TopicOf(captured.kind), captured.motor, null, comp);
-                    }
                 }
             }
 
-            // critical alerts: a marker while they stand; a banner when a new one appears (not when a fault banner already covers that part)
+            // critical alerts: a marker while they stand (not when a fault marker already covers that part)
             var alerts = client.Alerts;
             for (int i = 0; i < alerts.Count; i++)
             {
                 Alert a = alerts[i];
                 if (a.severity != AlertSeverity.Critical || string.IsNullOrEmpty(a.component)) continue;
-                bool covered = coveredComponents != null && coveredComponents.Contains(a.component);
-                if (!covered)
+                if (coveredComponents != null && coveredComponents.Contains(a.component)) continue;
+                _fxTargets.Add(new DesktopFaultMarkers.Target
                 {
-                    string part = PartName(a.component, lang);
-                    _fxTargets.Add(new DesktopFaultMarkers.Target
-                    {
-                        Key = "a:" + a.id,
-                        Component = a.component,
-                        Label = TelemetryStrings.F("fx.pin.alert", lang, "part", part),
-                        Synthetic = false,
-                    });
-                }
-                if (_bnAlerts.Add(a.id) && !covered && Time.unscaledTime - _bannerFaultAt > 8f)
-                {
-                    Alert captured = a;
-                    ShowBanner(l => TelemetryStrings.F("fx.banner.alert", l, "part", PartName(captured.component, l)), false, FaultExplain.TopicOfAlert(a.id), MotorOfComponent(a.component), a.id, a.component);
-                }
-            }
-
-            if (_bnAlerts.Count > 0)
-            {
-                _bnGone.Clear();
-                foreach (string id in _bnAlerts)
-                {
-                    bool present = false;
-                    for (int i = 0; i < alerts.Count; i++) if (alerts[i].id == id) { present = true; break; }
-                    if (!present) _bnGone.Add(id);
-                }
-                foreach (string id in _bnGone) _bnAlerts.Remove(id);
+                    Key = "a:" + a.id,
+                    Component = a.component,
+                    Label = TelemetryStrings.F("fx.pin.alert", lang, "part", PartName(a.component, lang)),
+                    Synthetic = false,
+                });
             }
 
             _markers.SetTargets(_fxTargets);
             _markers.Tick(viewer);
-
-            if (BannerVisible)
-            {
-                if (!viewer || Time.unscaledTime >= _bannerUntil) HideBanner();
-                else RefreshBannerText();
-            }
         }
     }
 

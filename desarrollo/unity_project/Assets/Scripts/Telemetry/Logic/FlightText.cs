@@ -389,11 +389,12 @@ namespace WebGL.Telemetry
             { "fx.pin.battery_sag", new[] { "Batería · caída", "Battery · sag" } },
             { "fx.pin.vibration", new[] { "Controladora · vibración", "Controller · vibration" } },
             { "fx.pin.alert", new[] { "{part} · alerta crítica", "{part} · critical alert" } },
-            { "fx.banner.fault", new[] { "{name} · {syn}", "{name} · {syn}" } },
-            { "fx.banner.alert", new[] { "Alerta crítica: {part}", "Critical alert: {part}" } },
-            { "fx.banner.view", new[] { "Ver qué pasa", "See what is happening" } },
-            { "fx.expand", new[] { "Qué pasa", "What is this" } },
+            // 28.1: the explanation is docked in the inspector and opens only on request (no banner, no toast)
+            { "fx.open", new[] { "Explicación", "Explanation" } },
+            { "fx.show", new[] { "Mostrar", "Show" } },
             { "fx.collapse", new[] { "Ocultar", "Hide" } },
+            { "fx.dock.title", new[] { "Explicación de fallas", "Fault explanation" } },
+            { "fx.dock.hint", new[] { "Se abre solo cuando tú lo pides. Elige una falla para leer qué significa.", "It opens only when you ask. Pick a fault to read what it means." } },
             { "fx.pick", new[] { "Qué explicar", "Explain" } },
             // A. motor cut (motor_failure, alert motorN:out)
             { "fx.a.means", new[] { "Un cuadricóptero necesita los cuatro rotores para controlar a la vez la inclinación y el giro. Sin uno pierde un cuarto del empuje y el giro queda desequilibrado.",

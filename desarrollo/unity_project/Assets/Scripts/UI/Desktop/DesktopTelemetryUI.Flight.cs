@@ -321,6 +321,7 @@ namespace WebGL.UI.Desktop
             if (!_flightTab) return;
             if (Time.unscaledTime < _nextFlight) return;
             _nextFlight = Time.unscaledTime + FlightPeriod;
+            TickFaultDock(DesktopTelemetry.Client); // the docked explanation (open only on request; a no-op while collapsed)
 
             var client = DesktopTelemetry.Client;
             _flEmpty.style.display = running ? DisplayStyle.None : DisplayStyle.Flex;

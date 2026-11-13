@@ -164,8 +164,9 @@ namespace WebGL.UI.Desktop
             DesktopMotion.WatchVisible(_container);
 
             BuildPilotOverlay();
-            if (!PCDebugFlags.Has("nofxui")) BuildFaultVisuals(); // PLAN_PC 27.3: fault banner and the markers pinned on the parts (-pcdbg nofxui: diagnostics)
+            if (!PCDebugFlags.Has("nofxui")) BuildFaultVisuals(); // PLAN_PC 27.3 / 28.1: the markers pinned on the parts (-pcdbg nofxui: diagnostics)
             BuildSheetTabs();
+            if (!PCDebugFlags.Has("nofxui")) BuildFaultDock(); // PLAN_PC 28.1: the explanation card, a collapsed section of the Flight tab
             UIDetailsSheet.DesktopKeepOpenOnDeselect = () => TelemetryTabActive;
             BuildStatusBarItem();
             OnLanguage(null);
