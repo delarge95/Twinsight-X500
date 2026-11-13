@@ -2191,3 +2191,48 @@
 .desktop-help-pilot-desc { margin-top: 3px; font-size: 12.5px; }
 .layout--desktop.chrome2 .desktop-help-card--wide .desktop-help-column { min-width: 0; }
 .layout--desktop.chrome2 .desktop-help-card--wide .desktop-help-column--pilot { width: 230px; min-width: 230px; }
+
+/* ================================================================
+   Phase 9 - game pad modes (PLAN_PC 27.2, PC only). Badge while a pad is connected: DRON = celeste (the pad flies the drone), MENUS = amber
+   (the pad drives the menus and the drone gets NOTHING from it: the colour is the warning). Colours from design/tokens.json (same literals as above).
+   ================================================================ */
+.dk-pad-badge {
+    position: absolute;
+    left: 56px;
+    bottom: 38px;
+    flex-direction: row;
+    align-items: center;
+    padding: 5px 12px 5px 9px;
+    border-width: 1px;
+    border-radius: 14px;
+    border-color: rgba(70, 175, 255, 0.55);
+    background-color: rgba(14, 17, 22, 0.92);
+    transition-property: background-color, border-color;
+    transition-duration: 0.16s;
+    transition-timing-function: ease-out;
+}
+.dk-pad-icon { width: 16px; height: 16px; margin: 0 7px 0 0; }
+.dk-pad-mode { margin: 0; font-size: 12.5px; -unity-font-style: bold; letter-spacing: 0.4px; color: rgb(191, 234, 255); }
+.dk-pad-hint { margin: 0 0 0 10px; padding: 1px 7px; font-size: 11px; color: rgb(182, 192, 204); border-width: 1px; border-radius: 8px; border-color: rgba(255, 255, 255, 0.16); background-color: rgba(255, 255, 255, 0.05); }
+.dk-pad-badge--menus { border-color: rgba(245, 185, 66, 0.75); background-color: rgba(44, 33, 12, 0.94); }
+.dk-pad-badge--menus .dk-pad-mode { color: rgb(255, 224, 160); }
+.dk-pad-badge--menus .dk-pad-hint { color: rgb(255, 224, 160); border-color: rgba(245, 185, 66, 0.45); }
+.dk-reduce-motion .dk-pad-badge { transition-duration: 0s; }
+
+/* focus ring ONLY in MENUS mode (DesktopPad adds .dk-padnav next to .dk-keynav): amber, thicker than the keyboard ring */
+.dk-padnav Button:focus,
+.dk-padnav .dk-stchip:focus,
+.dk-padnav .dk-src-row:focus,
+.dk-padnav .dk-alert-row:focus,
+.dk-padnav .dk-tab:focus,
+.dk-padnav .dk-seg-btn:focus,
+.dk-padnav .dk-strip-btn:focus { border-width: 2px; border-color: rgb(245, 185, 66); }
+
+/* pad legend rows inside the piloting legend and the help overlay tabs */
+.dk-pilot-padbox { flex-direction: column; align-items: flex-start; margin-top: 4px; padding-top: 4px; border-top-width: 1px; border-color: rgba(255, 255, 255, 0.10); }
+.dk-pilot-padcap { padding-left: 6px; padding-right: 6px; }
+.desktop-help-tabs { flex-direction: row; margin: 2px 0 10px 0; }
+.desktop-help-tab { margin: 0 8px 0 0; padding: 4px 14px; font-size: 12.5px; color: rgb(182, 192, 204); border-width: 1px; border-radius: 14px; border-color: rgba(255, 255, 255, 0.14); background-color: rgba(255, 255, 255, 0.04); }
+.desktop-help-tab:hover { border-color: rgba(70, 175, 255, 0.5); }
+.desktop-help-tab--on { color: rgb(255, 255, 255); border-color: rgba(70, 175, 255, 0.75); background-color: rgba(70, 175, 255, 0.16); }
+.desktop-help-padfoot { margin-top: 10px; }

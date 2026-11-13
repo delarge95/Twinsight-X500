@@ -33,6 +33,7 @@ namespace WebGL.UI.Desktop
         private readonly Dictionary<KeyCode, int> _pressAt = new Dictionary<KeyCode, int>();
         private int _typedAt = -10;
         private string _typed = string.Empty;
+        private PadState? _fake;
 
         /// <summary>-desk-check drives only the typing gate (RunGateOnly) from DesktopSelfCheck: this component then does not start by itself.</summary>
         public bool ExternalDrive;
@@ -49,6 +50,7 @@ namespace WebGL.UI.Desktop
             DesktopKeyboardGate.KeyHeld = k => _held.Contains(k);
             DesktopKeyboardGate.KeyPressed = k => _pressAt.TryGetValue(k, out int f) && Time.frameCount == f + 1;
             DesktopKeyboardGate.InputString = () => Time.frameCount == _typedAt + 1 ? _typed : string.Empty;
+            PadSource.Provider = () => _fake;
             DesktopTelemetryUI.IgnoreFocusLoss = true;
         }
 
@@ -62,6 +64,7 @@ namespace WebGL.UI.Desktop
             Log("GATE RESULT " + _pass + " pass, " + _fail + " fail");
             File.WriteAllText(Path.Combine(OutputDirectory, "gate_" + _tag + ".log"), _log.ToString());
             DesktopKeyboardGate.ResetSeams();
+            PadSource.Provider = null;
             ForgetProbePrefs();
         }
 
@@ -83,13 +86,14 @@ namespace WebGL.UI.Desktop
         private static void Click(Button b)
         {
             if (b == null) return;
-            using (var e = NavigationSubmitEvent.GetPooled()) { e.target = b; b.SendEvent(e); }
+            using (var e = NavigationSubmitEvent.GetPooled(DesktopPad.OwnMark)) { e.target = b; b.SendEvent(e); }
         }
 
         private VisualElement Root => UIManager.Instance.Root;
         private Button B(string n) => Root.Q<Button>(n);
         private DesktopUIController Ctrl => DesktopUIController.Instance;
         private DesktopTelemetryUI Tel => Ctrl.Chrome.Telemetry;
+        private DesktopPad Pad => Ctrl.Pad;
         private static string Lang => AppLanguageManager.IsSpanish ? "es" : "en";
         private SimTelemetrySource Sim => DesktopTelemetry.Source as SimTelemetrySource;
         private static bool Shown(VisualElement e) => e != null && e.resolvedStyle.display != DisplayStyle.None;
@@ -116,10 +120,21 @@ namespace WebGL.UI.Desktop
         private void Press(KeyCode k) { _pressAt[k] = Time.frameCount; }
         private void TypeChar(char c) { _typedAt = Time.frameCount; _typed = c.ToString(); }
 
+        private static PadState PadOf(PadButtons b = PadButtons.None, double lx = 0, double ly = 0, double rx = 0, double ry = 0) =>
+            new PadState { Buttons = b, LeftX = lx, LeftY = ly, RightX = rx, RightY = ry };
+
+        private IEnumerator PadPress(PadButtons b, int frames = 3)
+        {
+            _fake = PadOf(b);
+            yield return Frames(frames);
+            _fake = PadOf();
+            yield return Frames(3);
+        }
+
         private string Snapshot()
         {
             var sb = new StringBuilder();
-            sb.Append("mode=").Append((Root.Q<Button>(className: "dk-seg-btn--on")?.name ?? "-"));
+            sb.Append("mode=").Append(Ctrl.Chrome.ActiveModeIndex());
             sb.Append(" pins=").Append(HotspotManager.Instance != null && HotspotManager.Instance.IsVisible);
             sb.Append(" tree=").Append(Ctrl.Tree.IsOpen);
             sb.Append(" tel=").Append(Tel.ModeOpen);
@@ -164,10 +179,12 @@ namespace WebGL.UI.Desktop
             }
 
             yield return GateChecks();
+            yield return PadChecks();
 
             Log("RESULT " + _pass + " pass, " + _fail + " fail");
             File.WriteAllText(Path.Combine(OutputDirectory, "fix_" + _tag + ".log"), _log.ToString());
             DesktopKeyboardGate.ResetSeams();
+            PadSource.Provider = null;
             ForgetProbePrefs();
             Application.Quit();
         }
@@ -412,6 +429,207 @@ namespace WebGL.UI.Desktop
         }
 
         private void ui_Back() { UIManager.Instance.ShortcutBack(); }
+
+        // ═════════════════════════════ B. game pad ═════════════════════════════
+
+        // an event as the Input Manager's joystick / keyboard axes produce it (no marker); the keyboard is told apart by the key held (the seam)
+        private static void SendNav(VisualElement target, NavigationMoveEvent.Direction d, EventModifiers mods = EventModifiers.None)
+        {
+            using (var e = NavigationMoveEvent.GetPooled(d, mods)) { e.target = target; target.SendEvent(e); }
+        }
+
+        private IEnumerator PadChecks()
+        {
+            Log("── B. game pad (FAKE XInput state: no real pad was used) ──");
+            _fake = null;
+            yield return Frames(4);
+            Check("no pad: the badge is hidden", !Pad.Connected && !Shown(Pad.Badge));
+
+            // connect: DRON by default
+            _fake = PadOf();
+            yield return Frames(4);
+            Check("pad connected: DRON mode by default", Pad.Connected && Pad.Mode == PadMode.Drone);
+            Check("badge shown with the DRON text and the Start hint", Shown(Pad.Badge) && Pad.Badge.Q<Label>("DkPadMode").text == T("pad.badge.drone") && Pad.Badge.Q<Label>("DkPadHint").text == T("pad.badge.hint"));
+            Check("badge has the DRON state class, not the MENUS one", Pad.Badge.ClassListContains("dk-pad-badge--drone") && !Pad.Badge.ClassListContains("dk-pad-badge--menus"));
+            Check("a toast announced the connection", Tel.ToastText == T("pad.toast.connected"));
+            Check("DRON mode: no focus ring (no .dk-padnav)", !Root.ClassListContains("dk-padnav"));
+            yield return Shot("B1_mando_dron");
+
+            // DRON: pad navigation never reaches the UI
+            Button probe = B("DkMode1");
+            probe.Focus();
+            yield return Frames(3);
+            var focusBefore = FocusedEl;
+            int blocked0 = Pad.BlockedNavEvents;
+            SendNav(FocusedEl, NavigationMoveEvent.Direction.Right);
+            SendNav(FocusedEl, NavigationMoveEvent.Direction.Down);
+            yield return Frames(2);
+            Check("DRON: pad (non-keyboard) Move events were stopped by the filter", Pad.BlockedNavEvents == blocked0 + 2);
+            Check("DRON: the focus did not move", ReferenceEquals(FocusedEl, focusBefore));
+            using (var e = NavigationSubmitEvent.GetPooled(EventModifiers.None)) { e.target = FocusedEl; FocusedEl.SendEvent(e); }
+            using (var e = NavigationCancelEvent.GetPooled(EventModifiers.None)) { e.target = FocusedEl; FocusedEl.SendEvent(e); }
+            yield return Frames(2);
+            Check("DRON: pad Submit and Cancel were stopped too (the mode button did not toggle)", Pad.BlockedNavEvents == blocked0 + 4 && Ctrl.Chrome.ActiveModeIndex() == 0);
+
+            // the keyboard is unaffected: the same event with an arrow key held (the legacy module reads it the same frame) goes through
+            Hold(KeyCode.RightArrow);
+            SendNav(FocusedEl, NavigationMoveEvent.Direction.Right);
+            yield return Frames(2);
+            Release(KeyCode.RightArrow);
+            Check("keyboard navigation (arrow key held) still moves the focus and is not counted as blocked", !ReferenceEquals(FocusedEl, focusBefore) && Pad.BlockedNavEvents == blocked0 + 4);
+            probe.Focus();
+            yield return Frames(2);
+            Hold(KeyCode.Return);
+            int b1 = Pad.BlockedNavEvents;
+            using (var e = NavigationSubmitEvent.GetPooled(EventModifiers.None)) { e.target = FocusedEl; FocusedEl.SendEvent(e); }
+            Release(KeyCode.Return);
+            yield return Frames(2);
+            Check("Enter held makes a Submit pass (not blocked)", Pad.BlockedNavEvents == b1);
+            Tel.CloseMode();
+            yield return Frames(2);
+            Tel.CloseMode();
+            yield return Frames(2);
+            FocusedEl?.Blur();
+
+            // DRON flies: simulator; a pad press with Pilotar OFF only explains what to do; takeoff by the button, then Pilotar + pad X (hold) + right stick forward
+            Tel.OpenMode();
+            Tel.StartSimulator();
+            yield return new WaitForSecondsRealtime(1.5f);
+            yield return PadPress(PadButtons.A);
+            Check("DRON, Pilotar off: a pad press sends nothing and a toast says to turn Pilotar on", !DesktopTelemetry.Client.Displayed.armed && Tel.ToastText == T("pad.hint.pilot"));
+            Click(B("DkCmdTakeoff"));
+            yield return new WaitForSecondsRealtime(6f);
+            Click(B("DkTelPilot"));
+            yield return new WaitForSecondsRealtime(0.4f);
+            Check("piloting on (pad in DRON mode)", Tel.Piloting && Pad.Mode == PadMode.Drone);
+            Check("the piloting legend shows the pad mapping rows now", Shown(Root.Q<VisualElement>("DkPilotLegend")) && Shown(Root.Q<VisualElement>(className: "dk-pilot-padbox")));
+            yield return PadPress(PadButtons.X);
+            yield return new WaitForSecondsRealtime(0.5f);
+            Check("DRON: pad X = hold (command sent by the pad)", DesktopTelemetry.Client.LastAck != null && DesktopTelemetry.Client.LastAck.command == "hold");
+            _fake = PadOf(ry: 1.0);
+            yield return new WaitForSecondsRealtime(2.2f);
+            double speed = Math.Sqrt(Sim.Model.v[0] * Sim.Model.v[0] + Sim.Model.v[1] * Sim.Model.v[1]);
+            Check("DRON: the right stick forward flies the drone (speed " + speed.ToString("0.0") + " m/s)", speed > 2.0);
+            yield return Shot("B2_mando_dron_pilotando", 0.1f);
+            _fake = PadOf();
+            yield return new WaitForSecondsRealtime(1.2f);
+
+            // → MENÚS (hold on entering)
+            var ack0 = DesktopTelemetry.Client.LastAck;
+            yield return PadPress(PadButtons.Start);
+            yield return Frames(3);
+            Check("Start: MENUS mode", Pad.Mode == PadMode.Menus && Pad.MenusMode);
+            Check("MENUS: `hold` was sent to the drone on entering (it was piloting)", DesktopTelemetry.Client.LastAck != null && DesktopTelemetry.Client.LastAck.command == "hold" && !ReferenceEquals(ack0, DesktopTelemetry.Client.LastAck) && Sim.Model.mode == SimMode.Hold);
+            Check("badge: MENUS text and amber state class", Pad.Badge.Q<Label>("DkPadMode").text == T("pad.badge.menus") && Pad.Badge.ClassListContains("dk-pad-badge--menus"));
+            Check("toast on the change says the drone gets no pad command", Tel.ToastText != null && Tel.ToastText.StartsWith(T("pad.toast.menus")));
+            Check("focus ring only now: .dk-padnav and .dk-keynav on the root", Root.ClassListContains("dk-padnav") && Root.ClassListContains("dk-keynav"));
+            Check("first focus landed on a sensible control", FocusedEl != null && FocusedEl is Button);
+            Log("first focus: " + FocusedEl?.name);
+            yield return Shot("B3_mando_menus", 0.2f);
+
+            // MENÚS: the drone gets nothing from the pad
+            _fake = PadOf(ry: 1.0, lx: 0.0);
+            yield return new WaitForSecondsRealtime(1.5f);
+            speed = Math.Sqrt(Sim.Model.v[0] * Sim.Model.v[0] + Sim.Model.v[1] * Sim.Model.v[1]);
+            Check("MENUS: the right stick does NOT fly the drone (speed " + speed.ToString("0.0") + " m/s)", speed < 0.6 && Sim.Model.mode == SimMode.Hold);
+            _fake = PadOf();
+            yield return Frames(3);
+
+            // MENÚS: navigate
+            Tel.HandleBack(); // leave piloting so Esc semantics are clean
+            Tel.OpenMode();
+            yield return Frames(3);
+            B("DkTelPower").Focus();
+            yield return Frames(3);
+            var f0 = FocusedEl;
+            int d0 = Pad.DispatchedNavEvents;
+            _fake = PadOf(PadButtons.DpadRight);
+            yield return Frames(3);
+            _fake = PadOf();
+            yield return Frames(3);
+            Check("MENUS: d-pad right moves the focus", !ReferenceEquals(FocusedEl, f0) && Pad.DispatchedNavEvents > d0);
+            _fake = PadOf(lx: 1.0);
+            yield return Frames(3);
+            _fake = PadOf();
+            yield return Frames(3);
+            Check("MENUS: the left stick also moves it (second control now)", FocusedEl != null);
+            B("DkTelSource").Focus();
+            yield return Frames(3);
+            var ackA = DesktopTelemetry.Client.LastAck;
+            yield return PadPress(PadButtons.A);
+            yield return new WaitForSecondsRealtime(0.4f);
+            Check("MENUS: A activates the focused control (the source popover opened) and sent no drone command", Tel.OpenPopover == "source" && ReferenceEquals(ackA, DesktopTelemetry.Client.LastAck));
+            yield return PadPress(PadButtons.B);
+            yield return new WaitForSecondsRealtime(0.3f);
+            Check("MENUS: B goes back (the popover closed)", Tel.OpenPopover == null);
+            Check("Telemetry mode is the active one before the step", Ctrl.Chrome.ActiveModeIndex() == 4);
+            yield return PadPress(PadButtons.RB);
+            yield return new WaitForSecondsRealtime(0.5f);
+            Check("MENUS: RB steps to the next mode (4 -> 1)", Ctrl.Chrome.ActiveModeIndex() == 1);
+            yield return PadPress(PadButtons.LB);
+            yield return new WaitForSecondsRealtime(0.5f);
+            Check("MENUS: LB steps back (1 -> 4)", Ctrl.Chrome.ActiveModeIndex() == 4);
+
+            // MENÚS: the right stick scrolls a panel (a tall ScrollView of the probe: deterministic)
+            var sv = new ScrollView(ScrollViewMode.Vertical) { name = "ProbeScroll" };
+            sv.style.position = Position.Absolute; sv.style.left = 700; sv.style.top = 300; sv.style.width = 320; sv.style.height = 160;
+            for (int i = 0; i < 60; i++) sv.Add(new Label("probe row " + i) { pickingMode = PickingMode.Ignore });
+            Root.Add(sv);
+            FocusedEl?.Blur();
+            yield return Frames(4);
+            _fake = PadOf(ry: -1.0);
+            yield return new WaitForSecondsRealtime(0.5f);
+            float off = sv.scrollOffset.y;
+            _fake = PadOf(ry: 1.0);
+            yield return new WaitForSecondsRealtime(0.25f);
+            _fake = PadOf();
+            Check("MENUS: the right stick scrolls a panel down and back up (offset " + off.ToString("0") + " then " + sv.scrollOffset.y.ToString("0") + ")", off > 100f && sv.scrollOffset.y < off);
+            sv.RemoveFromHierarchy();
+
+            // MENÚS: Back = help on the pad tab
+            yield return PadPress(PadButtons.Back);
+            yield return new WaitForSecondsRealtime(0.8f);
+            Check("MENUS: Back opens the help on the pad tab", Ctrl.IsHelpOpen && Ctrl.Help.Tab == 1);
+            Check("the help has the pad legend with both modes", Root.Query<Label>(className: "desktop-help-section").ToList().Count >= 2);
+            yield return Shot("B4_ayuda_mando", 0.3f);
+            yield return PadPress(PadButtons.LB);
+            yield return new WaitForSecondsRealtime(0.4f);
+            Check("MENUS: LB switches the help tab (keyboard and mouse)", Ctrl.Help.Tab == 0);
+            yield return Shot("B5_ayuda_teclado", 0.2f);
+            yield return PadPress(PadButtons.B);
+            yield return new WaitForSecondsRealtime(0.4f);
+            Check("MENUS: B closes the help", !Ctrl.IsHelpOpen);
+
+            // → DRON again
+            yield return PadPress(PadButtons.Start);
+            yield return Frames(3);
+            Check("Start again: back to DRON", Pad.Mode == PadMode.Drone);
+            Check("DRON again: the ring is gone and the focus released", !Root.ClassListContains("dk-padnav") && FocusedEl == null);
+            Check("toast on the change", Tel.ToastText != null && Tel.ToastText.StartsWith(T("pad.toast.drone")));
+            Check("badge back to DRON", Pad.Badge.Q<Label>("DkPadMode").text == T("pad.badge.drone") && Pad.Badge.ClassListContains("dk-pad-badge--drone"));
+            Click(B("DkTelPilot"));
+            yield return new WaitForSecondsRealtime(0.4f);
+            _fake = PadOf(ry: 1.0);
+            yield return new WaitForSecondsRealtime(2.0f);
+            speed = Math.Sqrt(Sim.Model.v[0] * Sim.Model.v[0] + Sim.Model.v[1] * Sim.Model.v[1]);
+            Check("DRON again: the pad flies the drone (speed " + speed.ToString("0.0") + " m/s)", Tel.Piloting && speed > 2.0);
+            _fake = PadOf();
+
+            // unplug while piloting: dead-man
+            _fake = null;
+            yield return new WaitForSecondsRealtime(0.5f);
+            Check("unplugging while piloting: dead-man (piloting off, hold sent) and the badge is hidden", !Tel.Piloting && !Pad.Connected && !Shown(Pad.Badge));
+            _fake = PadOf(PadButtons.Start | PadButtons.A);
+            yield return Frames(4);
+            Check("a pad that comes back starts in DRON and held buttons are not presses", Pad.Connected && Pad.Mode == PadMode.Drone);
+            _fake = PadOf();
+
+            Tel.StopSession();
+            Tel.CloseMode();
+            yield return Frames(3);
+            _fake = null;
+            yield return Frames(3);
+        }
 
     }
 }

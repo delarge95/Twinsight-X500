@@ -38,6 +38,7 @@ namespace WebGL.UI.Desktop
         private DesktopSidePanel _sidePanel;
         private DesktopPartTree _tree;
         private DesktopChrome _chrome;
+        private DesktopPad _pad;
         private VisualElement _hint;
         private VisualElement _bottomSheet;
         private bool _ready;
@@ -58,6 +59,7 @@ namespace WebGL.UI.Desktop
         internal DesktopPartTree Tree => _tree;
         internal DesktopChrome Chrome => _chrome;
         internal DesktopHelpOverlay Help => _help;
+        internal DesktopPad Pad => _pad;
         internal DesktopUIScaler Scaler => _scaler;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -117,6 +119,7 @@ namespace WebGL.UI.Desktop
             if (UIManager.OverlayBackHandler != null) UIManager.OverlayBackHandler = null;
             _tooltip?.Dispose();
             _help?.Dispose();
+            _pad?.Dispose();
             _display?.Dispose();
             _sidePanel?.Dispose();
             _tree?.Dispose();
@@ -186,6 +189,7 @@ namespace WebGL.UI.Desktop
             if (!PCDebugFlags.Has("oldchrome")) _chrome = new DesktopChrome(_root, this, _tree, _sidePanel);
             _help = new DesktopHelpOverlay(_root);
             _help.PilotActive = () => _chrome != null && _chrome.Telemetry != null && _chrome.Telemetry.Piloting;
+            if (!PCDebugFlags.Has("nopad")) _pad = new DesktopPad(_root, this); // PLAN_PC 27.2: game pad modes (DRON / MENÚS) and the navigation filter (-pcdbg nopad: diagnostics)
             BuildHint();
             _tooltip = new DesktopTooltip(_root); // last child: always on top
 
@@ -278,6 +282,7 @@ namespace WebGL.UI.Desktop
             }
 
             _scaler.Tick();
+            _pad?.Tick(); // before the telemetry tick: the pilot reads the pad state of THIS frame
             _sidePanel.Tick();
             _tree.Tick();
             _chrome?.Tick(_scaler.LogicalSize.x);

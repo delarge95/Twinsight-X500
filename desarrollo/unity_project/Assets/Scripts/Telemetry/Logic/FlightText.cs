@@ -356,6 +356,24 @@ namespace WebGL.Telemetry
             { "toast.geofence.ceiling", new[] { "Geovalla: el dron llegó al techo de {h} m.", "Geofence: the drone reached the {h} m ceiling." } },
             { "toast.geofence.both", new[] { "Geovalla: el dron está en el límite de {r} m de radio y en el techo de {h} m.", "Geofence: the drone is at the {r} m radius limit and the {h} m ceiling." } },
 
+            // game pad modes (PLAN_PC 27.2): DRON (default) flies the drone and the UI gets nothing; MENÚS (Start) navigates the menus and the drone gets nothing
+            { "pad.badge.drone", new[] { "Mando: Dron", "Pad: Drone" } },
+            { "pad.badge.menus", new[] { "Mando: Menús", "Pad: Menus" } },
+            { "pad.badge.hint", new[] { "Start: cambiar", "Start: switch" } },
+            { "pad.badge.tip", new[] { "Start alterna entre pilotar el dron y navegar los menús. Solo mandos XInput (Xbox).", "Start switches between flying the drone and navigating the menus. XInput (Xbox) pads only." } },
+            { "pad.toast.connected", new[] { "Mando conectado en modo Dron: no mueve los menús. Start cambia a Menús.", "Pad connected in Drone mode: it does not move the menus. Start switches to Menus." } },
+            { "pad.toast.disconnected", new[] { "Mando desconectado.", "Pad disconnected." } },
+            { "pad.toast.drone", new[] { "Mando en modo Dron: pilota el dron y no mueve los menús. Start vuelve a los menús.", "Pad in Drone mode: it flies the drone and does not move the menus. Start goes back to the menus." } },
+            { "pad.toast.menus", new[] { "Mando en modo Menús: navega los menús y el dron no recibe órdenes del mando. Start vuelve al dron.", "Pad in Menus mode: it navigates the menus and the drone gets no pad commands. Start goes back to the drone." } },
+            { "pad.toast.menus.hold", new[] { " Se envió «mantener posición».", " «Hold position» was sent." } },
+            { "pad.hint.pilot", new[] { "Activa «Pilotar» para volar con el mando.", "Turn on «Pilot» to fly with the pad." } },
+            { "pad.leg.drone", new[] { "Dron", "Drone" } },
+            { "pad.leg.menus", new[] { "Menús", "Menus" } },
+            { "pad.leg.menus.note", new[] { "el dron no recibe órdenes del mando", "the drone gets no pad commands" } },
+            { "pad.leg.sticks", new[] { "Stick izq.: subir y girar · Stick der.: mover", "Left stick: climb and turn · Right stick: move" } },
+            { "pad.leg.abxy", new[] { "A despegar · B aterrizar · X mantener · Y volver", "A take off · B land · X hold · Y return" } },
+            { "pad.leg.start", new[] { "Start: menús", "Start: menus" } },
+
             // tutorial step 7 "Telemetría" (E-7; content of PROPUESTA_TEXTOS_HONESTIDAD §3 adapted to the desktop UI; honesty labels inside the
             // hints repeat labels.json titles verbatim and a test checks that they do; D-7: two FIXED readings with different origin)
             { "tut.tel.title", new[] { "Telemetría", "Telemetry" } },

@@ -699,6 +699,23 @@ namespace WebGL.UI.Desktop
             ViewModeManager.Instance.SetViewMode(next);
         }
 
+        /// <summary>The mode switch state: 1 Inspect, 2 Analyze, 3 Studio, 4 Telemetry, 0 none (PLAN_PC 27.2: the pad's LB / RB step through them).</summary>
+        public int ActiveModeIndex()
+        {
+            for (int i = 0; i < 4; i++) if (_modeSeg[i] != null && _modeSeg[i].ClassListContains("dk-seg-btn--on")) return i + 1;
+            return 0;
+        }
+
+        /// <summary>LB / RB in the pad's MENÚS mode: the previous / next of the four modes (wraps around), exactly the keys 1..4.</summary>
+        public void PadStepMode(int delta)
+        {
+            if (_ui.IsHeroVisible || _ui.IsOnboardingOpen) return;
+            int cur = ActiveModeIndex();
+            int next = cur == 0 ? (delta > 0 ? 1 : 4) : ((cur - 1 + delta + 4) % 4) + 1;
+            Debug.Log("[Pad] mode " + cur + " -> " + next);
+            if (next == 4) _tel.OpenMode(); else _ui.ShortcutToggleMode(next);
+        }
+
         // ───────────────────────── per frame ─────────────────────────
 
         private const float MinSpacer = 12f;

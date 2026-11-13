@@ -16,6 +16,8 @@ namespace WebGL.UI.Desktop
         private readonly VisualElement _card;
 
         public bool IsOpen { get; private set; }
+        /// <summary>0 = keyboard and mouse, 1 = game pad (PLAN_PC 27.2). The tab strip is clickable (and LB / RB switch it from the pad).</summary>
+        public int Tab { get; private set; }
 
         /// <summary>E-6: true while piloting is ON (set by DesktopUIController). The overlay then shows the piloting mapping as ACTIVE and marks the desktop shortcuts it pauses.</summary>
         public System.Func<bool> PilotActive;
@@ -55,6 +57,33 @@ namespace WebGL.UI.Desktop
         }
 
         public void Open()
+        {
+            if (IsOpen) return;
+            Tab = 0;
+            OpenInternal();
+        }
+
+        /// <summary>Opens (or closes, when it already shows the pad tab) the help on the game pad tab.</summary>
+        public void TogglePad()
+        {
+            if (IsOpen && Tab == 1) { Close(); return; }
+            OpenPadTab();
+        }
+
+        public void OpenPadTab()
+        {
+            Tab = 1;
+            if (IsOpen) Rebuild(); else OpenInternal();
+        }
+
+        public void StepTab(int delta)
+        {
+            if (!IsOpen) return;
+            Tab = ((Tab + delta) % 2 + 2) % 2;
+            Rebuild();
+        }
+
+        private void OpenInternal()
         {
             if (IsOpen) return;
 
@@ -100,11 +129,19 @@ namespace WebGL.UI.Desktop
             var subtitle = new Label(T("TwinSight X500 · desktop viewer", "TwinSight X500 · visor de escritorio")) { pickingMode = PickingMode.Ignore };
             subtitle.AddToClassList("desktop-help-subtitle");
             _card.Add(subtitle);
+            _card.Add(BuildTabs());
 
             var columns = new VisualElement { pickingMode = PickingMode.Ignore };
             columns.AddToClassList("desktop-help-columns");
             _card.Add(columns);
 
+            _card.AddToClassList("desktop-help-card--wide");
+            if (Tab == 1)
+            {
+                BuildPadColumns(columns);
+            }
+            else
+            {
             // ── Column 1: modes and tools ──
             VisualElement left = NewColumn(columns);
             left.AddToClassList("desktop-help-column--narrow");
@@ -148,6 +185,7 @@ namespace WebGL.UI.Desktop
             VisualElement pilotColumn = NewColumn(columns);
             pilotColumn.AddToClassList("desktop-help-column--pilot");
             AddPilotRows(pilotColumn);
+            }
 
             var footer = new VisualElement { pickingMode = PickingMode.Ignore };
             footer.AddToClassList("desktop-help-footer");
@@ -161,6 +199,79 @@ namespace WebGL.UI.Desktop
             footer.Add(f2);
             _card.Add(footer);
             MarkPausedRows();
+        }
+
+        // ───────────────────────── tabs and the game pad tab (PLAN_PC 27.2) ─────────────────────────
+
+        private VisualElement BuildTabs()
+        {
+            var strip = new VisualElement { name = "DesktopHelpTabs" };
+            strip.AddToClassList("desktop-help-tabs");
+            string[] names = { T("Keyboard and mouse", "Teclado y ratón"), T("Game pad", "Mando") };
+            for (int i = 0; i < 2; i++)
+            {
+                int idx = i;
+                var b = new Button(() => { Tab = idx; Rebuild(); }) { text = names[i], name = "DesktopHelpTab" + i };
+                b.AddToClassList("desktop-help-tab");
+                b.EnableInClassList("desktop-help-tab--on", Tab == i);
+                b.RegisterCallback<PointerDownEvent>(evt => evt.StopPropagation()); // the overlay closes on a click anywhere: not on its own tabs
+                strip.Add(b);
+            }
+            return strip;
+        }
+
+        private void BuildPadColumns(VisualElement columns)
+        {
+            VisualElement drone = NewColumn(columns);
+            AddSection(drone, T("DRONE MODE (default)", "MODO DRON (predeterminado)"));
+            AddPadRow(drone, new[] { "LS" }, T("Climb / descend (up-down) and turn (left-right)", "Subir / bajar (arriba-abajo) y girar (izq.-der.)"));
+            AddPadRow(drone, new[] { "RS" }, T("Move: forward, back, left, right", "Mover: adelante, atrás, izquierda, derecha"));
+            AddPadRow(drone, new[] { "A", "B", "X", "Y" }, T("Take off · land · hold · return", "Despegar · aterrizar · mantener · volver"));
+            AddPadRow(drone, new[] { "Start" }, T("Switch to MENUS mode", "Cambiar al modo MENÚS"));
+            AddNote(drone, T("The pad flies the drone only with «Pilot» on (flight simulator or PX4 SITL; a replay is read-only). In this mode the menus receive nothing from the pad.",
+                             "El mando pilota solo con «Pilotar» activado (simulador de vuelo o PX4 SITL; la repetición es de solo lectura). En este modo los menús no reciben nada del mando."));
+
+            VisualElement menus = NewColumn(columns);
+            AddSection(menus, T("MENUS MODE (Start)", "MODO MENÚS (Start)"));
+            AddPadRow(menus, new[] { "D-pad", "LS" }, T("Move the focus between controls", "Mover el foco entre controles"));
+            AddPadRow(menus, new[] { "A" }, T("Activate the focused control", "Activar el control enfocado"));
+            AddPadRow(menus, new[] { "B" }, T("Back / close (like Esc)", "Atrás / cerrar (como Esc)"));
+            AddPadRow(menus, new[] { "LB", "RB" }, T("Previous / next mode (or help tab)", "Modo anterior / siguiente (o pestaña de ayuda)"));
+            AddPadRow(menus, new[] { "RS" }, T("Scroll panels and the parts tree", "Desplazar paneles y el árbol de piezas"));
+            AddPadRow(menus, new[] { "Back" }, T("This help", "Esta ayuda"));
+            AddPadRow(menus, new[] { "Start" }, T("Back to DRONE mode", "Volver al modo DRON"));
+            AddNote(menus, T("In this mode the drone gets no pad command: «hold» is sent when you enter it while piloting. The keyboard still works as always.",
+                             "En este modo el dron no recibe órdenes del mando: al entrar pilotando se envía «mantener». El teclado sigue funcionando como siempre."));
+
+            var foot = new Label(T("XInput (Xbox) pads only. The window needs the focus for the pad to act. The badge «Pad: Drone / Menus» shows the mode.",
+                                   "Solo mandos XInput (Xbox). La ventana necesita el foco para que actúe el mando. La insignia «Mando: Dron / Menús» muestra el modo.")) { pickingMode = PickingMode.Ignore };
+            foot.AddToClassList("desktop-help-desc");
+            foot.AddToClassList("desktop-help-note");
+            foot.AddToClassList("desktop-help-padfoot");
+            columns.parent.Add(foot);
+        }
+
+        private static void AddPadRow(VisualElement column, string[] keys, string description)
+        {
+            var row = new VisualElement { pickingMode = PickingMode.Ignore };
+            row.AddToClassList("desktop-help-row--pilot");
+            var caps = new VisualElement { pickingMode = PickingMode.Ignore };
+            caps.AddToClassList("desktop-help-pilot-caps");
+            for (int i = 0; i < keys.Length; i++) caps.Add(MakeCap(keys[i], i == 0));
+            row.Add(caps);
+            var desc = new Label(description) { pickingMode = PickingMode.Ignore };
+            desc.AddToClassList("desktop-help-desc");
+            desc.AddToClassList("desktop-help-pilot-desc");
+            row.Add(desc);
+            column.Add(row);
+        }
+
+        private static void AddNote(VisualElement column, string text)
+        {
+            var note = new Label(text) { pickingMode = PickingMode.Ignore };
+            note.AddToClassList("desktop-help-desc");
+            note.AddToClassList("desktop-help-note");
+            column.Add(note);
         }
 
         // E-6: the piloting keys. They are active ONLY while piloting is on (Telemetry mode, "Pilot" toggle); then T L H R E and Shift+A stop being

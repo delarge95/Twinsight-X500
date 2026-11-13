@@ -24,7 +24,7 @@ namespace WebGL.UI.Desktop
     /// </summary>
     internal sealed partial class DesktopTelemetryUI
     {
-        private VisualElement _pilotStrip, _legend, _legendKeys;
+        private VisualElement _pilotStrip, _legend, _legendKeys, _legendPadBox;
         private Button _btnPilot;
         private readonly Button[] _btnCmd = new Button[4];
         private readonly Label[] _cmdLabels = new Label[4];
@@ -45,7 +45,7 @@ namespace WebGL.UI.Desktop
         private PilotKeys _held;
         private double _nextManual;
         private bool _padSeen;
-        private bool[] _padButtons = new bool[4];
+        private float _padHintAt = -10f;
         private AckMessage _lastAckToast;
         private int _geoTouch;
         private float _geoToastAt = -10f;
@@ -188,7 +188,35 @@ namespace WebGL.UI.Desktop
             _legendTexts.Clear();
             _legendKeys.Add(LegendRow(new[] { "W", "A", "S", "D" }, T("pilot.legend.move"), new[] { "Q", "E" }, T("pilot.legend.yaw"), new[] { "Space", "Shift" }, T("pilot.legend.alt")));
             _legendKeys.Add(LegendRow(new[] { "T" }, T("cmd.takeoff"), new[] { "L" }, T("cmd.land"), new[] { "H" }, T("cmd.hold"), new[] { "R" }, T("cmd.rtl"), new[] { "Esc" }, T("pilot.legend.release")));
+            // the pad mapping, shown only while a pad is connected (PLAN_PC 27.2); its caps are NOT registered in _caps (A is also the roll-left key)
+            _legendPadBox = new VisualElement { pickingMode = PickingMode.Ignore };
+            _legendPadBox.AddToClassList("dk-pilot-padbox");
+            _legendPadBox.Add(PadLegendRow(new[] { "LS" }, T("pilot.legend.alt") + " · " + T("pilot.legend.yaw"), new[] { "RS" }, T("pilot.legend.move"), new[] { "Start" }, T("pad.leg.menus")));
+            _legendPadBox.Add(PadLegendRow(new[] { "A" }, T("cmd.takeoff"), new[] { "B" }, T("cmd.land"), new[] { "X" }, T("cmd.hold"), new[] { "Y" }, T("cmd.rtl")));
+            _legendPadBox.style.display = DesktopPad.Instance != null && DesktopPad.Instance.Connected ? DisplayStyle.Flex : DisplayStyle.None;
+            _legendKeys.Add(_legendPadBox);
             _lastPadText = null;
+        }
+
+        private static VisualElement PadLegendRow(params object[] parts)
+        {
+            var row = new VisualElement { pickingMode = PickingMode.Ignore };
+            row.AddToClassList("dk-pilot-row");
+            for (int i = 0; i + 1 < parts.Length; i += 2)
+            {
+                foreach (string c in (string[])parts[i])
+                {
+                    var cap = new Label(c) { pickingMode = PickingMode.Ignore };
+                    cap.AddToClassList("dk-kbd");
+                    cap.AddToClassList("dk-pilot-cap");
+                    cap.AddToClassList("dk-pilot-padcap");
+                    row.Add(cap);
+                }
+                var t = new Label((string)parts[i + 1]) { pickingMode = PickingMode.Ignore };
+                t.AddToClassList("dk-pilot-text");
+                row.Add(t);
+            }
+            return row;
         }
 
         private string _lastPadText;
@@ -242,6 +270,17 @@ namespace WebGL.UI.Desktop
         }
 
         /// <summary>Window focus lost / app paused / pad gone: piloting ends and the drone holds (the web does the same).</summary>
+        /// <summary>The pad entered MENÚS mode: the drone must not keep a pad command. While piloting, `hold` is sent. True when it was sent.</summary>
+        public bool OnPadMenus()
+        {
+            _lastSticks = SimSticks.Neutral;
+            if (!_pilotOn || !DesktopTelemetry.AcceptsCommands) return false;
+            return SendPilotCommand(PilotCommand.Hold, "pad menus mode");
+        }
+
+        /// <summary>The pad is back in DRON mode (nothing to send: the next stick samples or buttons fly the drone).</summary>
+        public void OnPadDrone() { _lastSticks = SimSticks.Neutral; }
+
         public void PilotDeadMan(string reason)
         {
             if (!_pilotOn) return;
@@ -362,6 +401,16 @@ namespace WebGL.UI.Desktop
             }
             else if (_held != PilotKeys.None) _held = PilotKeys.None;
 
+            // the pad legend follows the pad connection; with the pad in DRON mode but piloting OFF a pad press explains what to do
+            DesktopPad padNow = DesktopPad.Instance;
+            bool padOn = padNow != null && padNow.Connected;
+            if (_legendPadBox != null) _legendPadBox.style.display = padOn ? DisplayStyle.Flex : DisplayStyle.None;
+            if (padOn && !_pilotOn && accepts && padNow.Mode == PadMode.Drone && (padNow.Edges & (PadButtons.A | PadButtons.B | PadButtons.X | PadButtons.Y)) != 0 && Time.unscaledTime - _padHintAt > 6f)
+            {
+                _padHintAt = Time.unscaledTime;
+                ShowToast(T("pad.hint.pilot"), false);
+            }
+
             if (client == null) { ClearFlyTarget(); _lastAckToast = null; _padSeen = false; return; }
 
             if (_pilotOn) ReadPilotInput(client);
@@ -371,7 +420,8 @@ namespace WebGL.UI.Desktop
 
         private void ReadPilotInput(TelemetryClient client)
         {
-            BlurFocus();
+            // Space must fly the drone, not press a focused button: the focus is dropped while piloting (except in the pad's MENUS mode, where the focus ring is the point)
+            if (!(DesktopPad.Instance != null && DesktopPad.Instance.MenusMode)) BlurFocus();
             bool ctrl = DesktopKeyboardGate.Ctrl || DesktopKeyboardGate.Alt;
             bool help = DesktopUIController.Instance != null && DesktopUIController.Instance.IsHelpOpen;
             bool listen = !ctrl && !help && !TypingNow();
@@ -395,33 +445,32 @@ namespace WebGL.UI.Desktop
             if (held != _held) { _held = held; RefreshCaps(); }
 
             SimSticks sticks = PilotControls.KeysToSticks(_held);
-#if UNITY_STANDALONE_WIN
-            if (listen && XInputPad.TryRead(out XInputPad.Reading pad))
+            // PLAN_PC 27.2: the pad (read once per frame by DesktopPad) flies the drone ONLY in DRON mode; in MENÚS mode the pilot ignores it
+            DesktopPad padSrc = DesktopPad.Instance;
+            if (padSrc != null && padSrc.Connected)
             {
                 _padSeen = true;
-                for (int i = 0; i < 4; i++)
+                if (padSrc.Mode == PadMode.Drone && listen)
                 {
-                    bool now = pad.Button(i);
-                    if (now && !_padButtons[i]) { PilotCommand? c = PilotControls.ButtonToCommand(i); if (c.HasValue) SendPilotCommand(c.Value, "pad " + "ABXY"[i]); }
-                    _padButtons[i] = now;
+                    PadState pad = padSrc.State;
+                    PadButtons[] faces = { PadButtons.A, PadButtons.B, PadButtons.X, PadButtons.Y };
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (!padSrc.Pressed(faces[i])) continue;
+                        PilotCommand? c = PilotControls.ButtonToCommand(i);
+                        if (c.HasValue) SendPilotCommand(c.Value, "pad " + "ABXY"[i]);
+                    }
+                    if (PilotControls.PadActive(pad.LeftX, pad.LeftY, pad.RightX, pad.RightY)) sticks = PilotControls.PadToSticks(pad.LeftX, pad.LeftY, pad.RightX, pad.RightY);
                 }
-                if (PilotControls.PadActive(pad.LeftX, pad.LeftY, pad.RightX, pad.RightY))
-                {
-                    sticks = PilotControls.PadToSticks(pad.LeftX, pad.LeftY, pad.RightX, pad.RightY);
-                }
-                SetPadText(T("pilot.legend.pad") + ": " + T("pilot.legend.pad.on"));
+                SetPadText(T(padSrc.Mode == PadMode.Menus ? "pad.badge.menus" : "pad.badge.drone"));
             }
             else if (_padSeen)
             {
                 _padSeen = false;
-                Array.Clear(_padButtons, 0, 4);
                 PilotDeadMan("the pad disconnected");
                 return;
             }
             else SetPadText(string.Empty);
-#else
-            SetPadText(string.Empty);
-#endif
             bool neutral = sticks.x == 0 && sticks.y == 0 && sticks.z == PilotControls.ThrottleHold && sticks.r == 0;
             if (!neutral) _pilotAuto = false; // the pilot took the sticks back from a click-to-fly
             if (!neutral && _pilotFlagLost) { _pilotFlagLost = false; client.Send(ClientMessage.Pilot(), out _); } // touching the sticks after land / hold / RTL takes control again
