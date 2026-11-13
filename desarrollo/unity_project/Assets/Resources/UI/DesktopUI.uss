@@ -2236,3 +2236,100 @@
 .desktop-help-tab:hover { border-color: rgba(70, 175, 255, 0.5); }
 .desktop-help-tab--on { color: rgb(255, 255, 255); border-color: rgba(70, 175, 255, 0.75); background-color: rgba(70, 175, 255, 0.16); }
 .desktop-help-padfoot { margin-top: 10px; }
+
+/* ================================================================
+   Phase 10 - fault and alert explanation (PLAN_PC 27.3, PC only): the explanation card, the fault banner and the marker pinned on the part.
+   Colours from design/tokens.json (state.crit #ff4d4d, state.warn #f5b942, celeste 70,175,255; same literals as above). The card is didactic: its own
+   background is neutral and the first block (the data) is the only one that is white; the origin tags reuse .dk-tag--*.
+   ================================================================ */
+.layout--desktop.chrome2 .dk-pop.dk-pop--w440 { width: 440px; }
+.dk-alert-list { max-height: 430px; }
+.dk-narrowbar .dk-alert-list { max-height: 300px; }
+.dk-alert-wrap { flex-direction: column; margin: 0 0 3px 0; }
+.dk-alert-line { flex-direction: row; align-items: stretch; }
+.dk-alert-line .dk-alert-row { flex-grow: 1; flex-shrink: 1; margin: 0; }
+.desktop-ui .dk-b.dk-fx-expand { flex-shrink: 0; align-self: center; height: 24px; min-width: 64px; margin: 0 0 0 6px; padding: 0 8px; font-size: 11.5px; }
+.dk-fx-scroll { max-height: 470px; margin-top: 4px; }
+.dk-narrowbar .dk-fx-scroll { max-height: 260px; }
+.dk-fx-scroll .unity-scroll-view__content-container { padding: 0 6px 0 0; }
+.dk-fx-pick { flex-direction: row; flex-wrap: wrap; margin: 2px 0 6px 0; }
+.desktop-ui .dk-b.dk-fx-pickbtn { height: 24px; margin: 0 6px 4px 0; padding: 0 9px; font-size: 11.5px; }
+.dk-fx-card { flex-direction: column; margin: 2px 0 4px 0; padding: 8px 10px 9px 10px; border-width: 1px; border-radius: 10px; border-color: rgba(255, 255, 255, 0.12); background-color: rgb(17, 20, 26); }
+.dk-fx-head { flex-direction: column; align-items: flex-start; margin: 0 0 3px 0; padding-bottom: 5px; border-bottom-width: 1px; border-color: rgba(255, 255, 255, 0.10); }
+.dk-fx-title { margin: 0; font-size: 12.5px; -unity-font-style: bold; letter-spacing: 0.3px; color: rgb(191, 234, 255); }
+.dk-fx-disclaimer { margin: 1px 0 0 0; font-size: 10.5px; color: rgb(139, 149, 163); }
+.dk-fx-bh { margin: 7px 0 1px 0; font-size: 11px; letter-spacing: 0.5px; -unity-font-style: bold; color: rgb(182, 192, 204); -unity-text-align: upper-left; }
+.dk-fx-body { margin: 0; font-size: 12px; color: rgb(204, 214, 226); white-space: normal; -unity-text-align: upper-left; }
+.dk-fx-body--data { color: rgb(255, 255, 255); }
+.dk-fx-body--none { color: rgb(139, 149, 163); }
+.dk-fx-readings { flex-direction: column; margin: 5px 0 0 0; }
+.dk-fx-rhead { margin: 0 0 2px 0; font-size: 10.5px; color: rgb(139, 149, 163); -unity-text-align: upper-left; }
+.dk-fx-rrow { flex-direction: row; flex-wrap: wrap; }
+.dk-fx-tag { margin: 0 5px 3px 0; }
+.dk-fx-srchead { flex-direction: row; align-items: center; flex-wrap: wrap; margin: 7px 0 1px 0; }
+.dk-fx-srchead .dk-fx-bh { margin: 0 8px 0 0; }
+.dk-fx-srcbadge { margin: 0; padding: 1px 7px; font-size: 10.5px; color: rgb(191, 234, 255); border-width: 1px; border-radius: 8px; border-color: rgba(70, 175, 255, 0.55); background-color: rgba(70, 175, 255, 0.14); }
+.dk-fx-body--src { padding: 5px 7px; border-left-width: 2px; border-color: rgba(70, 175, 255, 0.65); background-color: rgba(70, 175, 255, 0.06); }
+
+/* banner under the toast: a synthetic fault was injected / a critical alert appeared; the action opens the card */
+.dk-fx-banner {
+    position: absolute;
+    top: 164px;
+    left: 50%;
+    translate: -50% 0;
+    max-width: 620px;
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 8px 6px 12px;
+    border-width: 1px;
+    border-radius: 14px;
+    border-color: rgba(255, 77, 77, 0.75);
+    background-color: rgba(44, 14, 14, 0.95);
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 0.18s;
+    transition-timing-function: ease-out;
+}
+.dk-fx-banner--in { opacity: 1; }
+.dk-fx-bannericon { width: 16px; height: 16px; margin: 0 8px 0 0; }
+.dk-fx-bannertext { margin: 0; font-size: 13px; -unity-font-style: bold; color: rgb(255, 214, 214); white-space: normal; flex-shrink: 1; }
+.desktop-ui .dk-b.dk-fx-bannerbtn { flex-shrink: 0; height: 26px; margin: 0 4px 0 12px; padding: 0 12px; font-size: 12px; }
+.dk-reduce-motion .dk-fx-banner { transition-duration: 0s; }
+
+/* marker on the part: a red ring with the fault icon and a label chip (the pins' look: translucent ring + chip) */
+.dk-fx-layer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.dk-fx-anchor { position: absolute; width: 0; height: 0; }
+.dk-fx-ring {
+    position: absolute;
+    left: -13px;
+    top: -13px;
+    width: 26px;
+    height: 26px;
+    align-items: center;
+    justify-content: center;
+    border-width: 2px;
+    border-radius: 13px;
+    border-color: rgb(255, 77, 77);
+    background-color: rgba(255, 77, 77, 0.22);
+    scale: 1 1;
+    transition-property: scale, background-color;
+    transition-duration: 0.6s;
+    transition-timing-function: ease-in-out;
+}
+.dk-fx-ring--big { scale: 1.22 1.22; background-color: rgba(255, 77, 77, 0.38); }
+.dk-fx-ringicon { width: 12px; height: 12px; }
+.dk-fx-chip {
+    position: absolute;
+    left: 18px;
+    top: -30px;
+    flex-direction: row;
+    padding: 3px 9px;
+    border-width: 1px;
+    border-radius: 10px;
+    border-color: rgba(255, 77, 77, 0.8);
+    background-color: rgba(30, 10, 10, 0.92);
+}
+.dk-fx-chiptext { margin: 0; font-size: 11.5px; color: rgb(255, 214, 214); white-space: nowrap; }
+.dk-fx-chip--syn { border-color: rgba(245, 185, 66, 0.85); }
+.dk-fx-chip--syn .dk-fx-chiptext { color: rgb(255, 232, 178); }
+.dk-reduce-motion .dk-fx-ring { transition-duration: 0s; }

@@ -88,6 +88,7 @@ namespace WebGL.UI.Desktop
             if (SelectionManager.GroundClickHook == (System.Func<Vector2, bool>)TryGroundClick) SelectionManager.GroundClickHook = null;
             _legend?.RemoveFromHierarchy();
             _toast?.RemoveFromHierarchy();
+            DisposeFaultVisuals();
             _pulse?.Pause();
             _statusChip?.RemoveFromHierarchy();
             _sessionChip?.RemoveFromHierarchy();
@@ -163,6 +164,7 @@ namespace WebGL.UI.Desktop
             DesktopMotion.WatchVisible(_container);
 
             BuildPilotOverlay();
+            if (!PCDebugFlags.Has("nofxui")) BuildFaultVisuals(); // PLAN_PC 27.3: fault banner and the markers pinned on the parts (-pcdbg nofxui: diagnostics)
             BuildSheetTabs();
             UIDetailsSheet.DesktopKeepOpenOnDeselect = () => TelemetryTabActive;
             BuildStatusBarItem();
@@ -346,6 +348,7 @@ namespace WebGL.UI.Desktop
             RelabelPopovers();
             RelabelFlightTab();
             RelabelPilot();
+            RelabelFaultExplain();
         }
 
         private void OnRunningChanged(bool running)
@@ -476,6 +479,7 @@ namespace WebGL.UI.Desktop
             }
 
             if (Time.unscaledTime >= _nextSlowTick) _nextSlowTick = Time.unscaledTime + 0.1f;
+            TickFaultVisuals();
             TickPopovers();
             TickFlightTab();
             TickAnalysisTab();

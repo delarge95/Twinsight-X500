@@ -45,10 +45,12 @@ namespace WebGL.UI.Desktop
 
         private sealed class AlertRow
         {
-            public Button Root;
+            public VisualElement Wrap;
+            public Button Root, Expand;
             public VisualElement Dot;
             public Label Message, Meta;
             public string Id, Component;
+            public DesktopFaultCard Card;
         }
 
         // ───────────────────────── build ─────────────────────────
@@ -177,7 +179,7 @@ namespace WebGL.UI.Desktop
 
         private void BuildFaultsPopover()
         {
-            _popFaults = NewPopover("DkPopFaults", "dk-pop--w340", out _flTitle);
+            _popFaults = NewPopover("DkPopFaults", "dk-pop--w440", out _flTitle);
             var tagRow = new VisualElement();
             tagRow.AddToClassList("dk-fault-tagrow");
             _faultSyntheticTag = Text("dk-tag", tagRow);
@@ -229,8 +231,12 @@ namespace WebGL.UI.Desktop
             _popFaults.Add(_faultActiveList);
             _faultAck = Text("dk-note", _popFaults);
             _faultAck.AddToClassList("dk-note--muted");
+            BuildFaultExplain(_popFaults); // PLAN_PC 27.3: the explanation card (picker + four blocks)
             RefreshMotorButtons();
         }
+
+        /// <summary>Selects the motor of the injection buttons and of the card (verification harness and the banner action).</summary>
+        public void FaultMotorSelect(int motor) { if (motor >= 1 && motor <= 4) { _faultMotor = motor; RefreshMotorButtons(); } }
 
         private void RefreshMotorButtons()
         {
@@ -298,6 +304,7 @@ namespace WebGL.UI.Desktop
             _alertsHint.text = T("alerts.click");
 
             _flTitle.text = T("faults.title");
+            RelabelFaultExplain();
             _faultSyntheticTag.text = labels.FaultSynthetic(lang);
             _faultNote.text = T("faults.note");
             _faultMotorLabel.text = T("faults.motor");
@@ -374,7 +381,7 @@ namespace WebGL.UI.Desktop
             if (rebuild)
             {
                 _alertSig = sig;
-                while (_alertRows.Count > n) { _alertRows[_alertRows.Count - 1].Root.RemoveFromHierarchy(); _alertRows.RemoveAt(_alertRows.Count - 1); }
+                while (_alertRows.Count > n) { _alertRows[_alertRows.Count - 1].Wrap.RemoveFromHierarchy(); _alertRows.RemoveAt(_alertRows.Count - 1); }
                 while (_alertRows.Count < n) _alertRows.Add(MakeAlertRow());
             }
 
@@ -382,6 +389,7 @@ namespace WebGL.UI.Desktop
             _alertsEmpty.text = client == null ? T("alerts.off") : T("alerts.none");
             _alertsHint.style.display = n > 0 ? DisplayStyle.Flex : DisplayStyle.None;
             if (n == 0) return;
+            FitScroll(_alertList, 34f); // the hint under the list
 
             var labels = HonestyLabels.Load();
             string lang = Lang;
@@ -398,6 +406,20 @@ namespace WebGL.UI.Desktop
                 row.Dot.EnableInClassList("dk-dot--crit", a.severity == AlertSeverity.Critical);
                 row.Dot.EnableInClassList("dk-dot--warn", a.severity != AlertSeverity.Critical);
                 row.Root.tooltip = row.Meta.text;
+
+                // PLAN_PC 27.3: the explanation card, expanded under the alert (didactic; the first block is this alert's own sentence with its origin)
+                bool open = _alertOpen.Contains(a.id);
+                row.Expand.text = T_(open ? "fx.collapse" : "fx.expand");
+                row.Expand.EnableInClassList("dk-fx-expand--on", open);
+                row.Card.Show(open);
+                if (open)
+                {
+                    FaultTopic topic = FaultExplain.TopicOfAlert(a.id);
+                    string what = row.Message.text;
+                    Fault af = FaultExplain.IsApproved(topic) ? ActiveFaultOf(client, topic, MotorOfComponent(a.component), now) : null;
+                    if (af != null && AlertText.FaultHitsComponent(af, a.component)) what += "\n" + FaultExplain.FaultLine(af, now, lang);
+                    row.Card.Set(CardInput(topic, MotorOfComponent(a.component), a.id, what), lang, labels);
+                }
             }
         }
 
@@ -409,9 +431,15 @@ namespace WebGL.UI.Desktop
             return component ?? string.Empty;
         }
 
+        private static string T_(string key) => T(key);
+
         private AlertRow MakeAlertRow()
         {
             var r = new AlertRow();
+            r.Wrap = new VisualElement();
+            r.Wrap.AddToClassList("dk-alert-wrap");
+            var line = new VisualElement();
+            line.AddToClassList("dk-alert-line");
             r.Root = new Button();
             r.Root.AddToClassList("dk-alert-row");
             r.Dot = new VisualElement { pickingMode = PickingMode.Ignore };
@@ -424,7 +452,18 @@ namespace WebGL.UI.Desktop
             r.Root.Add(col);
             AlertRow captured = r;
             r.Root.clicked += () => SelectComponent(captured.Component);
-            _alertList.Add(r.Root);
+            line.Add(r.Root);
+            r.Expand = new Button { name = "DkAlertExpand" };
+            r.Expand.AddToClassList("dk-b");
+            r.Expand.AddToClassList("dk-b--pill");
+            r.Expand.AddToClassList("dk-fx-expand");
+            r.Expand.clicked += () => ToggleAlertCard(captured.Id);
+            line.Add(r.Expand);
+            r.Wrap.Add(line);
+            r.Card = new DesktopFaultCard("DkFxCardAlert");
+            r.Card.Show(false);
+            r.Wrap.Add(r.Card.Root);
+            _alertList.Add(r.Wrap);
             return r;
         }
 
@@ -449,6 +488,8 @@ namespace WebGL.UI.Desktop
             bool canInject = local && client.Hello != null && client.Hello.Accepts("inject");
 
             _faultControls.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
+            // the "sintética" tag belongs to the local replay's injection only: PX4 SITL and the simulator have no synthetic faults
+            _faultSyntheticTag.style.display = local ? DisplayStyle.Flex : DisplayStyle.None;
             string off = client == null ? T("faults.off") : simulator ? T("faults.sim") : sitl ? T("faults.sitl") : !canInject && !local ? T("faults.off") : string.Empty;
             _faultOff.text = off;
             _faultOff.style.display = string.IsNullOrEmpty(off) ? DisplayStyle.None : DisplayStyle.Flex;
@@ -459,12 +500,27 @@ namespace WebGL.UI.Desktop
             double now = client != null && client.Displayed != null ? client.Displayed.ts : ReplaySchedule.WallClockMs();
             var active = canInject ? Faults.Active(client.Faults, now) : new List<Fault>();
             while (_faultActiveRows.Count > active.Count) { _faultActiveRows[_faultActiveRows.Count - 1].RemoveFromHierarchy(); _faultActiveRows.RemoveAt(_faultActiveRows.Count - 1); }
-            while (_faultActiveRows.Count < active.Count) { var l = Text("dk-fault-row"); _faultActiveList.Add(l); _faultActiveRows.Add(l); }
+            while (_faultActiveRows.Count < active.Count)
+            {
+                var l = Text("dk-fault-row");
+                l.pickingMode = PickingMode.Position; // a click on an active fault shows its explanation
+                Label captured = l;
+                l.RegisterCallback<ClickEvent>(_ =>
+                {
+                    if (!(captured.userData is Fault ff)) return;
+                    _fxTopic = FaultExplain.TopicOf(ff.kind);
+                    if (ff.HasMotor && ff.motor >= 1) { _faultMotor = ff.motor; RefreshMotorButtons(); }
+                    _nextPopTick = 0f;
+                });
+                _faultActiveList.Add(l);
+                _faultActiveRows.Add(l);
+            }
             for (int i = 0; i < active.Count; i++)
             {
                 Fault f = active[i];
                 string kindName = T("faults." + WireNames.Of(f.kind));
                 if (f.HasMotor && f.motor != 0) kindName += " " + f.motor;
+                _faultActiveRows[i].userData = f;
                 _faultActiveRows[i].text = kindName + " · " + Math.Max(0, (int)Math.Ceiling((f.until - now) / 1000.0)) + " s · " + AlertText.SyntheticFault(Lang, HonestyLabels.Load());
             }
 
@@ -477,6 +533,8 @@ namespace WebGL.UI.Desktop
 
             _faultAck.text = canInject ? _ackText : string.Empty;
             _faultAck.style.display = canInject && !string.IsNullOrEmpty(_ackText) ? DisplayStyle.Flex : DisplayStyle.None;
+            TickFaultCard(client);
+            FitScroll(_fxScroll, 8f);
         }
 
         /// <summary>Synthetic injection on the local replay: validated like the web (Faults.Validate), sent as a normal client message.</summary>
@@ -492,6 +550,7 @@ namespace WebGL.UI.Desktop
             }
 
             bool sent = client.Send(ClientMessage.Inject(k, m), out string reason);
+            _fxTopic = FaultExplain.TopicOf(k); // the card follows the fault that was just injected
             if (!sent) _ackText = "inject: " + T("faults.ack.rejected") + " (" + reason + ")";
             _nextPopTick = 0f;
             return sent;

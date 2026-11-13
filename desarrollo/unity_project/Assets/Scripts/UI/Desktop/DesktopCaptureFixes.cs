@@ -180,6 +180,7 @@ namespace WebGL.UI.Desktop
 
             yield return GateChecks();
             yield return PadChecks();
+            yield return FaultChecks();
 
             Log("RESULT " + _pass + " pass, " + _fail + " fail");
             File.WriteAllText(Path.Combine(OutputDirectory, "fix_" + _tag + ".log"), _log.ToString());
@@ -631,6 +632,151 @@ namespace WebGL.UI.Desktop
             yield return Frames(3);
         }
 
+        // ═════════════════════════════ C. faults ═════════════════════════════
+
+        private IEnumerator FaultChecks()
+        {
+            Log("── C. fault visuals and explanation ──");
+            string lang = Lang;
+            var labels = HonestyLabels.Load();
+            OrbitCameraController.Instance?.SetAngles(-28f, 20f, true);
+            OrbitCameraController.Instance?.SetDistance(8f, true);
+            Tel.OpenMode();
+            DesktopTelemetry.StartLocalReplay(300.0);
+            yield return new WaitForSecondsRealtime(2.5f);
+            Check("replay running (local, read-only)", DesktopTelemetry.IsLocalReplay);
+
+            // card before any fault: replay text, approved, with the honest label
+            Click(B("DkTelFaults"));
+            yield return new WaitForSecondsRealtime(0.6f);
+            var card = Tel.FaultsCard;
+            Check("faults popover shows the explanation card (default: motor cut)", Shown(card.Root) && Tel.ExplainTopic == FaultTopic.MotorFailure);
+            Check("card is labelled «Explicación didáctica» and 'not a measurement'", card.TitleText == T("fx.title") && card.DisclaimerText == T("fx.disclaimer"));
+            Check("card means / controller are the approved texts", card.MeansText == FaultExplain.Means(FaultTopic.MotorFailure, lang) && card.ControllerText == FaultExplain.Controller(FaultTopic.MotorFailure, lang));
+            Check("card 'in this source' (replay): the trajectory does not react, the other motors do not compensate",
+                  card.SourceText.Contains(lang == "es" ? "no reaccionan" : "do not react") && card.SourceText.Contains(lang == "es" ? "tampoco compensan" : "do not compensate"));
+            Check("card source badge = the honest replay badge", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang));
+            Check("card affected readings carry their origin (" + card.ReadingTags + " tags)", card.ReadingTags >= 1 && (card.ReadingTagText(0) ?? string.Empty).Contains(" · "));
+            Check("card 'what is happening' says none active", card.WhatText == T("fx.what.none"));
+            yield return Shot("C1_tarjeta_repeticion_sin_falla", 0.2f);
+            Tel.CloseAllPopovers();
+
+            // inject motor 3 failure: banner, marker, countdown
+            Tel.FaultMotorSelect(3);
+            Tel.Inject(FaultKind.MotorFailure);
+            yield return new WaitForSecondsRealtime(1.2f);
+            Check("banner appears on the injection with the fault name and «falla sintética»", Tel.BannerVisible && Tel.BannerTextNow.Contains("Motor 3") && Tel.BannerTextNow.Contains(AlertText.SyntheticFault(lang, labels)));
+            Check("banner action reads «Ver qué pasa»", Tel.BannerViewButton.text == T("fx.banner.view"));
+            var mk = Tel.FaultMarkers;
+            string mkKey = null;
+            foreach (string k in mk.Keys) if (k.StartsWith("f:")) mkKey = k;
+            Check("a marker is pinned on motor 3 and visible", mkKey != null && mk.IsVisible(mkKey) && mk.ComponentOf(mkKey) == "motor3");
+            Check("marker label: motor 3, stopped, synthetic", mkKey != null && mk.LabelOf(mkKey).Contains("Motor 3") && mk.LabelOf(mkKey).Contains(AlertText.SyntheticFault(lang, labels)));
+            var scr = mk.ScreenOf(mkKey ?? "none");
+            Check("marker is on screen (" + (scr.HasValue ? scr.Value.ToString() : "n/a") + ")", scr.HasValue && scr.Value.x > 0 && scr.Value.x < Screen.width && scr.Value.y > 0 && scr.Value.y < Screen.height);
+            var drv = TelemetryDroneDriver.Instance;
+            yield return Shot("C2_banner_marcador_motor3", 0.2f);
+
+            // open the card from the banner
+            Click(Tel.BannerViewButton);
+            yield return new WaitForSecondsRealtime(0.6f);
+            Check("«Ver qué pasa» opens the Faults popover on that fault", Tel.OpenPopover == "faults" && !Tel.BannerVisible && Tel.ExplainTopic == FaultTopic.MotorFailure);
+            card = Tel.FaultsCard;
+            Check("card 'what is happening': the fault with its countdown (seconds of 30 s)", card.WhatText.Contains(lang == "es" ? "Motor 3 cortado" : "Motor 3 cut off") && card.WhatText.Contains(" s "));
+            string w1 = card.WhatText;
+            Log("what (t0): " + w1.Replace("\n", " | "));
+            yield return Shot("C3_tarjeta_repeticion_motor3_activa", 0.2f);
+            yield return new WaitForSecondsRealtime(2.6f);
+            Log("what (t0+2.6s): " + Tel.FaultsCard.WhatText.Replace("\n", " | "));
+            Check("the countdown went down", ParseSeconds(Tel.FaultsCard.WhatText) < ParseSeconds(w1));
+            Check("with the alert: the card also carries the alert sentence with its origin (RPM ... estimated/simulated)", Tel.FaultsCard.WhatText.Contains("RPM") || Tel.FaultsCard.WhatText.Contains("Motor 3:"));
+            Tel.CloseAllPopovers();
+
+            // alerts popover: expanded card under the alert
+            yield return new WaitForSecondsRealtime(1.0f);
+            var alerts = DesktopTelemetry.Client.Alerts;
+            string aid = null;
+            foreach (var a in alerts) if (a.id == "motor3:out") aid = a.id;
+            Log("alerts now: " + alerts.Count + " (motor3:out " + (aid != null ? "present" : "absent") + ")");
+            Check("the fault raised the 'motor 3 stopped' alert", aid != null);
+            Check("the existing red highlight of the part is still there (motor 3)", TelemetryDroneDriver.Instance != null && new List<string>(TelemetryDroneDriver.Instance.HighlightedComponents).Contains("motor3"));
+            Tel.OpenAlertCard(aid ?? "motor3:out");
+            yield return new WaitForSecondsRealtime(0.8f);
+            Check("alerts popover shows the card expanded under the alert", Tel.OpenPopover == "alerts" && Tel.AlertExpanded("motor3:out") && Tel.AlertCards.Count > 0 && Shown(Tel.AlertCards[0].Root));
+            bool okCard = false;
+            foreach (var ac in Tel.AlertCards) if (Shown(ac.Root) && ac.WhatText.Contains(AlertText.SyntheticFault(lang, labels)) && ac.SourceText.Contains(lang == "es" ? "Falla sintética" : "Synthetic fault")) okCard = true;
+            Check("alert card: synthetic suffix in the data block and the approved replay text", okCard);
+            yield return Shot("C4_alertas_tarjeta_expandida", 0.2f);
+            Tel.CloseAllPopovers();
+
+            // the other approved texts through the picker
+            FaultKind[] kinds = { FaultKind.MotorOverheat, FaultKind.BatterySag, FaultKind.Vibration };
+            FaultTopic[] topics = { FaultTopic.MotorOverheat, FaultTopic.BatterySag, FaultTopic.Vibration };
+            Click(B("DkTelFaults"));
+            yield return new WaitForSecondsRealtime(0.4f);
+            for (int i = 0; i < 3; i++)
+            {
+                Click(B("DkFxPick_" + WireNames.Of(kinds[i])));
+                yield return new WaitForSecondsRealtime(0.5f);
+                card = Tel.FaultsCard;
+                Check(kinds[i] + ": card shows the approved means / controller / replay text", Tel.ExplainTopic == topics[i] && card.MeansText == FaultExplain.Means(topics[i], lang) && card.ControllerText == FaultExplain.Controller(topics[i], lang)
+                      && card.SourceText == FaultExplain.InSource(topics[i], ExplainSource.LocalReplay, 3, lang));
+                if (i == 0) yield return Shot("C5_tarjeta_sobrecalentamiento", 0.2f);
+            }
+            Tel.CloseAllPopovers();
+            Tel.ClearFaults();
+            yield return new WaitForSecondsRealtime(1.0f);
+            Check("clearing the faults removes the markers", Tel.FaultMarkers.Count == 0 || AllAlertMarkers(Tel.FaultMarkers));
+
+            // simulator: no fault injection
+            Tel.StartSimulator();
+            yield return new WaitForSecondsRealtime(1.5f);
+            Click(B("DkTelFaults"));
+            yield return new WaitForSecondsRealtime(0.6f);
+            card = Tel.FaultsCard;
+            Check("simulator: the card says the simulator does not inject faults", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Simulator, 3, lang) && card.SourceText.Contains(lang == "es" ? "no inyecta fallas" : "does not inject faults"));
+            Check("simulator: the card badge is the simulator's, never SITL", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang) && !card.SourceBadgeText.ToUpperInvariant().Contains("SITL"));
+            Check("simulator: no markers (no fault can exist here)", Tel.FaultMarkers.Count == 0);
+            yield return Shot("C6_tarjeta_simulador", 0.2f);
+            Click(B("DkFxPick_battery_sag"));
+            yield return new WaitForSecondsRealtime(0.5f);
+            Check("simulator + battery: its own approved text (drains, does not react to low charge)", Tel.FaultsCard.SourceText == FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Simulator, 3, lang));
+            Tel.CloseAllPopovers();
+
+            // PX4 SITL: a session that never connects (nothing listens): the card still says what PX4 / Gazebo do
+            Tel.StartSitl("ws://127.0.0.1:9");
+            yield return new WaitForSecondsRealtime(1.2f);
+            Check("SITL session started (not connected)", DesktopTelemetry.IsRunning && DesktopTelemetry.Client.Classification == SourceClassification.Sitl);
+            Click(B("DkTelFaults"));
+            yield return new WaitForSecondsRealtime(0.6f);
+            Click(B("DkFxPick_motor_failure"));
+            yield return new WaitForSecondsRealtime(0.5f);
+            card = Tel.FaultsCard;
+            Check("SITL: the card has the Gazebo caveat and says the RPM are PX4's command", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Sitl, 3, lang)
+                  && card.SourceText.Contains("MAV_CMD_INJECT_FAILURE") && card.SourceText.Contains(lang == "es" ? "Gazebo puede no detener el rotor" : "Gazebo may not stop the rotor") && card.SourceText.Contains(lang == "es" ? "orden de PX4" : "PX4's command"));
+            Check("SITL: the card badge is the SITL one from labels.json", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang));
+            yield return Shot("C7_tarjeta_sitl", 0.2f);
+            Tel.CloseAllPopovers();
+            Tel.StopSession();
+            Tel.CloseMode();
+            yield return Frames(3);
+        }
+
+        private static bool AllAlertMarkers(DesktopFaultMarkers m)
+        {
+            foreach (string k in m.Keys) if (k.StartsWith("f:")) return false;
+            return true;
+        }
+
+        private static int ParseSeconds(string what)
+        {
+            // "Motor 3 cortado · 24 s restantes de 30 s" -> 24
+            int dot = what.IndexOf('·');
+            if (dot < 0) return 999;
+            string rest = what.Substring(dot + 1).Trim();
+            int sp = rest.IndexOf(' ');
+            return sp > 0 && int.TryParse(rest.Substring(0, sp), out int s) ? s : 999;
+        }
     }
 }
 #endif
