@@ -1,0 +1,418 @@
+#if UNITY_STANDALONE
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using UnityEngine;
+using UnityEngine.UIElements;
+using WebGL.Core.Content;
+using WebGL.Core.Managers;
+using WebGL.Telemetry;
+using WebGL.UI.Panels;
+
+namespace WebGL.UI.Desktop
+{
+    /// <summary>
+    /// Verification of PLAN_PC 27 (-desk-fix &lt;folder&gt;, plus -lang es|en and the window flags). In-player probes: no OS mouse, keyboard or pad.
+    ///  A. Typing gate: with the part-tree search box (and the SITL URL field) focused, every hotkey is injected through the DesktopKeyboardGate seams
+    ///     (plus the typed character into the field) and NOTHING changes while the text arrives; the control (the same keys with the field blurred) does act.
+    ///  B. Game pad: the XInput state is a FAKE (PadSource.Provider; nobody can plug a pad into a probe). DRON mode: navigation that does not come from the
+    ///     keyboard is stopped, the pad flies the drone; Start -> MENUS: the pad moves the focus / activates / goes back / steps the modes / scrolls and the
+    ///     drone gets nothing (hold on entering); Start -> DRON again; unplugging while piloting is the dead-man.
+    ///  C. Faults: the explanation card per source, the banner, the marker on the part, the countdown, the approved texts.
+    /// One PNG per state (tag = WxH_lang) and PASS / FAIL lines. Not active unless the flag is given.
+    /// </summary>
+    internal sealed class DesktopCaptureFixes : MonoBehaviour
+    {
+        public string OutputDirectory;
+        private int _fail, _pass;
+        private readonly StringBuilder _log = new StringBuilder();
+        private string _tag;
+        private readonly HashSet<KeyCode> _held = new HashSet<KeyCode>();
+        private readonly Dictionary<KeyCode, int> _pressAt = new Dictionary<KeyCode, int>();
+        private int _typedAt = -10;
+        private string _typed = string.Empty;
+
+        /// <summary>-desk-check drives only the typing gate (RunGateOnly) from DesktopSelfCheck: this component then does not start by itself.</summary>
+        public bool ExternalDrive;
+        /// <summary>-desk-fix-real: NO injected keys. A script (tools) sends the real keys with SendKeys to the foreground window; this component checks the result.</summary>
+        public bool RealKeys;
+        public int Failures => _fail;
+
+        private void Start() { if (!ExternalDrive) StartCoroutine(Run()); }
+
+        private void InstallSeams()
+        {
+            PlayerPrefs.SetInt("Onboarding_Seen", 1);
+            if (RealKeys) { DesktopTelemetryUI.IgnoreFocusLoss = false; return; }
+            DesktopKeyboardGate.KeyHeld = k => _held.Contains(k);
+            DesktopKeyboardGate.KeyPressed = k => _pressAt.TryGetValue(k, out int f) && Time.frameCount == f + 1;
+            DesktopKeyboardGate.InputString = () => Time.frameCount == _typedAt + 1 ? _typed : string.Empty;
+            DesktopTelemetryUI.IgnoreFocusLoss = true;
+        }
+
+        /// <summary>The regression check of the typing gate alone (called by -desk-check at its end).</summary>
+        internal IEnumerator RunGateOnly()
+        {
+            Directory.CreateDirectory(OutputDirectory);
+            InstallSeams();
+            _tag = Screen.width + "x" + Screen.height + "_" + Lang;
+            yield return GateChecks();
+            Log("GATE RESULT " + _pass + " pass, " + _fail + " fail");
+            File.WriteAllText(Path.Combine(OutputDirectory, "gate_" + _tag + ".log"), _log.ToString());
+            DesktopKeyboardGate.ResetSeams();
+            ForgetProbePrefs();
+        }
+
+        /// <summary>The probes start sources and a SITL URL: the user's saved choices (PlayerPrefs of this PC) are put back to their defaults.</summary>
+        private static void ForgetProbePrefs()
+        {
+            PlayerPrefs.DeleteKey(DesktopTelemetryUI.PrefSource);
+            PlayerPrefs.DeleteKey(DesktopTelemetryUI.PrefSitlUrl);
+            PlayerPrefs.Save();
+        }
+        private void Log(string s) { _log.AppendLine(s); Debug.Log("[FixUI] " + s); }
+
+        private void Check(string name, bool ok)
+        {
+            if (ok) _pass++; else _fail++;
+            Log((ok ? "PASS " : "FAIL ") + name);
+        }
+
+        private static void Click(Button b)
+        {
+            if (b == null) return;
+            using (var e = NavigationSubmitEvent.GetPooled()) { e.target = b; b.SendEvent(e); }
+        }
+
+        private VisualElement Root => UIManager.Instance.Root;
+        private Button B(string n) => Root.Q<Button>(n);
+        private DesktopUIController Ctrl => DesktopUIController.Instance;
+        private DesktopTelemetryUI Tel => Ctrl.Chrome.Telemetry;
+        private static string Lang => AppLanguageManager.IsSpanish ? "es" : "en";
+        private SimTelemetrySource Sim => DesktopTelemetry.Source as SimTelemetrySource;
+        private static bool Shown(VisualElement e) => e != null && e.resolvedStyle.display != DisplayStyle.None;
+        private static string T(string key) => TelemetryStrings.T(key, Lang);
+        private VisualElement FocusedEl => Root.panel.focusController.focusedElement as VisualElement;
+
+        private IEnumerator Shot(string name, float wait = 0.4f)
+        {
+            yield return new WaitForSecondsRealtime(wait);
+            yield return new WaitForEndOfFrame();
+            var tex = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+            tex.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+            tex.Apply();
+            File.WriteAllBytes(Path.Combine(OutputDirectory, _tag + "_" + name + ".png"), ImageConversion.EncodeToPNG(tex));
+            Destroy(tex);
+            Log("shot " + _tag + "_" + name);
+        }
+
+        private IEnumerator Frames(int n) { for (int i = 0; i < n; i++) yield return null; }
+
+        // keys through the gate seams
+        private void Hold(params KeyCode[] keys) { foreach (var k in keys) _held.Add(k); }
+        private void Release(params KeyCode[] keys) { foreach (var k in keys) _held.Remove(k); }
+        private void Press(KeyCode k) { _pressAt[k] = Time.frameCount; }
+        private void TypeChar(char c) { _typedAt = Time.frameCount; _typed = c.ToString(); }
+
+        private string Snapshot()
+        {
+            var sb = new StringBuilder();
+            sb.Append("mode=").Append((Root.Q<Button>(className: "dk-seg-btn--on")?.name ?? "-"));
+            sb.Append(" pins=").Append(HotspotManager.Instance != null && HotspotManager.Instance.IsVisible);
+            sb.Append(" tree=").Append(Ctrl.Tree.IsOpen);
+            sb.Append(" tel=").Append(Tel.ModeOpen);
+            sb.Append(" help=").Append(Ctrl.IsHelpOpen);
+            sb.Append(" pop=").Append(Tel.OpenPopover ?? "-");
+            sb.Append(" pilot=").Append(Tel.Piloting);
+            sb.Append(" ack=").Append(DesktopTelemetry.Client != null && DesktopTelemetry.Client.LastAck != null ? DesktopTelemetry.Client.LastAck.command : "-");
+            sb.Append(" explode=").Append(ExplodedViewManager.Instance != null ? ExplodedViewManager.Instance.GetExplosionFactor().ToString("0.00") : "-");
+            sb.Append(" view=").Append(ViewModeManager.Instance != null ? ViewModeManager.Instance.CurrentMode.ToString() : "-");
+            sb.Append(" cam=").Append(Camera.main != null ? Mathf.Round(Camera.main.transform.position.x) + "," + Mathf.Round(Camera.main.transform.position.y) + "," + Mathf.Round(Camera.main.transform.position.z) : "-");
+            sb.Append(" held=").Append(Tel.HeldKeys);
+            return sb.ToString();
+        }
+
+        private IEnumerator Run()
+        {
+            Directory.CreateDirectory(OutputDirectory);
+            PlayerPrefs.DeleteKey(DesktopTelemetryUI.PrefSource);
+            InstallSeams();
+            yield return new WaitForSecondsRealtime(7f);
+            AccessibilityManager.Instance?.SetUIScale(1f);
+            yield return new WaitForSecondsRealtime(0.5f);
+            _tag = Screen.width + "x" + Screen.height + "_" + Lang;
+            UIManager ui = UIManager.Instance;
+            ui.PrepareViewerForDeepLink();
+            yield return new WaitForSecondsRealtime(3f);
+            if (ui.IsOnboardingOpen) { ui.ShortcutBack(); yield return new WaitForSecondsRealtime(1f); }
+            OrbitCameraController.Instance?.ResetView();
+            OrbitCameraController.Instance?.SetAngles(-28f, 20f, true);
+            OrbitCameraController.Instance?.SetDistance(9f, true);
+            yield return new WaitForSecondsRealtime(1.5f);
+            Log("window " + Screen.width + "x" + Screen.height + " lang " + Lang);
+
+            if (RealKeys)
+            {
+                yield return RealKeyChecks();
+                Log("RESULT " + _pass + " pass, " + _fail + " fail");
+                File.WriteAllText(Path.Combine(OutputDirectory, "real_" + _tag + ".log"), _log.ToString());
+                ForgetProbePrefs();
+                Application.Quit();
+                yield break;
+            }
+
+            yield return GateChecks();
+
+            Log("RESULT " + _pass + " pass, " + _fail + " fail");
+            File.WriteAllText(Path.Combine(OutputDirectory, "fix_" + _tag + ".log"), _log.ToString());
+            DesktopKeyboardGate.ResetSeams();
+            ForgetProbePrefs();
+            Application.Quit();
+        }
+
+        // ═════════════════════════════ A0. the typing gate with the REAL keyboard ═════════════════════════════
+
+        private IEnumerator WaitFlag(string name, float seconds)
+        {
+            string path = Path.Combine(OutputDirectory, name);
+            float until = Time.realtimeSinceStartup + seconds;
+            while (!File.Exists(path) && Time.realtimeSinceStartup < until) yield return null;
+        }
+
+        /// <summary>
+        /// Real OS keys (sent by tools/real_keys.ps1 to the foreground .exe): the part-tree search box focused the way Ctrl+F and "/" do, then every hotkey
+        /// character; the state must not change and the text must arrive. Then the same for the SITL field. Flags: ready_*.flag (here) / done_*.flag (script).
+        /// </summary>
+        private IEnumerator RealKeyChecks()
+        {
+            Log("── A0. typing gate, REAL keyboard ──");
+            var tree = Ctrl.Tree;
+            for (int round = 0; round < 2; round++)
+            {
+                TextField field;
+                string label;
+                if (round == 0)
+                {
+                    tree.Open(true); // what "/" and Ctrl+F do: SetOpen + FocusSearch (programmatic focus on the field itself)
+                    yield return new WaitForSecondsRealtime(0.9f);
+                    field = tree.SearchField;
+                    label = "real keys, search box";
+                }
+                else
+                {
+                    Tel.OpenMode();
+                    yield return Frames(3);
+                    Click(B("DkTelSource"));
+                    yield return new WaitForSecondsRealtime(0.3f);
+                    Click(B("DkSrcSitl"));
+                    yield return new WaitForSecondsRealtime(0.4f);
+                    field = Root.Q<TextField>("DkSitlUrl");
+                    field.value = string.Empty;
+                    field.Focus(); // programmatic focus on the field itself
+                    yield return new WaitForSecondsRealtime(0.4f);
+                    label = "real keys, SITL field";
+                }
+                Check(label + ": the focused field counts as typing", DesktopKeyboardGate.Typing);
+                string before = Snapshot();
+                string textBefore = field.value;
+                Log("application focused: " + Application.isFocused);
+                File.WriteAllText(Path.Combine(OutputDirectory, "ready_" + round + ".flag"), "ready");
+                yield return WaitFlag("done_" + round + ".flag", 45f);
+                yield return new WaitForSecondsRealtime(0.6f);
+                string after = Snapshot();
+                // the script sends 1234fhierctplgvwasdq, Shift+A, Home, F1, then ? / [ ] and a space: Home is the field's own editing key (the caret goes to the start), so the last five characters land in front
+                string expected = "?/[] " + textBefore + "1234fhierctplgvwasdqA";
+                Log(label + " text: \"" + field.value + "\" (expected \"" + expected + "\")");
+                Check(label + ": nothing changed while the real keys went into the field (" + before + ")", before == after);
+                Check(label + ": the typed characters arrived in the field", field.value == expected);
+                Check(label + ": still typing", DesktopKeyboardGate.Typing);
+                yield return Shot("A0_" + (round == 0 ? "buscador" : "url_sitl") + "_teclas_reales", 0.1f);
+                File.WriteAllText(Path.Combine(OutputDirectory, "shot_" + round + ".flag"), "shot");
+                yield return WaitFlag("esc_" + round + ".flag", 15f);
+                yield return new WaitForSecondsRealtime(0.5f);
+                Check(label + ": Esc (real) leaves the field", !DesktopKeyboardGate.Typing);
+                if (round == 0) { tree.SetOpen(false); yield return new WaitForSecondsRealtime(0.4f); }
+                else { Tel.CloseAllPopovers(); Tel.CloseMode(); yield return Frames(3); }
+            }
+        }
+
+        // ═════════════════════════════ A. the typing gate ═════════════════════════════
+
+        private struct Hot { public KeyCode Key; public char Ch; public bool Shift; public string Name; }
+
+        private static readonly Hot[] Hotkeys =
+        {
+            new Hot { Key = KeyCode.Alpha1, Ch = '1', Name = "1" }, new Hot { Key = KeyCode.Alpha2, Ch = '2', Name = "2" },
+            new Hot { Key = KeyCode.Alpha3, Ch = '3', Name = "3" }, new Hot { Key = KeyCode.Alpha4, Ch = '4', Name = "4" },
+            new Hot { Key = KeyCode.F, Ch = 'f', Name = "F" }, new Hot { Key = KeyCode.H, Ch = 'h', Name = "H" },
+            new Hot { Key = KeyCode.I, Ch = 'i', Name = "I" }, new Hot { Key = KeyCode.E, Ch = 'e', Name = "E" },
+            new Hot { Key = KeyCode.R, Ch = 'r', Name = "R" }, new Hot { Key = KeyCode.C, Ch = 'c', Name = "C" },
+            new Hot { Key = KeyCode.G, Ch = 'g', Name = "G" }, new Hot { Key = KeyCode.V, Ch = 'v', Name = "V" },
+            new Hot { Key = KeyCode.T, Ch = 't', Name = "T" }, new Hot { Key = KeyCode.P, Ch = 'p', Name = "P" },
+            new Hot { Key = KeyCode.L, Ch = 'l', Name = "L" }, new Hot { Key = KeyCode.A, Ch = 'A', Shift = true, Name = "Shift+A" },
+            new Hot { Key = KeyCode.Home, Ch = '\0', Name = "Home" }, new Hot { Key = KeyCode.F1, Ch = '\0', Name = "F1" },
+            new Hot { Key = KeyCode.Slash, Ch = '?', Shift = true, Name = "?" }, new Hot { Key = KeyCode.Slash, Ch = '/', Name = "/" },
+            new Hot { Key = KeyCode.LeftBracket, Ch = '[', Name = "[" }, new Hot { Key = KeyCode.RightBracket, Ch = ']', Name = "]" },
+            new Hot { Key = KeyCode.W, Ch = 'w', Name = "W" }, new Hot { Key = KeyCode.S, Ch = 's', Name = "S" }, new Hot { Key = KeyCode.D, Ch = 'd', Name = "D" },
+            new Hot { Key = KeyCode.Q, Ch = 'q', Name = "Q" }, new Hot { Key = KeyCode.Space, Ch = ' ', Name = "Space" },
+        };
+
+        private IEnumerator InjectHotkeys(TextField field, string label)
+        {
+            string before = Snapshot();
+            string initial = before;
+            string expectedText = field.value;
+            foreach (Hot h in Hotkeys)
+            {
+                if (h.Shift) Hold(KeyCode.LeftShift);
+                Press(h.Key);
+                if (h.Ch != '\0')
+                {
+                    TypeChar(h.Ch);
+                    // the character goes to the inner input of the field (what the keyboard does once the field has the focus)
+                    VisualElement target = field.Q<TextElement>() ?? FocusedEl;
+                    if (target != null)
+                    {
+                        using (var e = KeyDownEvent.GetPooled(h.Ch, h.Key, h.Shift ? EventModifiers.Shift : EventModifiers.None)) { e.target = target; target.SendEvent(e); }
+                        expectedText += h.Ch;
+                    }
+                }
+                yield return Frames(2);
+                if (h.Shift) Release(KeyCode.LeftShift);
+                string now = Snapshot();
+                if (now != before) { Check(label + ": " + h.Name + " changed the state while typing (" + before + " -> " + now + ")", false); before = now; }
+            }
+            Hold(KeyCode.LeftShift);
+            yield return Frames(2);
+            Release(KeyCode.LeftShift);
+            Check(label + ": " + Hotkeys.Length + " hotkeys injected while typing: nothing changed (mode, pins, tree, telemetry, help, popover, pilot, commands, explode, view, camera)", Snapshot() == initial);
+            Log(label + " text in the field: \"" + field.value + "\"");
+            Check(label + ": the typed characters arrived in the text field (\"" + field.value + "\")", field.value == expectedText);
+        }
+
+        private IEnumerator GateChecks()
+        {
+            Log("── A. typing gate ──");
+            var tree = Ctrl.Tree;
+            Check("gate: no text field focused at the start, so no typing", !DesktopKeyboardGate.Typing);
+
+            // control: with nothing focused, key 4 opens Telemetry mode and H toggles the pins (the injection reaches the handlers)
+            bool pins0 = HotspotManager.Instance.IsVisible;
+            Press(KeyCode.H);
+            yield return Frames(3);
+            Check("control: H (no field focused) toggles the pins", HotspotManager.Instance.IsVisible != pins0);
+            Press(KeyCode.H);
+            yield return Frames(3);
+            Press(KeyCode.Alpha4);
+            yield return Frames(4);
+            Check("control: key 4 (no field focused) opens Telemetry mode", Tel.ModeOpen);
+            Press(KeyCode.Alpha4);
+            yield return Frames(4);
+            Check("control: key 4 again closes it", !Tel.ModeOpen);
+
+            // 1. the part-tree search box
+            tree.SetOpen(true);
+            yield return new WaitForSecondsRealtime(0.6f);
+            // programmatic focus = what Ctrl+F and "/" do: the FIELD itself holds the focus (it is not an ITextEdition: the bug of the old check)
+            tree.SearchField.Focus();
+            yield return Frames(3);
+            Check("gate: the search box focused the way Ctrl+F / '/' do counts as typing", DesktopKeyboardGate.Typing && tree.SearchFocused && FocusedEl == tree.SearchField);
+            // a mouse click focuses the inner input: the keys are typed there
+            tree.SearchField.Q<TextElement>().Focus();
+            yield return Frames(3);
+            Check("gate: the search box focused by a click (inner input) counts as typing", DesktopKeyboardGate.Typing && tree.SearchFocused);
+            yield return InjectHotkeys(tree.SearchField, "search box");
+            Check("search box: still typing after the keys", DesktopKeyboardGate.Typing);
+            yield return Shot("A1_buscador_teclas_bloqueadas", 0.3f);
+
+            // Esc leaves / clears the field (the tree clears first)
+            ui_Back();
+            yield return Frames(3);
+            Check("Esc while typing in the search box clears it and leaves the field", !DesktopKeyboardGate.Typing && string.IsNullOrEmpty(tree.SearchField.value));
+            tree.SetOpen(false);
+            yield return new WaitForSecondsRealtime(0.4f);
+
+            // 2. the SITL URL field
+            Tel.OpenMode();
+            yield return Frames(3);
+            Click(B("DkTelSource"));
+            yield return new WaitForSecondsRealtime(0.3f);
+            Click(B("DkSrcSitl"));
+            yield return new WaitForSecondsRealtime(0.4f);
+            var urlField = Root.Q<TextField>("DkSitlUrl");
+            Check("SITL URL field exists and is shown", Shown(urlField));
+            string urlBefore = urlField.value;
+            urlField.SetValueWithoutNotify(string.Empty); // a focused field selects its text: start from an empty one so the typed text is the whole value
+            urlField.Focus();
+            yield return Frames(3);
+            Check("gate: the focused SITL URL field counts as typing", DesktopKeyboardGate.Typing);
+            urlField.Q<TextElement>().Focus();
+            yield return Frames(3);
+            yield return InjectHotkeys(urlField, "SITL field");
+            Check("SITL field: the source popover is still the open one (L, Shift+A, 4... did not move it)", Tel.OpenPopover == "source");
+            yield return Shot("A2_url_sitl_teclas_bloqueadas", 0.3f);
+
+            // closing the popover leaves the field focused but hidden: it must not swallow the shortcuts any more
+            urlField.value = urlBefore;
+            Tel.CloseAllPopovers();
+            yield return Frames(4);
+            Check("a hidden focused field does not count as typing (the gate releases it)", !DesktopKeyboardGate.Typing);
+            Press(KeyCode.Alpha4);
+            yield return Frames(4);
+            Check("after that, key 4 acts again (closes Telemetry mode)", !Tel.ModeOpen);
+            Press(KeyCode.F1);
+            yield return Frames(3);
+            Check("F1 acts when not typing (opens the help)", Ctrl.IsHelpOpen);
+            Press(KeyCode.F1);
+            yield return Frames(3);
+            Check("F1 closes it", !Ctrl.IsHelpOpen);
+
+            // 3. piloting keys and click-to-fly while typing
+            Tel.OpenMode();
+            Tel.StartSimulator();
+            yield return new WaitForSecondsRealtime(1.5f);
+            Click(B("DkCmdTakeoff"));
+            yield return new WaitForSecondsRealtime(6f);
+            Check("simulator armed and flying (5 m)", DesktopTelemetry.Client.Displayed != null && DesktopTelemetry.Client.Displayed.armed && !DesktopTelemetry.Client.Displayed.landed);
+            Click(B("DkTelPilot"));
+            yield return new WaitForSecondsRealtime(0.4f);
+            Check("piloting on", Tel.Piloting);
+            tree.SetOpen(true);
+            yield return new WaitForSecondsRealtime(0.5f);
+            tree.SearchField.Focus();
+            yield return Frames(3);
+            Check("gate: typing again before the piloting keys", DesktopKeyboardGate.Typing);
+            var ackBefore = DesktopTelemetry.Client.LastAck;
+            Hold(KeyCode.W, KeyCode.D, KeyCode.Space, KeyCode.Q, KeyCode.LeftShift);
+            Press(KeyCode.T); Press(KeyCode.L); Press(KeyCode.H); Press(KeyCode.R);
+            yield return new WaitForSecondsRealtime(0.6f);
+            Check("piloting keys while typing: no key is held by the pilot", Tel.HeldKeys == PilotKeys.None);
+            Check("piloting keys while typing: sticks stay neutral", Tel.LastSticks.x == 0 && Tel.LastSticks.y == 0 && Tel.LastSticks.r == 0);
+            Check("piloting keys while typing: T / L / H / R sent no command", ReferenceEquals(ackBefore, DesktopTelemetry.Client.LastAck));
+            Release(KeyCode.W, KeyCode.D, KeyCode.Space, KeyCode.Q, KeyCode.LeftShift);
+            var pt = new Vector2(Screen.width * 0.20f, Screen.height * 0.13f);
+            bool consumed = Tel.TryGroundClick(pt);
+            yield return Frames(3);
+            Check("click-to-fly while typing: the click only ends the typing (no fly_to, no target)", consumed && !Tel.HasFlyTarget && ReferenceEquals(ackBefore, DesktopTelemetry.Client.LastAck) && !DesktopKeyboardGate.Typing);
+            // control: field blurred -> W flies
+            Hold(KeyCode.W);
+            yield return new WaitForSecondsRealtime(0.5f);
+            Check("control: with the field released, W flies (the pilot holds Forward)", (Tel.HeldKeys & PilotKeys.Forward) != 0);
+            Release(KeyCode.W);
+            yield return new WaitForSecondsRealtime(0.3f);
+            tree.SetOpen(false);
+            Tel.HandleBack(); // leaves piloting
+            Click(B("DkCmdLand"));
+            yield return new WaitForSecondsRealtime(0.5f);
+            Tel.StopSession();
+            Tel.CloseMode();
+            yield return Frames(3);
+        }
+
+        private void ui_Back() { UIManager.Instance.ShortcutBack(); }
+
+    }
+}
+#endif

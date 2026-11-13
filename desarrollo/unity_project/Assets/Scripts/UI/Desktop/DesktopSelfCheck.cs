@@ -161,6 +161,14 @@ namespace WebGL.UI.Desktop
             }
             else Check("pick: drone part found for the moved-drone check", false);
 
+            // ── typing gate (PLAN_PC 27.1): with a text field focused no hotkey fires, the text arrives ──
+            var gate = gameObject.AddComponent<DesktopCaptureFixes>();
+            gate.OutputDirectory = OutputDirectory;
+            gate.ExternalDrive = true;
+            yield return gate.RunGateOnly();
+            _fail += gate.Failures;
+            Debug.Log("[SelfCheck] typing gate: " + (gate.Failures == 0 ? "all PASS" : gate.Failures + " FAIL (see gate_*.log)"));
+
             Debug.Log("[SelfCheck] done failures=" + _fail);
             Application.Quit();
         }

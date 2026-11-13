@@ -71,6 +71,9 @@ namespace WebGL.UI.Desktop
         private void CacheSelection(PartSelectedEvent evt) { _lastEvt = evt; _hasLastEvt = true; if (_built) OnPartSelected(evt); }
 
         public bool IsOpen => _open;
+        /// <summary>The search box has the keyboard focus (the typing gate, PLAN_PC 27.1).</summary>
+        public bool SearchFocused => DesktopKeyboardGate.TextFieldOf(_search?.panel?.focusController?.focusedElement) == _search;
+        public TextField SearchField => _search;
         public float OccupiedWidth => _open ? Width + 2f * Margin : 0f;
 
         public DesktopPartTree(VisualElement root)

@@ -191,6 +191,15 @@ namespace WebGL.UI.Desktop
 
             UIManager.OverlayBackHandler = () =>
             {
+                // PLAN_PC 27.1: Esc while typing only leaves the field (the tree search clears first, like before); the layers below wait for the next Esc.
+                if (DesktopKeyboardGate.Typing)
+                {
+                    Log("Esc -> leaves the text field");
+                    if (_tree != null && _tree.IsOpen && _tree.SearchFocused && _tree.HandleBack()) return true;
+                    DesktopKeyboardGate.LeaveTextField();
+                    return true;
+                }
+
                 if (_help != null && _help.IsOpen)
                 {
                     Log("Esc -> help closed");
@@ -223,6 +232,7 @@ namespace WebGL.UI.Desktop
             _bottomSheet = _root.Q<VisualElement>("BottomSheet");
             _lastScreenW = Screen.width;
             _lastScreenH = Screen.height;
+            DesktopKeyboardGate.Bind(_root);
             _ready = true;
 
             ParseDemoArgument();
@@ -281,7 +291,7 @@ namespace WebGL.UI.Desktop
             }
 
             // keyboard focus ring (the button system draws it only after Tab / arrows, never after a click)
-            if (Input.GetMouseButtonDown(0)) _root.RemoveFromClassList("dk-keynav");
+            if (Input.GetMouseButtonDown(0)) { _root.RemoveFromClassList("dk-keynav"); ReleaseTextFieldOnSceneClick(); }
             else if (Input.GetKeyDown(KeyCode.Tab)) _root.AddToClassList("dk-keynav");
 
             UpdateHintVisibility();
@@ -302,19 +312,17 @@ namespace WebGL.UI.Desktop
             _root.EnableInClassList("desktop-tutorial-open", _ui.IsOnboardingOpen);
         }
 
-        private bool IsTypingInTextField()
+        /// <summary>A click on the 3D scene (no UI element under the pointer) ends typing: the UI Toolkit panel never sees that click, so the field would keep the focus.</summary>
+        private void ReleaseTextFieldOnSceneClick()
         {
-            Focusable focused = _root?.panel?.focusController?.focusedElement;
-            for (VisualElement e = focused as VisualElement; e != null; e = e.parent)
-            {
-                if (e is ITextEdition)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            if (!DesktopKeyboardGate.Typing || _root?.panel == null) return;
+            Vector2 p = RuntimePanelUtils.ScreenToPanel(_root.panel, new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
+            VisualElement hit = _root.panel.Pick(p);
+            if (hit == null || hit == _root) DesktopKeyboardGate.LeaveTextField();
         }
+
+        /// <summary>True while a text field has the keyboard focus (PLAN_PC 27.1): the single answer of <see cref="DesktopKeyboardGate"/>.</summary>
+        internal static bool IsTypingInTextField() => DesktopKeyboardGate.Typing;
 
         private static void Log(string message)
         {
@@ -323,40 +331,40 @@ namespace WebGL.UI.Desktop
 
         private void HandleShortcuts()
         {
-            bool alt = Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt);
-            bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
-                || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
+            bool alt = DesktopKeyboardGate.Alt;
+            bool ctrl = DesktopKeyboardGate.Ctrl;
 
-            // Window: F11 and Alt+Enter work everywhere (Unity's own Alt+Enter is disabled in Player Settings
-            // so the state is tracked and saved here).
-            if (Input.GetKeyDown(KeyCode.F11)
-                || (alt && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))))
+            // Window: F11 and Alt+Enter work everywhere, typing included (they are window keys, not viewer hotkeys). Unity's own Alt+Enter is
+            // disabled in Player Settings so the state is tracked and saved here.
+            if (DesktopKeyboardGate.WindowKeyDown(KeyCode.F11)
+                || (alt && (DesktopKeyboardGate.WindowKeyDown(KeyCode.Return) || DesktopKeyboardGate.WindowKeyDown(KeyCode.KeypadEnter))))
             {
                 Log("F11/Alt+Enter -> fullscreen toggle"); DesktopWindowSettings.ToggleFullscreen();
                 return;
             }
 
+            // PLAN_PC 27.1: while a text field has the focus NOTHING below fires (every reader goes through DesktopKeyboardGate, which is false
+            // while typing; this early return is the belt to those braces and also skips the work).
+            if (DesktopKeyboardGate.Typing)
+            {
+                return;
+            }
+
             bool treeAllowed = !_ui.IsHeroVisible && !_ui.IsOnboardingOpen && !_help.IsOpen;
-            if (treeAllowed && ctrl && Input.GetKeyDown(KeyCode.F))
+            if (treeAllowed && ctrl && DesktopKeyboardGate.Down(KeyCode.F))
             {
                 Log("Ctrl+F -> part tree + search"); _tree.Open(true);
                 return;
             }
 
-            if (IsTypingInTextField())
-            {
-                return;
-            }
-
-            if (treeAllowed && !alt && !ctrl && Input.inputString != null && Input.inputString.IndexOf('/') >= 0)
+            if (treeAllowed && !alt && !ctrl && DesktopKeyboardGate.Typed('/'))
             {
                 Log("/ -> part tree + search"); _tree.Open(true);
                 return;
             }
 
             // Help: "?" (any keyboard layout, read from the typed characters) or F1.
-            bool questionTyped = Input.inputString != null && Input.inputString.IndexOf('?') >= 0;
-            if (Input.GetKeyDown(KeyCode.F1) || questionTyped)
+            if (DesktopKeyboardGate.Down(KeyCode.F1) || DesktopKeyboardGate.Typed('?'))
             {
                 Log("? / F1 -> help toggle"); _help.Toggle();
                 return;
@@ -371,27 +379,27 @@ namespace WebGL.UI.Desktop
             // letters (tree T, source L, pins H, reset R, explode E, alerts Shift+A) are paused until piloting ends (Esc, the toggle, the source stopping).
             // Home, [ ] and every other key keep working. DesktopTelemetryUI reads the same keys for flying.
             if (_chrome != null && _chrome.Telemetry != null && _chrome.Telemetry.Piloting
-                && (DesktopTelemetryUI.KeyPressed(KeyCode.T) || DesktopTelemetryUI.KeyPressed(KeyCode.L) || DesktopTelemetryUI.KeyPressed(KeyCode.H) || DesktopTelemetryUI.KeyPressed(KeyCode.R) || DesktopTelemetryUI.KeyPressed(KeyCode.E) || DesktopTelemetryUI.KeyPressed(KeyCode.A)))
+                && (DesktopKeyboardGate.Down(KeyCode.T) || DesktopKeyboardGate.Down(KeyCode.L) || DesktopKeyboardGate.Down(KeyCode.H) || DesktopKeyboardGate.Down(KeyCode.R) || DesktopKeyboardGate.Down(KeyCode.E) || DesktopKeyboardGate.Down(KeyCode.A)))
             {
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)) { Log("key 1"); _ui.ShortcutToggleMode(1); }
-            else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2)) { Log("key 2"); _ui.ShortcutToggleMode(2); }
-            else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3)) { Log("key 3"); _ui.ShortcutToggleMode(3); }
-            else if (_chrome != null && (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))) { Log("key 4"); _chrome.Telemetry.ToggleMode(); }
-            else if (_chrome != null && Input.GetKeyDown(KeyCode.L)) { Log("key L"); _chrome.Telemetry.OpenSourcePopover(); }
-            else if (_chrome != null && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) && Input.GetKeyDown(KeyCode.A)) { Log("key Shift+A"); _chrome.Telemetry.OpenAlertsPopover(); }
-            else if (Input.GetKeyDown(KeyCode.F)) { Log("key F"); _ui.ShortcutFocusSelection(); }
-            else if (Input.GetKeyDown(KeyCode.Home) || Input.GetKeyDown(KeyCode.R)) { Log("key Home/R"); _ui.ShortcutResetView(); }
-            else if (Input.GetKeyDown(KeyCode.H)) { Log("key H"); _ui.ShortcutTogglePins(); }
-            else if (Input.GetKeyDown(KeyCode.I)) { Log("key I"); _ui.ShortcutToggleIsolation(); }
-            else if (Input.GetKeyDown(KeyCode.E)) { Log("key E"); _ui.ShortcutToggleExplode(); }
-            else if (_chrome != null && Input.GetKeyDown(KeyCode.C)) { Log("key C"); _chrome.OpenAnalyzeTool("AnalyzeCrossSectionBtn"); }
-            else if (_chrome != null && Input.GetKeyDown(KeyCode.G)) { Log("key G"); _chrome.OpenAnalyzeTool("AnalyzeFilterBtn"); }
-            else if (_chrome != null && Input.GetKeyDown(KeyCode.V)) { Log("key V"); _chrome.CycleViewMode(); }
-            else if (_chrome != null && (Input.GetKeyDown(KeyCode.T) || (Input.inputString != null && Input.inputString.IndexOf('[') >= 0))) { Log("key ["); _chrome.ToggleTreePublic(); }
-            else if (_chrome != null && (Input.GetKeyDown(KeyCode.P) || (Input.inputString != null && Input.inputString.IndexOf(']') >= 0))) { Log("key ]"); _chrome.ToggleInspectorPublic(); }
+            if (DesktopKeyboardGate.Down(KeyCode.Alpha1) || DesktopKeyboardGate.Down(KeyCode.Keypad1)) { Log("key 1"); _ui.ShortcutToggleMode(1); }
+            else if (DesktopKeyboardGate.Down(KeyCode.Alpha2) || DesktopKeyboardGate.Down(KeyCode.Keypad2)) { Log("key 2"); _ui.ShortcutToggleMode(2); }
+            else if (DesktopKeyboardGate.Down(KeyCode.Alpha3) || DesktopKeyboardGate.Down(KeyCode.Keypad3)) { Log("key 3"); _ui.ShortcutToggleMode(3); }
+            else if (_chrome != null && (DesktopKeyboardGate.Down(KeyCode.Alpha4) || DesktopKeyboardGate.Down(KeyCode.Keypad4))) { Log("key 4"); _chrome.Telemetry.ToggleMode(); }
+            else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.L)) { Log("key L"); _chrome.Telemetry.OpenSourcePopover(); }
+            else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.A)) { Log("key Shift+A"); _chrome.Telemetry.OpenAlertsPopover(); }
+            else if (DesktopKeyboardGate.Down(KeyCode.F)) { Log("key F"); _ui.ShortcutFocusSelection(); }
+            else if (DesktopKeyboardGate.Down(KeyCode.Home) || DesktopKeyboardGate.Down(KeyCode.R)) { Log("key Home/R"); _ui.ShortcutResetView(); }
+            else if (DesktopKeyboardGate.Down(KeyCode.H)) { Log("key H"); _ui.ShortcutTogglePins(); }
+            else if (DesktopKeyboardGate.Down(KeyCode.I)) { Log("key I"); _ui.ShortcutToggleIsolation(); }
+            else if (DesktopKeyboardGate.Down(KeyCode.E)) { Log("key E"); _ui.ShortcutToggleExplode(); }
+            else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.C)) { Log("key C"); _chrome.OpenAnalyzeTool("AnalyzeCrossSectionBtn"); }
+            else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.G)) { Log("key G"); _chrome.OpenAnalyzeTool("AnalyzeFilterBtn"); }
+            else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.V)) { Log("key V"); _chrome.CycleViewMode(); }
+            else if (_chrome != null && (DesktopKeyboardGate.Down(KeyCode.T) || DesktopKeyboardGate.Typed('['))) { Log("key ["); _chrome.ToggleTreePublic(); }
+            else if (_chrome != null && (DesktopKeyboardGate.Down(KeyCode.P) || DesktopKeyboardGate.Typed(']'))) { Log("key ]"); _chrome.ToggleInspectorPublic(); }
         }
 
         // ─────────────────────────── capture demo hook ───────────────────────────
@@ -412,6 +420,21 @@ namespace WebGL.UI.Desktop
                 {
                     var probe = gameObject.AddComponent<DesktopPickProbe>();
                     probe.OutputDirectory = args[i + 1];
+                    return;
+                }
+
+                if (args[i].Equals("-desk-fix-real", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var real = gameObject.AddComponent<DesktopCaptureFixes>();
+                    real.OutputDirectory = args[i + 1];
+                    real.RealKeys = true;
+                    return;
+                }
+
+                if (args[i].Equals("-desk-fix", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var fix = gameObject.AddComponent<DesktopCaptureFixes>();
+                    fix.OutputDirectory = args[i + 1];
                     return;
                 }
 

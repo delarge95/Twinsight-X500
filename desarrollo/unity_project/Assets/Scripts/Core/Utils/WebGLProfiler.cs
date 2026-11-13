@@ -156,7 +156,7 @@ namespace WebGL.Core.Utils
 
         private void Update()
         {
-            if (toggleKey != KeyCode.None && Input.GetKeyDown(toggleKey))
+            if (toggleKey != KeyCode.None && WebGL.Core.Managers.DesktopKeyboardGate.Down(toggleKey))
             {
                 ToggleCapturePanel();
             }

@@ -480,10 +480,10 @@ namespace WebGL.UI.Panels
             if (!IsOpen) return;
 #if UNITY_STANDALONE
             // the key hints "press" on screen when the user presses the key
-            if (Input.GetKeyDown(KeyCode.RightArrow)) WebGL.UI.Desktop.DesktopMotion.Flash(_next, "dk-press-sim");
-            else if (Input.GetKeyDown(KeyCode.LeftArrow)) WebGL.UI.Desktop.DesktopMotion.Flash(_prev, "dk-press-sim");
+            if (WebGL.Core.Managers.DesktopKeyboardGate.Down(KeyCode.RightArrow)) WebGL.UI.Desktop.DesktopMotion.Flash(_next, "dk-press-sim");
+            else if (WebGL.Core.Managers.DesktopKeyboardGate.Down(KeyCode.LeftArrow)) WebGL.UI.Desktop.DesktopMotion.Flash(_prev, "dk-press-sim");
             else if (Input.GetKeyDown(KeyCode.Escape)) WebGL.UI.Desktop.DesktopMotion.Flash(_skip, "dk-press-sim");
-            string typed = Input.inputString;
+            string typed = WebGL.Core.Managers.DesktopKeyboardGate.Typing ? null : WebGL.Core.Managers.DesktopKeyboardGate.InputString();
             if (!string.IsNullOrEmpty(typed))
             {
                 string up = typed.ToUpperInvariant();
@@ -491,10 +491,10 @@ namespace WebGL.UI.Panels
             }
 #endif
 #if UNITY_STANDALONE
-            if (Input.GetKeyDown(KeyCode.RightArrow) && _lockedRow >= 0) { _lockedRow = -1; _anim.Lock(-1); HighlightRow(_anim.CurrentPhase); return; }
+            if (WebGL.Core.Managers.DesktopKeyboardGate.Down(KeyCode.RightArrow) && _lockedRow >= 0) { _lockedRow = -1; _anim.Lock(-1); HighlightRow(_anim.CurrentPhase); return; }
 #endif
-            if (Input.GetKeyDown(KeyCode.RightArrow)) Next();
-            else if (Input.GetKeyDown(KeyCode.LeftArrow)) Prev();
+            if (WebGL.Core.Managers.DesktopKeyboardGate.Down(KeyCode.RightArrow)) Next();
+            else if (WebGL.Core.Managers.DesktopKeyboardGate.Down(KeyCode.LeftArrow)) Prev();
         }
 
         private void Render()

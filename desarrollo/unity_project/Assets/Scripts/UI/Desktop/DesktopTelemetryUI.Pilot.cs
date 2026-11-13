@@ -32,9 +32,10 @@ namespace WebGL.UI.Desktop
         private readonly Dictionary<string, Label> _caps = new Dictionary<string, Label>();
         private readonly List<Label> _legendTexts = new List<Label>();
 
-        /// <summary>Input seams: the verification harness (in-player probes) injects the same key events the pilot reads. Default = the old Input Manager.</summary>
-        internal static Func<KeyCode, bool> KeyHeld = Input.GetKey;
-        internal static Func<KeyCode, bool> KeyPressed = Input.GetKeyDown;
+        /// <summary>Input seams: the verification harness (in-player probes) injects the same key events the pilot reads. They are the seams of the
+        /// <see cref="DesktopKeyboardGate"/> (one place for every shortcut reader, PLAN_PC 27.1): default = the old Input Manager.</summary>
+        internal static Func<KeyCode, bool> KeyHeld { get => DesktopKeyboardGate.KeyHeld; set => DesktopKeyboardGate.KeyHeld = value; }
+        internal static Func<KeyCode, bool> KeyPressed { get => DesktopKeyboardGate.KeyPressed; set => DesktopKeyboardGate.KeyPressed = value; }
         /// <summary>Verification only: the harness runs in a window that may not have the OS focus, so it asks for focus loss to be ignored except in its own dead-man probe.</summary>
         internal static bool IgnoreFocusLoss;
 
@@ -269,20 +270,10 @@ namespace WebGL.UI.Desktop
         private void BlurFocus()
         {
             var fe = _root?.panel?.focusController?.focusedElement as VisualElement;
-            if (fe != null && !(fe is ITextEdition) && !IsInsideTextField(fe)) fe.Blur();
+            if (fe != null && DesktopKeyboardGate.TextFieldOf(fe) == null) fe.Blur();
         }
 
-        private static bool IsInsideTextField(VisualElement e)
-        {
-            for (; e != null; e = e.parent) if (e is ITextEdition) return true;
-            return false;
-        }
-
-        private bool TypingNow()
-        {
-            var fe = _root?.panel?.focusController?.focusedElement as VisualElement;
-            return IsInsideTextField(fe);
-        }
+        private static bool TypingNow() => DesktopKeyboardGate.Typing;
 
         // ───────────────────────── toast ─────────────────────────
 
@@ -305,6 +296,8 @@ namespace WebGL.UI.Desktop
         /// </summary>
         public bool TryGroundClick(Vector2 screen)
         {
+            // PLAN_PC 27.1: while typing in a text field a click on the scene only ends the typing (no fly_to, no deselection)
+            if (DesktopKeyboardGate.Typing) { DesktopKeyboardGate.LeaveTextField(); return true; }
             var client = DesktopTelemetry.Client;
             var drv = TelemetryDroneDriver.Instance;
             if (client == null || drv == null || !DesktopTelemetry.AcceptsCommands) return false;
@@ -379,25 +372,25 @@ namespace WebGL.UI.Desktop
         private void ReadPilotInput(TelemetryClient client)
         {
             BlurFocus();
-            bool ctrl = KeyHeld(KeyCode.LeftControl) || KeyHeld(KeyCode.RightControl) || KeyHeld(KeyCode.LeftAlt) || KeyHeld(KeyCode.RightAlt);
+            bool ctrl = DesktopKeyboardGate.Ctrl || DesktopKeyboardGate.Alt;
             bool help = DesktopUIController.Instance != null && DesktopUIController.Instance.IsHelpOpen;
             bool listen = !ctrl && !help && !TypingNow();
 
             PilotKeys held = PilotKeys.None;
             if (listen)
             {
-                if (KeyHeld(KeyCode.W) || KeyHeld(KeyCode.UpArrow)) held |= PilotKeys.Forward;
-                if (KeyHeld(KeyCode.S) || KeyHeld(KeyCode.DownArrow)) held |= PilotKeys.Back;
-                if (KeyHeld(KeyCode.A) || KeyHeld(KeyCode.LeftArrow)) held |= PilotKeys.Left;
-                if (KeyHeld(KeyCode.D) || KeyHeld(KeyCode.RightArrow)) held |= PilotKeys.Right;
-                if (KeyHeld(KeyCode.Q)) held |= PilotKeys.YawLeft;
-                if (KeyHeld(KeyCode.E)) held |= PilotKeys.YawRight;
-                if (KeyHeld(KeyCode.Space)) held |= PilotKeys.Up;
-                if (KeyHeld(KeyCode.LeftShift) || KeyHeld(KeyCode.RightShift)) held |= PilotKeys.Down;
-                if (KeyPressed(KeyCode.T)) SendPilotCommand(PilotCommand.Takeoff, "key T");
-                if (KeyPressed(KeyCode.L)) SendPilotCommand(PilotCommand.Land, "key L");
-                if (KeyPressed(KeyCode.H)) SendPilotCommand(PilotCommand.Hold, "key H");
-                if (KeyPressed(KeyCode.R)) SendPilotCommand(PilotCommand.Rtl, "key R");
+                if (DesktopKeyboardGate.Held(KeyCode.W) || DesktopKeyboardGate.Held(KeyCode.UpArrow)) held |= PilotKeys.Forward;
+                if (DesktopKeyboardGate.Held(KeyCode.S) || DesktopKeyboardGate.Held(KeyCode.DownArrow)) held |= PilotKeys.Back;
+                if (DesktopKeyboardGate.Held(KeyCode.A) || DesktopKeyboardGate.Held(KeyCode.LeftArrow)) held |= PilotKeys.Left;
+                if (DesktopKeyboardGate.Held(KeyCode.D) || DesktopKeyboardGate.Held(KeyCode.RightArrow)) held |= PilotKeys.Right;
+                if (DesktopKeyboardGate.Held(KeyCode.Q)) held |= PilotKeys.YawLeft;
+                if (DesktopKeyboardGate.Held(KeyCode.E)) held |= PilotKeys.YawRight;
+                if (DesktopKeyboardGate.Held(KeyCode.Space)) held |= PilotKeys.Up;
+                if (DesktopKeyboardGate.Held(KeyCode.LeftShift) || DesktopKeyboardGate.Held(KeyCode.RightShift)) held |= PilotKeys.Down;
+                if (DesktopKeyboardGate.Down(KeyCode.T)) SendPilotCommand(PilotCommand.Takeoff, "key T");
+                if (DesktopKeyboardGate.Down(KeyCode.L)) SendPilotCommand(PilotCommand.Land, "key L");
+                if (DesktopKeyboardGate.Down(KeyCode.H)) SendPilotCommand(PilotCommand.Hold, "key H");
+                if (DesktopKeyboardGate.Down(KeyCode.R)) SendPilotCommand(PilotCommand.Rtl, "key R");
             }
             if (held != _held) { _held = held; RefreshCaps(); }
 
