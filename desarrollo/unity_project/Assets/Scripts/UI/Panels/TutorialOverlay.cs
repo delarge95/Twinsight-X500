@@ -12,18 +12,23 @@ namespace WebGL.UI.Panels
     /// Hints per input: PC build (keys), WebGL with a mouse (buttons and mouse), touch (gestures). The small switch of the card
     /// swaps the hints between mouse and touch. Created and driven by OnboardingController (Esc is handled by UIManager).
     /// </summary>
-    internal sealed class TutorialOverlay
+    internal sealed partial class TutorialOverlay
     {
-        private struct Row
+        internal struct Row
         {
             public string Icon, NameEs, NameEn;
             public string[] HintsEs, HintsEn;
+            // optional: the texts come from the TelemetryStrings dictionary (keys) instead of the inline ES/EN fields (step 7)
+            public string NameKey;
+            public string[] HintKeys;
         }
 
-        private struct Step
+        internal struct Step
         {
             public string Icon, TitleEs, TitleEn, DescEs, DescEn;
             public Row[] Pc, Mouse, Touch;
+            public string TitleKey, DescKey;
+            public bool PcOnly;   // only in the desktop (Standalone) build
         }
 
         private static Row R(string icon, string es, string en, string hintsEs, string hintsEn = null)
@@ -183,7 +188,7 @@ namespace WebGL.UI.Panels
         private readonly VisualElement _overlay;
         private readonly Action _onClose;
         private readonly Label _counter;
-        private readonly VisualElement[] _segs = new VisualElement[6];
+        private readonly VisualElement[] _segs = new VisualElement[Active.Length];
         private readonly Button _skip;
         private readonly Button _pcBtn, _touchBtn;
         private readonly OutlineIcon _bigIcon;
@@ -400,7 +405,7 @@ namespace WebGL.UI.Panels
         /// <summary>Test hook: jump to a step (0-based).</summary>
         public void GoTo(int step)
         {
-            _step = Mathf.Clamp(step, 0, Steps.Length - 1);
+            _step = Mathf.Clamp(step, 0, Active.Length - 1);
             Render();
         }
 
@@ -459,7 +464,7 @@ namespace WebGL.UI.Panels
 
         private void Next()
         {
-            if (_step < Steps.Length - 1)
+            if (_step < Active.Length - 1)
             {
                 _step++;
                 Render();
@@ -494,9 +499,9 @@ namespace WebGL.UI.Panels
 
         private void Render()
         {
-            Step s = Steps[_step];
-            if (IsOpen) Debug.Log("[Tutorial] step " + (_step + 1) + "/" + Steps.Length + (_touch ? " touch" : " mouse") + (IsSheet ? " sheet" : " card"));
-            _counter.text = (_step + 1).ToString("00") + " / " + Steps.Length.ToString("00");
+            Step s = Active[_step];
+            if (IsOpen) Debug.Log("[Tutorial] step " + (_step + 1) + "/" + Active.Length + (_touch ? " touch" : " mouse") + (IsSheet ? " sheet" : " card"));
+            _counter.text = (_step + 1).ToString("00") + " / " + Active.Length.ToString("00");
             for (int i = 0; i < _segs.Length; i++)
             {
                 _segs[i].EnableInClassList("dk-tut-seg--cur", i == _step);
@@ -504,11 +509,11 @@ namespace WebGL.UI.Panels
             }
 
             _bigIcon.SetShape(s.Icon);
-            _title.text = Es ? s.TitleEs : s.TitleEn;
-            _desc.text = Es ? s.DescEs : s.DescEn;
+            _title.text = s.TitleKey != null ? Tr(s.TitleKey) : Es ? s.TitleEs : s.TitleEn;
+            _desc.text = s.DescKey != null ? Tr(s.DescKey) : Es ? s.DescEs : s.DescEn;
             _skipLabel.text = Es ? "Omitir" : "Skip";
             _prevLabel.text = Es ? "Atrás" : "Back";
-            _nextLabel.text = _step == Steps.Length - 1 ? (Es ? "Empezar" : "Start") : (Es ? "Siguiente" : "Next");
+            _nextLabel.text = _step == Active.Length - 1 ? (Es ? "Empezar" : "Start") : (Es ? "Siguiente" : "Next");
             _pcBtn.text = StandaloneBuild ? "PC" : (Es ? "Ratón" : "Mouse");
             _touchBtn.text = Es ? "Táctil" : "Touch";
             _pcBtn.EnableInClassList("dk-tut-switch-btn--on", !_touch);
@@ -520,7 +525,7 @@ namespace WebGL.UI.Panels
             _anim.Touch = _touch;
             _anim.LockedPhase = _lockedRow;
             _anim.SetStep(_step);
-            _fill.style.width = Length.Percent(100f * (_step + 1) / Steps.Length);
+            _fill.style.width = Length.Percent(100f * (_step + 1) / Active.Length);
             if (IsOpen && _prevStep != _step && _prevStep >= 0) WebGL.UI.Desktop.DesktopMotion.Enter(_textEl, 0, _step < _prevStep ? "dk-enter--back" : null);
             _prevStep = _step;
             _rowEls.Clear();
@@ -537,12 +542,12 @@ namespace WebGL.UI.Panels
                 bubble.AddToClassList("dk-tut-bubble");
                 bubble.Add(new OutlineIcon { Shape = r.Icon });
                 row.Add(bubble);
-                var name = new Label(Es ? r.NameEs : r.NameEn) { pickingMode = PickingMode.Ignore };
+                var name = new Label(r.NameKey != null ? Tr(r.NameKey) : Es ? r.NameEs : r.NameEn) { pickingMode = PickingMode.Ignore };
                 name.AddToClassList("dk-tut-rowname");
                 row.Add(name);
                 var keys = new VisualElement { pickingMode = PickingMode.Ignore };
                 keys.AddToClassList("dk-tut-keys");
-                foreach (string h in Es ? r.HintsEs : r.HintsEn)
+                foreach (string h in HintTexts(r))
                 {
                     var cap = new Label(h) { pickingMode = PickingMode.Ignore };
                     cap.AddToClassList("dk-tut-cap");

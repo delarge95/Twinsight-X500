@@ -356,6 +356,48 @@ namespace WebGL.Telemetry
             { "toast.geofence.ceiling", new[] { "Geovalla: el dron llegó al techo de {h} m.", "Geofence: the drone reached the {h} m ceiling." } },
             { "toast.geofence.both", new[] { "Geovalla: el dron está en el límite de {r} m de radio y en el techo de {h} m.", "Geofence: the drone is at the {r} m radius limit and the {h} m ceiling." } },
 
+            // tutorial step 7 "Telemetría" (E-7; content of PROPUESTA_TEXTOS_HONESTIDAD §3 adapted to the desktop UI; honesty labels inside the
+            // hints repeat labels.json titles verbatim and a test checks that they do; D-7: two FIXED readings with different origin)
+            { "tut.tel.title", new[] { "Telemetría", "Telemetry" } },
+            { "tut.tel.desc", new[] { "Datos de vuelo sobre el modelo, siempre con su origen.", "Flight data on the model, always with its origin." } },
+            { "tut.tel.mode", new[] { "Modo Telemetría", "Telemetry mode" } },
+            { "tut.tel.mode.key", new[] { "Tecla 4", "Key 4" } },
+            { "tut.tel.mode.strip", new[] { "Tira: Encendido, Fuente, Alertas, Fallas", "Strip: Power, Source, Alerts, Faults" } },
+            { "tut.tel.src", new[] { "Fuente", "Source" } },
+            { "tut.tel.key.l", new[] { "L", "L" } },
+            { "tut.tel.src.replay", new[] { "Sombra digital: vuelo real repetido aquí", "Digital shadow: a real flight replayed here" } },
+            { "tut.tel.src.sim", new[] { "Simulador de vuelo: no es PX4 ni un dron real", "Flight simulator: not PX4 and not a real drone" } },
+            { "tut.tel.src.sitl", new[] { "Gemelo digital SITL: PX4 simulado", "SITL digital twin: simulated PX4" } },
+            { "tut.tel.flight", new[] { "Pestaña Vuelo", "Flight tab" } },
+            { "tut.tel.flight.origin", new[] { "Origen: medido, estimado o simulado", "Origin: measured, estimated or simulated" } },
+            { "tut.tel.key.shifta", new[] { "Shift+A", "Shift+A" } },
+            { "tut.tel.flight.faults", new[] { "Fallas de la repetición: sintéticas", "Replay faults: synthetic" } },
+            { "tut.tel.pilot", new[] { "Pilotar", "Pilot" } },
+            { "tut.tel.pilot.when", new[] { "Simulador o PX4 SITL; repetición: solo lectura", "Simulator or PX4 SITL; replay: read-only" } },
+            { "tut.tel.pilot.keys", new[] { "W A S D · Q E · Espacio / Mayús", "W A S D · Q E · Space / Shift" } },
+            { "tut.tel.pilot.cmds", new[] { "T L H R: despegar, aterrizar, mantener, volver", "T L H R: take off, land, hold, return" } },
+            { "tut.tel.pilot.esc", new[] { "Esc: soltar el pilotaje", "Esc: release piloting" } },
+            // touch variant (finger glyphs, no keyboard)
+            { "tut.tel.t.mode", new[] { "Toca Telemetría en el conmutador de modos", "Tap Telemetry in the mode switch" } },
+            { "tut.tel.t.power", new[] { "Toca Encendido en la tira", "Tap Power in the strip" } },
+            { "tut.tel.t.src", new[] { "Toca Fuente", "Tap Source" } },
+            { "tut.tel.t.flight", new[] { "Toca la pestaña Vuelo", "Tap the Flight tab" } },
+            { "tut.tel.t.alerts", new[] { "Toca Alertas", "Tap Alerts" } },
+            { "tut.tel.t.pilot", new[] { "Toca Pilotar", "Tap Pilot" } },
+            { "tut.tel.t.cmds", new[] { "Toca Despegar, Aterrizar, Mantener o Volver", "Tap Take off, Land, Hold or Return" } },
+            // illustration captions (pc / touch)
+            { "tut.tel.cap0", new[] { "4: abre el modo Telemetría", "4: opens Telemetry mode" } },
+            { "tut.tel.cap1", new[] { "L: elige la fuente", "L: pick the source" } },
+            { "tut.tel.cap2", new[] { "Cada lectura dice su origen", "Each reading states its origin" } },
+            { "tut.tel.cap3", new[] { "Pilotar: Esc suelta", "Pilot: Esc releases" } },
+            { "tut.tel.cap0.t", new[] { "Toca Telemetría", "Tap Telemetry" } },
+            { "tut.tel.cap1.t", new[] { "Toca Fuente", "Tap Source" } },
+            { "tut.tel.cap2.t", new[] { "Cada lectura dice su origen", "Each reading states its origin" } },
+            { "tut.tel.cap3.t", new[] { "Toca Pilotar", "Tap Pilot" } },
+            // drawn labels of the illustration
+            { "tut.tel.ill.alt", new[] { "Altura", "Altitude" } },
+            { "tut.tel.ill.motor", new[] { "Temp. motores", "Motor temp." } },
+
             // status bar
             { "st.link", new[] { "Enlace", "Link" } },
         };

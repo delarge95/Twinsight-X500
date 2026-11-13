@@ -14,7 +14,7 @@ namespace WebGL.UI.Desktop
     /// repaints while the tutorial is open and not at all with "Reduce animations" (one still frame).
     /// Tokens: PhaseSeconds, the 210x230 design box, the colours below and DesktopMotion.Speed are the only constants to port.
     /// </summary>
-    internal sealed class TutorialAnim : VisualElement
+    internal sealed partial class TutorialAnim : VisualElement
     {
         private const float W = 210f, H = 230f, PhaseSeconds = 2.6f;
         private static readonly int[] PhaseCount = { 3, 3, 4, 3, 3, 3 };
@@ -76,6 +76,7 @@ namespace WebGL.UI.Desktop
                 Add(_keys[i]);
             }
 
+            InitTel();
             _tick = schedule.Execute(Frame).Every(16);
             _tick.Pause();
             DesktopMotion.Changed += () => MarkDirtyRepaint();
@@ -83,10 +84,11 @@ namespace WebGL.UI.Desktop
 
         public void SetStep(int step)
         {
-            _step = Mathf.Clamp(step, 0, PhaseCount.Length - 1);
+            _step = Mathf.Clamp(step, 0, PhaseCount.Length);   // 0-4 as before, 5 = Telemetría (E-7), 6 = Listo
             _t0 = Time.unscaledTime;
             _phase = -1;
             _popState = 0;
+            _pop.style.display = DisplayStyle.None;   // the part label of the Inspect scene must not survive a step change
             MarkDirtyRepaint();
             Frame();
         }
@@ -105,6 +107,7 @@ namespace WebGL.UI.Desktop
             _t0 = Time.unscaledTime;
             _phase = -1;
             _popState = 0;
+            _pop.style.display = DisplayStyle.None;
             Frame();
         }
 
@@ -115,8 +118,8 @@ namespace WebGL.UI.Desktop
         private int PhaseNow(float time)
         {
             if (DesktopMotion.Reduce) return Mathf.Max(0, LockedPhase);
-            if (LockedPhase >= 0) return Mathf.Min(LockedPhase, PhaseCount[_step] - 1);
-            return Mathf.FloorToInt(time / PhaseSeconds) % PhaseCount[_step];
+            if (LockedPhase >= 0) return Mathf.Min(LockedPhase, PhasesOf(_step) - 1);
+            return Mathf.FloorToInt(time / PhaseSeconds) % PhasesOf(_step);
         }
 
         private void Frame()
@@ -135,6 +138,7 @@ namespace WebGL.UI.Desktop
             }
 
             UpdatePop(time);
+            UpdateTel(time);
             if (!DesktopMotion.Reduce) MarkDirtyRepaint();
         }
 
@@ -164,6 +168,8 @@ namespace WebGL.UI.Desktop
             int s = _step, ph = Mathf.Max(0, _phase);
             string cap = "";
             for (int i = 0; i < _keys.Length; i++) _keys[i].style.display = DisplayStyle.None;
+            HideTel();
+            if (s == TelStep) { _cap.text = PlaceTelTags(ph); return; }
             switch (s)
             {
                 case 0:
@@ -519,6 +525,7 @@ namespace WebGL.UI.Desktop
                 case 2: Modes(p); break;
                 case 3: Analyze(p); break;
                 case 4: Studio(p); break;
+                case TelStep: Telemetry(p); break;
                 default: Ready(p); break;
             }
         }
