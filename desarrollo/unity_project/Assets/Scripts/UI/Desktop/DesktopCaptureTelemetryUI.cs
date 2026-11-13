@@ -183,13 +183,10 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(0.8f);
             Check("source popover open with four rows", Tel.OpenPopover == "source" && Root.Q<VisualElement>("DkPopSource") != null);
             Button sim = B("DkSrcSim");
-            Check("flight simulator row is visible but disabled, tooltip 'Próximamente'", sim != null && sim.ClassListContains("dk-src-row--disabled") && sim.tooltip == TelemetryStrings.T("src.sim.soon", lang));
+            Check("flight simulator row is enabled (E-5) and its tooltip is the honest detail, never SITL", sim != null && !sim.ClassListContains("dk-src-row--disabled") && labels.TrySimText("detail", lang, out string simHonest) && sim.tooltip.StartsWith(TelemetryStrings.ForDesktop(simHonest, lang)) && !sim.tooltip.ToUpperInvariant().Contains("SITL"));
             Check("replay row is the active one", B("DkSrcReplay").ClassListContains("dk-src-row--on"));
             string badge = Root.Q<VisualElement>("DkSrcReplay").Q<Label>(className: "dk-src-badge").text;
             Check("replay row badge is the approved text", labels.TryLocalReplayText(lang, out string ap2) && badge == ap2);
-            Click(sim);
-            yield return new WaitForSecondsRealtime(0.3f);
-            Check("clicking the simulator row does nothing (still local replay)", DesktopTelemetry.IsLocalReplay);
             yield return Shot("05_fuente");
 
             // ── 5. alerts with a synthetic fault ──

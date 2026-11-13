@@ -331,9 +331,12 @@ namespace WebGL.UI.Desktop
             var labels = HonestyLabels.Load();
             SourceClassification cls = client.Classification;
             _flBadge.text = DesktopTelemetry.BadgeText(lang);
-            _flBadgeDetail.text = cls == SourceClassification.Replay && DesktopTelemetry.IsLocalReplay
-                ? TelemetryStrings.LocalReplayDetail(labels, lang)
-                : TelemetryStrings.ForDesktop(labels.ClassificationDetail(cls, lang), lang);
+            bool sim = DesktopTelemetry.IsSimulator; // E-5: the flight simulator is NOT SITL and NOT a shadow: its own approved texts, every reading simulated
+            _flBadgeDetail.text = sim && labels.TrySimText("detail", lang, out string simDetail)
+                ? TelemetryStrings.ForDesktop(simDetail, lang)
+                : cls == SourceClassification.Replay && DesktopTelemetry.IsLocalReplay
+                    ? TelemetryStrings.LocalReplayDetail(labels, lang)
+                    : TelemetryStrings.ForDesktop(labels.ClassificationDetail(cls, lang), lang);
 
             TelemetryFrame f = client.Displayed;
             HelloMessage h = client.Hello;
@@ -374,14 +377,14 @@ namespace WebGL.UI.Desktop
             _batFill.EnableInClassList("dk-bat-fill--low", bc == BatteryClass.Low);
             _batFill.EnableInClassList("dk-bat-fill--crit", bc == BatteryClass.Critical);
             Set(_rBatVolt, f.bat.v.ToString("0.00", CultureInfo.InvariantCulture) + " V · " + (f.bat.v / cells).ToString("0.00", CultureInfo.InvariantCulture) + " V/" + (lang == "en" ? "cell" : "celda"), baseOrigin, baseTag);
-            ReadingOrigin oi = FlightOrigins.BatteryCurrent(h, cls);
+            ReadingOrigin oi = FlightOrigins.ForSession(FlightOrigins.BatteryCurrent(h, cls), sim);
             Set(_rBatCurrent, F1(f.bat.i) + " A", oi, FlightOrigins.Text(oi, lang, labels));
-            ReadingOrigin obt = FlightOrigins.BatteryTemp(h, cls);
+            ReadingOrigin obt = FlightOrigins.ForSession(FlightOrigins.BatteryTemp(h, cls), sim);
             Set(_rBatTemp, F1(f.temp[4]) + " °C", obt, FlightOrigins.Text(obt, lang, labels));
 
             // motors
-            ReadingOrigin orpm = FlightOrigins.Rpm(h, cls);
-            ReadingOrigin omt = FlightOrigins.MotorTemp(h, cls);
+            ReadingOrigin orpm = FlightOrigins.ForSession(FlightOrigins.Rpm(h, cls), sim);
+            ReadingOrigin omt = FlightOrigins.ForSession(FlightOrigins.MotorTemp(h, cls), sim);
             SetTag(_tagRpm, orpm, FlightOrigins.Text(orpm, lang, labels));
             SetTag(_tagMotorTemp, omt, FlightOrigins.Text(omt, lang, labels));
             RotorGeometry[] rotors = h != null && h.rotors != null && h.rotors.Length == 4 ? h.rotors : QuadX.Px4QuadX;
@@ -399,7 +402,7 @@ namespace WebGL.UI.Desktop
             }
 
             // controller and vibration
-            ReadingOrigin ofc = FlightOrigins.FcTemp(h, cls);
+            ReadingOrigin ofc = FlightOrigins.ForSession(FlightOrigins.FcTemp(h, cls), sim);
             Set(_rFcTemp, ofc == ReadingOrigin.Unavailable ? "—" : F1(f.temp[5]) + " °C", ofc, FlightOrigins.Text(ofc, lang, labels));
             Set(_rVib, F1(f.vib) + " m/s²", baseOrigin, baseTag);
 

@@ -73,7 +73,7 @@ namespace WebGL.UI.Desktop
             _sitlUrl = PlayerPrefs.GetString(PrefSitlUrl, TelemetryEndpoints.Sitl);
             if (TelemetryEndpoints.CommandLine("-sitl-url") != null) _sitlUrl = TelemetryEndpoints.CommandLine("-sitl-url");
             string pref = PlayerPrefs.GetString(PrefSource, "replay");
-            _preferred = pref == "sitl" ? TelSource.Sitl : TelSource.LocalReplay;
+            _preferred = pref == "sitl" ? TelSource.Sitl : pref == "sim" ? TelSource.Simulator : TelSource.LocalReplay;
 
             BuildChips();
             AppLanguageManager.LanguageChanged += OnLanguage;
@@ -255,6 +255,7 @@ namespace WebGL.UI.Desktop
             switch (_preferred)
             {
                 case TelSource.Sitl: StartSitl(_sitlUrl); break;
+                case TelSource.Simulator: StartSimulator(); break;
                 default: StartLocalReplay(); break;
             }
         }
@@ -266,6 +267,16 @@ namespace WebGL.UI.Desktop
             _sitlError = null;
             bool ok = DesktopTelemetry.StartLocalReplay();
             _startError = ok ? null : DesktopTelemetry.LastError;
+        }
+
+        /// <summary>The flight simulator (E-5): the kinematic model of the app. Not PX4, not a real drone; accepts the flight commands.</summary>
+        public void StartSimulator()
+        {
+            _preferred = TelSource.Simulator;
+            PlayerPrefs.SetString(PrefSource, "sim");
+            _sitlError = null;
+            DesktopTelemetry.StartSimulator();
+            _startError = null;
         }
 
         /// <summary>PX4 SITL through the local bridge (WebSocketTelemetrySource). A bad URL is reported in the popover; a dead bridge shows as Connecting then Error.</summary>
@@ -299,6 +310,7 @@ namespace WebGL.UI.Desktop
             {
                 if (!DesktopTelemetry.IsRunning) return TelSource.Inspector;
                 var c = DesktopTelemetry.Client;
+                if (DesktopTelemetry.IsSimulator) return TelSource.Simulator; // checked first: the simulator rides the wire as mode sitl but is NOT SITL
                 if (c.Classification == SourceClassification.Sitl) return TelSource.Sitl;
                 return TelSource.LocalReplay;
             }

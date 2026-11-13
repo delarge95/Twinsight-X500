@@ -37,6 +37,12 @@ namespace WebGL.Telemetry
         /// <summary>A "measured" value coming from a simulator is simulated; the other origins stay as the source declares them.</summary>
         public static ReadingOrigin Honest(ReadingOrigin o, SourceClassification c) => o == ReadingOrigin.Measured && c == SourceClassification.Sitl ? ReadingOrigin.Simulated : o;
 
+        /// <summary>
+        /// In the flight simulator (E-5) EVERY reading is simulated, whatever the hello declares for it (estimated, command...): the only
+        /// exception is a channel the source says it does not have (unavailable). Other sources keep their own origin.
+        /// </summary>
+        public static ReadingOrigin ForSession(ReadingOrigin o, bool simulator) => simulator && o != ReadingOrigin.Unavailable ? ReadingOrigin.Simulated : o;
+
         static ReadingOrigin Of(string wire, SourceClassification c) => Honest(FromWire(wire), c);
 
         public static ReadingOrigin Rpm(HelloMessage h, SourceClassification c) => h == null ? Base(c) : Of(h.provenance.rpm, c);
@@ -216,6 +222,8 @@ namespace WebGL.Telemetry
                                               "No flight link: the power switch and the load drive the propellers and the didactic thermal simulation. Flight panels do not apply." } }, // H-20
             { "src.replay", new[] { "Repetición local", "Local replay" } },
             { "src.sim.soon", new[] { "Próximamente", "Coming soon" } },
+            { "src.sim", new[] { "Simulador", "Simulator" } },
+            { "src.sim.params", new[] { "Parámetros verosímiles, sin calibrar con el X500 real.", "Plausible parameters, not calibrated against the real X500." } },
             { "src.sitl", new[] { "PX4 SITL", "PX4 SITL" } },                                                         // tsw.sitl
             { "src.sitl.url", new[] { "URL del puente", "Bridge URL" } },
             { "src.sitl.note", new[] { "Necesita PX4 SITL y el puente bridge/px4_bridge.py en marcha en este equipo. Si no están, no habrá datos.",
@@ -248,7 +256,9 @@ namespace WebGL.Telemetry
             { "faults.off", new[] { "Activa la repetición local para inyectar fallas sintéticas.", "Turn the local replay on to inject synthetic faults." } },
             { "faults.sitl", new[] { "En PX4 SITL no hay inyección sintética: las fallas se envían a PX4 con comandos (llegan al escritorio más adelante). PX4 acepta motor_off, pero el simulador Gazebo puede no aplicarlo.",
                                      "PX4 SITL has no synthetic injection: faults are sent to PX4 with commands (they reach the desktop later). PX4 accepts motor_off, but the Gazebo simulator may not apply it." } }, // H-13/H-14 (approved D-5)
-            { "faults.ack.ok", new[] { "aceptada", "accepted" } },
+            { "faults.sim", new[] { "El simulador no inyecta fallas: no es PX4 ni la repetición. Para fallas sintéticas usa la repetición local.",
+                                    "The simulator does not inject faults: it is not PX4 nor the replay. Use the local replay for synthetic faults." } },
+            { "faults.ack.ok",new[] { "aceptada", "accepted" } },
             { "faults.ack.rejected", new[] { "rechazada", "rejected" } },               // cmd.ackRejected
 
             // flight tab (tel.*, motors.*, tag.*, prov.*)

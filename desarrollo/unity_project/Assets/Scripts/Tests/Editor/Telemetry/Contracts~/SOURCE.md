@@ -1,6 +1,6 @@
 # Copia del contrato de telemetría (WP-01) para los tests EditMode
 
-- Origen: repo web `E:\twinsight-web-twin`, commit `69822e7d65e508b253201ad60e6a4258ae01536d` (contrato WP-01 de `fb5671b` + `classification.replay.local` y dt exacto en `golden/quadx.json` [8e47e15] + `classification.sim` y `replay.localDetail` [96de458] + `golden/history.json` de las graficas de Analisis [69822e7]; en 96de458 solo cambia `labels.json` y en 69822e7 solo se anade `golden/history.json`)
+- Origen: repo web `E:\twinsight-web-twin`, commit `ab3e5a6a706513c8c95f1400aebc44b6130c24a7` (contrato WP-01 de `fb5671b` + `classification.replay.local` y dt exacto en `golden/quadx.json` [8e47e15] + `classification.sim` y `replay.localDetail` [96de458] + `golden/history.json` de las graficas de Analisis [69822e7] + `golden/flightsim.json` del simulador de vuelo [ab3e5a6]; en 96de458 solo cambia `labels.json` y en 69822e7 solo se anade `golden/history.json`)
   (`feat: contrato de telemetria versionado (WP-01)`), `protocolVersion` 1.0.0.
 - Copiado: `contracts/telemetry.schema.json`, `contracts/labels.json`, `contracts/fixtures/**`, `contracts/golden/**`
   y `tests/fixtures/mini.twf` (en `golden/mini.twf`, lo cita `golden/replay.json`).

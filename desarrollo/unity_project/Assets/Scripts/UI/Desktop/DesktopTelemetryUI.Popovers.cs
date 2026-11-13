@@ -19,6 +19,7 @@ namespace WebGL.UI.Desktop
 
         // source popover
         private Button _rowInspector, _rowReplay, _rowSim, _rowSitl;
+        private Label _simDetail;
         private Label _inspTitle, _inspDetail, _repTitle, _repBadge, _repDetail, _simTitle, _simSub, _sitlTitle, _sitlBadge, _sitlDetail, _sitlNote, _sitlUrlLabel, _sitlMsg;
         private TextField _sitlField;
         private Button _sitlConnect;
@@ -120,8 +121,10 @@ namespace WebGL.UI.Desktop
             _rowReplay.Q<VisualElement>(className: "dk-src-col").Add(_repDetail);
             _popSource.Add(_rowReplay);
 
-            _rowSim = SourceRow("DkSrcSim", "flight", out _simTitle, out _simSub, () => { /* disabled until the flight simulator exists */ });
-            _rowSim.AddToClassList("dk-src-row--disabled");
+            _rowSim = SourceRow("DkSrcSim", "flight", out _simTitle, out _simSub, () => { StartSimulator(); });
+            _simSub.AddToClassList("dk-src-badge");
+            _simDetail = Text("dk-src-detail");
+            _rowSim.Q<VisualElement>(className: "dk-src-col").Add(_simDetail);
             _popSource.Add(_rowSim);
 
             _rowSitl = SourceRow("DkSrcSitl", "sitl", out _sitlTitle, out _sitlBadge, () => SelectSitl());
@@ -280,9 +283,10 @@ namespace WebGL.UI.Desktop
             _repTitle.text = T("src.replay");
             _repBadge.text = labels.TryLocalReplayText(lang, out string local) ? local : string.Empty;
             _repDetail.text = TelemetryStrings.LocalReplayDetail(labels, lang);
-            _simTitle.text = labels.TrySimText("title", lang, out string sim) ? sim : string.Empty;
-            _simSub.text = T("src.sim.soon");
-            _rowSim.tooltip = T("src.sim.soon");
+            _simTitle.text = T("src.sim");
+            _simSub.text = labels.TrySimText("title", lang, out string sim) ? sim : string.Empty;
+            _simDetail.text = (labels.TrySimText("detail", lang, out string simDetail) ? TelemetryStrings.ForDesktop(simDetail, lang) : string.Empty) + " " + T("src.sim.params");
+            _rowSim.tooltip = _simDetail.text;
             _sitlTitle.text = T("src.sitl");
             _sitlBadge.text = labels.ClassificationTitle(SourceClassification.Sitl, lang);
             _sitlDetail.text = TelemetryStrings.ForDesktop(labels.ClassificationDetail(SourceClassification.Sitl, lang), lang);
@@ -335,6 +339,7 @@ namespace WebGL.UI.Desktop
             TelSource active = ActiveSource;
             _rowInspector.EnableInClassList("dk-src-row--on", active == TelSource.Inspector);
             _rowReplay.EnableInClassList("dk-src-row--on", active == TelSource.LocalReplay);
+            _rowSim.EnableInClassList("dk-src-row--on", active == TelSource.Simulator);
             _rowSitl.EnableInClassList("dk-src-row--on", active == TelSource.Sitl);
 
             bool showSitl = _sitlBlockOpen || active == TelSource.Sitl || _preferred == TelSource.Sitl;
@@ -439,11 +444,12 @@ namespace WebGL.UI.Desktop
         private void TickFaults(TelemetryClient client)
         {
             bool local = DesktopTelemetry.IsLocalReplay;
-            bool sitl = client != null && client.Classification == SourceClassification.Sitl;
+            bool simulator = DesktopTelemetry.IsSimulator;
+            bool sitl = client != null && client.Classification == SourceClassification.Sitl && !simulator;
             bool canInject = local && client.Hello != null && client.Hello.Accepts("inject");
 
             _faultControls.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
-            string off = client == null ? T("faults.off") : sitl ? T("faults.sitl") : !canInject && !local ? T("faults.off") : string.Empty;
+            string off = client == null ? T("faults.off") : simulator ? T("faults.sim") : sitl ? T("faults.sitl") : !canInject && !local ? T("faults.off") : string.Empty;
             _faultOff.text = off;
             _faultOff.style.display = string.IsNullOrEmpty(off) ? DisplayStyle.None : DisplayStyle.Flex;
             _faultNote.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;

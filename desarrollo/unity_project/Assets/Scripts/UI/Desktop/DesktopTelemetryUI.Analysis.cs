@@ -369,7 +369,7 @@ namespace WebGL.UI.Desktop
             if (repaint) AnalysisRefreshes++;
             foreach (ChartCell c in _anCells)
             {
-                ReadingOrigin o = c.Spec.RpmOrigin ? FlightOrigins.Rpm(h, cls) : FlightOrigins.Base(cls);
+                ReadingOrigin o = FlightOrigins.ForSession(c.Spec.RpmOrigin ? FlightOrigins.Rpm(h, cls) : FlightOrigins.Base(cls), DesktopTelemetry.IsSimulator);
                 SetTag(c.Tag, o, FlightOrigins.Text(o, lang, labels));
 
                 SparkRange range = Sparkline.Range(c.Lines, c.Lines.Length, c.Spec.MinSpan);

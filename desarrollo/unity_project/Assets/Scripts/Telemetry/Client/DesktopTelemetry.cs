@@ -15,6 +15,8 @@ namespace WebGL.Telemetry
     {
         public const string ReplayFlag = "-tel-replay";
         public const string ReplayAtFlag = "-tel-replay-at";
+        /// <summary>Test aid: start the flight simulator (E-5) instead of the replay.</summary>
+        public const string SimFlag = "-tel-sim";
 
         /// <summary>Pumps the client once per frame (before the scene components that read it).</summary>
         [DefaultExecutionOrder(-100)]
@@ -34,6 +36,10 @@ namespace WebGL.Telemetry
         public static LinkState LinkState => Client?.State ?? LinkState.Disconnected;
         /// <summary>Why the last Start failed (null when it did not).</summary>
         public static string LastError { get; private set; }
+        /// <summary>True while the running source is the flight simulator (E-5): NOT PX4 SITL, NOT a real drone, NOT a digital shadow.</summary>
+        public static bool IsSimulator => Client?.Source is SimTelemetrySource;
+        /// <summary>The running source takes flight commands (takeoff, land...): the simulator, or SITL once connected. Never a replay.</summary>
+        public static bool AcceptsCommands => Client != null && Client.Hello != null && Client.Hello.Accepts("takeoff") && Client.Source != null && Client.Source.State == TransportState.Open;
         public static bool IsLocalReplay => Client?.Source != null && Client.Source.IsLocal && Client.Source.Classification == SourceClassification.Replay;
 
         /// <summary>Raised on the main thread after a session starts (true) or stops (false).</summary>
@@ -69,6 +75,9 @@ namespace WebGL.Telemetry
             return Start(src);
         }
 
+        /// <summary>Starts the flight simulator (kinematic model, not PX4). Its badge is HonestyLabels.TrySimText, never SITL.</summary>
+        public static bool StartSimulator() => Start(new SimTelemetrySource());
+
         public static void Stop()
         {
             var c = Client;
@@ -97,6 +106,7 @@ namespace WebGL.Telemetry
             var c = Client;
             if (c == null) return null;
             var labels = HonestyLabels.Load();
+            if (c.Source is SimTelemetrySource && labels.TrySimText("title", lang, out string simTitle)) return simTitle;
             if (c.Source != null && c.Source.IsLocal && c.Classification == SourceClassification.Replay && labels.TryLocalReplayText(lang, out string t)) return t;
             return labels.ClassificationTitle(c.Classification, lang);
         }
@@ -112,14 +122,21 @@ namespace WebGL.Telemetry
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void AutoStartFromCommandLine()
         {
-            bool replay = false;
+            bool replay = false, sim = false;
             double at = 0;
             var args = Environment.GetCommandLineArgs();
             for (int i = 0; i < args.Length; i++)
             {
                 if (string.Equals(args[i], ReplayFlag, StringComparison.OrdinalIgnoreCase)) replay = true;
+                else if (string.Equals(args[i], SimFlag, StringComparison.OrdinalIgnoreCase)) sim = true;
                 else if (string.Equals(args[i], ReplayAtFlag, StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                     double.TryParse(args[i + 1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out at);
+            }
+            if (sim)
+            {
+                bool okSim = StartSimulator();
+                Debug.Log("[Telemetry] " + SimFlag + ": simulator " + (okSim ? "started (" + BadgeText("es") + ")" : "NOT started"));
+                return;
             }
             if (!replay) return;
             bool ok = StartLocalReplay(at);
