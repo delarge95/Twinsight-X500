@@ -135,6 +135,32 @@ namespace WebGL.UI.Desktop
             }
 
             ViewModeManager.Instance.SetViewMode(ViewMode.Realistic);
+
+            // ── picking follows a moved drone (PLAN_PC §26: telemetry / power hover moved the drone, colliders stayed at rest) ──
+            SelectionManager.Instance.Deselect();
+            OrbitCameraController.Instance.ResetView();
+            yield return new WaitForSecondsRealtime(1.2f);
+            Camera cam = Camera.main;
+            Transform droneRoot = part != null ? part.transform.root : null;
+            RaycastHit restHit = default;
+            bool restOk = col != null && droneRoot != null && cam != null
+                && Physics.Raycast(cam.ScreenPointToRay(cam.WorldToScreenPoint(col.bounds.center)), out restHit, 100f, SelectionManager.Instance.SelectionLayerMask);
+            if (restOk)
+            {
+                Transform hitT = restHit.collider.transform;
+                Vector3 local = hitT.InverseTransformPoint(restHit.point);
+                Vector3 rootPos = droneRoot.position;
+                droneRoot.position = rootPos + Vector3.up * 0.35f;
+                yield return null;
+                Vector3 sp = cam.WorldToScreenPoint(hitT.TransformPoint(local));
+                var r = PickDiagnostics.Describe(sp);
+                Debug.Log("[SelfCheck] pick after moving the drone 0.35 m: " + PickDiagnostics.Format(r));
+                Check("pick: a click on a part of the MOVED drone hits that part's current collider", r.Hit && r.Drift <= PickDiagnostics.StaleDriftMetres);
+                droneRoot.position = rootPos;
+                yield return null;
+            }
+            else Check("pick: drone part found for the moved-drone check", false);
+
             Debug.Log("[SelfCheck] done failures=" + _fail);
             Application.Quit();
         }

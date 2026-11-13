@@ -408,6 +408,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-desk-pickprobe", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var probe = gameObject.AddComponent<DesktopPickProbe>();
+                    probe.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-desk-close", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var closing = gameObject.AddComponent<DesktopCaptureClosing>();

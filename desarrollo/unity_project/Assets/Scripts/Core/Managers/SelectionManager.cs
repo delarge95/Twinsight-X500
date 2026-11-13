@@ -77,6 +77,8 @@ namespace WebGL.Core.Managers
         /// Gets the currently hovered transform.
         /// </summary>
         public Transform HoveredObject => hoveredObject;
+        public LayerMask SelectionLayerMask => selectionLayer;
+        public float MaxRayDistance => maxRayDistance;
 
         /// <summary>
         /// Returns true if any object is currently selected.
@@ -250,7 +252,14 @@ namespace WebGL.Core.Managers
         private void HandleClick()
         {
             if (!Input.GetMouseButtonDown(0)) return;
-            
+#if UNITY_STANDALONE
+            if (PickDiagnostics.LogClicks)
+            {
+                Debug.Log("[PickDbg] click at " + (Vector2)Input.mousePosition + " hover=" + (hoveredObject != null ? hoveredObject.name : "none") + " "
+                    + PickDiagnostics.Format(PickDiagnostics.Describe(Input.mousePosition)));
+            }
+#endif
+
             LogDebug("[SelectionManager.HandleClick] LMB clicked");
             
             // Phase 4: Respect centralized input block (set by UI pointer events)

@@ -141,6 +141,21 @@ namespace WebGL.Core.Managers
         {
             return IsScreenPositionOverPickableUI(Input.mousePosition);
         }
+
+        /// <summary>Diagnostics (PickDiagnostics): the selection UI block at an arbitrary screen position, ignoring InputBlocked / gestures.</summary>
+        public bool IsScreenPositionOverSelectionBlockingUI(Vector2 screenPos)
+        {
+            return IsScreenPositionOverSelectionBlockingUIRaw(screenPos);
+        }
+
+        /// <summary>Diagnostics: the element Panel.Pick returns at a screen position with its type, classes, picking mode and rect, or "none".</summary>
+        public string DescribePickDetailAt(Vector2 screenPos)
+        {
+            if (!TryPickUIAtScreenPosition(screenPos, out VisualElement e)) return "none";
+            Rect wb = e.worldBound;
+            return (string.IsNullOrEmpty(e.name) ? "(unnamed)" : e.name) + "[" + e.GetType().Name + "]." + string.Join(".", e.GetClasses())
+                + " picking=" + e.pickingMode + " rect=(" + wb.x.ToString("F0") + "," + wb.y.ToString("F0") + "," + wb.width.ToString("F0") + "x" + wb.height.ToString("F0") + ")";
+        }
 #endif
 
         // ═══════════════════════════════════════════════════════
