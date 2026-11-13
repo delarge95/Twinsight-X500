@@ -89,6 +89,7 @@ namespace WebGL.UI.Desktop
             _legend?.RemoveFromHierarchy();
             _toast?.RemoveFromHierarchy();
             DisposeFaultVisuals();
+            DisposeEnv();
             _pulse?.Pause();
             _statusChip?.RemoveFromHierarchy();
             _sessionChip?.RemoveFromHierarchy();
@@ -166,6 +167,7 @@ namespace WebGL.UI.Desktop
             BuildPilotOverlay();
             if (!PCDebugFlags.Has("nofxui")) BuildFaultVisuals(); // PLAN_PC 27.3 / 28.1: the markers pinned on the parts (-pcdbg nofxui: diagnostics)
             BuildSheetTabs();
+            BuildEnvOverlay(); // PLAN_PC 28.2 / 28.3: the altitude label and the course HUD pill
             if (!PCDebugFlags.Has("nofxui")) BuildFaultDock(); // PLAN_PC 28.1: the explanation card, a collapsed section of the Flight tab
             UIDetailsSheet.DesktopKeepOpenOnDeselect = () => TelemetryTabActive;
             BuildStatusBarItem();
@@ -481,6 +483,7 @@ namespace WebGL.UI.Desktop
 
             if (Time.unscaledTime >= _nextSlowTick) _nextSlowTick = Time.unscaledTime + 0.1f;
             TickFaultVisuals();
+            TickEnv();
             TickPopovers();
             TickFlightTab();
             TickAnalysisTab();

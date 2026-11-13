@@ -464,6 +464,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-env-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var envCap = gameObject.AddComponent<DesktopCaptureEnv>();
+                    envCap.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-tel-sim-ui", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var simUi = gameObject.AddComponent<DesktopCaptureSim>();

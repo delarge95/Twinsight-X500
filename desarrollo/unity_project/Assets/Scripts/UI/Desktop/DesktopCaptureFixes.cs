@@ -103,13 +103,11 @@ namespace WebGL.UI.Desktop
         private IEnumerator Shot(string name, float wait = 0.4f)
         {
             yield return new WaitForSecondsRealtime(wait);
-            yield return new WaitForEndOfFrame();
-            var tex = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-            tex.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-            tex.Apply();
+            Texture2D tex = null;
+            yield return DesktopScreenGrab.Grab(t => tex = t); // back buffer, or an offscreen render when the desktop does not present (PLAN_PC 28.4)
             File.WriteAllBytes(Path.Combine(OutputDirectory, _tag + "_" + name + ".png"), ImageConversion.EncodeToPNG(tex));
             Destroy(tex);
-            Log("shot " + _tag + "_" + name);
+            Log("shot " + _tag + "_" + name + " via " + DesktopScreenGrab.LastMethod + " luma " + DesktopScreenGrab.LastLuma.ToString("F1", System.Globalization.CultureInfo.InvariantCulture));
         }
 
         private IEnumerator Frames(int n) { for (int i = 0; i < n; i++) yield return null; }

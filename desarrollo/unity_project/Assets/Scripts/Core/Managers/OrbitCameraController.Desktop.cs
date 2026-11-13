@@ -62,6 +62,20 @@ namespace WebGL.Core.Managers
         private Vector3 _telemetryCenterOffset;
         private bool _telemetryHaveCenter;
 
+        /// <summary>
+        /// PLAN_PC 28.2: while a telemetry session runs the zoom-out reaches the whole flight (the viewer's own limit, 25 units, is about 1.5 m of the drone:
+        /// the ground, the course and a 60 m climb are out of reach). 2400 units are about 150 m (the geofence is 120 m); the far plane of the session is 6000.
+        /// </summary>
+        public const float SessionMaxDistance = 2400f;
+
+        /// <summary>Session wheel zoom: a fixed fraction of the current distance per notch (12 %), from the eye-level of the drone to the whole course; the viewer's own step is a fraction of its short range and would jump 20 m per notch here.</summary>
+        private bool DesktopSessionZoom(float amount)
+        {
+            if (!_telemetryFollow || LegacyTelemetryFollow) return false;
+            targetDistance = Mathf.Clamp(targetDistance * Mathf.Pow(0.88f, amount), GetZoomMinDistance(), GetZoomMaxDistance());
+            return true;
+        }
+
         /// <summary>-cam-legacy (tests): the follow of WP-10 (position only, offsets fixed in the world, no snap) to measure the drift it had.</summary>
         public static bool LegacyTelemetryFollow;
 

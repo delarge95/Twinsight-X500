@@ -212,6 +212,19 @@ namespace WebGL.Telemetry
             { "strip.source", new[] { "Fuente", "Source" } },
             { "strip.alerts", new[] { "Alertas", "Alerts" } },                                                        // alerts.title
             { "strip.faults", new[] { "Fallas", "Faults" } },
+            // 28.2 / 28.3: environment toggles and the simulated test course (honest: simulated, no physics, nothing about real drones)
+            { "env.ground", new[] { "Suelo", "Ground" } },
+            { "env.ground.tip", new[] { "Suelo del mundo con rejilla de 1, 10 y 100 m, sombra del dron y línea de altitud. Se puede ocultar.", "World ground with a 1, 10 and 100 m grid, the drone's shadow and an altitude line. It can be hidden." } },
+            { "course.btn", new[] { "Escenario", "Course" } },
+            { "course.label", new[] { "Escenario de prueba simulado", "Simulated test scenario" } },
+            { "course.tip", new[] { "Escenario de prueba simulado: aros, conos, un muro con hueco y zonas para volar en el simulador. Sin física: las colisiones son pruebas de volumen simples sobre la posición del dron.", "Simulated test scenario: rings, pylons, a wall with a gap and zones to fly in the simulator. No physics: collisions are simple volume tests on the drone position." } },
+            { "course.tip.off", new[] { "Disponible solo con el simulador de vuelo.", "Available only with the flight simulator." } },
+            { "course.waiting", new[] { "Despega o pasa el aro 1", "Take off or fly ring 1" } },
+            { "course.cp", new[] { "Puntos {k}/{n}", "Points {k}/{n}" } },
+            { "course.hits", new[] { "Choques {c}", "Hits {c}" } },
+            { "course.reset", new[] { "Reiniciar", "Reset" } },
+            { "course.reset.tip", new[] { "Empezar otra vuelta: tiempo, puntos y choques a cero", "Start another lap: time, points and hits back to zero" } },
+            { "course.done", new[] { "Vuelta completa en {t} · choques: {c}", "Lap complete in {t} · hits: {c}" } },
             { "chip.status.tip", new[] { "Abrir el modo Telemetría", "Open Telemetry mode" } },
             { "chip.session.tip", new[] { "Detener la telemetría", "Stop telemetry" } },
 

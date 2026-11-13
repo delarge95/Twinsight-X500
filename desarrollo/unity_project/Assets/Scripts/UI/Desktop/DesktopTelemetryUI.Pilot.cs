@@ -93,6 +93,7 @@ namespace WebGL.UI.Desktop
                 _pilotStrip.Add(b);
             }
 
+            BuildEnvButtons(_pilotStrip); // PLAN_PC 28.2 / 28.3: «Suelo» and «Escenario»
             _container.Add(_pilotStrip);
         }
 
@@ -181,6 +182,7 @@ namespace WebGL.UI.Desktop
                 _btnCmd[i].tooltip = T(ck[i] + ".tip");
             }
             _btnPilot.tooltip = T(DesktopTelemetry.AcceptsCommands || _pilotOn ? "pilot.toggle.tip" : "pilot.toggle.off.tip");
+            RelabelEnv();
 
             _legendTitle.text = T("pilot.legend.title");
             _legendKeys.Clear();

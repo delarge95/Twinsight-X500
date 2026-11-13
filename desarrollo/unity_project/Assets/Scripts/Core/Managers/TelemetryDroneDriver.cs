@@ -55,8 +55,17 @@ namespace WebGL.Core.Managers
         public DronePose.Rest RestPose => rest;
         public IReadOnlyCollection<string> HighlightedComponents => highlighted.Keys;
         public double[] PropPhases => phase;
-        /// <summary>Faint 1 m ground grid under the flight (the studio has no world floor). On by default; WP-11 may expose it.</summary>
+        /// <summary>The world ground under the flight (the studio has no world floor): infinite grid in world space, shadow and altitude cue (TelemetryGroundReference, PLAN_PC 28.2). On by default; the strip's «Suelo» toggle switches it live.</summary>
         public static bool ShowGroundReference = true;
+        /// <summary>The camera's far plane while a session runs, in model units (16 units = 1 m): the geofence is 120 m wide, so 6000 units (~370 m) keeps the whole course and the horizon objects inside the frustum.</summary>
+        public const float SessionFarClip = 6000f;
+        public TelemetryGroundReference GroundRef => ground;
+        public float AltitudeMeters => ground != null ? ground.AltitudeMeters : 0f;
+        /// <summary>World units per metre of the model (16.13 for the X500).</summary>
+        public float UnitsPerMeter => rest.UnitsPerMeter;
+        /// <summary>The origin of the flight in world space (the body origin at rest) and the metres-to-world conversion used by anything placed in the flight's frame (the test course).</summary>
+        public Vector3 FlightOrigin => rest.BodyOrigin;
+        public bool GroundShown => ground != null && ground.Visible;
         public Transform MotorPart(int motor) => motor >= 1 && motor <= 4 ? motorPart[motor] : null;
         public int LastMotorOfPart(string partName) => motorOfPart.TryGetValue(partName, out int m) ? m : 0;
 
@@ -82,7 +91,7 @@ namespace WebGL.Core.Managers
             north = east = 0;
             world = default;
             var cam = Camera.main;
-            if (!Engaged || ground == null || cam == null || rest.UnitsPerMeter <= 0f) return false;
+            if (!Engaged || ground == null || !ground.Visible || cam == null || rest.UnitsPerMeter <= 0f) return false;
             Ray ray = cam.ScreenPointToRay(screen);
             var plane = new Plane(Vector3.up, new Vector3(0f, ground.GroundY, 0f));
             if (!plane.Raycast(ray, out float enter)) return false;
@@ -107,6 +116,8 @@ namespace WebGL.Core.Managers
         OrbitCameraController orbit;
         HelloMessage mappedHello;
         TelemetryGroundReference ground;
+        Camera sessionCam;
+        float prevFar = 200f;
 
         // motor number (1..4) -> parts
         readonly Transform[] motorPart = new Transform[5];
@@ -157,7 +168,11 @@ namespace WebGL.Core.Managers
             if (root == null) return;
 
             ApplyPose(f);
-            if (ground != null) ground.Follow(DronePose.BodyPosition(rest, f.p));
+            if (ground != null)
+            {
+                ground.Visible = ShowGroundReference;
+                ground.Follow(DronePose.BodyPosition(rest, f.p), (float)(-f.p[2]));
+            }
             ApplyPropellers(client, f, Time.unscaledDeltaTime);
             ApplyAlerts(client);
         }
@@ -202,14 +217,17 @@ namespace WebGL.Core.Managers
                 if (t != null) propRestByName[n] = (t.localRotation, t.InverseTransformDirection(Vector3.up).normalized);
             }
 
-            if (ShowGroundReference)
             {
-                // Ground = underside of the landing gear at rest (altitude 0 of the flight).
+                // Ground = underside of the landing gear at rest (altitude 0 of the flight). Always built (the toggle only hides it).
                 float feet = float.PositiveInfinity;
                 foreach (var r in root.GetComponentsInChildren<Renderer>())
                     if (r.enabled && r.gameObject.activeInHierarchy) feet = Mathf.Min(feet, r.bounds.min.y);
                 if (!float.IsInfinity(feet)) ground = TelemetryGroundReference.Create(rest.UnitsPerMeter, feet);
             }
+
+            // The camera sees the whole geofence and the horizon objects: far plane up to SessionFarClip while a session runs (near stays 0.01).
+            sessionCam = orbit != null ? orbit.GetComponent<Camera>() : Camera.main;
+            if (sessionCam != null && !(ground != null && ground.IsLegacy)) { prevFar = sessionCam.farClipPlane; sessionCam.farClipPlane = Mathf.Max(prevFar, SessionFarClip); }
 
             mappedHello = null;
             BuildMapping(null);
@@ -225,6 +243,7 @@ namespace WebGL.Core.Managers
         {
             ReleaseAllAlerts();
             if (ground != null) { Destroy(ground.gameObject); ground = null; }
+            if (sessionCam != null) { sessionCam.farClipPlane = prevFar; sessionCam = null; }
             // Rest pose and propeller angles.
             if (root != null)
             {

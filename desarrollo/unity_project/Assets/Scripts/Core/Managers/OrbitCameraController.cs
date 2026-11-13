@@ -464,6 +464,9 @@ namespace WebGL.Core.Managers
 
         private void ApplyZoom(float amount)
         {
+#if UNITY_STANDALONE
+            if (DesktopSessionZoom(amount)) return;
+#endif
              float zoomMin = GetZoomMinDistance();
              float zoomMax = GetZoomMaxDistance();
              float zoomRange = Mathf.Max(zoomMax - zoomMin, 0.001f);
@@ -705,6 +708,9 @@ namespace WebGL.Core.Managers
 
         private float GetZoomMaxDistance()
         {
+#if UNITY_STANDALONE
+            if (_telemetryFollow && !LegacyTelemetryFollow) return Mathf.Max(currentMaxDistance, SessionMaxDistance);
+#endif
             return Mathf.Max(currentMaxDistance, GetZoomMinDistance() + 0.01f);
         }
 

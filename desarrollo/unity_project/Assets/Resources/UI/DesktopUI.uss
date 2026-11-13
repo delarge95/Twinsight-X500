@@ -2321,3 +2321,39 @@
 .dk-fxdock-body .dk-fx-card { margin: 2px 0 0 0; }
 .dk-fault-foot { flex-direction: row; justify-content: flex-end; margin: 2px 0 0 0; }
 .desktop-ui .dk-b.dk-fault-footbtn { height: 24px; margin: 0 0 0 6px; padding: 0 10px; font-size: 11.5px; }
+
+/* ================================================================
+   Phase 12 - PLAN_PC 28.2 / 28.3: environment. The altitude label next to the drone->ground line and the course HUD pill. Tokens only: celeste
+   70,175,255 / highlight 191,234,255 / surfaces, state.ok 63,191,138, state.crit 255,77,77.
+   ================================================================ */
+.dk-alt-chip {
+    position: absolute;
+    margin: 0;
+    padding: 1px 7px;
+    font-size: 11.5px;
+    color: rgb(191, 234, 255);
+    border-width: 1px;
+    border-radius: 9px;
+    border-color: rgba(70, 175, 255, 0.55);
+    background-color: rgba(11, 13, 17, 0.72);
+    white-space: nowrap;
+}
+.dk-course {
+    align-self: center;
+    margin: 6px 0 0 0;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 6px 5px 12px;
+    border-width: 1px;
+    border-radius: 14px;
+    border-color: rgba(70, 175, 255, 0.45);
+    background-color: rgba(14, 17, 22, 0.88);
+}
+.dk-course-caption { margin: 0; font-size: 10px; letter-spacing: 0.4px; color: rgb(139, 149, 163); }
+.dk-course-row { flex-direction: row; align-items: center; }
+.dk-course-time { margin: 0 12px 0 0; min-width: 52px; font-size: 15px; -unity-font-style: bold; color: rgb(255, 255, 255); -unity-text-align: middle-left; }
+.dk-course-stat { margin: 0 12px 0 0; font-size: 12.5px; color: rgb(204, 214, 226); }
+.desktop-ui .dk-b.dk-course-resetbtn { height: 22px; margin: 0; padding: 0 10px; font-size: 11px; }
+.dk-course-result { margin: 3px 6px 0 0; font-size: 12.5px; -unity-font-style: bold; color: rgb(63, 191, 138); }
+.dk-course--hit { border-color: rgba(255, 77, 77, 0.95); background-color: rgba(44, 14, 14, 0.92); }
+.dk-course--done { border-color: rgba(63, 191, 138, 0.8); }

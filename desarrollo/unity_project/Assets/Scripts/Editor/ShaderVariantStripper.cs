@@ -75,7 +75,7 @@ namespace WebGL.Editor
                 return;
             
             // Fase 3A: los shaders/materiales de PC (Resources/PC) no se compilan para WebGL.
-            if (shader.name == "TwinSight/DroneLitPC" || shader.name == "TwinSight/XRayPC" || shader.name == "TwinSight/WireframePC")
+            if (shader.name == "TwinSight/DroneLitPC" || shader.name == "TwinSight/XRayPC" || shader.name == "TwinSight/WireframePC" || shader.name == "TwinSight/GroundGridPC" || shader.name == "TwinSight/CourseUnlitPC")
             {
                 _strippedCount += variants.Count;
                 _totalCount += variants.Count;
