@@ -848,3 +848,77 @@ Todo PC-only (`#if UNITY_STANDALONE`; el modelo y las pruebas compilan en cualqu
 - Con SITL real el flujo de sticks usa los mismos mensajes (`pilot`, `manual`, `fly_to`...), pero no se ha probado contra PX4 (F-3): la geovalla de 120 m y el recorte del destino son del simulador y el aviso solo sale con él.
 - El clic en el suelo solo actúa con el dron en vuelo y sin pieza seleccionada (como la web): con una pieza seleccionada el primer clic en el fondo deselecciona.
 - El rótulo de la fuente del `hello` («Simulador de vuelo de la aplicación...») está en español también con la interfaz en inglés (texto libre del contrato).
+
+## 25. E-7 y E-9: 7.º paso del tutorial, cierre de la versión de escritorio y empaquetado (2026-11-13, rama `pc-desktop`)
+
+### 25.1 Estado final
+Aplicación de escritorio completa para Windows 10/11 64 bits: visor 3D con el X500 V2, ficha lateral, modos 1/2/3, modo 4 «Telemetría» con tres fuentes (repetición local = sombra digital, simulador de vuelo y PX4 SITL, este último sin probar con un PX4 real), pestañas Pieza / Vuelo / Análisis, alertas y fallas sintéticas, pilotaje del simulador, tutorial de **7 pasos** y ajustes (idioma, calidad, reducir animaciones). Build: `E:\TwinSight_builds\release\TwinSightX500_PC\TwinSightX500.exe` (236 MB, 0 errores). WebGL no cambia: compila con 0 errores y su tutorial sigue con 6 pasos (control en Play: 6 segmentos, sin `DkTopBar` ni `_DesktopUI`).
+
+### 25.2 E-7: paso «Telemetría» (6.º de 7, antes de «Listo»; web `f7624af`, Unity `3030386`)
+- **Orden.** Sigue `design/onboarding.json` `finalOrder`: `… studio, flight_telemetry, ready`; el contador dice `06 / 07` y «Listo» es el 7.º. Barra de progreso de 7 segmentos, flechas ← → y Esc, «Reducir animaciones» (un fotograma de la fase 0, o de la fase fijada).
+- **Datos.** `TutorialOverlay` conserva intactos los 6 pasos (el extractor de la web los sigue leyendo) y el paso nuevo está en `TutorialOverlay.Telemetry.cs`, solo para escritorio (`BuildSteps(includePcOnly)`; WebGL lo filtra). Sus textos son claves de `TelemetryStrings` (`tut.tel.*`, ES/EN). Las palabras de honestidad salen de `labels.json` (`HonestyLabels`, `FlightOrigins`): fuente («Sombra digital», «Simulador de vuelo», «Gemelo digital SITL»), origen («medido», «estimado») y «sintética». Una prueba comprueba que las pistas repiten esas palabras.
+- **Escena «Vuelo»** (`TutorialAnim.Telemetry.cs`, Painter2D + etiquetas): 4 fases de 2,6 s que coinciden con las 4 filas (clicables: solo se reproduce la fila elegida). 1: la tecla `4` enciende el modo (chip 4), sube la tira Encendido / Fuente / Alertas / Fallas y giran las hélices. 2: tecla `L`, lista de fuentes y el chip nombra cada una (sombra digital, simulador, gemelo SITL). 3: pestaña «Vuelo» con **dos lecturas fijas de origen distinto** (altura «medido», temp. motores «estimado»; D-7: nada convierte una en la otra). 4: interruptor «Pilotar», las cuatro órdenes y las teclas (WASD, Esc). Variante táctil con dedos y pies de ilustración propios (sin teclado).
+- **Diferencias con la propuesta (§3 de `PROPUESTA_TEXTOS_HONESTIDAD`)**, todas hacia la app real: la tira es «Encendido, Fuente, Alertas, Fallas» (las lecturas están en la pestaña «Vuelo», no en una banda); hay una fila «Pilotar» (pedida en el encargo) y «Encendido» pasó a ser una pista de la fila 1; el cuerpo dice «Datos de vuelo sobre el modelo, siempre con su origen» (sin «de PX4», porque el simulador no es PX4); «Gemelo SITL» es «Gemelo digital SITL» (rótulo exacto del contrato). Las filas `mouse` de la web usan el texto de la propuesta; las `touch` del .exe hablan de la interfaz de escritorio en pantalla táctil.
+- **Pruebas** (`TutorialStepsTests`, 4): 7 pasos en el .exe y 6 en WebGL; cada fila de cada variante tiene un icono que existe (`OutlineIconData`) y textos ES/EN (pasos 1-6: pares en línea; paso 7: claves presentes en los dos idiomas); 4 filas por variante y captions por fase; las pistas repiten `labels.json`. EditMode total: **133 pasan, 3 fallan** (los 3 `MigrationSmokeTests` de siempre).
+- **Arreglo de paso**: la etiqueta de pieza de «Modos» («Controlador de vuelo») se quedaba flotando al cambiar de paso; ahora se oculta en `SetStep`/`Lock`.
+
+### 25.3 E-9: recorrido completo en el .exe (build `release`; sondas dentro del jugador: `-desk-close <carpeta>`, `DesktopCaptureClosing`)
+Los clics son `NavigationSubmitEvent` y las teclas se inyectan por las costuras del pilotaje: **no se usó el ratón ni el teclado del sistema** (no se puede garantizar que el .exe esté en primer plano: Comet roba el foco). Arranque con las preferencias borradas (primer uso; copia en el `scratchpad` de la sesión, restaurada al final).
+
+| # | Paso | Resultado |
+|---|---|---|
+| 1-2 | Hero visible; «Abrir visor» | PASS |
+| 3-4 | El tutorial se abre solo en la primera visita | PASS |
+| 5-19 | Tutorial: 7 segmentos; pasos 1-7 con contador `0n / 07`, título y 3-4 filas; paso 6 «Telemetría» con 4 filas; fila fijada; variante táctil; reducir animaciones; Atrás; «Empezar» cierra y lo marca como visto | PASS |
+| 20 | Segunda visita sin tutorial | PASS |
+| 21-24 | Seleccionar pieza; pestañas Vuelo, Análisis y Pieza | PASS |
+| 25-28 | Modos 1, 2, 3 y 4 (segmento encendido, tira visible) | PASS |
+| 29-36 | Chips de corte, explosión, filtro y energía: aparecen y al pulsarlos desactivan | PASS |
+| 37-39 | Árbol de piezas y búsqueda | PASS |
+| 40-43 | Ajustes: idioma, calidad (Ultra, Medium, High), reducir animaciones, cerrar | PASS |
+| 44-45 | Repetición local desde el selector: rótulo aprobado y fotogramas | PASS |
+| 46-48 | Falla sintética, alerta «falla sintética», limpiar | PASS |
+| 49 | Análisis dibuja las gráficas | PASS |
+| 50-55 | Simulador (nunca SITL), Pilotar, despegue a ~5 m, `W` avanza, Esc suelta, Encendido detiene | PASS |
+| 56-58 | Restablecer vista, Inicio, salir | PASS |
+
+**57/57 PASS** (58 con «salir») en español con la build final (`player_close_es_final.log`). Una ejecución anterior en inglés (build intermedia) dio 3 FAIL que eran de la sonda, no de la app: «chip explosión» (la sonda no activaba el modo antes de fijar el factor) y «repetición» y «falla» (la preferencia `Desk_Source` recordaba el simulador de la ejecución anterior y «Encendido» arrancó el simulador); la sonda ya elige la fuente por el selector y activa la explosión como `DesktopSelfCheck`. Con la build final el tutorial en inglés dio 19/19; el recorrido completo en inglés con la build final **no se repitió** (unos 12 min por ejecución).
+- **Player.log** de la sesión completa (~12 min): 231 líneas, **0 excepciones, 0 errores, 0 avisos**.
+- Capturas: `twinsight-web-twin/docs/unity_pc/capturas_cierre/` (`1904x984_<es|en>_tut_paso1..7_pc`, `tut_paso6_pc_fila1..4`, `tut_paso6_tactil_fila1..4`, `tut_paso6_reducir_animaciones` y 13 fotogramas del recorrido; `fps_ultra.png` y `fps_high.png` confirman el visor abierto a 1920x1080). La ventana sale de 1904x984 porque la app ajusta la ventana al área de trabajo.
+
+### 25.4 Higiene de la versión
+- **Valores por defecto del primer arranque**: calidad automática = **PC_Ultra** en esta GPU; ventana ajustada al área de trabajo (`FitWindowToWorkArea`); tutorial solo en la primera visita (probado); **idioma**: era inglés fijo; ahora, en el escritorio, el del sistema (español si Windows está en español, inglés si no; `AppLanguageManager.LoadInitialLanguage`, solo `UNITY_STANDALONE`; WebGL sigue en inglés). Comprobado: la primera ejecución sin `-lang` arrancó en español (este Windows está en español).
+- **PlayerSettings**: empresa `UNAD`, producto `TwinSight X500` (título de la ventana y clave de `PlayerPrefs`), versión `1.0`: ya eran coherentes y **no se tocaron** (son globales y cambiarían también el WebGL y el registro de preferencias).
+- **FPS** (1920x1080 en ventana, `-vsync 0` confirmado en el registro con `vsync=0 target=-1`, visor abierto con `-perf-viewer` y confirmado con `-perf-shot`, ventanas de 10 s, RTX 5060 Ti, i7-5820K, D3D11, Editor abierto):
+
+  | Calidad | FPS media (ventanas 3-8) | p1 |
+  |---|---|---|
+  | PC_Ultra (render 1,25, MSAA 4x) | ~61,6 (60,7-62,9) | ~38 |
+  | PC_High (render 1,0, MSAA 4x) | ~60,8 (58,2-61,8) | ~39 |
+  | PC_Low (control) | ~61,7 | ~37 |
+  | PC_Ultra con `-desk-reduce` | ~62,8 | ~37 |
+
+  El Hero (sin visor) da 105-150 FPS con el mismo `-vsync 0`. **Problema abierto**: el visor se queda en ~61 FPS **también en Low** y con las animaciones reducidas, así que no es la GPU ni los iconos: hay un límite o un coste de CPU por fotograma de ~16 ms que antes no estaba (la fase 3B.1 medía ~120 FPS en la misma máquina). No se aisló; sospechas: el trabajo por fotograma de las fases de telemetría (F-6) y el Editor abierto. Se añadieron `vsync` y `targetFrameRate` a la línea de `PerfLogger`.
+- Se reconstruyó varias veces (`unity_build`, Standalone) en `E:\TwinSight_builds\release\`; se pintó bien siempre (no hizo falta la receta 12.3). Tras construir: plataforma activa **WebGL**, `UniversalRenderPipelineGlobalSettings.asset` y `QualitySettings.asset` restaurados con `git checkout`.
+
+### 25.5 Empaquetado
+- Carpeta `E:\TwinSight_builds\release\TwinSightX500_PC\` (exe, `TwinSightX500_Data`, `MonoBleedingEdge`, `D3D12`, DLL de Unity y de DirectStorage y `LEEME.txt` en español: qué es, requisitos, controles, fuentes y su significado honesto, opciones `-part`, `-lang`, `-quality`, `-sitl-url` y límites). De la zip se excluye la carpeta `TwinSightX500_BackUpThisFolder_ButDontShipItWithYourGame`.
+- Zip: `E:\TwinSight_builds\release\TwinSightX500_PC_20261113.zip` (80,7 MB, `Compress-Archive`), SHA-256 en `TwinSightX500_PC_20261113.zip.sha256`: `7ba378a6b260352a5e801a476f51748aa088f649873ed1d556bf50ae3da738b8`. Nada se publicó ni se subió. Las entradas de la zip llevan `\` (Compress-Archive de PowerShell 5.1): Windows y 7-Zip las leen bien.
+- La build incluye los ayudantes de verificación (`-desk-*`, `-tel-*`, `-perf-*`): solo actúan con su argumento.
+
+### 25.6 Límites conocidos
+PX4 SITL sin probar de extremo a extremo; el simulador no está calibrado; el mando XInput no se probó con un mando real; sin ratón ni teclado reales del SO (hover real, pérdida de foco real); FPS ~61 frente a ~120 de la 3B.1 (arriba); recorrido completo en inglés no repetido con la build final; la zip no se probó en otro equipo; el protocolo `twinsight://` solo se acepta como argumento; la variante táctil del tutorial dibuja dedos, pero la app de escritorio no tiene gestos táctiles propios.
+
+### 25.7 Lista pendiente para Fable 5.2
+- **F-1** Campo térmico desde la telemetría en el shader (hoy la carga térmica sigue siendo del modo simulado).
+- **F-2** Calibrar el simulador contra el ULog real del X500.
+- **F-3** PX4 SITL de extremo a extremo con un PX4 real y el puente (`bridge/px4_bridge.py`).
+- **F-4** Registro de `twinsight://` e instalador.
+- **F-5** Despliegue 24/7 del Worker.
+- **F-6** Asignación por fotograma (~19 KB por fotograma medidos en el visor en reposo) y el techo de ~61 FPS de 25.4.
+- **Numeración de motores**: la ficha de la pieza dice «frontal derecho» para lo que la telemetría llama «Motor 3 · delantero izquierdo» (etiquetas de Blender frente a la numeración de PX4).
+- **Variante de escritorio de los rótulos de honestidad en el contrato**: los textos dicen «navegador»; hoy `TelemetryStrings.ForDesktop` los sustituye por «esta aplicación» en el cliente.
+- **Orígenes sin etiquetar en el contrato**: pose, velocidades, batería (carga y tensión) y vibración no llevan origen en `hello`; el escritorio les asigna medido (repetición) o simulado.
+- **Pruebas de hover con ratón real** (y de pérdida de foco real) cuando el .exe pueda estar en primer plano.
+- **3 `MigrationSmokeTests` que fallan desde antes**: esperan Unity 6000.4.3f1 y el proyecto es 6000.6.5f1 (versión, banderas WebGL y sistemas de la escena).
+- Web: los ficheros generados de `design/`, `design.lock.json`, `tests/ts/design.test.ts` y `tools/design/extract_unity.mjs` quedaron actualizados **sin commit** (el encargo pedía solo `design/onboarding.json`); hasta que se confirmen, `npm run design:check` falla en HEAD por el `design.lock.json` desfasado.

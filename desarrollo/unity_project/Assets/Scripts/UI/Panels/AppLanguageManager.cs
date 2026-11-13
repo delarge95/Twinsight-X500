@@ -254,7 +254,13 @@ namespace WebGL.UI.Panels
 
         private static string LoadInitialLanguage()
         {
+#if UNITY_STANDALONE
+            // desktop first run: the language of the system (Spanish or English); WebGL keeps its fixed English default
+            string fallback = Application.systemLanguage == SystemLanguage.Spanish ? "es" : "en";
+            return NormalizeLanguage(PlayerPrefs.GetString(PlayerPrefsKey, fallback));
+#else
             return NormalizeLanguage(PlayerPrefs.GetString(PlayerPrefsKey, "en"));
+#endif
         }
 
         private static string NormalizeLanguage(string languageCode)

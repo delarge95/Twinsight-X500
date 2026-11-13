@@ -408,6 +408,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-desk-close", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var closing = gameObject.AddComponent<DesktopCaptureClosing>();
+                    closing.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-desk-anim", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var anim = gameObject.AddComponent<DesktopCaptureAnim>();

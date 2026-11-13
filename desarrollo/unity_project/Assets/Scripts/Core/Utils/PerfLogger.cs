@@ -97,7 +97,7 @@ namespace WebGL.Core.Utils
             float minFps = 1f / worst;
             float p1Fps = 1f / p99;
             _windowIndex++;
-            Debug.Log($"[PerfLogger] ventana {_windowIndex} ({_windowElapsed:F1}s, {n} frames): t={Time.realtimeSinceStartup:F0}s FPS media={avgFps:F1} min={minFps:F1} p1={p1Fps:F1}");
+            Debug.Log($"[PerfLogger] ventana {_windowIndex} ({_windowElapsed:F1}s, {n} frames): t={Time.realtimeSinceStartup:F0}s FPS media={avgFps:F1} min={minFps:F1} p1={p1Fps:F1} vsync={QualitySettings.vSyncCount} target={Application.targetFrameRate}");
             _frameTimes.Clear();
             _windowElapsed = 0f;
         }
