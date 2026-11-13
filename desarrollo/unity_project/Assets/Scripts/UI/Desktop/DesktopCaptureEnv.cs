@@ -277,9 +277,6 @@ namespace WebGL.UI.Desktop
             Application.Quit();
         }
 
-
-        // the test course checks arrive with PLAN_PC 28.3 (DesktopCaptureEnv.Course.cs)
-        private IEnumerator RunCourseChecks() { yield break; }
     }
 }
 #endif
