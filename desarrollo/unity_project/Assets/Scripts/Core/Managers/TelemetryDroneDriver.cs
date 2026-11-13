@@ -36,7 +36,14 @@ namespace WebGL.Core.Managers
         static readonly string[] BatteryParts = { "x500v2_blend_battery_pad", "x500v2_blend_battery_mounting_plat" };
         static readonly string[] FcParts = { "x500v2_pixhawk6c", "x500v2_blend_pcb_pixhawk6c_f1", "x500v2_blend_mianke_pixhawk6c_lv_c1" };
 
-        static readonly Color AlertColor = new Color(1f, 0.16f, 0.12f, 1f);
+        // Alert accent: the design token state.crit (#ff4d4d), drawn by the _AlertColor / _AlertIntensity properties of DroneLitPC (own
+        // path: it is not mixed with the celeste of the selection/hover highlight, which keeps its colours). Materials without those
+        // properties (the WebGL shader, view modes) fall back to the shared highlight properties with the legacy red.
+        static readonly Color AlertColor = new Color32(255, 77, 77, 255);
+        static readonly Color AlertColorFallback = new Color(1f, 0.16f, 0.12f, 1f);
+        static readonly int AlertColorId = Shader.PropertyToID("_AlertColor");
+        static readonly int AlertIntensityId = Shader.PropertyToID("_AlertIntensity");
+        MaterialPropertyBlock alertBlock;
 
         // ── state read by the verification harness ──
         public static TelemetryDroneDriver Instance { get; private set; }
@@ -176,7 +183,7 @@ namespace WebGL.Core.Managers
             mappedHello = null;
             BuildMapping(null);
             if (drone != null) drone.ExternalMotion = true;
-            if (orbit != null) orbit.SetTelemetryFollow(true);
+            if (orbit != null) orbit.SetTelemetryFollow(true, root, rest.RootRotation);
             Engaged = true;
             Debug.Log("[TelemetryDrone] engaged: model units per metre = " + rest.UnitsPerMeter.ToString("F2") + ", body origin = " + rest.BodyOrigin.ToString("F3") +
                       ", model nose = -Z (correction = Ry(180))");
@@ -290,8 +297,7 @@ namespace WebGL.Core.Managers
                 foreach (var hs in systems)
                 {
                     if (hs == null) continue;
-                    var mc = hs.GetComponent<MaterialController>();
-                    if (mc != null) mc.SetColor(AlertColor, intensity);
+                    SetAlert(hs, intensity);
                 }
             }
 
@@ -322,10 +328,36 @@ namespace WebGL.Core.Managers
             return result;
         }
 
+        /// <summary>Paints (intensity &gt; 0) or clears (0) the alert accent of a part. Reads the renderer's property block first, so a selection or hover on the same part keeps its own values.</summary>
+        void SetAlert(HighlightSystem hs, float intensity)
+        {
+            var mc = hs.GetComponent<MaterialController>();
+            Renderer[] rs = mc != null && mc.Renderers != null && mc.Renderers.Length > 0 ? mc.Renderers : hs.GetComponentsInChildren<Renderer>(true);
+            if (alertBlock == null) alertBlock = new MaterialPropertyBlock();
+            bool fallback = false;
+            for (int i = 0; i < rs.Length; i++)
+            {
+                Renderer r = rs[i];
+                if (r == null) continue;
+                Material m = r.sharedMaterial;
+                if (m == null || !m.HasProperty(AlertIntensityId)) { fallback = true; continue; }
+                r.GetPropertyBlock(alertBlock);
+                alertBlock.SetColor(AlertColorId, AlertColor);
+                alertBlock.SetFloat(AlertIntensityId, intensity);
+                r.SetPropertyBlock(alertBlock);
+            }
+            if (fallback && intensity > 0f && mc != null) mc.SetColor(AlertColorFallback, intensity);
+        }
+
         void ReleaseAlert(string component)
         {
             if (highlighted.TryGetValue(component, out var systems))
-                foreach (var hs in systems) if (hs != null) hs.RefreshVisualTargets(); // back to selection / hover / rest
+                foreach (var hs in systems)
+                {
+                    if (hs == null) continue;
+                    SetAlert(hs, 0f);
+                    hs.RefreshVisualTargets(); // back to selection / hover / rest
+                }
             highlighted.Remove(component);
         }
 

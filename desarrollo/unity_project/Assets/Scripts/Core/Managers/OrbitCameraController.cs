@@ -666,6 +666,9 @@ namespace WebGL.Core.Managers
             // Reset Pan / Focus
             targetFocusPoint = initialFocusPoint;
             targetOffset = initialTargetOffset;
+#if UNITY_STANDALONE
+            targetOffset = DesktopResetOffset(initialTargetOffset);
+#endif
             
             // Optional: Reset View Shift
             targetViewShiftRatio = 0f;

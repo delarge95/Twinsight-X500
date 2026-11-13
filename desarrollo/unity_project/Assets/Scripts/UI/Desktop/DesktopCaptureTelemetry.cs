@@ -211,7 +211,7 @@ namespace WebGL.UI.Desktop
                 var mpb = new MaterialPropertyBlock();
                 var rend = m3.GetComponentInChildren<Renderer>();
                 rend.GetPropertyBlock(mpb);
-                Debug.Log("[TelCap] motor3 renderer " + rend.name + " _HighlightIntensity = " + mpb.GetFloat("_HighlightIntensity").ToString("F2") + " _HighlightColor = " + mpb.GetColor("_HighlightColor"));
+                Debug.Log("[TelCap] motor3 renderer " + rend.name + " _AlertIntensity = " + mpb.GetFloat("_AlertIntensity").ToString("F2") + " _AlertColor = " + mpb.GetColor("_AlertColor") + " (alert accent of DroneLitPC; _HighlightIntensity = " + mpb.GetFloat("_HighlightIntensity").ToString("F2") + ", selection/hover untouched)");
                 yield return Strip("04b_alerta_detalle_motor3", 4, 0.35f, 2, 640, 360);
                 OrbitCameraController.Instance?.ResetView();
                 yield return new WaitForSecondsRealtime(1.5f);

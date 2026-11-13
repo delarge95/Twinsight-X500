@@ -225,6 +225,7 @@ namespace WebGL.UI.Desktop
             Check("Vuelo tab survives a deselection (sheet stays open)", ctrl.SidePanel.IsOpen && Tel.FlightTabActive);
             Tel.CloseAllPopovers();
             yield return Shot("09_vuelo", 1.0f);
+            Log("framing at 09_vuelo: " + FramingProbe.Measure());
             Click(B("DkTelFaults"));
             yield return new WaitForSecondsRealtime(0.3f);
             Click(B("DkFaultClear"));

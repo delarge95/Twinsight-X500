@@ -86,6 +86,10 @@ Shader "TwinSight/DroneLitPC"
         _HighlightIntensity("Highlight Intensity", Range(0, 1)) = 0.0
         _HighlightRimPower("Highlight Rim Power", Range(0.5, 8)) = 2.5
 
+        [Header(Alert Highlight)]
+        [HideInInspector] _AlertColor("Alert Color", Color) = (1, 0.302, 0.302, 1)
+        [HideInInspector] _AlertIntensity("Alert Intensity", Range(0, 1)) = 0.0
+
         [Header(Clipping)]
         [Toggle(_CLIP_ENABLED)] _ClipEnabled("Enable Clipping", Float) = 0
         _ClipPlane("Clip Plane", Vector) = (0, 1, 0, 0)
@@ -198,6 +202,8 @@ Shader "TwinSight/DroneLitPC"
                 half4 _HighlightColor;
                 half _HighlightIntensity;
                 half _HighlightRimPower;
+                half4 _AlertColor;
+                half _AlertIntensity;
                 float4 _ClipPlane;
                 half4 _ClipColor;
                 half _ClipEdgeWidth;
@@ -389,6 +395,20 @@ Shader "TwinSight/DroneLitPC"
                     color.rgb += hc * highlightAmount * (0.03 + 0.10 * selBoost + (1.1 + 1.8 * selBoost) * rim);
                 }
 
+                // Alerta de telemetria (PC): rojo del token state.crit (#ff4d4d), NO mezclado con el celeste de seleccion. Conserva el
+                // sombreado (luma) para que el metal siga leyendose como metal, pero lleva el matiz a rojo saturado, y suma un relleno
+                // emisivo + borde para que las piezas oscuras (estator, placa) tambien se vean. Hover y seleccion no cambian.
+                half alertAmount = saturate(_AlertIntensity);
+                if (alertAmount > 0.001)
+                {
+                    float ndotvA = saturate(dot(normalize(normalWS), normalize(inputData.viewDirectionWS)));
+                    half rimA = pow(1.0 - ndotvA, 2.0);
+                    half luma = dot(color.rgb, half3(0.299, 0.587, 0.114));
+                    half3 redShaded = _AlertColor.rgb * (0.30 + 1.1 * saturate(luma));
+                    color.rgb = lerp(color.rgb, redShaded, saturate(alertAmount * 0.9));
+                    color.rgb += _AlertColor.rgb * alertAmount * (0.22 + 1.0 * rimA);
+                }
+
                 color.a = 1.0;
                 return color;
             }
@@ -455,6 +475,8 @@ Shader "TwinSight/DroneLitPC"
                 half4 _HighlightColor;
                 half _HighlightIntensity;
                 half _HighlightRimPower;
+                half4 _AlertColor;
+                half _AlertIntensity;
                 float4 _ClipPlane;
                 half4 _ClipColor;
                 half _ClipEdgeWidth;
@@ -559,6 +581,8 @@ Shader "TwinSight/DroneLitPC"
                 half4 _HighlightColor;
                 half _HighlightIntensity;
                 half _HighlightRimPower;
+                half4 _AlertColor;
+                half _AlertIntensity;
                 float4 _ClipPlane;
                 half4 _ClipColor;
                 half _ClipEdgeWidth;
@@ -653,6 +677,8 @@ Shader "TwinSight/DroneLitPC"
                 half4 _HighlightColor;
                 half _HighlightIntensity;
                 half _HighlightRimPower;
+                half4 _AlertColor;
+                half _AlertIntensity;
                 float4 _ClipPlane;
                 half4 _ClipColor;
                 half _ClipEdgeWidth;

@@ -37,37 +37,171 @@ namespace WebGL.Core.Managers
         /// </summary>
         public void SetDesktopViewShiftX(float ratio)
         {
-            _lateralTarget = Mathf.Clamp(ratio, 0f, 0.45f);
+            // negative = the left dock (part tree) is wider than the right one: the free area is then right of the screen centre
+            _lateralTarget = Mathf.Clamp(ratio, -0.45f, 0.45f);
         }
 
-        // -- WP-10: keep framing the drone while telemetry moves it --------------------------------------------
+        // -- WP-10 / polish: keep framing the drone while telemetry moves it ------------------------------------
         private bool _telemetryFollow;
         private bool _telemetryHavePrev;
+        private bool _telemetrySnap;
         private Vector3 _telemetryPrevTarget;
+        private Transform _telemetryPrevTargetRef;
+        private Transform _telemetryBody;
+        private Quaternion _telemetryRestRotation = Quaternion.identity;
+        private bool _telemetryRecenter;
+        private bool _telemetryHadSelection;
+        private float _telemetryReframeAt = -1f;
+
+        /// <summary>Seconds after a selection is cleared (alert click, then Esc) before the view returns to the whole drone during a session.</summary>
+        private const float TelemetryReframeDelay = 0.6f;
+        private Quaternion _telemetryPrevBodyRotation = Quaternion.identity;
+        // offset (world axes, rest attitude) from the pivot of the drone root to the centre of what is VISIBLE of it, measured when the
+        // follow engages. The framing offset the viewer leaves behind comes from the bounds of ALL renderers (hidden ones included) and can
+        // sit several units from the visible drone: a session re-centres on the visible drone, and Reset does the same while it runs.
+        private Vector3 _telemetryCenterOffset;
+        private bool _telemetryHaveCenter;
+
+        /// <summary>-cam-legacy (tests): the follow of WP-10 (position only, offsets fixed in the world, no snap) to measure the drift it had.</summary>
+        public static bool LegacyTelemetryFollow;
 
         /// <summary>
         /// True while a telemetry session moves the drone root (TelemetryDroneDriver). The view keeps framing whatever the camera
-        /// target is (the drone root, or a part of it while isolating / focusing): the focus point moves WITH the target in the same
-        /// frame instead of easing towards it, so orbit, zoom, pan, Reset and the side-panel shift behave exactly as at rest.
+        /// target is (the drone root, or a part of it while isolating / focusing) and does it RIGIDLY: the focus point is a point of the
+        /// drone body, so it moves with the target's position AND turns with the body (<paramref name="body"/> = the drone root, whose
+        /// attitude comes from the flight). Before, the focus offset (the framing offset of the root, or the "focus on part" offset) stayed
+        /// fixed in the world, so a yaw of 80 degrees swung the part out of the frame (PLAN_PC 23). Orbit angles, zoom, pan, Reset and the
+        /// side-panel shift behave as at rest. Engaging and releasing snap the focus: the drone jumps between its rest pose and the flight
+        /// pose in one frame, and the camera must not sweep across the scene in between.
         /// </summary>
-        public void SetTelemetryFollow(bool on)
+        public void SetTelemetryFollow(bool on, Transform body = null, Quaternion restRotation = default)
         {
+            if (on)
+            {
+                _telemetryBody = body;
+                _telemetryRestRotation = restRotation.w == 0f && restRotation.x == 0f && restRotation.y == 0f && restRotation.z == 0f ? Quaternion.identity : restRotation;
+                _telemetryPrevBodyRotation = _telemetryRestRotation;
+                _telemetryHaveCenter = false;
+                if (body != null && TryVisibleCenter(body, out Vector3 c)) { _telemetryHaveCenter = true; _telemetryCenterOffset = c - body.position; }
+                _telemetryRecenter = _telemetryHaveCenter;
+            }
+            // on release the body is kept for one frame: the offset must turn back to the rest attitude before the snap
             _telemetryFollow = on;
             _telemetryHavePrev = false;
+            _telemetrySnap = true;
+        }
+
+        /// <summary>The framing offset of Reset (measured at rest) turned to the current attitude of the drone while a session runs.</summary>
+        private Vector3 DesktopResetOffset(Vector3 restOffset)
+        {
+            if (!_telemetryFollow || _telemetryBody == null || LegacyTelemetryFollow) return restOffset;
+            if (_telemetryHaveCenter) restOffset = _telemetryCenterOffset;
+            return (_telemetryBody.rotation * Quaternion.Inverse(_telemetryRestRotation)) * restOffset;
         }
 
         private void ApplyDesktopTelemetryFollow()
         {
-            if (!_telemetryFollow || target == null)
+            if (target == null)
             {
                 _telemetryHavePrev = false;
                 return;
             }
 
+            if (LegacyTelemetryFollow)
+            {
+                if (!_telemetryFollow) { _telemetryHavePrev = false; return; }
+                Vector3 lp = target.position;
+                if (_telemetryHavePrev) currentFocusPoint += lp - _telemetryPrevTarget;
+                _telemetryPrevTarget = lp;
+                _telemetryHavePrev = true;
+                return;
+            }
+
             Vector3 p = target.position;
-            if (_telemetryHavePrev) currentFocusPoint += p - _telemetryPrevTarget;
+            Quaternion body = _telemetryBody != null ? _telemetryBody.rotation : Quaternion.identity;
+            bool turn = _telemetryBody != null;
+
+            if (_telemetrySnap)
+            {
+                // the drone changed pose in one frame (session start / stop): turn the offset with it and put the focus on it at once
+                if (_telemetryRecenter && _telemetryFollow && turn && ReferenceEquals(target, _telemetryBody))
+                {
+                    // engaging on the whole drone: put the focus on its visible centre (turned to the flight attitude)
+                    targetOffset = (body * Quaternion.Inverse(_telemetryRestRotation)) * _telemetryCenterOffset;
+                }
+                else if (turn)
+                {
+                    targetOffset = (body * Quaternion.Inverse(_telemetryPrevBodyRotation)) * targetOffset;
+                }
+
+                _telemetryRecenter = false;
+                targetFocusPoint = p + targetOffset;
+                currentFocusPoint = targetFocusPoint;
+                _telemetrySnap = false;
+                _telemetryHavePrev = _telemetryFollow;
+                if (!_telemetryFollow) _telemetryBody = null;
+            }
+            else if (_telemetryFollow && _telemetryHavePrev && ReferenceEquals(target, _telemetryPrevTargetRef))
+            {
+                // rigid follow: the target's translation plus the swing of the body-fixed offset
+                Vector3 before = targetOffset;
+                if (turn) targetOffset = (body * Quaternion.Inverse(_telemetryPrevBodyRotation)) * targetOffset;
+                currentFocusPoint += (p - _telemetryPrevTarget) + (targetOffset - before);
+                targetFocusPoint = p + targetOffset;
+            }
+
+            TelemetryReframeAfterDeselect();
+
+            // a different target (focus on a part, isolate): the normal glide goes there, it is not a jump of the drone
             _telemetryPrevTarget = p;
-            _telemetryHavePrev = true;
+            _telemetryPrevTargetRef = target;
+            _telemetryPrevBodyRotation = body;
+            _telemetryHavePrev = _telemetryFollow;
+        }
+
+        /// <summary>
+        /// During a session the drone keeps moving, so a view left on one part (an alert click focuses it) stops framing the drone once the
+        /// selection is gone: the part sits at the centre and the rest of the drone is cut off. When the selection is cleared (and nothing is
+        /// isolated) the view glides back to the whole drone, ONCE, keeping the orbit angles: the same distance / focus Reset uses, with the
+        /// framing offset of the engaged drone. Zoom, orbit and pan afterwards are the user's.
+        /// </summary>
+        private void TelemetryReframeAfterDeselect()
+        {
+            if (!_telemetryFollow || _telemetryBody == null || LegacyTelemetryFollow || SelectionManager.Instance == null) { _telemetryReframeAt = -1f; return; }
+            bool selected = SelectionManager.Instance.CurrentSelection != null;
+            bool isolated = PartVisibilityManager.Instance != null && (PartVisibilityManager.Instance.GetIsolatedTransform() != null || PartVisibilityManager.Instance.GetIsolatedPart() != null);
+            if (selected || isolated) { _telemetryHadSelection = selected || isolated; _telemetryReframeAt = -1f; return; }
+            if (_telemetryHadSelection)
+            {
+                _telemetryHadSelection = false;
+                if (!ReferenceEquals(target, _telemetryBody)) _telemetryReframeAt = Time.unscaledTime + TelemetryReframeDelay;
+            }
+
+            if (_telemetryReframeAt < 0f || Time.unscaledTime < _telemetryReframeAt) return;
+            _telemetryReframeAt = -1f;
+            if (ReferenceEquals(target, _telemetryBody)) return;
+            ClearRetainedNavigationContext();
+            target = _telemetryBody;
+            CalibrateDefaultNavigationContext(immediate: false);
+            RestoreDefaultZoomWindow();
+            targetDistance = distance;
+            targetOffset = DesktopResetOffset(initialTargetOffset);
+        }
+
+        /// <summary>Centre of the bounds of the renderers that are enabled and active under `root` (what the user sees of the drone).</summary>
+        private static bool TryVisibleCenter(Transform root, out Vector3 center)
+        {
+            center = default;
+            bool any = false;
+            Bounds b = default;
+            foreach (Renderer r in root.GetComponentsInChildren<Renderer>())
+            {
+                if (!r.enabled || !r.gameObject.activeInHierarchy) continue;
+                if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds);
+            }
+
+            if (any) center = b.center;
+            return any;
         }
 
         private Vector3 DesktopLateralShift(Quaternion rotation, float dt)

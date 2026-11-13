@@ -155,6 +155,7 @@ namespace WebGL.UI.Desktop
             _flBody.Add(_flData);
             _secState = Section(_flData);
             _rMode = AddReading(_flData, "fl.mode", false);
+            _rMode.Value.pickingMode = PickingMode.Position; // so that the tooltip with the raw PX4 name can show
             _rTime = AddReading(_flData, "fl.time", false);
 
             _secPos = Section(_flData);
@@ -347,8 +348,12 @@ namespace WebGL.UI.Desktop
             string baseTag = FlightOrigins.Text(baseOrigin, lang, labels);
 
             // state
-            string nav = labels.NavState(f.nav);
+            // PX4 nav_state in the language of the interface (TelemetryStrings.NavStateText); the raw PX4 name stays as the tooltip
+            string navRaw = labels.NavState(f.nav);
+            string nav = TelemetryStrings.NavStateText(f.nav, navRaw, lang);
             Set(_rMode, nav + " · " + T(f.armed ? "fl.armed" : "fl.disarmed") + (f.landed ? " · " + T("fl.landed") : string.Empty));
+            string navTip = nav == navRaw ? string.Empty : "PX4 nav_state " + f.nav + ": " + navRaw;
+            if (_rMode.Value.tooltip != navTip) _rMode.Value.tooltip = navTip;
             string time = Clock(f.lt) + (h != null && h.source.HasDurationS ? " / " + Clock(h.source.durationS) : string.Empty);
             Set(_rTime, time);
 

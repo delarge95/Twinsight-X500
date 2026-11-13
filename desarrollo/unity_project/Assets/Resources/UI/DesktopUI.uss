@@ -2077,11 +2077,21 @@
 .dk-fl-empty .dk-note { -unity-text-align: upper-center; }
 .desktop-ui .dk-b--pill.dk-b--on, .desktop-ui .dk-b--pill.dk-b--on:hover { background-color: rgba(70, 175, 255, 0.16); border-color: rgba(70, 175, 255, 0.55); color: rgb(191, 234, 255); }
 
-/* narrow windows: the top bar gives up the key caps of the modes, truncates a long part name and the status chip */
-.dk-narrowbar .dk-seg-btn .dk-kbd { display: none; }
-.dk-narrowbar .dk-seg-btn { padding: 0 10px; }
+/* narrow windows: the top bar gives up its least important items first (levels set by DesktopChrome.UpdateBarLevel from the logical width
+   and an overflow check); the mode switch with its key caps is the last to go (level 6) */
+.dk-top .dk-seg { flex-shrink: 0; }
 .dk-narrowbar .dk-crumb { flex-shrink: 1; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dk-narrowbar .dk-stchip { max-width: 320px; flex-shrink: 0; }
+.dk-bar-l2 .dk-brand-word { display: none; }
+.dk-bar-l2 .dk-brand--accent { margin-left: 8px; }
+.dk-bar-l3 .dk-stchip { max-width: 190px; flex-shrink: 1; }
+.dk-bar-l3 .dk-seg-btn { padding: 0 10px; }
+.dk-bar-l4 .dk-lang-icon { display: none; }
+.dk-bar-l4 .dk-stchip { max-width: 160px; }
+.dk-bar-l5 .dk-opt-l5 { display: none; }
+.dk-bar-l5 .dk-seg-btn { padding: 0 8px; }
+.dk-bar-l5 .dk-seg-btn .dk-icon { margin-right: 4px; }
+.dk-bar-l6 .dk-seg-btn .dk-kbd { display: none; }
+.dk-bar-l6 .dk-stchip { max-width: 120px; }
 
 .dk-reduce-motion .dk-stchip,
 .dk-reduce-motion .dk-dot,

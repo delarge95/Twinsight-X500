@@ -320,6 +320,40 @@ namespace WebGL.Telemetry
             { "st.link", new[] { "Enlace", "Link" } },
         };
 
+        // PX4 nav_state names (labels.json navState carries the raw PX4 names, with no translation): the desktop shows them in the language of the
+        // interface and keeps the raw PX4 name as the tooltip. Ids as in src/shared/protocol.ts NAV_STATE_LABEL; an unknown id falls back to the raw label.
+        static readonly Dictionary<int, string[]> NavStates = new Dictionary<int, string[]>
+        {
+            { 0, new[] { "Manual", "Manual" } },
+            { 1, new[] { "Altitud", "Altitude" } },
+            { 2, new[] { "Posición", "Position" } },
+            { 3, new[] { "Misión", "Mission" } },
+            { 4, new[] { "Mantener posición", "Hold" } },
+            { 5, new[] { "Regreso a casa", "Return" } },
+            { 10, new[] { "Acro", "Acro" } },
+            { 12, new[] { "Descenso", "Descend" } },
+            { 13, new[] { "Terminación de vuelo", "Termination" } },
+            { 14, new[] { "Offboard (control externo)", "Offboard" } },
+            { 15, new[] { "Estabilizado", "Stabilized" } },
+            { 17, new[] { "Despegue", "Takeoff" } },
+            { 18, new[] { "Aterrizaje", "Land" } },
+            { 19, new[] { "Seguir", "Follow" } },
+            { 20, new[] { "Aterrizaje de precisión", "Precision land" } },
+            { 21, new[] { "Órbita", "Orbit" } },
+        };
+
+        /// <summary>Ids that have a translation (for the completeness test against labels.json navState).</summary>
+        public static IEnumerable<int> NavStateIds => NavStates.Keys;
+
+        /// <summary>
+        /// The flight mode name in the language of the interface. `raw` is the PX4 name of labels.json (HonestyLabels.NavState), which is the
+        /// fallback for an id without translation and what the UI shows as the tooltip.
+        /// </summary>
+        public static string NavStateText(int nav, string raw, string lang)
+        {
+            return NavStates.TryGetValue(nav, out var v) ? (lang == "en" ? v[1] : v[0]) : raw;
+        }
+
         public static string T(string key, string lang)
         {
             if (!Table.TryGetValue(key, out var v)) throw new KeyNotFoundException("TelemetryStrings: missing key " + key);

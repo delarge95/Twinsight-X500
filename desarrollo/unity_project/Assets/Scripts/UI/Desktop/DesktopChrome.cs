@@ -29,6 +29,8 @@ namespace WebGL.UI.Desktop
         public const float RailWidth = 40f;
         public const float AutoOpenMinLogicalWidth = 1600f;
         public const float NarrowBarLogicalWidth = 1600f;
+        /// <summary>Logical widths below which the top bar gives up one more thing (levels 1..6, see UpdateBarLevel).</summary>
+        private static readonly float[] BarLevelBelow = { 1600f, 1500f, 1380f, 1320f, 1260f, 1200f };
 
         private readonly VisualElement _root;
         private readonly DesktopUIController _ctrl;
@@ -288,6 +290,7 @@ namespace WebGL.UI.Desktop
 
             var brand = new Label("TwinSight") { pickingMode = PickingMode.Ignore };
             brand.AddToClassList("dk-brand");
+            brand.AddToClassList("dk-brand-word");
             var x500 = new Label("X500") { pickingMode = PickingMode.Ignore };
             x500.AddToClassList("dk-brand");
             x500.AddToClassList("dk-brand--accent");
@@ -337,6 +340,8 @@ namespace WebGL.UI.Desktop
 
             _btnPins = IconButton("pin", "DkPins", () => _ui.ShortcutTogglePins());
             _btnIso = IconButton("iso", "DkIso", () => _ui.ShortcutToggleIsolation());
+            _btnPins.AddToClassList("dk-opt-l5"); // given up at level 5 of the top bar (their keys H / I remain)
+            _btnIso.AddToClassList("dk-opt-l5");
             var reset = IconButton("reset", "DkReset", () => _ui.ShortcutResetView());
             _top.Add(_btnPins);
             _chipFilter = MakeChip("filter", "DkChipFilter", () => _ui.ShortcutClearFilter());
@@ -696,6 +701,72 @@ namespace WebGL.UI.Desktop
 
         // ───────────────────────── per frame ─────────────────────────
 
+        private const float MinSpacer = 12f;
+        private int _barLevel;
+        private int _barExtra;
+        private float _barLastWidth = -1f;
+        private int _barShown, _barKey, _barKeyPrev = -1, _barWait;
+
+        /// <summary>How much the top bar has given up (0 = nothing, 6 = everything optional). Read by the probes.</summary>
+        public int BarLevel => _barLevel;
+
+        /// <summary>True when two items of the top bar overlap or the last one leaves the bar (the layout of the previous frame).</summary>
+        public bool TopBarOverflows()
+        {
+            if (_top == null || _top.resolvedStyle.display == DisplayStyle.None) return false;
+            Rect bar = _top.worldBound;
+            if (bar.width < 10f) return false;
+            float prevRight = float.NegativeInfinity;
+            bool over = false;
+            int shown = 0;
+            foreach (VisualElement c in _top.Children())
+            {
+                if (c.resolvedStyle.display == DisplayStyle.None) continue;
+                Rect r = c.worldBound;
+                shown++; // counted by display, not by width: a squeezed item must not look like one that came or went
+                // the two spacers around the mode switch must keep some air: with none left the bar is cramped even if nothing overlaps
+                if (c.resolvedStyle.flexGrow > 0f && r.width < MinSpacer) over = true;
+                if (r.width < 1f) continue;
+                if (r.xMin < prevRight - 0.5f) over = true;
+                // an item squeezed below its content (the mode switch) paints its children outside its own box: measure them too
+                float right = r.xMax;
+                foreach (VisualElement g in c.Children())
+                {
+                    if (g.resolvedStyle.display == DisplayStyle.None || g.resolvedStyle.position == Position.Absolute) continue;
+                    Rect gr = g.worldBound;
+                    if (gr.width < 1f) continue;
+                    right = Mathf.Max(right, gr.xMax);
+                }
+
+                prevRight = Mathf.Max(prevRight, right);
+            }
+
+            _barShown = shown;
+            return over || prevRight > bar.xMax + 0.5f;
+        }
+
+        /// <summary>
+        /// The top bar degrades from the least important item to the most: (1) the "select a part" placeholder, (2) the word "TwinSight"
+        /// (the "X500" mark stays), (3) the status chip gets a shorter box (its text truncates, the dot and the start of the honest label
+        /// stay), (4) the globe of the language switch, (5) the pins and isolate buttons (their keys H / I remain) and tighter mode buttons,
+        /// (6) the key caps of the mode switch. The mode switch with its keys is therefore the last thing to go. The level comes from the
+        /// logical width; if the layout still overflows (UI size 150 %, a long part name, several chips) the bar gives up one more level
+        /// per frame until nothing overlaps, and keeps that until the width changes.
+        /// </summary>
+        private void UpdateBarLevel(float logicalWidth)
+        {
+            if (Mathf.Abs(logicalWidth - _barLastWidth) > 0.5f) { _barLastWidth = logicalWidth; _barExtra = 0; }
+            int level = 0;
+            while (level < BarLevelBelow.Length && logicalWidth < BarLevelBelow[level]) level++;
+            bool over = TopBarOverflows();
+            if (_barKey != _barKeyPrev) { _barKeyPrev = _barKey; _barExtra = 0; _barWait = 4; } // a chip came or went, or a part was (de)selected: measure again
+            else if (_barWait > 0) _barWait--; // the styles and the layout trail the class change by a few frames: judge the new level only after they caught up
+            else if (over && level + _barExtra < BarLevelBelow.Length) { _barExtra++; _barWait = 4; }
+            _barLevel = Mathf.Min(BarLevelBelow.Length, level + _barExtra);
+            _root.EnableInClassList("dk-narrowbar", _barLevel >= 1);
+            for (int i = 1; i <= BarLevelBelow.Length; i++) _root.EnableInClassList("dk-bar-l" + i, _barLevel >= i);
+        }
+
         public void Tick(float logicalWidth)
         {
             // segmented mode switch mirrors the (hidden) capsule buttons; the pill slides under the active one
@@ -725,7 +796,7 @@ namespace WebGL.UI.Desktop
             if (_crumb.text != text) _crumb.text = text;
             _crumb.EnableInClassList("dk-crumb--has", hasSel);
             // narrow windows: the "select a part" placeholder gives its room to the telemetry chips; a real part name stays (truncated)
-            _crumb.style.display = string.IsNullOrEmpty(text) || (logicalWidth < NarrowBarLogicalWidth && !hasSel) ? DisplayStyle.None : DisplayStyle.Flex;
+            _crumb.style.display = string.IsNullOrEmpty(text) || (_barLevel >= 1 && !hasSel) ? DisplayStyle.None : DisplayStyle.Flex;
 
             bool treeOpen = _tree.IsOpen;
             bool sheetOpen = _side.IsOpen;
@@ -749,7 +820,11 @@ namespace WebGL.UI.Desktop
             _tel.Tick();
             RelabelPowerCard();
             // narrow windows (1280x720 = 1391 logical px): the mode keys, a long part name and the status chip give way so the bar never overlaps
-            _root.EnableInClassList("dk-narrowbar", logicalWidth < NarrowBarLogicalWidth);
+            // what the bar shows, as a key: its change (not the layout, which the levels themselves change) restarts the overflow guard
+            _barKey = (_ui.FilterActive ? 1 : 0) | (ExplodedViewManager.Instance != null && ExplodedViewManager.Instance.GetExplosionFactor() > 0.001f ? 2 : 0)
+                      | (CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled ? 4 : 0) | (DroneStateController.Instance != null && DroneStateController.Instance.IsOn ? 8 : 0)
+                      | (_tel.IsRunning ? 16 : 0) | (hasSel ? 32 : 0);
+            UpdateBarLevel(logicalWidth);
             SetOn(_btnIso, _root.Q<Button>("ToolIsolateBtn")?.ClassListContains("submenu-card--active") == true);
             SetOn(_btnGear, _settingsOpen);
             _btnLangEn.EnableInClassList("dk-lang-btn--on", !AppLanguageManager.IsSpanish);

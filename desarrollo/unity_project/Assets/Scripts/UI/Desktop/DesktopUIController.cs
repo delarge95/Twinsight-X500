@@ -406,6 +406,31 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-cam-legacy", StringComparison.OrdinalIgnoreCase)) OrbitCameraController.LegacyTelemetryFollow = true; // tests: the follow of WP-10
+
+                if (args[i].Equals("-tel-an", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var an = gameObject.AddComponent<DesktopCaptureAnalysis>();
+                    an.OutputDirectory = args[i + 1];
+                    return;
+                }
+
+                if (args[i].Equals("-tel-an-fps", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var anFps = gameObject.AddComponent<DesktopCaptureAnalysis>();
+                    anFps.OutputDirectory = args[i + 1];
+                    anFps.FpsMode = true;
+                    anFps.FpsClosed = i + 2 < args.Length && args[i + 2].Equals("closed", StringComparison.OrdinalIgnoreCase);
+                    return;
+                }
+
+                if (args[i].Equals("-tel-frame", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var fr = gameObject.AddComponent<DesktopCaptureFraming>();
+                    fr.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-tel-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var telCap = gameObject.AddComponent<DesktopCaptureTelemetry>();
