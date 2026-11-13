@@ -48,6 +48,9 @@ namespace WebGL.Core.Managers
         // ── state read by the verification harness ──
         public static TelemetryDroneDriver Instance { get; private set; }
         public bool Engaged { get; private set; }
+        /// <summary>World height of the ground grid (NaN when there is none) and whether the fly_to target marker is drawn (verification harness).</summary>
+        public float GroundY => ground != null ? ground.GroundY : float.NaN;
+        public bool FlyTargetVisible => ground != null && ground.HasTarget;
         public Transform Root => root;
         public DronePose.Rest RestPose => rest;
         public IReadOnlyCollection<string> HighlightedComponents => highlighted.Keys;
@@ -68,6 +71,34 @@ namespace WebGL.Core.Managers
             if (component == "battery") return FindDeep(root, BatteryParts[0]);
             if (component == "fc") return FindDeep(root, FcParts[0]);
             return null;
+        }
+
+        /// <summary>
+        /// E-6 (click to fly): the NED point (metres from the take-off point) under a screen position, on the ground plane of the reference grid.
+        /// False when the model is not engaged, there is no ground or the ray does not reach the plane.
+        /// </summary>
+        public bool TryGroundPoint(Vector2 screen, out double north, out double east, out Vector3 world)
+        {
+            north = east = 0;
+            world = default;
+            var cam = Camera.main;
+            if (!Engaged || ground == null || cam == null || rest.UnitsPerMeter <= 0f) return false;
+            Ray ray = cam.ScreenPointToRay(screen);
+            var plane = new Plane(Vector3.up, new Vector3(0f, ground.GroundY, 0f));
+            if (!plane.Raycast(ray, out float enter)) return false;
+            world = ray.GetPoint(enter);
+            Vector3 rel = (world - rest.BodyOrigin) / rest.UnitsPerMeter; // the inverse of DronePose.BodyPosition for ground-level points: (E, ., N)
+            north = rel.z;
+            east = rel.x;
+            return true;
+        }
+
+        /// <summary>E-6: shows (or hides, with nulls) the fly_to target marker on the ground grid.</summary>
+        public void SetFlyTarget(double? north, double? east)
+        {
+            if (ground == null) return;
+            if (!north.HasValue || !east.HasValue) { ground.SetTarget(null); return; }
+            ground.SetTarget(new Vector3((float)(rest.BodyOrigin.x + east.Value * rest.UnitsPerMeter), ground.GroundY, (float)(rest.BodyOrigin.z + north.Value * rest.UnitsPerMeter)));
         }
 
         Transform root;

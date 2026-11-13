@@ -378,6 +378,12 @@ namespace WebGL.Core.Managers
         private bool _backgroundClickPending;
         private Vector2 _backgroundClickPosition;
 
+        /// <summary>
+        /// E-6 (click to fly): a click on the empty background that would only deselect asks this hook first, when nothing is selected and the
+        /// pointer is not over UI. Return true when the click was used (fly_to on the ground grid): no deselection then. Null = not wired.
+        /// </summary>
+        public static System.Func<Vector2, bool> GroundClickHook;
+
         private void HandleDeferredBackgroundClick()
         {
             if (!_backgroundClickPending)
@@ -400,6 +406,12 @@ namespace WebGL.Core.Managers
             _backgroundClickPending = false;
             if (!moved && hoveredObject == null && !InputManager.InputBlocked)
             {
+                if (GroundClickHook != null && currentFullSelection == null && InputManager.Instance != null && !InputManager.Instance.IsPointerOverSelectionBlockingUI() && GroundClickHook(Input.mousePosition))
+                {
+                    Debug.Log("[DesktopUI] selection: background click released without drag -> fly_to (ground click)");
+                    return;
+                }
+
                 Debug.Log("[DesktopUI] selection: background click released without drag -> deselect");
                 ApplyClickSelection();
             }

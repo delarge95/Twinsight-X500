@@ -17,6 +17,9 @@ namespace WebGL.UI.Desktop
 
         public bool IsOpen { get; private set; }
 
+        /// <summary>E-6: true while piloting is ON (set by DesktopUIController). The overlay then shows the piloting mapping as ACTIVE and marks the desktop shortcuts it pauses.</summary>
+        public System.Func<bool> PilotActive;
+
         public DesktopHelpOverlay(VisualElement root)
         {
             _root = root;
@@ -140,6 +143,12 @@ namespace WebGL.UI.Desktop
             AddRow(right, new[] { T("Middle drag", "Central arrastrar"), "Shift + " + T("Right drag", "Der.") }, T("Pan", "Desplazar"));
             AddRow(right, new[] { T("Wheel", "Rueda") }, T("Zoom toward the cursor", "Zoom hacia el cursor"));
 
+            // E-6: the piloting mapping gets its own third column (the card widens): it is a temporary mapping, shown ACTIVE while piloting is on
+            _card.AddToClassList("desktop-help-card--wide");
+            VisualElement pilotColumn = NewColumn(columns);
+            pilotColumn.AddToClassList("desktop-help-column--pilot");
+            AddPilotRows(pilotColumn);
+
             var footer = new VisualElement { pickingMode = PickingMode.Ignore };
             footer.AddToClassList("desktop-help-footer");
             footer.Add(MakeCap("?", true));
@@ -151,6 +160,63 @@ namespace WebGL.UI.Desktop
             f2.AddToClassList("desktop-help-footer-text");
             footer.Add(f2);
             _card.Add(footer);
+            MarkPausedRows();
+        }
+
+        // E-6: the piloting keys. They are active ONLY while piloting is on (Telemetry mode, "Pilot" toggle); then T L H R E and Shift+A stop being
+        // desktop shortcuts. The rows are built here (not in the table above) because they are a temporary mapping, not a global shortcut.
+        private static readonly string[] PausedKeys = { "H", "E", "L", "R", "T", "Shift+A" };
+
+        private bool Piloting => PilotActive != null && PilotActive();
+
+        private void AddPilotRows(VisualElement column)
+        {
+            AddSection(column, Piloting ? T("PILOTING · ON", "PILOTAJE · ACTIVO") : T("PILOTING (when on)", "PILOTAJE (al activarlo)"));
+            AddPilotRow(column, new[] { "W", "A", "S", "D" }, T("Fly: forward, left, back, right (also arrows)", "Volar: avanzar, izquierda, atrás, derecha (también flechas)"));
+            AddPilotRow(column, new[] { "Q", "E" }, T("Turn left / right", "Girar a izquierda / derecha"));
+            AddPilotRow(column, new[] { "Space", "Shift" }, T("Climb / descend", "Subir / bajar"));
+            AddPilotRow(column, new[] { "T", "L", "H", "R" }, T("Take off · land · hold · return", "Despegar · aterrizar · mantener · volver"));
+            AddPilotRow(column, new[] { "Esc" }, T("Leave piloting (hold)", "Soltar el pilotaje (mantener)"));
+            AddPilotRow(column, new[] { T("Click", "Clic") }, T("On the ground grid: fly there", "En la rejilla del suelo: volar allí"));
+            var note = new Label(Piloting
+                ? T("Paused while piloting: H E L R T and Shift+A. Esc gives them back.", "En pausa mientras pilotas: H E L R T y Shift+A. Esc los devuelve.")
+                : T("While on, H E L R T and Shift+A are paused as shortcuts.", "Al activarlo, H E L R T y Shift+A dejan de ser atajos.")) { pickingMode = PickingMode.Ignore };
+            note.AddToClassList("desktop-help-desc");
+            note.AddToClassList("desktop-help-note");
+            column.Add(note);
+        }
+
+        private void AddPilotRow(VisualElement column, string[] keys, string description)
+        {
+            // two lines (the column is narrow): the key caps, then what they do. No "/" separators.
+            var row = new VisualElement { pickingMode = PickingMode.Ignore };
+            row.AddToClassList("desktop-help-row--pilot");
+            var caps = new VisualElement { pickingMode = PickingMode.Ignore };
+            caps.AddToClassList("desktop-help-pilot-caps");
+            for (int i = 0; i < keys.Length; i++) caps.Add(MakeCap(keys[i], i == 0));
+            row.Add(caps);
+            var desc = new Label(description) { pickingMode = PickingMode.Ignore };
+            desc.AddToClassList("desktop-help-desc");
+            desc.AddToClassList("desktop-help-pilot-desc");
+            row.Add(desc);
+            column.Add(row);
+        }
+
+        /// <summary>While piloting, the desktop shortcuts that share a key with the pilot are shown as paused (dimmed, struck by the class).</summary>
+        private void MarkPausedRows()
+        {
+            if (!Piloting) return;
+            foreach (VisualElement row in _card.Query<VisualElement>(className: "desktop-help-row").ToList())
+            {
+                if (row.ClassListContains("desktop-help-row--pilot")) continue;
+                var caps = row.Query<Label>(className: "desktop-keycap").ToList();
+                bool pausedRow = false;
+                foreach (Label cap in caps)
+                {
+                    if (System.Array.IndexOf(PausedKeys, cap.text) >= 0) { cap.AddToClassList("desktop-keycap--paused"); pausedRow = true; }
+                }
+                if (pausedRow) row.AddToClassList("desktop-help-row--paused");
+            }
         }
 
         private static VisualElement NewColumn(VisualElement parent)

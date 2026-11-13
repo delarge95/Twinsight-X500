@@ -77,11 +77,17 @@ namespace WebGL.UI.Desktop
 
             BuildChips();
             AppLanguageManager.LanguageChanged += OnLanguage;
+            DesktopTelemetry.RunningChanged += OnRunningChanged;
+            SelectionManager.GroundClickHook = TryGroundClick; // E-6: click on the ground grid = fly_to
         }
 
         public void Dispose()
         {
             AppLanguageManager.LanguageChanged -= OnLanguage;
+            DesktopTelemetry.RunningChanged -= OnRunningChanged;
+            if (SelectionManager.GroundClickHook == (System.Func<Vector2, bool>)TryGroundClick) SelectionManager.GroundClickHook = null;
+            _legend?.RemoveFromHierarchy();
+            _toast?.RemoveFromHierarchy();
             _pulse?.Pause();
             _statusChip?.RemoveFromHierarchy();
             _sessionChip?.RemoveFromHierarchy();
@@ -150,11 +156,13 @@ namespace WebGL.UI.Desktop
             _strip.Add(_btnAnalysis);
 
             _container.Add(_strip);
+            BuildPilotStrip(); // E-6: second pill (Pilotar + the four commands); the popovers added after it open on top of it
             BuildPopovers();
             // after the Studio container: keeps the other modes' order
             bar.Add(_container);
             DesktopMotion.WatchVisible(_container);
 
+            BuildPilotOverlay();
             BuildSheetTabs();
             UIDetailsSheet.DesktopKeepOpenOnDeselect = () => TelemetryTabActive;
             BuildStatusBarItem();
@@ -231,6 +239,8 @@ namespace WebGL.UI.Desktop
         /// <summary>Esc: closes the open popover first, then the mode itself. True when it consumed the key.</summary>
         public bool HandleBack()
         {
+            // Esc while piloting: leave piloting first (hold is sent, the desktop shortcuts come back)
+            if (_pilotOn) { SetPilot(false, "Esc"); return true; }
             if (!ModeOpen) return false;
             if (_openPop != null) { CloseAllPopovers(); return true; }
             CloseMode();
@@ -335,6 +345,12 @@ namespace WebGL.UI.Desktop
             _lastLang = null;
             RelabelPopovers();
             RelabelFlightTab();
+            RelabelPilot();
+        }
+
+        private void OnRunningChanged(bool running)
+        {
+            if (!running) OnPilotSessionEnded();
         }
 
         /// <summary>The honest badge of what is on now: the session's own text (HonestyLabels) or the Inspector.</summary>
@@ -463,6 +479,7 @@ namespace WebGL.UI.Desktop
             TickPopovers();
             TickFlightTab();
             TickAnalysisTab();
+            TickPilot();
         }
 
         private static void UpdateChipVisibility(Button chip, bool active)

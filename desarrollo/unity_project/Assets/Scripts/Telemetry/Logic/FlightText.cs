@@ -326,6 +326,36 @@ namespace WebGL.Telemetry
             { "an.alert.warning", new[] { "Aviso", "Warning" } },
             { "an.hover", new[] { "Pasa el cursor por las gráficas para leer cada valor.", "Hover the charts to read each value." } },
 
+            // piloting (E-6): the Pilotar toggle, the four commands, the legend, the toasts (web: pilot.*, cmd.*, pad.* dictionaries)
+            { "pilot.toggle", new[] { "Pilotar", "Pilot" } },                                                       // pilot.title
+            { "pilot.toggle.tip", new[] { "Pilotar con teclado o mando. Esc suelta el pilotaje y deja el dron en mantener posición.", "Pilot with the keyboard or a pad. Esc releases piloting and leaves the drone holding its position." } },
+            { "pilot.toggle.off.tip", new[] { "Disponible con el simulador de vuelo o con PX4 SITL conectado. La repetición es de solo lectura.", "Available with the flight simulator or a connected PX4 SITL. The replay is read-only." } },
+            { "cmd.takeoff", new[] { "Despegar", "Take off" } },
+            { "cmd.takeoff.tip", new[] { "Armar y despegar a 5 m (T)", "Arm and take off to 5 m (T)" } },       // cmd.takeoff
+            { "cmd.land", new[] { "Aterrizar", "Land" } },
+            { "cmd.land.tip", new[] { "Aterrizar aquí (L)", "Land here (L)" } },
+            { "cmd.hold", new[] { "Mantener", "Hold" } },
+            { "cmd.hold.tip", new[] { "Mantener la posición (H)", "Hold the position (H)" } },                  // cmd.hold
+            { "cmd.rtl", new[] { "Volver", "Return" } },
+            { "cmd.rtl.tip", new[] { "Volver al punto de despegue y aterrizar (R)", "Return to the take-off point and land (R)" } }, // cmd.rtl
+            { "pilot.legend.title", new[] { "Pilotando", "Piloting" } },
+            { "pilot.legend.move", new[] { "Mover", "Move" } },
+            { "pilot.legend.yaw", new[] { "Girar", "Turn" } },
+            { "pilot.legend.alt", new[] { "Subir / bajar", "Up / down" } },
+            { "pilot.legend.release", new[] { "Soltar", "Release" } },
+            { "pilot.legend.pad", new[] { "Mando", "Pad" } },                                                       // pad.title
+            { "pilot.legend.pad.on", new[] { "conectado", "connected" } },                                           // pad.connected
+            { "pilot.key.space", new[] { "Espacio", "Space" } },                                                    // pilot.space
+            { "pilot.key.shift", new[] { "Mayús", "Shift" } },                                                      // pilot.shift
+            { "toast.replay", new[] { "La repetición no acepta comandos: es de solo lectura. Usa el simulador de vuelo.", "The replay does not accept commands: it is read-only. Use the flight simulator." } },
+            { "toast.nosession", new[] { "Enciende el simulador de vuelo (modo Telemetría, tecla 4) para dar órdenes.", "Turn on the flight simulator (Telemetry mode, key 4) to give orders." } },
+            { "toast.nolink", new[] { "El enlace con PX4 SITL no está abierto: no hay a quién enviar la orden.", "The PX4 SITL link is not open: there is nothing to send the command to." } },
+            { "toast.deadman", new[] { "Pilotaje suelto: el dron queda en mantener posición.", "Piloting released: the drone holds its position." } },
+            { "toast.geofence.target", new[] { "Fuera de la geovalla: el destino se ajusta al límite de {r} m.", "Outside the geofence: the target is clamped to the {r} m limit." } },
+            { "toast.geofence.radius", new[] { "Geovalla: el dron llegó al límite de {r} m de radio.", "Geofence: the drone reached the {r} m radius limit." } },
+            { "toast.geofence.ceiling", new[] { "Geovalla: el dron llegó al techo de {h} m.", "Geofence: the drone reached the {h} m ceiling." } },
+            { "toast.geofence.both", new[] { "Geovalla: el dron está en el límite de {r} m de radio y en el techo de {h} m.", "Geofence: the drone is at the {r} m radius limit and the {h} m ceiling." } },
+
             // status bar
             { "st.link", new[] { "Enlace", "Link" } },
         };
@@ -362,6 +392,24 @@ namespace WebGL.Telemetry
         public static string NavStateText(int nav, string raw, string lang)
         {
             return NavStates.TryGetValue(nav, out var v) ? (lang == "en" ? v[1] : v[0]) : raw;
+        }
+
+        // Details the simulator (and the replay) send in the ack, Spanish like the bridge ones; the desktop shows them in the interface language.
+        static readonly Dictionary<string, string[]> AckDetails = new Dictionary<string, string[]>
+        {
+            { "el dron está en tierra: despega primero", new[] { "el dron está en tierra: despega primero", "the drone is on the ground: take off first" } },
+            { "ya está en vuelo", new[] { "ya está en vuelo", "it is already flying" } },
+            { "punto no válido", new[] { "punto no válido", "invalid point" } },
+            { "no disponible en el simulador del navegador", new[] { "no disponible en el simulador (no es PX4: sin inyección de fallas)", "not available in the simulator (it is not PX4: no fault injection)" } },
+            { "demasiado rápido, espera un segundo", new[] { "demasiado rápido, espera un segundo", "too fast, wait a second" } },
+        };
+
+        /// <summary>An ack detail in the language of the interface (unknown details are shown as the source wrote them, with the web wording adapted to the desktop).</summary>
+        public static string AckDetail(string detail, string lang)
+        {
+            if (string.IsNullOrEmpty(detail)) return detail;
+            if (AckDetails.TryGetValue(detail, out var v)) return lang == "en" ? v[1] : v[0];
+            return ForDesktop(detail, lang);
         }
 
         public static string T(string key, string lang)

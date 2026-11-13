@@ -185,6 +185,7 @@ namespace WebGL.UI.Desktop
             _display = new DesktopDisplayPanel(_root);
             if (!PCDebugFlags.Has("oldchrome")) _chrome = new DesktopChrome(_root, this, _tree, _sidePanel);
             _help = new DesktopHelpOverlay(_root);
+            _help.PilotActive = () => _chrome != null && _chrome.Telemetry != null && _chrome.Telemetry.Piloting;
             BuildHint();
             _tooltip = new DesktopTooltip(_root); // last child: always on top
 
@@ -241,6 +242,19 @@ namespace WebGL.UI.Desktop
             AppLanguageManager.LanguageChanged += code => label.text = AppLanguageManager.IsSpanish ? "ATAJOS" : "SHORTCUTS";
             _root.Add(hint);
             _hint = hint;
+        }
+
+        // E-6 dead-man: a window that loses focus (or an app that pauses) must not keep flying on held keys.
+        private void OnApplicationFocus(bool hasFocus) { HandleFocus(hasFocus); }
+
+        internal void HandleFocus(bool hasFocus)
+        {
+            if (!hasFocus && !DesktopTelemetryUI.IgnoreFocusLoss && _chrome != null && _chrome.Telemetry != null) _chrome.Telemetry.PilotDeadMan("the window lost focus");
+        }
+
+        private void OnApplicationPause(bool paused)
+        {
+            if (paused && !DesktopTelemetryUI.IgnoreFocusLoss && _chrome != null && _chrome.Telemetry != null) _chrome.Telemetry.PilotDeadMan("the app paused");
         }
 
         // ─────────────────────────── per frame ───────────────────────────
@@ -353,6 +367,15 @@ namespace WebGL.UI.Desktop
                 return;
             }
 
+            // E-6: while piloting is ON the pilot owns T L H R (and E, and Shift+A: A is roll left, Shift is descend): the desktop shortcuts with those
+            // letters (tree T, source L, pins H, reset R, explode E, alerts Shift+A) are paused until piloting ends (Esc, the toggle, the source stopping).
+            // Home, [ ] and every other key keep working. DesktopTelemetryUI reads the same keys for flying.
+            if (_chrome != null && _chrome.Telemetry != null && _chrome.Telemetry.Piloting
+                && (DesktopTelemetryUI.KeyPressed(KeyCode.T) || DesktopTelemetryUI.KeyPressed(KeyCode.L) || DesktopTelemetryUI.KeyPressed(KeyCode.H) || DesktopTelemetryUI.KeyPressed(KeyCode.R) || DesktopTelemetryUI.KeyPressed(KeyCode.E) || DesktopTelemetryUI.KeyPressed(KeyCode.A)))
+            {
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)) { Log("key 1"); _ui.ShortcutToggleMode(1); }
             else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2)) { Log("key 2"); _ui.ShortcutToggleMode(2); }
             else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3)) { Log("key 3"); _ui.ShortcutToggleMode(3); }
@@ -396,6 +419,13 @@ namespace WebGL.UI.Desktop
                 {
                     var fb2 = gameObject.AddComponent<DesktopCaptureFeedback2>();
                     fb2.OutputDirectory = args[i + 1];
+                    return;
+                }
+
+                if (args[i].Equals("-tel-sim-ui", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var simUi = gameObject.AddComponent<DesktopCaptureSim>();
+                    simUi.OutputDirectory = args[i + 1];
                     return;
                 }
 

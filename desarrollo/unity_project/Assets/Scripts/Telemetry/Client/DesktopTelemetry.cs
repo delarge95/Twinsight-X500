@@ -17,16 +17,29 @@ namespace WebGL.Telemetry
         public const string ReplayAtFlag = "-tel-replay-at";
         /// <summary>Test aid: start the flight simulator (E-5) instead of the replay.</summary>
         public const string SimFlag = "-tel-sim";
+        /// <summary>Test aid (FPS runs): with -tel-sim, take off at +1 s and orbit at +9 s so the drone keeps flying while it is measured.</summary>
+        public const string SimDemoFlag = "-tel-sim-demo";
 
         /// <summary>Pumps the client once per frame (before the scene components that read it).</summary>
         [DefaultExecutionOrder(-100)]
         sealed class Pump : MonoBehaviour
         {
-            void Update() => Client?.Update(Time.unscaledDeltaTime);
+            void Update()
+            {
+                Client?.Update(Time.unscaledDeltaTime);
+                if (DemoStartedAt >= 0 && Client != null && Client.Source is SimTelemetrySource)
+                {
+                    float t = Time.unscaledTime - DemoStartedAt;
+                    if (demoStep == 0 && t > 1f) { Client.Send(ClientMessage.Takeoff(6), out _); demoStep = 1; }
+                    else if (demoStep == 1 && t > 9f) { Client.Send(ClientMessage.Orbit(10), out _); demoStep = 2; }
+                }
+            }
             void OnApplicationQuit() => Stop();
         }
 
         static GameObject pumpObject;
+        static float DemoStartedAt = -1f;
+        static int demoStep;
         static LinkState lastLink = LinkState.Disconnected;
 
         /// <summary>The running client, or null when stopped.</summary>
@@ -135,6 +148,7 @@ namespace WebGL.Telemetry
             if (sim)
             {
                 bool okSim = StartSimulator();
+                foreach (string a in args) if (string.Equals(a, SimDemoFlag, StringComparison.OrdinalIgnoreCase)) { DemoStartedAt = Time.unscaledTime; demoStep = 0; }
                 Debug.Log("[Telemetry] " + SimFlag + ": simulator " + (okSim ? "started (" + BadgeText("es") + ")" : "NOT started"));
                 return;
             }

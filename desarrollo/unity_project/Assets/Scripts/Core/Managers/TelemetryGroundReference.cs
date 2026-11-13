@@ -18,6 +18,13 @@ namespace WebGL.Core.Managers
 
         float cell = 16f;
         float groundY;
+        GameObject marker;
+        Mesh markerMesh;
+        Material markerMaterial;
+
+        /// <summary>World height of the ground plane (the underside of the landing gear at rest).</summary>
+        public float GroundY => groundY;
+        public bool HasTarget => marker != null && marker.activeSelf;
         MeshRenderer meshRenderer;
         Material material;
         Mesh mesh;
@@ -74,6 +81,49 @@ namespace WebGL.Core.Managers
             meshRenderer.receiveShadows = false;
         }
 
+        /// <summary>E-6: the fly_to target marker (a ring and a cross on the ground, 2.4 m wide); null hides it.</summary>
+        public void SetTarget(Vector3? world)
+        {
+            if (!world.HasValue) { if (marker != null) marker.SetActive(false); return; }
+            if (marker == null) BuildMarker();
+            marker.SetActive(true);
+            marker.transform.position = new Vector3(world.Value.x, groundY + 0.02f * cell, world.Value.z);
+        }
+
+        void BuildMarker()
+        {
+            var verts = new System.Collections.Generic.List<Vector3>();
+            var idx = new System.Collections.Generic.List<int>();
+            var cols = new System.Collections.Generic.List<Color>();
+            Color c = new Color(0.27f, 0.69f, 1f, 0.95f);
+            void Seg(Vector3 a, Vector3 b) { idx.Add(verts.Count); verts.Add(a); cols.Add(c); idx.Add(verts.Count); verts.Add(b); cols.Add(c); }
+            float r = 1.2f * cell; // 1.2 m: it has to read from the far camera of a flight
+            const int n = 32;
+            for (int i = 0; i < n; i++)
+            {
+                float a0 = i * Mathf.PI * 2f / n, a1 = (i + 1) * Mathf.PI * 2f / n;
+                Seg(new Vector3(Mathf.Cos(a0) * r, 0, Mathf.Sin(a0) * r), new Vector3(Mathf.Cos(a1) * r, 0, Mathf.Sin(a1) * r));
+                Seg(new Vector3(Mathf.Cos(a0) * r * 0.55f, 0, Mathf.Sin(a0) * r * 0.55f), new Vector3(Mathf.Cos(a1) * r * 0.55f, 0, Mathf.Sin(a1) * r * 0.55f));
+            }
+            Seg(new Vector3(-r * 1.4f, 0, 0), new Vector3(r * 1.4f, 0, 0));
+            Seg(new Vector3(0, 0, -r * 1.4f), new Vector3(0, 0, r * 1.4f));
+            markerMesh = new Mesh { name = "TelemetryFlyTarget" };
+            markerMesh.SetVertices(verts);
+            markerMesh.SetColors(cols);
+            markerMesh.SetIndices(idx, MeshTopology.Lines, 0);
+            markerMesh.bounds = new Bounds(Vector3.zero, new Vector3(r * 4f, 1f, r * 4f));
+            marker = new GameObject("_TelemetryFlyTarget") { hideFlags = HideFlags.HideInHierarchy, layer = 2 };
+            // not a child: the grid follows the drone (snapped to cells), the target stays where it was clicked
+            marker.AddComponent<MeshFilter>().sharedMesh = markerMesh;
+            var shader = Shader.Find("Sprites/Default");
+            markerMaterial = new Material(shader != null ? shader : Shader.Find("Hidden/Internal-Colored")) { name = "TelemetryFlyTarget", renderQueue = 3000 };
+            var mr = marker.AddComponent<MeshRenderer>();
+            mr.sharedMaterial = markerMaterial;
+            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            mr.receiveShadows = false;
+            marker.SetActive(false);
+        }
+
         /// <summary>Centres the grid under `bodyPosition` snapped to whole cells (lines stay still while the drone moves).</summary>
         public void Follow(Vector3 bodyPosition)
         {
@@ -86,6 +136,9 @@ namespace WebGL.Core.Managers
         {
             if (mesh != null) Destroy(mesh);
             if (material != null) Destroy(material);
+            if (marker != null) Destroy(marker);
+            if (markerMesh != null) Destroy(markerMesh);
+            if (markerMaterial != null) Destroy(markerMaterial);
         }
     }
 }
