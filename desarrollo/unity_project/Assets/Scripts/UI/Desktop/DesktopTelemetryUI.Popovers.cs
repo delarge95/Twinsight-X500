@@ -179,7 +179,7 @@ namespace WebGL.UI.Desktop
 
         private void BuildFaultsPopover()
         {
-            _popFaults = NewPopover("DkPopFaults", "dk-pop--w300", out _flTitle);
+            _popFaults = NewPopover("DkPopFaults", "dk-pop--w280", out _flTitle);
             var tagRow = new VisualElement();
             tagRow.AddToClassList("dk-fault-tagrow");
             _faultSyntheticTag = Text("dk-tag", tagRow);
@@ -229,6 +229,7 @@ namespace WebGL.UI.Desktop
             // foot: Clear (only where faults can be injected) and «Explicación», which opens the docked explanation (never opened by itself)
             _faultFoot = new VisualElement { name = "DkFaultFoot" };
             _faultFoot.AddToClassList("dk-fault-foot");
+            _faultFoot.Add(_faultAck); // the ack line sits in the foot row, left of the buttons (one row less in the popover)
             _faultClear = new Button(() => ClearFaults()) { name = "DkFaultClear" };
             _faultClear.AddToClassList("dk-b");
             _faultClear.AddToClassList("dk-b--ghost");
@@ -489,7 +490,7 @@ namespace WebGL.UI.Desktop
             _faultOff.text = off;
             _faultOff.style.display = string.IsNullOrEmpty(off) ? DisplayStyle.None : DisplayStyle.Flex;
             _faultClear.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
-            _faultActiveTitle.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
+            _faultActiveTitle.style.display = DisplayStyle.None; // the rows say «… · 28 s · sintética» themselves: the label is not needed (compact popover, PLAN_PC 28.1)
 
             // active faults with the seconds left
             double now = client != null && client.Displayed != null ? client.Displayed.ts : ReplaySchedule.WallClockMs();

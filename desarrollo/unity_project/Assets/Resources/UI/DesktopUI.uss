@@ -2243,6 +2243,7 @@
    background is neutral and the first block (the data) is the only one that is white; the origin tags reuse .dk-tag--*.
    ================================================================ */
 .layout--desktop.chrome2 .dk-pop.dk-pop--w300 { width: 300px; }
+.layout--desktop.chrome2 .dk-pop.dk-pop--w280 { width: 280px; padding: 8px 10px 9px 10px; }
 .dk-alert-list { max-height: 430px; }
 .dk-narrowbar .dk-alert-list { max-height: 300px; }
 .dk-alert-wrap { flex-direction: column; margin: 0 0 3px 0; }
@@ -2319,7 +2320,8 @@
 .dk-fxdock-state { margin: 0; font-size: 11px; color: rgb(139, 149, 163); }
 .dk-fxdock-body { flex-direction: column; padding: 6px 8px 8px 8px; }
 .dk-fxdock-body .dk-fx-card { margin: 2px 0 0 0; }
-.dk-fault-foot { flex-direction: row; justify-content: flex-end; margin: 2px 0 0 0; }
+.dk-fault-foot { flex-direction: row; justify-content: flex-end; align-items: center; margin: 2px 0 0 0; }
+.dk-fault-foot .dk-note { flex-grow: 1; flex-shrink: 1; margin: 0; white-space: normal; }
 .desktop-ui .dk-b.dk-fault-footbtn { height: 24px; margin: 0 0 0 6px; padding: 0 10px; font-size: 11.5px; }
 
 /* ================================================================
