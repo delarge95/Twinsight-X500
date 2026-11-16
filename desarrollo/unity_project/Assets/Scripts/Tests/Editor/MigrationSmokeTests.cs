@@ -35,13 +35,13 @@ namespace WebGL.Tests.Editor
         }
 
         [Test]
-        public void ProjectVersion_TargetsUnity643f1()
+        public void ProjectVersion_TargetsUnity665f1()
         {
             string projectVersionPath = Path.Combine(ProjectRoot, "ProjectSettings", "ProjectVersion.txt");
             string projectVersionText = File.ReadAllText(projectVersionPath);
 
-            StringAssert.Contains("m_EditorVersion: 6000.4.3f1", projectVersionText);
-            StringAssert.Contains("m_EditorVersionWithRevision: 6000.4.3f1 (39d1a88d4dd1)", projectVersionText);
+            StringAssert.Contains("m_EditorVersion: 6000.6.5f1", projectVersionText);
+            StringAssert.Contains("m_EditorVersionWithRevision: 6000.6.5f1 (3ff58d469c8a)", projectVersionText);
         }
 
         [Test]
@@ -68,8 +68,8 @@ namespace WebGL.Tests.Editor
             Assert.IsNotNull(Camera.main ?? FindSceneObject<Camera>(), "Main scene must provide a main camera.");
             Assert.IsNotNull(FindSceneObject<OrbitCameraController>(), "Main scene must contain OrbitCameraController.");
             Assert.IsNotNull(FindSceneObject<SelectionManager>(), "Main scene must contain SelectionManager.");
-            Assert.IsNotNull(FindSceneObject<ViewModeManager>(), "Main scene must contain ViewModeManager.");
-            Assert.IsNotNull(FindSceneObject<CrossSectionManager>(), "Main scene must contain CrossSectionManager.");
+            // ViewModeManager and CrossSectionManager are not serialized in the scene: UIManager adds them at runtime, so the scene must carry UIManager.
+            Assert.IsNotNull(FindSceneBehaviour("WebGL.UI.UIManager"), "Main scene must contain UIManager (it creates ViewModeManager and CrossSectionManager at runtime).");
             Assert.IsNotNull(FindSceneObject<ExplodedViewManager>(), "Main scene must contain ExplodedViewManager.");
             Assert.IsNotNull(FindSceneObject<UIDocument>(), "Main scene must contain a UIDocument.");
         }
@@ -113,7 +113,8 @@ namespace WebGL.Tests.Editor
 
             StringAssert.Contains("webGLLinkerTarget: 1", projectSettingsText);
             StringAssert.Contains("webGLThreadsSupport: 0", projectSettingsText);
-            StringAssert.Contains("webGLEnableWebGPU: 0", projectSettingsText);
+            // Unity 6000.6 no longer writes webGLEnableWebGPU: WebGPU is on only if it is listed in the WebGL graphics APIs.
+            Assert.IsFalse(System.Array.IndexOf(UnityEditor.PlayerSettings.GetGraphicsAPIs(UnityEditor.BuildTarget.WebGL), UnityEngine.Rendering.GraphicsDeviceType.WebGPU) >= 0, "WebGPU must stay off for the WebGL build.");
             StringAssert.Contains("webGLDataCaching: 1", projectSettingsText);
         }
 
@@ -121,6 +122,20 @@ namespace WebGL.Tests.Editor
         {
             string fullPath = Path.Combine(ProjectRoot, relativePath.Replace('/', Path.DirectorySeparatorChar));
             Assert.IsTrue(File.Exists(fullPath), $"Expected file was not found: {relativePath}");
+        }
+
+        private static MonoBehaviour FindSceneBehaviour(string fullTypeName)
+        {
+            MonoBehaviour[] candidates = Resources.FindObjectsOfTypeAll<MonoBehaviour>();
+            for (int i = 0; i < candidates.Length; i++)
+            {
+                if (candidates[i] != null && candidates[i].GetType().FullName == fullTypeName && candidates[i].gameObject.scene.path == MainScenePath)
+                {
+                    return candidates[i];
+                }
+            }
+
+            return null;
         }
 
         private static T FindSceneObject<T>() where T : Object
