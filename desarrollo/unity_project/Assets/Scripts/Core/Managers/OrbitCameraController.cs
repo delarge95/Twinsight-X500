@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using WebGL.Core.Content;
 using WebGL.Core.Utils;
@@ -993,6 +994,11 @@ namespace WebGL.Core.Managers
             return Mathf.Clamp(adaptiveFactor, MIN_ADAPTIVE_PAN_FACTOR, 1f);
         }
 
+#if UNITY_STANDALONE
+        private static readonly List<Renderer> _boundsRenderers = new List<Renderer>(512);
+        private static readonly List<Collider> _boundsColliders = new List<Collider>(512);
+#endif
+
         private bool TryGetObjectBounds(Transform root, out Bounds bounds)
         {
             bounds = default;
@@ -1002,8 +1008,16 @@ namespace WebGL.Core.Managers
             }
 
             bool hasBounds = false;
+            #if UNITY_STANDALONE
+            // PLAN_PC F-6: called every LateUpdate; the list overload does not allocate (the array one cost ~2.6 KB per frame).
+            List<Renderer> renderers = _boundsRenderers;
+            root.GetComponentsInChildren(true, renderers);
+            int rendererCount = renderers.Count;
+#else
             Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
-            for (int i = 0; i < renderers.Length; i++)
+            int rendererCount = renderers.Length;
+#endif
+            for (int i = 0; i < rendererCount; i++)
             {
                 Renderer renderer = renderers[i];
                 if (renderer == null)
@@ -1027,8 +1041,15 @@ namespace WebGL.Core.Managers
                 return true;
             }
 
+            #if UNITY_STANDALONE
+            List<Collider> colliders = _boundsColliders;
+            root.GetComponentsInChildren(true, colliders);
+            int colliderCount = colliders.Count;
+#else
             Collider[] colliders = root.GetComponentsInChildren<Collider>(true);
-            for (int i = 0; i < colliders.Length; i++)
+            int colliderCount = colliders.Length;
+#endif
+            for (int i = 0; i < colliderCount; i++)
             {
                 Collider collider = colliders[i];
                 if (collider == null)

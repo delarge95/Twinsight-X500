@@ -1,6 +1,9 @@
 #if UNITY_STANDALONE
 using System;
 using System.Collections.Generic;
+using Unity.Profiling;
+using Unity.Profiling.LowLevel;
+using Unity.Profiling.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace WebGL.Core.Utils
@@ -19,6 +22,19 @@ namespace WebGL.Core.Utils
         private readonly List<float> _frameTimes = new List<float>(2048);
         private float _windowElapsed;
         private int _windowIndex;
+
+        // F-6: asignacion gestionada por fotograma (contador "GC Allocated In Frame", disponible tambien en builds
+        // de release) y tiempos de CPU/GPU del fotograma (FrameTimingManager). Con -perf-markers (pensado para una
+        // build de desarrollo) se suman ademas TODOS los marcadores del hilo principal y se listan los mas caros.
+        private ProfilerRecorder _gcAlloc;
+        private long _gcBytes, _heapBytes, _lastHeap = -1;
+        private readonly FrameTiming[] _ft = new FrameTiming[1];
+        private double _ftCpu, _ftMain, _ftPresent, _ftRender, _ftGpu;
+        private int _ftN;
+        private bool _markers;
+        private sealed class Rec { public string Name; public ProfilerRecorder R; public double Sum; }
+        private readonly List<Rec> _recs = new List<Rec>(4096);
+        private readonly HashSet<string> _recNames = new HashSet<string>();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -40,6 +56,7 @@ namespace WebGL.Core.Utils
             {
                 // Fase 3A: -perf-viewer abre el visor a los 8 s para medir con el dron en pantalla.
                 if (string.Equals(a, "-perf-viewer", StringComparison.OrdinalIgnoreCase)) pl.StartCoroutine(pl.OpenViewer());
+                if (string.Equals(a, "-perf-markers", StringComparison.OrdinalIgnoreCase)) pl._markers = true;
             }
             Debug.Log("[PerfLogger] activo (-perflog). GPU=" + SystemInfo.graphicsDeviceName +
                       " | API=" + SystemInfo.graphicsDeviceType + " | CPU=" + SystemInfo.processorType +
@@ -72,10 +89,70 @@ namespace WebGL.Core.Utils
             Debug.Log("[PerfLogger] visor abierto: tipo=" + (t != null) + " instancia=" + (inst != null));
         }
 
+        private void OnEnable()
+        {
+            _gcAlloc = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Allocated In Frame");
+        }
+
+        private void OnDisable()
+        {
+            _gcAlloc.Dispose();
+            for (int i = 0; i < _recs.Count; i++) _recs[i].R.Dispose();
+            _recs.Clear();
+        }
+
+        /// <summary>Anade un grabador por cada marcador de tiempo que exista ya (los marcadores se crean al usarse).</summary>
+        private void CollectMarkers()
+        {
+            var handles = new List<ProfilerRecorderHandle>();
+            ProfilerRecorderHandle.GetAvailable(handles);
+            foreach (ProfilerRecorderHandle h in handles)
+            {
+                ProfilerRecorderDescription d = ProfilerRecorderHandle.GetDescription(h);
+                if (d.UnitType != ProfilerMarkerDataUnit.TimeNanoseconds || !WantMarker(d.Name) || !_recNames.Add(d.Name)) continue;
+                var r = new ProfilerRecorder(h, 1, ProfilerRecorderOptions.Default | ProfilerRecorderOptions.CollectOnlyOnCurrentThread);
+                r.Start();
+                _recs.Add(new Rec { Name = d.Name, R = r });
+            }
+        }
+
+        // Solo los marcadores utiles para repartir el fotograma (grabarlos todos frena el jugador).
+        private static readonly string[] MarkerPrefixes =
+        {
+            "PlayerLoop", "Initialization.", "EarlyUpdate.", "FixedUpdate.", "PreUpdate.", "Update.", "PreLateUpdate.", "PostLateUpdate.",
+            "UIElements.", "MainPanelSettings.", "UIR.", "Gfx.", "Camera.", "Inl_", "RenderPipeline", "Universal", "Physics.", "GC.",
+            "BehaviourUpdate", "LateBehaviourUpdate", "CoroutinesDelayedCalls", "GenerateVisualContent", "GenerateTextMesh", "ATGTextJob.",
+            "VectorAPI", "WaitForTargetFPS", "Semaphore.WaitForSignal", "Culling", "Shadows.", "Render", "Draw", "Animators.", "Director.",
+        };
+
+        private static bool WantMarker(string name)
+        {
+            if (name.IndexOf("Update()", StringComparison.Ordinal) >= 0 || name.IndexOf("[Coroutine", StringComparison.Ordinal) >= 0) return true;
+            for (int i = 0; i < MarkerPrefixes.Length; i++) if (name.StartsWith(MarkerPrefixes[i], StringComparison.Ordinal)) return true;
+            return false;
+        }
+
         private void Update()
         {
             float dt = Time.unscaledDeltaTime;
             if (dt <= 0f) return;
+            // El contador "GC Allocated In Frame" solo da valores en builds de desarrollo; en release se usa el crecimiento del monton
+            // (GC.GetTotalMemory, igual que -desk-fps), que no asigna.
+            long heapNow = GC.GetTotalMemory(false);
+            if (_lastHeap >= 0 && heapNow > _lastHeap) _heapBytes += heapNow - _lastHeap;
+            _lastHeap = heapNow;
+            if (_gcAlloc.Valid) _gcBytes += _gcAlloc.LastValue;
+            FrameTimingManager.CaptureFrameTimings();
+            if (FrameTimingManager.GetLatestTimings(1, _ft) > 0)
+            {
+                _ftCpu += _ft[0].cpuFrameTime; _ftMain += _ft[0].cpuMainThreadFrameTime; _ftPresent += _ft[0].cpuMainThreadPresentWaitTime;
+                _ftRender += _ft[0].cpuRenderThreadFrameTime; _ftGpu += _ft[0].gpuFrameTime; _ftN++;
+            }
+            if (_markers)
+            {
+                if (_recs.Count == 0 && Time.realtimeSinceStartup > 14f) CollectMarkers();
+                for (int i = 0; i < _recs.Count; i++) _recs[i].Sum += _recs[i].R.LastValue;
+            }
             _frameTimes.Add(dt);
             _windowElapsed += dt;
             if (_windowElapsed >= WindowSeconds) Flush();
@@ -98,6 +175,18 @@ namespace WebGL.Core.Utils
             float p1Fps = 1f / p99;
             _windowIndex++;
             Debug.Log($"[PerfLogger] ventana {_windowIndex} ({_windowElapsed:F1}s, {n} frames): t={Time.realtimeSinceStartup:F0}s FPS media={avgFps:F1} min={minFps:F1} p1={p1Fps:F1} vsync={QualitySettings.vSyncCount} target={Application.targetFrameRate}");
+            int fn = Mathf.Max(1, _ftN);
+            Debug.Log($"[PerfLogger] ventana {_windowIndex}: asignacion gestionada={(_heapBytes / (double)n):F0} B/fotograma por crecimiento del monton ({(_heapBytes / 1048576.0 / _windowElapsed):F2} MB/s), contador={(_gcBytes / (double)n):F0} B/fotograma | ms cpu={_ftCpu / fn:F2} hiloPrincipal={_ftMain / fn:F2} esperaPresent={_ftPresent / fn:F2} hiloRender={_ftRender / fn:F2} gpu={_ftGpu / fn:F2} (muestras {_ftN})");
+            _gcBytes = 0; _heapBytes = 0; _ftCpu = _ftMain = _ftPresent = _ftRender = _ftGpu = 0; _ftN = 0;
+            if (_markers)
+            {
+                _recs.Sort((a, b) => b.Sum.CompareTo(a.Sum));
+                var sb = new System.Text.StringBuilder("[PerfLogger] marcadores (ms/fotograma, hilo principal): ");
+                for (int i = 0; i < _recs.Count && i < 60; i++) sb.Append(_recs[i].Name).Append('=').Append((_recs[i].Sum / n / 1e6).ToString("F2")).Append("; ");
+                Debug.Log(sb.ToString());
+                for (int i = 0; i < _recs.Count; i++) _recs[i].Sum = 0;
+                CollectMarkers();
+            }
             _frameTimes.Clear();
             _windowElapsed = 0f;
         }

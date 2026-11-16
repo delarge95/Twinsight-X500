@@ -695,6 +695,43 @@ namespace WebGL.Core.Thermal
 
         private void RefreshDebugSnapshot()
         {
+#if UNITY_STANDALONE
+            // PLAN_PC F-6: this runs every simulation step; reuse the snapshot objects instead of allocating one per node per step
+            // (~8 KB per frame at idle). Every entry is overwritten before the sort, so the permutation left by the last sort is harmless.
+            if (debugSnapshot.Count != nodes.Count)
+            {
+                debugSnapshot.Clear();
+                for (int i = 0; i < nodes.Count; i++) debugSnapshot.Add(new ThermalPartSnapshot());
+            }
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                ThermalNodeRuntime node = nodes[i];
+                ThermalPartSnapshot snap = debugSnapshot[i];
+                if (snap == null) { snap = new ThermalPartSnapshot(); debugSnapshot[i] = snap; }
+                snap.partId = node.PartId;
+                snap.partName = node.PartName;
+                snap.currentTemperatureC = node.CurrentTemperatureC;
+                snap.normalizedTemperature = NormalizeTemperature(node.CurrentTemperatureC, node.MinTemperatureC, node.PeakTemperatureC);
+                snap.equilibriumTemperatureC = node.EquilibriumTemperatureC;
+                snap.sourceClass = node.SourceClass;
+                snap.isCritical = node.IsCritical;
+            }
+
+            // insertion sort, hottest first: allocation-free (List.Sort allocates in Mono) and near O(n) because the order barely changes between steps
+            for (int i = 1; i < debugSnapshot.Count; i++)
+            {
+                ThermalPartSnapshot key = debugSnapshot[i];
+                int j = i - 1;
+                while (j >= 0 && debugSnapshot[j].currentTemperatureC < key.currentTemperatureC)
+                {
+                    debugSnapshot[j + 1] = debugSnapshot[j];
+                    j--;
+                }
+
+                debugSnapshot[j + 1] = key;
+            }
+#else
             debugSnapshot.Clear();
             foreach (ThermalNodeRuntime node in nodes)
             {
@@ -711,6 +748,7 @@ namespace WebGL.Core.Thermal
             }
 
             debugSnapshot.Sort((left, right) => right.currentTemperatureC.CompareTo(left.currentTemperatureC));
+#endif
         }
 
         private void AttachDroneState()

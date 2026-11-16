@@ -160,6 +160,9 @@ namespace WebGL.Core.Utils
             {
                 ToggleCapturePanel();
             }
+#if UNITY_STANDALONE
+            SyncOverlayGui();
+#endif
         }
 
         private void SamplePerformance()
@@ -244,7 +247,37 @@ namespace WebGL.Core.Utils
             _sessionPeakReservedMb = Math.Max(_sessionPeakReservedMb, _reservedMB);
         }
 
+#if UNITY_STANDALONE
+        // PLAN_PC F-6: a MonoBehaviour with OnGUI makes Unity run the IMGUI layout + repaint passes every frame (and allocate) even when
+        // nothing is drawn. On PC the OnGUI lives in a helper that only exists/enabled while the overlay is shown.
+        private sealed class OverlayGui : MonoBehaviour
+        {
+            public WebGLProfiler Owner;
+            private void OnGUI() { if (Owner != null) Owner.DrawOverlayGui(); }
+        }
+
+        private OverlayGui _overlayGui;
+
+        private void SyncOverlayGui()
+        {
+            bool has = _overlayGui != null && _overlayGui.enabled;
+            if (showOnScreen == has) return;
+            if (_overlayGui == null)
+            {
+                _overlayGui = gameObject.AddComponent<OverlayGui>();
+                _overlayGui.Owner = this;
+            }
+
+            _overlayGui.enabled = showOnScreen;
+        }
+#else
         private void OnGUI()
+        {
+            DrawOverlayGui();
+        }
+#endif
+
+        private void DrawOverlayGui()
         {
             if (!showOnScreen)
             {

@@ -736,8 +736,9 @@ namespace WebGL.UI.Desktop
             float prevRight = float.NegativeInfinity;
             bool over = false;
             int shown = 0;
-            foreach (VisualElement c in _top.Children())
+            for (int ci = 0; ci < _top.childCount; ci++) // F-6: Children() boxes an enumerator every frame
             {
+                VisualElement c = _top[ci];
                 if (c.resolvedStyle.display == DisplayStyle.None) continue;
                 Rect r = c.worldBound;
                 shown++; // counted by display, not by width: a squeezed item must not look like one that came or went
@@ -747,8 +748,9 @@ namespace WebGL.UI.Desktop
                 if (r.xMin < prevRight - 0.5f) over = true;
                 // an item squeezed below its content (the mode switch) paints its children outside its own box: measure them too
                 float right = r.xMax;
-                foreach (VisualElement g in c.Children())
+                for (int gi = 0; gi < c.childCount; gi++)
                 {
+                    VisualElement g = c[gi];
                     if (g.resolvedStyle.display == DisplayStyle.None || g.resolvedStyle.position == Position.Absolute) continue;
                     Rect gr = g.worldBound;
                     if (gr.width < 1f) continue;
@@ -770,6 +772,8 @@ namespace WebGL.UI.Desktop
         /// logical width; if the layout still overflows (UI size 150 %, a long part name, several chips) the bar gives up one more level
         /// per frame until nothing overlaps, and keeps that until the width changes.
         /// </summary>
+        private static string[] _barLevelClasses;
+
         private void UpdateBarLevel(float logicalWidth)
         {
             if (Mathf.Abs(logicalWidth - _barLastWidth) > 0.5f) { _barLastWidth = logicalWidth; _barExtra = 0; }
@@ -781,7 +785,13 @@ namespace WebGL.UI.Desktop
             else if (over && level + _barExtra < BarLevelBelow.Length) { _barExtra++; _barWait = 4; }
             _barLevel = Mathf.Min(BarLevelBelow.Length, level + _barExtra);
             _root.EnableInClassList("dk-narrowbar", _barLevel >= 1);
-            for (int i = 1; i <= BarLevelBelow.Length; i++) _root.EnableInClassList("dk-bar-l" + i, _barLevel >= i);
+            if (_barLevelClasses == null)
+            {
+                _barLevelClasses = new string[BarLevelBelow.Length + 1];
+                for (int i = 1; i <= BarLevelBelow.Length; i++) _barLevelClasses[i] = "dk-bar-l" + i;
+            }
+
+            for (int i = 1; i <= BarLevelBelow.Length; i++) _root.EnableInClassList(_barLevelClasses[i], _barLevel >= i); // F-6: no string per frame
         }
 
         public void Tick(float logicalWidth)
@@ -807,7 +817,7 @@ namespace WebGL.UI.Desktop
             TickFeedback();
 
             // crumb: the existing header label already has the localized part name / "select a part"
-            Label ctx = _root.Q<Label>("TopContextLabel");
+            Label ctx = _qCtx ?? (_qCtx = _root.Q<Label>("TopContextLabel"));
             bool hasSel = SelectionManager.Instance != null && SelectionManager.Instance.CurrentSelection != null;
             string text = ctx != null ? ctx.text : string.Empty;
             if (_crumb.text != text) _crumb.text = text;
@@ -829,7 +839,7 @@ namespace WebGL.UI.Desktop
             // pins: the real state is the hotspot manager (the card class can drift after Home / re-entry and used to invert the button)
             bool pinsVisible = HotspotManager.Instance != null && HotspotManager.Instance.IsVisible;
             SetOn(_btnPins, pinsVisible);
-            _root.Q<Button>("ToolHotspotBtn")?.EnableInClassList("submenu-card--active", pinsVisible);
+            (_qHotspotBtn ?? (_qHotspotBtn = _root.Q<Button>("ToolHotspotBtn")))?.EnableInClassList("submenu-card--active", pinsVisible);
             UpdateChip(_chipFilter, _ui.FilterActive);
             UpdateChip(_chipExplode, ExplodedViewManager.Instance != null && ExplodedViewManager.Instance.GetExplosionFactor() > 0.001f);
             UpdateChip(_chipCut, CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled);
@@ -842,7 +852,7 @@ namespace WebGL.UI.Desktop
                       | (CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled ? 4 : 0) | (DroneStateController.Instance != null && DroneStateController.Instance.IsOn ? 8 : 0)
                       | (_tel.IsRunning ? 16 : 0) | (hasSel ? 32 : 0);
             UpdateBarLevel(logicalWidth);
-            SetOn(_btnIso, _root.Q<Button>("ToolIsolateBtn")?.ClassListContains("submenu-card--active") == true);
+            SetOn(_btnIso, (_qIsolateBtn ?? (_qIsolateBtn = _root.Q<Button>("ToolIsolateBtn")))?.ClassListContains("submenu-card--active") == true);
             SetOn(_btnGear, _settingsOpen);
             _btnLangEn.EnableInClassList("dk-lang-btn--on", !AppLanguageManager.IsSpanish);
             _btnLangEs.EnableInClassList("dk-lang-btn--on", AppLanguageManager.IsSpanish);
@@ -861,16 +871,23 @@ namespace WebGL.UI.Desktop
             }
 
             // thermal legend, horizontal, from the original (hidden) legend
-            VisualElement legend = _root.Q<VisualElement>("ThermalLegendContainer");
+            VisualElement legend = _qLegend ?? (_qLegend = _root.Q<VisualElement>("ThermalLegendContainer"));
             bool thermal = legend != null && !legend.ClassListContains("thermal-legend--hidden");
             _tlg.style.display = thermal ? DisplayStyle.Flex : DisplayStyle.None;
             if (thermal)
             {
-                _tlgMin.text = _root.Q<Label>("ThermalMinTemp")?.text ?? string.Empty;
-                _tlgMax.text = _root.Q<Label>("ThermalMaxTemp")?.text ?? string.Empty;
+                _tlgMin.text = (_qTMin ?? (_qTMin = _root.Q<Label>("ThermalMinTemp")))?.text ?? string.Empty;
+                _tlgMax.text = (_qTMax ?? (_qTMax = _root.Q<Label>("ThermalMaxTemp")))?.text ?? string.Empty;
             }
 
-            _quality.text = T("Quality ", "Calidad ") + RenderQualityController.ResolvedTier;
+            // PLAN_PC F-6: these labels were rebuilt (string concat + enum boxing) every frame; rebuild only when the value or the language changes
+            var tierNow = RenderQualityController.ResolvedTier;
+            bool esNow = AppLanguageManager.IsSpanish;
+            if (!_qualityInit || !tierNow.Equals(_qualityTier) || esNow != _qualityEs)
+            {
+                _qualityInit = true; _qualityTier = tierNow; _qualityEs = esNow;
+                _quality.text = T("Quality ", "Calidad ") + tierNow;
+            }
 
             // Studio strip: current render mode on the button, default section when the mode opens
             if (_studioContainer != null)
@@ -880,8 +897,13 @@ namespace WebGL.UI.Desktop
                 _studioWasVisible = studioVisible;
                 if (_studioRenderLabel != null && ViewModeManager.Instance != null)
                 {
-                    _studioRenderLabel.text = T("Render: ", "Render: ") + ModeName(ViewModeManager.Instance.CurrentMode);
-                    _renderIcon?.SetShape(ModeIcon(ViewModeManager.Instance.CurrentMode));
+                    var modeNow = ViewModeManager.Instance.CurrentMode;
+                    if (!_studioInit || !modeNow.Equals(_studioMode) || esNow != _studioEs)
+                    {
+                        _studioInit = true; _studioMode = modeNow; _studioEs = esNow;
+                        _studioRenderLabel.text = T("Render: ", "Render: ") + ModeName(modeNow);
+                        _renderIcon?.SetShape(ModeIcon(modeNow));
+                    }
                 }
             }
 
@@ -907,6 +929,14 @@ namespace WebGL.UI.Desktop
 
         private Label _powerCardLabel, _powerNote;
 
+        // PLAN_PC F-6: per-frame UQuery results and derived strings, cached (the elements live as long as the document)
+        private Label _qCtx, _qTMin, _qTMax;
+        private Button _qHotspotBtn, _qIsolateBtn, _qPowerBtn;
+        private VisualElement _qLegend;
+        private bool _qualityInit, _qualityEs, _studioInit, _studioEs;
+        private QualityTier _qualityTier;
+        private ViewMode _studioMode;
+
         /// <summary>
         /// D-6 / WP-11: the Inspector's power card is the MANUAL SIMULATION ("Energia (simulada)"), not the telemetry session (the session
         /// switch "Encendido" is in mode 4). The simulation popover says so; its FLYING state reads "Carga alta (simulado)" (InspectModeHandler).
@@ -929,7 +959,7 @@ namespace WebGL.UI.Desktop
             string lang = AppLanguageManager.IsSpanish ? "es" : "en";
             string t = TelemetryStrings.T("power.sim", lang);
             if (_powerCardLabel != null && _powerCardLabel.text != t) _powerCardLabel.text = t;
-            Button powerBtn = _root.Q<Button>("ToolPowerBtn");
+            Button powerBtn = _qPowerBtn ?? (_qPowerBtn = _root.Q<Button>("ToolPowerBtn"));
             string tip = TelemetryStrings.T("power.sim.tip", lang);
             if (powerBtn != null && powerBtn.tooltip != tip) powerBtn.tooltip = tip;
             string n = TelemetryStrings.T("power.sim.note", lang);

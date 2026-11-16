@@ -237,6 +237,10 @@ namespace WebGL.Core.Managers
             }
         }
 
+#if UNITY_STANDALONE
+        private readonly System.Collections.Generic.Dictionary<Transform, Vector3> _spinAxisCache = new System.Collections.Generic.Dictionary<Transform, Vector3>();
+#endif
+
         private void UpdatePropellers()
         {
             currentPropellerSpeed = Mathf.Lerp(currentPropellerSpeed, targetPropellerSpeed, Time.deltaTime * 5f);
@@ -252,7 +256,17 @@ namespace WebGL.Core.Managers
                 if (propeller == null) continue;
 
                 float direction = i % 2 == 0 ? 1f : -1f;
+#if UNITY_STANDALONE
+                // PLAN_PC F-6: the axis comes from the propeller's local bounds, which do not change: resolve it once per propeller
+                // (resolving it every frame allocated a renderer array per propeller, ~0.7 KB per frame).
+                if (!_spinAxisCache.TryGetValue(propeller, out Vector3 spinAxis))
+                {
+                    spinAxis = ResolvePropellerSpinAxis(propeller);
+                    _spinAxisCache[propeller] = spinAxis;
+                }
+#else
                 Vector3 spinAxis = ResolvePropellerSpinAxis(propeller);
+#endif
                 propeller.Rotate(spinAxis, currentPropellerSpeed * direction * Time.deltaTime, Space.Self);
             }
         }
