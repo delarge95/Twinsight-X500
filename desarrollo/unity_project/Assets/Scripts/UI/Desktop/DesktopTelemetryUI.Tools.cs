@@ -96,6 +96,7 @@ namespace WebGL.UI.Desktop
 
         private void TickToolsLote1(bool viewer)
         {
+            TickBatterySampler();
             TickMap(viewer); TickPreflight(viewer); TickMission(viewer); TickRecord(viewer); TickTraining(viewer);
         }
 

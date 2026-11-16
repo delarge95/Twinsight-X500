@@ -178,6 +178,7 @@ namespace WebGL.UI.Desktop
             _rBatVolt = AddReading(_flData, "fl.voltage");
             _rBatCurrent = AddReading(_flData, "fl.current");
             _rBatTemp = AddReading(_flData, "fl.batteryTemp");
+            BuildBatteryRows(_flData); // Lote 1b, tool 8: the estimated health of the battery
 
             _secMotors = Section(_flData);
             var heads = new VisualElement { pickingMode = PickingMode.Ignore };
@@ -305,6 +306,7 @@ namespace WebGL.UI.Desktop
             _motorRpmHead.text = T("fl.rpm");
             _motorTempHead.text = T("fl.temp");
             _propNote.text = T("fl.propnote");
+            RelabelBattery();
             _nextFlight = 0f;
         }
 
@@ -382,6 +384,8 @@ namespace WebGL.UI.Desktop
             Set(_rBatCurrent, F1(f.bat.i) + " A", oi, FlightOrigins.Text(oi, lang, labels));
             ReadingOrigin obt = FlightOrigins.ForSession(FlightOrigins.BatteryTemp(h, cls), sim);
             Set(_rBatTemp, F1(f.temp[4]) + " °C", obt, FlightOrigins.Text(obt, lang, labels));
+
+            TickBatteryRows(client, f, h, cells, lang, labels);
 
             // motors
             ReadingOrigin orpm = FlightOrigins.ForSession(FlightOrigins.Rpm(h, cls), sim);

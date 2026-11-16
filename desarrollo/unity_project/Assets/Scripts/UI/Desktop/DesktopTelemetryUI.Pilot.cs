@@ -300,6 +300,8 @@ namespace WebGL.UI.Desktop
                 Debug.Log("[Pilot] " + PilotControls.NameOf(c) + " refused (" + via + "): " + NotAcceptedText());
                 return false;
             }
+            // Lote 1b, tool 3: with a failing pre-flight check «Despegar» asks once; «Despegar igualmente» comes back here with via = "preflight"
+            if (c == PilotCommand.Takeoff && via != "preflight" && PreflightHoldsTakeoff()) return false;
             bool ok = client.Send(PilotControls.CommandMessage(c), out string reason);
             _pilotAuto = false;
             if (ok && _pilotOn && c != PilotCommand.Takeoff) _pilotFlagLost = true; // the model drops the pilot flag on hold / land / rtl
