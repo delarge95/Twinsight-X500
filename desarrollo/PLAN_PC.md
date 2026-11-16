@@ -1059,3 +1059,32 @@ Port a C# de tres herramientas de la web (`fable/lote1`, commit `1311a20`), en s
 - Textos **sin aprobación explícita del usuario**: los de la web `fence.*`, `wind.*`, `simfault.*` (salvo `simfault.note`, marcado [APROBADO 2026-11-13] en la web) y los rótulos «Geocerca», «Viento» y «Geocerca (simulador)» de la ayuda. «¿Cortar motor N? Toca otra vez» conserva el «Toca» de la web aunque en el escritorio se hace clic. En `fence.honest` (EN) se corrigió una mayúscula perdida.
 - Preexistente y no tocado: la frase de una alerta del simulador dice «RPM estimadas» mientras la etiqueta de la lectura dice «simulado» (`AlertText` no aplica `ForSession`).
 - La sonda no usa el ratón del sistema (clics como eventos de UI Toolkit): no se verificó el arrastre real del dial ni de los deslizadores. Con «Sin viento» la flecha tarda unos segundos en desaparecer (la última ráfaga se apaga con su tiempo de correlación de 2 s, como en la web).
+
+## 30. Lote 1b: mapa cenital, comprobaciones previas y salud de la batería (2026-11-16, rama `pc-desktop`, solo PC)
+
+Port a C# de tres herramientas de la web (`web/telemetria-control`, commit `a8664fa`): **mapa (1)**, **comprobaciones previas (3)** y **batería (8)**. La lógica es C# puro en `Telemetry/Logic` (`Minimap.cs`, `Preflight.cs`, `BatteryHealth.cs`; sin `UnityEngine`) y se prueba en EditMode contra `minimap.json`, `preflight.json` y `battery.json` copiados a `Contracts~/golden` (`SOURCE.md` anota el commit). La interfaz es solo de PC (`#if UNITY_STANDALONE`). Los textos son los de los diccionarios de la web. La tira de Telemetría gana una **tercera pastilla** (`DesktopTelemetryUI.Tools.cs`) con «Mapa» y «Comprobar» y ganchos para las herramientas del Lote 1c. Build de verificación: `E:\TwinSight_builds\pc_lote1b\`; capturas y registros: `twinsight-web-twin/docs/unity_pc/capturas_lote1b/sonda/`.
+
+### 30.1 Mapa cenital (1)
+- `DesktopTelemetryUI.Map.cs` + `DesktopMiniMap.cs`: botón «Mapa» (tecla `M`); panel abajo a la izquierda con un disco de 220 px (doble clic: 360 px), rastro del vuelo, origen «H», anillo de la geocerca (solo simulador), flecha del rumbo, barra de escala y norte; encima, cuando están activos, el escenario de pruebas y el viento del simulador. «Norte arriba» / «Rumbo arriba», «Encajar» y «Seguir»; rueda = zoom, arrastrar = desplazar, `Inicio` sobre el mapa = encajar. Tocar el mapa no envía ninguna orden. Se recuerda en `Desk_MapOn`, `Desk_MapBig`, `Desk_MapHeadingUp`.
+- Honestidad: sin mapa de fondo ni coordenadas geográficas (el enlace no las trae); el origen es «Origen local (EKF)» en la repetición y PX4 SITL y «Punto de despegue» en el simulador; «Posición: medido» solo en la repetición del vuelo real, «simulado» en lo demás.
+
+### 30.2 Comprobaciones previas (3)
+- `DesktopTelemetryUI.Preflight.cs`: botón «Comprobar» con un punto del color del veredicto (verde «Listo», ámbar «Con avisos», rojo «No apto»); popover con una fila por comprobación (enlace, carga, tensión por celda, temperaturas, vibración, estado, geocerca, fallas y alertas, GPS) con su estado, valor y **origen**, y las tres casillas que marca el usuario (solo viven durante la ejecución). En la repetición no hay casillas y se avisa «Evaluación del vuelo grabado en este instante».
+- **Es informativa**: no bloquea nada. Con una comprobación en fallo, «Despegar» (botón, tecla `T` o mando) pregunta una vez («Hay comprobaciones en fallo», con la lista) y «Despegar igualmente» envía el despegue; «Cancelar» no envía nada. El gancho está en `SendPilotCommand`.
+- Honestidad: el GPS siempre sale «Sin dato · El cable no trae GPS»; la geocerca solo existe en el simulador; lo que marca el usuario lleva «lo marca el usuario», nunca «medido».
+
+### 30.3 Salud de la batería (8)
+- `DesktopTelemetryUI.Battery.cs`: en la sección «Batería» de la pestaña «Vuelo», bajo las lecturas de siempre: resistencia interna (y por celda), caída bajo carga, tensión en reposo, tiempo restante por la pendiente de la carga y, **solo en el simulador** (la única fuente con capacidad conocida, 5 Ah), «Por corriente»; debajo, la nube «Tensión frente a corriente · último minuto» con la recta V₀ − R̂·I. Muestreo a 4 Hz aunque la pestaña no esté a la vista; un cambio de fuente, de segmento o un reloj que retrocede empieza de cero.
+- Honestidad: todas las filas derivadas llevan «estimado» (no son medidas); sobre lecturas simuladas la sección dice «Estimado sobre datos simulados.»; mientras no hay 5 pares aceptados dice «calculando… (n/5)». **Diferencia con la web**: allí la nube está entre las gráficas de análisis; aquí está junto a las filas de la batería.
+
+### 30.4 Pruebas
+- **EditMode**: **238 pasan, 0 fallan** (antes 214): los tres goldens nuevos más lo anterior.
+- **Sonda `-lote1b-capture <carpeta>`** (`DesktopCaptureLote1B`, dentro del jugador, sin ratón ni teclado del sistema): **53/53** en 1920x1080 ES (ventana 1904x984) y en 1280x720 EN, ninguna captura negra. Cubre: botones atenuados sin telemetría, la tercera pastilla dentro de la ventana, veredictos y punto, filas y orígenes en simulador y repetición, casillas, aviso de despegue (cancelar / despegar igualmente), mapa (tecla M, rastro, geocerca, orientación, tamaños, seguir, encajar, zoom, viento, escenario, rótulos honestos) y batería (filas, origen, nota, fila solo del simulador, nube y recta).
+- Números en el jugador: R̂ del simulador **11,6-12,6 mΩ** (golden de la web 11,5 mΩ); en 20 s de la repetición del vuelo real, 83,1 mΩ con 11 pares en una ejecución (el TWF completo da 82 mΩ en el golden) y «calculando» con 2 pares en la otra: depende del tramo que toque.
+
+### 30.5 Límites honestos
+- Las sondas del Lote 1a y las anteriores (`-tools-capture`, `-desk-fix`, `-desk-check`, `-env-capture`, `-tel-sim-ui`) **no se han vuelto a pasar todavía** con este build; quedan para el cierre del lote.
+- La sonda no usa el ratón del sistema: el arrastre, la rueda y el doble clic reales sobre el mapa no están verificados (sí sus mismas rutas de código).
+- En vuelo el punto de «Comprobar» está en rojo («En vuelo: no es prevuelo» cuenta como fallo, igual que en la web) y «Despegar» en vuelo pregunta.
+- El encaje del mapa incluye la geocerca de 120 m como en la web, así que un vuelo corto se ve pequeño hasta que se pulsa «Seguir» o se hace zoom.
+- Textos `map.*`, `pf.*` y `battery.*` copiados de la web, sin aprobación explícita del usuario. Icono de «Comprobar» y de «Mapa» reutilizados (no hay iconos propios).

@@ -483,6 +483,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-lote1b-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var l1b = gameObject.AddComponent<DesktopCaptureLote1B>(); // Lote 1b: map, pre-flight, battery health
+                    l1b.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-tel-sim-ui", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var simUi = gameObject.AddComponent<DesktopCaptureSim>();
