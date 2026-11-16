@@ -104,8 +104,10 @@ namespace WebGL.Telemetry
                 case ExplainSource.LocalReplay: return TelemetryStrings.F("fx." + Key(t) + ".src.replay", lang, "n", Motor(motor));
                 case ExplainSource.Sitl: return TelemetryStrings.F("fx." + Key(t) + ".src.sitl", lang, "n", Motor(motor));
                 case ExplainSource.Simulator:
-                    // the battery has its own approved simulator text; every other fault: the simulator does not inject faults
-                    return t == FaultTopic.BatterySag ? TelemetryStrings.T("fx.bat.src.sim", lang) : TelemetryStrings.T("fx.src.sim", lang);
+                    // the battery and (Lote 1a) the motor failure have their own simulator text; every other fault: the simulator does not inject faults
+                    if (t == FaultTopic.BatterySag) return TelemetryStrings.T("fx.bat.src.sim", lang);
+                    if (t == FaultTopic.MotorFailure) return TelemetryStrings.T("fx.a.src.sim", lang);
+                    return TelemetryStrings.T("fx.src.sim", lang);
                 default: return null;
             }
         }

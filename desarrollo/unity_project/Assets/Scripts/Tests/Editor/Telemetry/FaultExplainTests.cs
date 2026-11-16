@@ -51,9 +51,12 @@ namespace WebGL.Telemetry.Tests
         }
 
         [Test]
-        public void SimulatorText_SaysItDoesNotInjectFaults_ExceptTheBatteryWhichHasItsOwnApprovedText()
+        public void SimulatorText_SaysItDoesNotInjectFaults_ExceptTheBatteryAndTheMotorCut_WhichHaveTheirOwnApprovedText()
         {
-            foreach (var t in new[] { FaultTopic.MotorFailure, FaultTopic.MotorOverheat, FaultTopic.Vibration, FaultTopic.Neutral })
+            // Lote 1a: the simulator now cuts a motor in a simplified model: the approved line of the web (simfault.note)
+            Assert.AreEqual("Simulador: el motor deja de empujar en un modelo simplificado; no es PX4 ni un dron real.", FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Simulator, 1, "es"));
+            Assert.AreEqual("Simulator: the motor stops pushing in a simplified model; this is not PX4 or a real drone.", FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Simulator, 1, "en"));
+            foreach (var t in new[] { FaultTopic.MotorOverheat, FaultTopic.Vibration, FaultTopic.Neutral })
             {
                 StringAssert.Contains("no inyecta fallas", FaultExplain.InSource(t, ExplainSource.Simulator, 1, "es"));
                 StringAssert.Contains("does not inject faults", FaultExplain.InSource(t, ExplainSource.Simulator, 1, "en"));

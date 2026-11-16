@@ -11,6 +11,7 @@
 // quaternion Hamilton scalar first rotating body FRD into NED: the conventions of TelemetryFrame.
 
 using System;
+using System.Collections.Generic;
 
 namespace WebGL.Telemetry
 {
@@ -39,8 +40,8 @@ namespace WebGL.Telemetry
         public const double OrbitSpeed = 2.5;
         /// <summary>No stick sample for this long while piloting = hold position (dead-man).</summary>
         public const double ManualTimeoutS = 0.6;
-        /// <summary>Hover motor command, measured in the real flight (0.62; docs/CALIBRACION_MODELO_FALLAS.md of the web).</summary>
-        public const double HoverThrottle = 0.62;
+        /// <summary>Hover motor command, measured in the real flight (0.62; docs/CALIBRACION_MODELO_FALLAS.md of the web). Single source: MotorFailParams.</summary>
+        public const double HoverThrottle = MotorFailParams.HoverThrottle;
         /// <summary>Battery: 5000 mAh 4S, about 22 A in hover.</summary>
         public const double CapacityAh = 5;
         public const double HoverAmps = 22;
@@ -108,6 +109,21 @@ namespace WebGL.Telemetry
         public SimConfig cfg = new SimConfig();
         /// <summary>Gust of each horizontal axis and the state of its random generator (seeded from cfg.wind.seed).</summary>
         public WindState wind;
+        /// <summary>A motor is cut: the rigid-body model of MotorFail.cs carries the state instead of the kinematic one (null = no fault).</summary>
+        public MotorFailState fail;
+        /// <summary>A motor was cut on the ground: it is only marked (no fall dynamics, the vehicle stays put) and the manoeuvre commands are refused until restore (0 = none).</summary>
+        public int groundCut;
+        /// <summary>Just restored from a cut motor and still falling: if the ground comes first, it is an impact (cleared once the descent is arrested).</summary>
+        public bool recovering;
+        /// <summary>Events raised by Step (impact, forced landing), waiting for the client: read and empty them with FlightSim.TakeEvents.</summary>
+        public List<SimEvent> events = new List<SimEvent>();
+    }
+
+    /// <summary>An event raised while stepping (not the reply of a command).</summary>
+    public struct SimEvent
+    {
+        public EventSeverity severity;
+        public string text;
     }
 
     public static class FlightSim
@@ -115,8 +131,19 @@ namespace WebGL.Telemetry
         const double G = 9.80665;
         const double Deg = Math.PI / 180;
 
-        /// <summary>Commands the simulator accepts (HelloMessage.commands). motor_off / restore are PX4 fault injection and do not exist here.</summary>
-        public static readonly string[] Commands = { "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "pilot", "manual" };
+        /// <summary>Commands the simulator accepts (HelloMessage.commands). motor_off / restore drive the simplified model of MotorFail.cs (not PX4 fault injection).</summary>
+        public static readonly string[] Commands = { "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "pilot", "manual", "motor_off", "restore" };
+
+        /// <summary>The answer of every command but restore and hold while a motor is cut (spec 10).</summary>
+        public const string MotorCutDetail = "motor cortado: el simulador no puede maniobrar";
+
+        /// <summary>Returns the events raised since the last call and empties the queue.</summary>
+        public static List<SimEvent> TakeEvents(SimState s)
+        {
+            var l = new List<SimEvent>(s.events);
+            s.events.Clear();
+            return l;
+        }
 
         public const string NotAvailable = "no disponible en el simulador del navegador";
 
@@ -157,10 +184,80 @@ namespace WebGL.Telemetry
             return true;
         }
 
+        /// <summary>Commands with a motor cut on the ground: restore clears the mark (no altitude limit), hold confirms, the rest is refused.</summary>
+        static SimReply GroundCutCommand(SimState s, int motorCut, CommandMessage msg)
+        {
+            if (msg.name == "hold") return Ok();
+            if (msg.name != "restore") return No(MotorCutDetail);
+            int motor = msg.motor ?? 0;
+            if (motor != 0 && motor != motorCut) return No("el motor " + motor + " no está cortado (el cortado es el " + motorCut + ")");
+            s.groundCut = 0;
+            return Ok("Motor " + motorCut + " restaurado (simulado)");
+        }
+
+        /// <summary>Commands while a motor is cut: only restore acts, hold just confirms, the rest is refused.</summary>
+        static SimReply FailCommand(SimState s, MotorFailState fail, CommandMessage msg)
+        {
+            if (msg.name == "hold") return Ok();
+            if (msg.name != "restore") return No(MotorCutDetail);
+            int motor = msg.motor ?? 0;
+            if (motor != 0 && motor != fail.motor) return No("el motor " + motor + " no está cortado (el cortado es el " + fail.motor + ")");
+            MotorFailRestore r = MotorFail.Restore(fail);
+            if (r == null) return No("demasiado cerca del suelo para restaurar (altura mínima " + MotorFailParams.RestoreMinAltitude.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture).Replace('.', ',') + " m)");
+            // Back to the kinematic model: hold at this very point, keeping the velocity; the attitude levels with TiltTau (declared simplification).
+            s.p = r.p;
+            s.v = r.v;
+            s.roll = r.roll;
+            s.pitch = r.pitch;
+            s.yaw = r.yaw;
+            s.yawRate = r.yawRate;
+            s.target = r.target;
+            s.yawTarget = null;
+            s.orbit = null;
+            s.mode = SimMode.Hold;
+            s.fail = null;
+            s.recovering = true;
+            return Ok("Motor " + fail.motor + " restaurado (simulado)");
+        }
+
+        /// <summary>The vehicle hit the ground (cut motor, or restored too low to stop the fall): landed, disarmed, idle, and the event.</summary>
+        static void Crash(SimState s, double speed)
+        {
+            bool hard = speed >= MotorFailParams.ImpactSpeed;
+            s.events.Add(new SimEvent { severity = hard ? EventSeverity.Critical : EventSeverity.Warning, text = (hard ? "Impacto simulado" : "Aterrizaje forzoso simulado") + " a " + JsMath.ToFixed(speed, 1).Replace('.', ',') + " m/s" });
+            s.fail = null;
+            s.recovering = false;
+            s.landed = true;
+            s.armed = false;
+            s.mode = SimMode.Idle;
+            s.pilot = false;
+            s.v = new double[3];
+            s.p[2] = 0;
+            s.yawRate = 0;
+            s.u = new double[4];
+        }
+
+        /// <summary>One step with a motor cut: MotorFail.cs carries position, velocity and attitude; sticks, targets, wind and geofence do not act.</summary>
+        static void StepFail(SimState s, MotorFailState fail, double dt)
+        {
+            MotorFail.Step(fail, dt);
+            MotorFail.Euler(fail.q, out double roll, out double pitch, out double yaw);
+            s.p = new[] { fail.p[0], fail.p[1], fail.p[2] };
+            s.v = new[] { fail.v[0], fail.v[1], fail.v[2] };
+            s.roll = roll;
+            s.pitch = pitch;
+            s.yaw = yaw;
+            s.yawRate = fail.w[2];
+            s.u = MotorFail.U(fail);
+            if (fail.impact != null) Crash(s, fail.impact.speed);
+        }
+
         /// <summary>Applies a command. Mutates `s`.</summary>
         public static SimReply Command(SimState s, CommandMessage msg)
         {
             SimReply no;
+            if (s.fail != null) return FailCommand(s, s.fail, msg);
+            if (s.groundCut != 0) return GroundCutCommand(s, s.groundCut, msg);
             switch (msg.name)
             {
                 case "takeoff":
@@ -258,6 +355,26 @@ namespace WebGL.Telemetry
                     if (Flying(s) && s.mode != SimMode.Takeoff && s.mode != SimMode.Land) s.mode = SimMode.Manual;
                     return Ok("Pilotaje manual (modo Position simulado)");
                 }
+                case "motor_off":
+                {
+                    int motor = msg.motor ?? 0;
+                    if (motor < 1 || motor > 4) return No("motor no válido: debe ser 1, 2, 3 o 4");
+                    if (!Flying(s))
+                    {
+                        // On the ground: the motor is only marked as cut (no fall dynamics); takeoff and the rest are refused until restore.
+                        s.groundCut = motor;
+                        s.u[motor - 1] = 0;
+                        return Ok("Motor " + motor + " cortado (simulado) · en tierra");
+                    }
+                    s.fail = MotorFail.Start(new MotorFailSnapshot { p = s.p, v = s.v, roll = s.roll, pitch = s.pitch, yaw = s.yaw, yawRate = s.yawRate }, motor, s.cfg.faultComp);
+                    s.recovering = false;
+                    s.orbit = null;
+                    s.yawTarget = null;
+                    s.mode = SimMode.Hold;
+                    return Ok("Motor " + motor + " cortado (simulado)" + (s.cfg.faultComp ? " · compensación didáctica" : ""));
+                }
+                case "restore":
+                    return No("no hay ningún motor cortado");
                 default:
                     return No(NotAvailable);
             }
@@ -273,6 +390,7 @@ namespace WebGL.Telemetry
             if (next.radius.HasValue) merged.radius = next.radius.Value;
             if (next.ceiling.HasValue) merged.ceiling = next.ceiling.Value;
             if (next.rtlAltitude.HasValue) merged.rtlAltitude = next.rtlAltitude.Value;
+            if (next.faultComp.HasValue) merged.faultComp = next.faultComp.Value;
             if (next.wind != null)
             {
                 WindPatch w = next.wind;
@@ -288,6 +406,8 @@ namespace WebGL.Telemetry
             if (!wind.ok) return wind;
             // A new seed starts a new sequence of gusts (from calm); the rest of the wind changes without touching the generator.
             if (merged.wind.seed != s.cfg.wind.seed) s.wind = new WindState(merged.wind.seed);
+            // The switch also acts on a motor that is already cut (the didactic comparison is live).
+            if (s.fail != null) s.fail.comp = merged.faultComp;
             s.cfg = merged;
             return ConfigCheck.Ok;
         }
@@ -305,6 +425,7 @@ namespace WebGL.Telemetry
         {
             s.manual = new SimSticks(Clamp(m.x, -1000, 1000), Clamp(m.y, -1000, 1000), Clamp(m.z, 0, 1000), Clamp(m.r, -1000, 1000));
             s.manualAge = 0;
+            if (s.fail != null) return; // a cut motor: the sticks are ignored
             if (s.pilot && Flying(s) && (s.mode == SimMode.Hold || s.mode == SimMode.Goto || s.mode == SimMode.Orbit)) s.mode = SimMode.Manual;
         }
 
@@ -316,6 +437,11 @@ namespace WebGL.Telemetry
             s.t += dt;
             s.manualAge += dt;
             Wind.StepGusts(s.wind, s.cfg.wind, dt); // the gusts live on while landed; they only act in flight
+            if (s.fail != null)
+            {
+                StepFail(s, s.fail, dt);
+                return StepPower(s, dt);
+            }
             double alt = -s.p[2];
             double vn = 0, ve = 0, climb = 0, yawRateCmd = 0;
 
@@ -427,6 +553,17 @@ namespace WebGL.Telemetry
                 if (-s.p[2] > s.cfg.ceiling) { s.p[2] = -s.cfg.ceiling; s.v[2] = Math.Max(0, s.v[2]); }
                 s.yawRate += (yawRateCmd - s.yawRate) * Math.Min(1, dt / 0.12);
                 s.yaw = WrapPi(s.yaw + s.yawRate * dt);
+                // Restored from a cut motor and still falling: the ground wins if MaxAccel cannot stop the fall in the height left (no magic).
+                if (s.recovering)
+                {
+                    if (s.p[2] >= 0 && s.v[2] > 0)
+                    {
+                        Crash(s, Hypot(Hypot(s.v[0], s.v[1]), s.v[2]));
+                        an = ae = ad = 0;
+                        wn = we = 0;
+                    }
+                    else if (s.v[2] < 0.3) s.recovering = false;
+                }
                 // Touchdown.
                 if (s.p[2] >= 0 && s.v[2] >= 0 && (s.mode == SimMode.Land || (s.mode == SimMode.Rtl && s.rtlPhase == RtlPhase.Land) || (s.mode == SimMode.Manual && climb < 0)))
                 {
@@ -465,7 +602,13 @@ namespace WebGL.Telemetry
                 }
             }
             else s.u[0] = s.u[1] = s.u[2] = s.u[3] = 0;
+            if (s.groundCut != 0) s.u[s.groundCut - 1] = 0;
+            return StepPower(s, dt);
+        }
 
+        /// <summary>Battery and temperatures from the motor commands `s.u` of this step (shared by the kinematic model and the cut-motor one).</summary>
+        static SimState StepPower(SimState s, double dt)
+        {
             // Battery and temperatures (first-order models with made-up but plausible constants; labelled "estimated").
             double load = 0;
             for (int i = 0; i < 4; i++) load += Math.Pow(s.u[i] / SimLimits.HoverThrottle, 1.5);

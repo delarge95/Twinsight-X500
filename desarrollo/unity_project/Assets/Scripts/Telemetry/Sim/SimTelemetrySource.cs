@@ -33,6 +33,7 @@ namespace WebGL.Telemetry
         /// <summary>The local configuration a (re)started flight begins with (geofence, wind...); null = the defaults. Set it before Start.</summary>
         public SimConfig InitialConfig;
         bool running;
+        readonly List<SimEvent> pendingEvents = new List<SimEvent>();
         double carry, lastTickLocal = double.NaN, sinceFrame;
 
         /// <summary>The model (tests and the on-screen readout read it; mutate it only through Send).</summary>
@@ -109,8 +110,15 @@ namespace WebGL.Telemetry
                 {
                     FlightSim.Step(sim, StepS);
                     carry -= StepS;
+                    if (sim.events.Count > 0) pendingEvents.AddRange(FlightSim.TakeEvents(sim)); // impact / forced landing of a cut motor
                 }
                 sinceFrame += dt;
+            }
+            if (pendingEvents.Count > 0)
+            {
+                foreach (SimEvent e in pendingEvents)
+                    PostMessage(Stamp(new EventMessage { severity = e.severity, text = e.text, ts = WallNowMs() }, localNowMs));
+                pendingEvents.Clear();
             }
             if (sinceFrame >= 1.0 / FrameHz - 1e-6)
             {

@@ -9,11 +9,13 @@ namespace WebGL.Telemetry
     {
         /// <summary>Simulated wind (tool 4 of Lote 1a). All zero by default = no wind.</summary>
         public WindConfig wind = new WindConfig();
+        /// <summary>Didactic compensation of a cut motor (tool 10 of Lote 1a, MotorFail.cs). Off by default. NOT the controller of PX4.</summary>
+        public bool faultComp;
 
         public SimConfig() { }
 
         /// <summary>A copy with every member present, nothing shared with the original.</summary>
-        public SimConfig Clone() => new SimConfig { radius = radius, ceiling = ceiling, rtlAltitude = rtlAltitude, wind = wind.Clone() };
+        public SimConfig Clone() => new SimConfig { radius = radius, ceiling = ceiling, rtlAltitude = rtlAltitude, wind = wind.Clone(), faultComp = faultComp };
     }
 
     /// <summary>What <see cref="FlightSim.SetConfig"/> takes: any members of the configuration (null = leave as is).</summary>
@@ -21,5 +23,6 @@ namespace WebGL.Telemetry
     {
         public double? radius, ceiling, rtlAltitude;
         public WindPatch wind;
+        public bool? faultComp;
     }
 }

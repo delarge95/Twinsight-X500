@@ -760,13 +760,13 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(1.5f);
             Click(B("DkTelFaults"));
             yield return new WaitForSecondsRealtime(0.6f);
-            Check("simulator: the Faults popover is read-only (no injection buttons) and still compact", !Shown(Root.Q<VisualElement>("DkFaultControls")) && PopCoverage("DkPopFaults") <= 6.0f);
+            Check("simulator: the Faults popover has no replay-injection buttons but the simulator's motor-cut controls (Lote 1a), and stays compact (<= 10 %)", !Shown(Root.Q<VisualElement>("DkFaultControls")) && Shown(Root.Q<VisualElement>("DkSimFaultControls")) && PopCoverage("DkPopFaults") <= 10.0f);
             Click(B("DkFaultExplain"));
             yield return new WaitForSecondsRealtime(0.6f);
             card = Tel.DockCard;
-            Check("simulator: the card says the simulator does not inject faults", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Simulator, 3, lang) && card.SourceText.Contains(lang == "es" ? "no inyecta fallas" : "does not inject faults"));
+            Check("simulator: the card says the approved line (Lote 1a: the simulator cuts a motor in a simplified model, not PX4 nor a real drone)", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Simulator, 3, lang) && card.SourceText.Contains(lang == "es" ? "modelo simplificado; no es PX4 ni un dron real" : "simplified model; this is not PX4 or a real drone"));
             Check("simulator: the card badge is the simulator's, never SITL", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang) && !card.SourceBadgeText.ToUpperInvariant().Contains("SITL"));
-            Check("simulator: no markers (no fault can exist here)", Tel.FaultMarkers.Count == 0);
+            Check("simulator: no markers while no motor is cut", Tel.FaultMarkers.Count == 0);
             yield return Shot("C9_explicacion_simulador", 0.2f);
             Click(B("DkFxPick_battery_sag"));
             yield return new WaitForSecondsRealtime(0.5f);

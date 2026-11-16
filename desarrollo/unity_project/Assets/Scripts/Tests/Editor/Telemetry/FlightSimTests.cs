@@ -25,7 +25,6 @@ namespace WebGL.Telemetry.Tests
             foreach (JObj sc in C.A(g, "scenarios"))
             {
                 string name = C.S(sc, "name");
-                if (name == "replies") continue; // TEMP(Lote 1a, tool 10): motor_off / restore are accepted from the motor-cut commit on
                 var cs = new Cases("flightsim." + name, t.State);
                 var s = FlightSim.Create(C.N(sc, "ambientC"));
                 SimGolden.Play(cs, name, sc, s, t);
@@ -63,7 +62,7 @@ namespace WebGL.Telemetry.Tests
             Assert.AreEqual(C.N(l, "hoverAmps"), SimLimits.HoverAmps);
             Assert.AreEqual(C.N(l, "avionicsAmps"), SimLimits.AvionicsAmps);
             Assert.AreEqual(C.N(l, "motorKv"), SimLimits.MotorKv);
-            CollectionAssert.AreEqual(C.A(g, "commands").Cast<string>().Take(10).ToArray(), FlightSim.Commands); // TEMP(Lote 1a, tool 10): + motor_off, restore
+            CollectionAssert.AreEqual(C.A(g, "commands").Cast<string>().ToArray(), FlightSim.Commands);
         }
 
         [Test]
@@ -140,7 +139,7 @@ namespace WebGL.Telemetry.Tests
             StringAssert.DoesNotContain("SITL", h.source.label.ToUpperInvariant());
             StringAssert.Contains("no es PX4", h.source.label);
             foreach (string c in new[] { "takeoff", "land", "hold", "rtl", "fly_to", "orbit", "yaw", "set_altitude", "pilot" }) Assert.IsTrue(h.Accepts(c), c);
-            Assert.IsFalse(h.Accepts("motor_off"));
+            Assert.IsTrue(h.Accepts("motor_off") && h.Accepts("restore"), "Lote 1a: the simulator cuts a motor in its simplified model (not PX4 injection)");
             Assert.IsFalse(h.Accepts("inject"));
             Assert.IsTrue(r.Client.HasFrame);
             Assert.AreEqual(LinkState.Live, r.Client.State);
@@ -176,12 +175,11 @@ namespace WebGL.Telemetry.Tests
         }
 
         [Test]
-        public void Source_RejectsFaultInjection_AndCommandsOnTheGround()
+        public void Source_RejectsPx4FaultInjection_AndCommandsOnTheGround()
         {
             var r = new Rig();
             r.Run(0.2);
             Assert.IsFalse(r.Send(ClientMessage.Inject(FaultKind.Vibration)), "the client refuses a command the hello does not list");
-            Assert.IsFalse(r.Send(ClientMessage.MotorOff(1)));
             Assert.IsTrue(r.Send(ClientMessage.Land()));
             Assert.IsFalse(r.Client.LastAck.ok);
             StringAssert.Contains("en tierra", r.Client.LastAck.detail);

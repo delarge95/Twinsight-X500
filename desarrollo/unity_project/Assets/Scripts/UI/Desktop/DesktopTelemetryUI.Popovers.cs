@@ -221,6 +221,7 @@ namespace WebGL.UI.Desktop
 
             _faultControls.Add(grid);
             _popFaults.Add(_faultControls);
+            BuildSimFaultControls(); // Lote 1a, tool 10: «Cortar motor N», «Restaurar» and the didactic compensation, only with the simulator
             _faultActiveTitle = Text("dk-field-label", _popFaults);
             _faultActiveList = new VisualElement();
             _faultActiveList.AddToClassList("dk-fault-active");
@@ -318,6 +319,7 @@ namespace WebGL.UI.Desktop
             _flTitle.text = T("faults.title");
             RelabelFaultExplain();
             _faultSyntheticTag.text = labels.FaultSynthetic(lang);
+            RelabelSimFaults();
             _faultExplain.text = T("fx.open");
             _faultMotorLabel.text = T("faults.motor");
             _faultActiveTitle.text = T("faults.active");
@@ -489,9 +491,11 @@ namespace WebGL.UI.Desktop
             bool canInject = local && client.Hello != null && client.Hello.Accepts("inject");
 
             _faultControls.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
-            // the "sintética" tag belongs to the local replay's injection only: PX4 SITL and the simulator have no synthetic faults
-            _faultSyntheticTag.style.display = local ? DisplayStyle.Flex : DisplayStyle.None;
-            string off = client == null ? T("faults.off") : simulator ? T("faults.sim") : sitl ? T("faults.sitl") : !canInject && !local ? T("faults.off") : string.Empty;
+            // the "sintética" tag belongs to the local replay's injection only: PX4 SITL has none and the simulator's cut is «simulado» (Lote 1a)
+            _faultSyntheticTag.style.display = local || simulator ? DisplayStyle.Flex : DisplayStyle.None;
+            if (simulator) { _faultSyntheticTag.text = T("simfault.hint"); _flTitle.text = T("simfault.title"); }
+            else { _faultSyntheticTag.text = HonestyLabels.Load().FaultSynthetic(Lang); _flTitle.text = T("faults.title"); }
+            string off = client == null ? T("faults.off") : simulator ? string.Empty : sitl ? T("faults.sitl") : !canInject && !local ? T("faults.off") : string.Empty;
             _faultOff.text = off;
             _faultOff.style.display = string.IsNullOrEmpty(off) ? DisplayStyle.None : DisplayStyle.Flex;
             _faultClear.style.display = canInject ? DisplayStyle.Flex : DisplayStyle.None;
@@ -533,6 +537,7 @@ namespace WebGL.UI.Desktop
 
             _faultAck.text = canInject ? _ackText : string.Empty;
             _faultAck.style.display = canInject && !string.IsNullOrEmpty(_ackText) ? DisplayStyle.Flex : DisplayStyle.None;
+            TickSimFaults(client, simulator);
         }
 
         /// <summary>Synthetic injection on the local replay: validated like the web (Faults.Validate), sent as a normal client message.</summary>

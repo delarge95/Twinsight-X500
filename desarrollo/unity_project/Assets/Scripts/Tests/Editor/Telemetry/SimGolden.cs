@@ -133,7 +133,7 @@ namespace WebGL.Telemetry.Tests
                 if (w.ContainsKey("gustTau")) p.wind.gustTau = C.N(w, "gustTau");
                 if (w.ContainsKey("seed")) p.wind.seed = C.N(w, "seed");
             }
-            // (faultComp is read here by the motor-cut tool)
+            if (cfg.ContainsKey("faultComp")) p.faultComp = C.B(cfg, "faultComp");
             return p;
         }
 

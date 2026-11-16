@@ -289,6 +289,22 @@ namespace WebGL.Telemetry
             { "wind.err.wind_gust_range", new[] { "Las ráfagas deben estar entre {min} y {max} m/s.", "The gusts must be between {min} and {max} m/s." } },
             { "wind.err.wind_tau_range", new[] { "El tiempo de ráfaga debe estar entre {min} y {max} s.", "The gust time must be between {min} and {max} s." } },
             { "wind.err.wind_seed", new[] { "La semilla es un entero de 32 bits sin signo.", "The seed is an unsigned 32-bit integer." } },
+
+            // Lote 1a, tool 10: motor cut of the simulator (wording of the web dictionaries src/web/i18n, simfault.* and cmd.ackOkSim). simfault.note is the line «En esta fuente» of the
+            // simulator for the motor failure, marked [APROBADO 2026-11-13] in the web; the rest is the web wording (simulated, a simplified model: not PX4, not a real drone)
+            { "simfault.title", new[] { "Fallas del simulador", "Simulator faults" } },
+            { "simfault.hint", new[] { "simulado", "simulated" } },
+            { "simfault.note", new[] { "Simulador: el motor deja de empujar en un modelo simplificado; no es PX4 ni un dron real.",
+                                       "Simulator: the motor stops pushing in a simplified model; this is not PX4 or a real drone." } },
+            { "simfault.cut", new[] { "Cortar motor {n}", "Cut motor {n}" } },
+            { "simfault.cutConfirm", new[] { "¿Cortar motor {n}? Toca otra vez", "Cut motor {n}? Tap again" } },
+            { "simfault.restore", new[] { "Restaurar", "Restore" } },
+            { "simfault.comp", new[] { "Compensación didáctica", "Didactic compensation" } },
+            { "simfault.compNote", new[] { "Apaga también el motor opuesto y deja los otros dos a tope. Es un ejemplo didáctico, no el controlador de PX4.",
+                                           "Also shuts down the opposite motor and runs the other two flat out. A teaching example, not the PX4 controller." } },
+            { "simfault.status", new[] { "Motor {n} · cortado · simulado", "Motor {n} · cut · simulated" } },
+            { "simfault.none", new[] { "Sin fallas activas", "No active faults" } },
+            { "simfault.ack.ok", new[] { "aceptado por el simulador", "accepted by the simulator" } },
             { "chip.status.tip", new[] { "Abrir el modo Telemetría", "Open Telemetry mode" } },
             { "chip.session.tip", new[] { "Detener la telemetría", "Stop telemetry" } },
 
@@ -515,6 +531,9 @@ namespace WebGL.Telemetry
                                        "Vibration reported by PX4 (in simulation it is usually almost zero)." } },                                                              // (translation)
             // any fault in the flight simulator (approved as faults.sim in D-5)
             { "fx.src.sim", new[] { "El simulador no inyecta fallas: no es PX4 ni la repetición.", "The simulator does not inject faults: it is not PX4 nor the replay." } },
+            // «En esta fuente · simulador» for the motor failure: the approved line simfault.note (the simulator now cuts a motor in a simplified model)
+            { "fx.a.src.sim", new[] { "Simulador: el motor deja de empujar en un modelo simplificado; no es PX4 ni un dron real.",
+                                      "Simulator: the motor stops pushing in a simplified model; this is not PX4 or a real drone." } },
             // alerts with NO approved explanation (controller temperature, battery temperature): a neutral factual line, to be approved
             { "fx.n.means", new[] { "Alerta por temperatura alta: la lectura supera el umbral de aviso de la app (valores de demostración, no del fabricante).",
                                     "High temperature alert: the reading is above the app's warning threshold (demo values, not the manufacturer's)." } },

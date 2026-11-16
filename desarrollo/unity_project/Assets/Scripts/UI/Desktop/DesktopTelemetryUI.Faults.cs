@@ -221,6 +221,13 @@ namespace WebGL.UI.Desktop
             double now = client.Displayed != null ? client.Displayed.ts : ReplaySchedule.WallClockMs();
             var labels = HonestyLabels.Load();
             var parts = new List<string>();
+            // Lote 1a: the simulator's own cut (a simplified model): «Motor N · cortado · simulado»
+            int simCut = DesktopTelemetry.IsSimulator ? SimCutMotor() : 0;
+            if (simCut != 0 && topic == FaultTopic.MotorFailure)
+            {
+                parts.Add(TelemetryStrings.F("simfault.status", lang, "n", simCut));
+                usedMotor = simCut;
+            }
             Fault f = ActiveFaultOf(client, topic, motor, now);
             if (f != null)
             {
@@ -343,6 +350,22 @@ namespace WebGL.UI.Desktop
                         Synthetic = true,
                     });
                 }
+            }
+
+            // Lote 1a: the simulator's cut motor: a marker pinned on it with «Motor N · cortado · simulado» (the propeller stops by itself: its rpm is 0)
+            int simCut = DesktopTelemetry.IsSimulator ? SimCutMotor() : 0;
+            if (simCut != 0)
+            {
+                string comp = "motor" + simCut;
+                if (coveredComponents == null) coveredComponents = new List<string>(1);
+                coveredComponents.Add(comp);
+                _fxTargets.Add(new DesktopFaultMarkers.Target
+                {
+                    Key = "s:cut" + simCut,
+                    Component = comp,
+                    Label = TelemetryStrings.F("simfault.status", lang, "n", simCut),
+                    Synthetic = true,
+                });
             }
 
             // critical alerts: a marker while they stand (not when a fault marker already covers that part)
