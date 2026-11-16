@@ -766,7 +766,7 @@ namespace WebGL.Telemetry
 
         public static string T(string key, string lang)
         {
-            if (!Table.TryGetValue(key, out var v)) throw new KeyNotFoundException("TelemetryStrings: missing key " + key);
+            if (!Table.TryGetValue(key, out var v) && !ExtraStrings.TryGet(key, out v)) throw new KeyNotFoundException("TelemetryStrings: missing key " + key);
             return lang == "en" ? v[1] : v[0];
         }
 
@@ -779,7 +779,7 @@ namespace WebGL.Telemetry
         }
 
         /// <summary>All keys and both languages (for the EditMode completeness and honesty tests).</summary>
-        public static IEnumerable<KeyValuePair<string, string[]>> All => Table;
+        public static IEnumerable<KeyValuePair<string, string[]>> All => ExtraStrings.Concat(Table);
 
         /// <summary>
         /// Detail text of the local replay for the DESKTOP: the contract text (labels.json classification.replay.localDetail) says the flight
