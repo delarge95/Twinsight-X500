@@ -1,0 +1,363 @@
+{
+  "_doc": "src/shared/minimap.ts (tool 1, top-down map). World = local NED of the frame: north n, east e, metres from the EKF origin; yaw = rad clockwise from north (yawFromQuat, quaternion [w, x, y, z] body FRD to world NED). Trail: pushTrail(trail, p, seg, minStep, max) with p = NED position (only p[0] north and p[1] east count): it appends [n, e] when the distance to the last point is >= minStep (0.5 m, equality adds), empties the trail and starts again with the new point when seg differs from the trail seg (the first push of an empty trail has no seg to compare), and drops the oldest points above max (1200). A new hello = emptyTrail() (the web does it, not this function). fitView(points, fence, sizePx, marginPx): centre = middle of the bounding box of the points and of the fence square; scale = (distance from the centre to the farthest point, or to the fence centre + radius) / max(1, sizePx / 2 - marginPx), never below 0.05 m/px; nothing to show = origin at 0.05. followView = vehicle at the centre, scale = max(fitScale, 0.25). scaleBar(scale, maxPx) = the largest m x 10^k, m in {1, 2, 5}, with metres / scale <= maxPx (relative slack 1e-12), px = metres / scale. toScreen returns px from the CENTRE of the view, y down: north up x = (e - centerE) / scale, y = -(n - centerN) / scale; heading up (yaw rad): x = (-dn sin(yaw) + de cos(yaw)) / scale, y = -(dn cos(yaw) + de sin(yaw)) / scale. viewAngles = rad clockwise from the top of the screen where the vehicle arrow and the north mark point (north up: arrow = yaw, north = 0; heading up: arrow = 0, north = -yaw). The desktop port compares numbers with the tolerance below; scaleLabel strings are exact.",
+  "tolerance": 1e-9,
+  "constants": { "min_scale": 0.05, "trail_max": 1200, "trail_min_step": 0.5, "follow_min_scale": 0.25 },
+  "yaw": [
+    { "name": "level, nose north", "q": [1, 0, 0, 0], "out": 0 },
+    { "name": "nose east (yaw 90)", "q": [0.707106781, 0, 0, 0.707106781], "out": 1.570796327 },
+    { "name": "nose south (yaw 180)", "q": [0, 0, 0, 1], "out": 3.141592654 },
+    { "name": "nose west (yaw -90)", "q": [0.707106781, 0, 0, -0.707106781], "out": -1.570796327 },
+    { "name": "yaw 45 level", "q": [0.923879533, 0, 0, 0.382683432], "out": 0.785398163 },
+    {
+      "name": "yaw -135, rolled 20 and pitched 10",
+      "q": [0.361453113, 0.145497515, -0.126973162, -0.912173194],
+      "out": -2.35619449
+    },
+    {
+      "name": "yaw 30, pitched -25",
+      "q": [0.943029527, 0.056018694, -0.209064613, 0.252684],
+      "out": 0.523598776
+    },
+    {
+      "name": "tilted 35 deg nose-down towards east, yaw 170",
+      "q": [0.062023073, -0.304630098, -0.040130377, 0.949601598],
+      "out": 2.967059728
+    }
+  ],
+  "trail": {
+    "pushes": [
+      { "p": [0, 0, -5], "seg": 0 },
+      { "p": [0, 0.25, -5], "seg": 0 },
+      { "p": [0, 0.5, -5], "seg": 0 },
+      { "p": [0, 0.75, -5], "seg": 0 },
+      { "p": [0, 1, -5], "seg": 0 },
+      { "p": [0, 1.25, -5], "seg": 0 },
+      { "p": [0, 1.5, -5], "seg": 0 },
+      { "p": [0, 1.75, -5], "seg": 0 },
+      { "p": [0, 2, -5], "seg": 0 },
+      { "p": [0, 2, -5], "seg": 0 },
+      { "p": [0.1, 2, -5], "seg": 0 },
+      { "p": [0.2, 2, -5], "seg": 0 },
+      { "p": [0.30000000000000004, 2, -5], "seg": 0 },
+      { "p": [0.4, 2, -5], "seg": 0 },
+      { "p": [0.5, 2, -5], "seg": 0 },
+      { "p": [0.6000000000000001, 2, -5], "seg": 0 },
+      { "p": [0.7000000000000001, 2, -5], "seg": 0 },
+      { "p": [0.8, 2, -5], "seg": 0 },
+      { "p": [0.9, 2, -5], "seg": 0 },
+      { "p": [1, 2, -5], "seg": 0 },
+      { "p": [1.1, 2, -5], "seg": 0 },
+      { "p": [10, 3, -5], "seg": 1 },
+      { "p": [9.4, 3.6, -5], "seg": 1 },
+      { "p": [8.8, 4.2, -5], "seg": 1 },
+      { "p": [8.2, 4.8, -5], "seg": 1 },
+      { "p": [7.6, 5.4, -5], "seg": 1 },
+      { "p": [7, 6, -5], "seg": 1 },
+      { "p": [7, 6, -5], "seg": 1 },
+      { "p": [7, 6, -5], "seg": 1 },
+      { "p": [0, 0, -5], "seg": 2 },
+      { "p": [0.5, 0, -5], "seg": 2 },
+      { "p": [1, 0, -5], "seg": 2 },
+      { "p": [1.5, 0, -5], "seg": 2 },
+      { "p": [20, 20, -5], "seg": 3 },
+      { "p": [20, 19.6, -5], "seg": 3 },
+      { "p": [20, 19.2, -5], "seg": 3 },
+      { "p": [20, 18.8, -5], "seg": 3 },
+      { "p": [20, 18.4, -5], "seg": 3 },
+      { "p": [20, 18, -5], "seg": 3 }
+    ],
+    "steps": [
+      { "seg": 0, "length": 1, "last": [0, 0] },
+      { "seg": 0, "length": 1, "last": [0, 0] },
+      { "seg": 0, "length": 2, "last": [0, 0.5] },
+      { "seg": 0, "length": 2, "last": [0, 0.5] },
+      { "seg": 0, "length": 3, "last": [0, 1] },
+      { "seg": 0, "length": 3, "last": [0, 1] },
+      { "seg": 0, "length": 4, "last": [0, 1.5] },
+      { "seg": 0, "length": 4, "last": [0, 1.5] },
+      { "seg": 0, "length": 5, "last": [0, 2] },
+      { "seg": 0, "length": 5, "last": [0, 2] },
+      { "seg": 0, "length": 5, "last": [0, 2] },
+      { "seg": 0, "length": 5, "last": [0, 2] },
+      { "seg": 0, "length": 5, "last": [0, 2] },
+      { "seg": 0, "length": 5, "last": [0, 2] },
+      { "seg": 0, "length": 6, "last": [0.5, 2] },
+      { "seg": 0, "length": 6, "last": [0.5, 2] },
+      { "seg": 0, "length": 6, "last": [0.5, 2] },
+      { "seg": 0, "length": 6, "last": [0.5, 2] },
+      { "seg": 0, "length": 6, "last": [0.5, 2] },
+      { "seg": 0, "length": 7, "last": [1, 2] },
+      { "seg": 0, "length": 7, "last": [1, 2] },
+      { "seg": 1, "length": 1, "last": [10, 3] },
+      { "seg": 1, "length": 2, "last": [9.4, 3.6] },
+      { "seg": 1, "length": 3, "last": [8.8, 4.2] },
+      { "seg": 1, "length": 4, "last": [8.2, 4.8] },
+      { "seg": 1, "length": 5, "last": [7.6, 5.4] },
+      { "seg": 1, "length": 6, "last": [7, 6] },
+      { "seg": 1, "length": 6, "last": [7, 6] },
+      { "seg": 1, "length": 6, "last": [7, 6] },
+      { "seg": 2, "length": 1, "last": [0, 0] },
+      { "seg": 2, "length": 2, "last": [0.5, 0] },
+      { "seg": 2, "length": 3, "last": [1, 0] },
+      { "seg": 2, "length": 4, "last": [1.5, 0] },
+      { "seg": 3, "length": 1, "last": [20, 20] },
+      { "seg": 3, "length": 1, "last": [20, 20] },
+      { "seg": 3, "length": 2, "last": [20, 19.2] },
+      { "seg": 3, "length": 2, "last": [20, 19.2] },
+      { "seg": 3, "length": 3, "last": [20, 18.4] },
+      { "seg": 3, "length": 3, "last": [20, 18.4] }
+    ],
+    "final": { "seg": 3, "points": [[20, 20], [20, 19.2], [20, 18.4]] },
+    "ring": {
+      "max": 5,
+      "pushes": [
+        { "p": [0, 0, 0], "seg": 7 },
+        { "p": [1, 0.2, 0], "seg": 7 },
+        { "p": [2, 0.4, 0], "seg": 7 },
+        { "p": [3, 0, 0], "seg": 7 },
+        { "p": [4, 0.2, 0], "seg": 7 },
+        { "p": [5, 0.4, 0], "seg": 7 },
+        { "p": [6, 0, 0], "seg": 7 },
+        { "p": [7, 0.2, 0], "seg": 7 },
+        { "p": [8, 0.4, 0], "seg": 7 }
+      ],
+      "steps": [
+        [[0, 0]],
+        [[0, 0], [1, 0.2]],
+        [[0, 0], [1, 0.2], [2, 0.4]],
+        [[0, 0], [1, 0.2], [2, 0.4], [3, 0]],
+        [[0, 0], [1, 0.2], [2, 0.4], [3, 0], [4, 0.2]],
+        [[1, 0.2], [2, 0.4], [3, 0], [4, 0.2], [5, 0.4]],
+        [[2, 0.4], [3, 0], [4, 0.2], [5, 0.4], [6, 0]],
+        [[3, 0], [4, 0.2], [5, 0.4], [6, 0], [7, 0.2]],
+        [[4, 0.2], [5, 0.4], [6, 0], [7, 0.2], [8, 0.4]]
+      ]
+    },
+    "new_hello": { "before": [[0, 0], [5, 0]], "after": [[9, 9]], "seg": 0 }
+  },
+  "fit": [
+    {
+      "name": "nothing to show",
+      "points": [],
+      "sizePx": 112,
+      "fence": null,
+      "marginPx": 12,
+      "out": { "scale": 0.05, "centerN": 0, "centerE": 0 }
+    },
+    {
+      "name": "only the origin: the minimum scale",
+      "points": [[0, 0]],
+      "sizePx": 112,
+      "fence": null,
+      "marginPx": 12,
+      "out": { "scale": 0.05, "centerN": 0, "centerE": 0 }
+    },
+    {
+      "name": "takeoff and fly_to (30, 40): 50 m from the origin",
+      "points": [[0, 0], [10, 14], [30, 40]],
+      "sizePx": 112,
+      "fence": null,
+      "marginPx": 12,
+      "out": { "scale": 0.568181818, "centerN": 15, "centerE": 20 }
+    },
+    {
+      "name": "same on the expanded sheet",
+      "points": [[0, 0], [10, 14], [30, 40]],
+      "sizePx": 300,
+      "fence": null,
+      "marginPx": 12,
+      "out": { "scale": 0.18115942, "centerN": 15, "centerE": 20 }
+    },
+    {
+      "name": "a few metres: stays at the minimum scale",
+      "points": [[0, 0], [1.5, -0.5], [2, 2]],
+      "sizePx": 112,
+      "fence": null,
+      "marginPx": 12,
+      "out": { "scale": 0.05, "centerN": 1, "centerE": 0.75 }
+    },
+    {
+      "name": "wide west-east flight with margin 20",
+      "points": [[0, 0], [3, -60], [-4, 90]],
+      "sizePx": 112,
+      "marginPx": 20,
+      "fence": null,
+      "out": { "scale": 2.085600618, "centerN": -0.5, "centerE": 15 }
+    },
+    {
+      "name": "geofence 120 m dominates the points",
+      "points": [[0, 0], [30, 40]],
+      "fence": { "radius": 120 },
+      "sizePx": 112,
+      "marginPx": 12,
+      "out": { "scale": 2.727272727, "centerN": 0, "centerE": 0 }
+    },
+    {
+      "name": "geofence off-centre",
+      "points": [[0, 0]],
+      "fence": { "radius": 50, "n": 20, "e": -30 },
+      "sizePx": 200,
+      "marginPx": 12,
+      "out": { "scale": 0.568181818, "centerN": 20, "centerE": -30 }
+    },
+    {
+      "name": "negative coordinates only",
+      "points": [[-100, -40], [-120, -90]],
+      "sizePx": 160,
+      "marginPx": 8,
+      "fence": null,
+      "out": { "scale": 0.373969778, "centerN": -110, "centerE": -65 }
+    },
+    {
+      "name": "margin larger than the circle",
+      "points": [[0, 0], [10, 0]],
+      "sizePx": 20,
+      "marginPx": 30,
+      "fence": null,
+      "out": { "scale": 5, "centerN": 5, "centerE": 0 }
+    }
+  ],
+  "follow": [
+    { "n": 12.5, "e": -3, "fitScale": 0.05, "out": { "scale": 0.25, "centerN": 12.5, "centerE": -3 } },
+    { "n": 12.5, "e": -3, "fitScale": 0.2, "out": { "scale": 0.25, "centerN": 12.5, "centerE": -3 } },
+    { "n": 12.5, "e": -3, "fitScale": 0.25, "out": { "scale": 0.25, "centerN": 12.5, "centerE": -3 } },
+    { "n": 12.5, "e": -3, "fitScale": 0.7, "out": { "scale": 0.7, "centerN": 12.5, "centerE": -3 } }
+  ],
+  "scale_bar": [
+    { "scale": 0.05, "maxPx": 80, "out": { "metres": 2, "px": 40 } },
+    { "scale": 0.05, "maxPx": 56, "out": { "metres": 2, "px": 40 } },
+    { "scale": 0.0999, "maxPx": 80, "out": { "metres": 5, "px": 50.05005005 } },
+    { "scale": 0.0999, "maxPx": 56, "out": { "metres": 5, "px": 50.05005005 } },
+    { "scale": 0.1, "maxPx": 80, "out": { "metres": 5, "px": 50 } },
+    { "scale": 0.1, "maxPx": 56, "out": { "metres": 5, "px": 50 } },
+    { "scale": 0.125, "maxPx": 80, "out": { "metres": 10, "px": 80 } },
+    { "scale": 0.125, "maxPx": 56, "out": { "metres": 5, "px": 40 } },
+    { "scale": 0.1999, "maxPx": 80, "out": { "metres": 10, "px": 50.025012506 } },
+    { "scale": 0.1999, "maxPx": 56, "out": { "metres": 10, "px": 50.025012506 } },
+    { "scale": 0.2, "maxPx": 80, "out": { "metres": 10, "px": 50 } },
+    { "scale": 0.2, "maxPx": 56, "out": { "metres": 10, "px": 50 } },
+    { "scale": 0.25, "maxPx": 80, "out": { "metres": 20, "px": 80 } },
+    { "scale": 0.25, "maxPx": 56, "out": { "metres": 10, "px": 40 } },
+    { "scale": 0.4, "maxPx": 80, "out": { "metres": 20, "px": 50 } },
+    { "scale": 0.4, "maxPx": 56, "out": { "metres": 20, "px": 50 } },
+    { "scale": 0.5, "maxPx": 80, "out": { "metres": 20, "px": 40 } },
+    { "scale": 0.5, "maxPx": 56, "out": { "metres": 20, "px": 40 } },
+    { "scale": 0.568, "maxPx": 80, "out": { "metres": 20, "px": 35.211267606 } },
+    { "scale": 0.568, "maxPx": 56, "out": { "metres": 20, "px": 35.211267606 } },
+    { "scale": 1, "maxPx": 80, "out": { "metres": 50, "px": 50 } },
+    { "scale": 1, "maxPx": 56, "out": { "metres": 50, "px": 50 } },
+    { "scale": 1.25, "maxPx": 80, "out": { "metres": 100, "px": 80 } },
+    { "scale": 1.25, "maxPx": 56, "out": { "metres": 50, "px": 40 } },
+    { "scale": 2.4, "maxPx": 80, "out": { "metres": 100, "px": 41.666666667 } },
+    { "scale": 2.4, "maxPx": 56, "out": { "metres": 100, "px": 41.666666667 } },
+    { "scale": 2.5, "maxPx": 80, "out": { "metres": 200, "px": 80 } },
+    { "scale": 2.5, "maxPx": 56, "out": { "metres": 100, "px": 40 } },
+    { "scale": 6.25, "maxPx": 80, "out": { "metres": 500, "px": 80 } },
+    { "scale": 6.25, "maxPx": 56, "out": { "metres": 200, "px": 32 } },
+    { "scale": 12.5, "maxPx": 80, "out": { "metres": 1000, "px": 80 } },
+    { "scale": 12.5, "maxPx": 56, "out": { "metres": 500, "px": 40 } },
+    { "scale": 25, "maxPx": 80, "out": { "metres": 2000, "px": 80 } },
+    { "scale": 25, "maxPx": 56, "out": { "metres": 1000, "px": 40 } },
+    { "scale": 100, "maxPx": 80, "out": { "metres": 5000, "px": 50 } },
+    { "scale": 100, "maxPx": 56, "out": { "metres": 5000, "px": 50 } },
+    { "scale": 1000, "maxPx": 80, "out": { "metres": 50000, "px": 50 } },
+    { "scale": 1000, "maxPx": 56, "out": { "metres": 50000, "px": 50 } }
+  ],
+  "scale_label": [
+    { "metres": 0.5, "out": "0.5 m" },
+    { "metres": 1, "out": "1 m" },
+    { "metres": 2, "out": "2 m" },
+    { "metres": 5, "out": "5 m" },
+    { "metres": 10, "out": "10 m" },
+    { "metres": 20, "out": "20 m" },
+    { "metres": 50, "out": "50 m" },
+    { "metres": 100, "out": "100 m" },
+    { "metres": 500, "out": "500 m" },
+    { "metres": 1000, "out": "1 km" },
+    { "metres": 2000, "out": "2 km" }
+  ],
+  "to_screen": [
+    {
+      "headingUp": false,
+      "yaw": 0,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [[-40, 30], [40, -30], [0, 0], [-20, 40], [-46, -50]],
+      "angles": { "arrow": 0, "north": 0 }
+    },
+    {
+      "headingUp": true,
+      "yaw": 0,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [[-40, 30], [40, -30], [0, 0], [-20, 40], [-46, -50]],
+      "angles": { "arrow": 0, "north": 0 }
+    },
+    {
+      "headingUp": false,
+      "yaw": 1.570796327,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [[-40, 30], [40, -30], [0, 0], [-20, 40], [-46, -50]],
+      "angles": { "arrow": 1.570796327, "north": 0 }
+    },
+    {
+      "headingUp": true,
+      "yaw": 1.570796327,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [[30, 40], [-30, -40], [0, 0], [40, 20], [-50, 46]],
+      "angles": { "arrow": 0, "north": -1.570796327 }
+    },
+    {
+      "headingUp": false,
+      "yaw": 3.141592654,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [[-40, 30], [40, -30], [0, 0], [-20, 40], [-46, -50]],
+      "angles": { "arrow": 3.141592654, "north": 0 }
+    },
+    {
+      "headingUp": true,
+      "yaw": 3.141592654,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [[40, -30], [-40, 30], [0, 0], [20, -40], [46, 50]],
+      "angles": { "arrow": 0, "north": -3.141592654 }
+    },
+    {
+      "headingUp": false,
+      "yaw": -0.785398163,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [[-40, 30], [40, -30], [0, 0], [-20, 40], [-46, -50]],
+      "angles": { "arrow": -0.785398163, "north": 0 }
+    },
+    {
+      "headingUp": true,
+      "yaw": -0.785398163,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [
+        [-49.497474683, -7.071067812],
+        [49.497474683, 7.071067812],
+        [0, 0],
+        [-42.426406871, 14.142135624],
+        [2.828427125, -67.882250994]
+      ],
+      "angles": { "arrow": 0, "north": 0.785398163 }
+    },
+    {
+      "headingUp": false,
+      "yaw": 2.5,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [[-40, 30], [40, -30], [0, 0], [-20, 40], [-46, -50]],
+      "angles": { "arrow": 2.5, "north": 0 }
+    },
+    {
+      "headingUp": true,
+      "yaw": 2.5,
+      "view": { "scale": 0.5, "centerN": 15, "centerE": 20 },
+      "out": [
+        [49.999908945, -0.095422702],
+        [-49.999908945, 0.095422702],
+        [0, 0],
+        [39.961758075, -20.07630174],
+        [6.92899911, 67.586899406]
+      ],
+      "angles": { "arrow": 0, "north": -2.5 }
+    }
+  ]
+}

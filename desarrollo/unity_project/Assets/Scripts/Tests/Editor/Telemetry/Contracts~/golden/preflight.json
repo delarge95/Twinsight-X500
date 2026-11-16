@@ -1,0 +1,951 @@
+{
+  "_doc": "src/shared/preflight.ts: lista de comprobaciones previas. preflight(input) -> { items, summary }. Estados pass / warn / fail / na. Ítems en este orden: link, bat.rem, bat.cell, temp, vib, armed, fence, faults, gps, manual.props, manual.radius, manual.clear. link: cerrado = fail, conectando = warn, abierto con el último fotograma de más de 0,5 s = warn \"late\", sin tasa medida aún (rxHz 0) = warn \"measuring\", rxHz < 0,5 * rateHz = warn \"slow\", si no pass. bat.rem: >= 0,60 pass, >= 0,30 warn, si no fail (R: estimado; S, X: simulado). bat.cell = bat.v / batteryCells: >= 3,70 V pass, >= 3,50 warn, si no fail (R: medido; S, X: simulado). temp: cada motor contra 65 / 80 C y la batería contra 50 / 60 C (pass por debajo del aviso, warn por debajo del crítico, fail desde el crítico); el ítem muestra el componente que decide (peor estado y, a igualdad, el más por encima de su aviso) en `detail`; origen simulado en S, medido si motorTemp y batteryTemp son \"measured\" en el hello y estimado si no. vib: < 20 pass, < 30 warn, si no fail. armed: desarmado en tierra pass, armado en tierra warn, desarmado fuera de tierra warn, armado y en vuelo fail (\"no es prevuelo\"). fence (solo S): margen mínimo a la pared y al techo >= 5 m pass, de 0 a 5 m warn, negativo (fuera) fail; na en R y X. faults: cualquier falla activa o alerta crítica = fail, solo alertas de aviso = warn, ninguna = pass; value = nº de fallas + alertas; origen sintético (R), simulado (S), comando (X). gps: na siempre (el cable no trae GPS: sería un cambio de contrato). manual.*: en S y X marcado = pass y sin marcar = warn, origen \"user\"; en R (nadie en el campo) na. Sin fotograma: todo lo que depende de él es na. summary.verdict: algún fail = \"fail\" (No apto), si no algún warn = \"warn\" (Con avisos), si no \"ready\" (Listo); los na no cuentan. Es informativa: no bloquea nada. Los casos con `input_b` / `input_c` son el otro lado de un borde. Tolerancia de los valores numéricos: `tolerance`.",
+  "tolerance": 1e-9,
+  "thresholds": {
+    "rem_pass": 0.6,
+    "rem_warn": 0.3,
+    "cell_pass_v": 3.7,
+    "cell_warn_v": 3.5,
+    "link_rate_ratio": 0.5,
+    "starved_warn_s": 0.5,
+    "fence_margin_m": 5,
+    "motor_temp_warn_c": 65,
+    "motor_temp_crit_c": 80,
+    "battery_temp_warn_c": 50,
+    "battery_temp_crit_c": 60,
+    "vibration_warn": 20,
+    "vibration_crit": 30
+  },
+  "item_ids": [
+    "link",
+    "bat.rem",
+    "bat.cell",
+    "temp",
+    "vib",
+    "armed",
+    "fence",
+    "faults",
+    "gps",
+    "manual.props",
+    "manual.radius",
+    "manual.clear"
+  ],
+  "cases": [
+    {
+      "name": "sim_ready",
+      "note": "the simulator on the ground, everything nominal and the three boxes ticked: every item passes (the fence with plenty of margin), gps is na",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "ready", "pass": 11, "warn": 0, "fail": 0, "na": 1 }
+      }
+    },
+    {
+      "name": "sim_manual_unticked",
+      "note": "the same but nothing ticked: the three manual items are warn (the user has not said it), the verdict is \"warn\"",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": {},
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "warn", "origin": "user" },
+          { "id": "manual.radius", "status": "warn", "origin": "user" },
+          { "id": "manual.clear", "status": "warn", "origin": "user" }
+        ],
+        "summary": { "verdict": "warn", "pass": 8, "warn": 3, "fail": 0, "na": 1 }
+      }
+    },
+    {
+      "name": "replay_ready",
+      "note": "the recorded flight on the ground: origins measured / estimated, fence na (the replay has none), the three manual items na (nobody at the field), faults row ok with origin synthetic",
+      "input": {
+        "hello": {
+          "rateHz": 20,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "measured",
+            "batteryCurrent": "measured"
+          }
+        },
+        "source": "replay",
+        "link": { "state": "open", "rxHz": 20, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": null,
+        "manual": {},
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 20, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "estimated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "measured" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "estimated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "measured" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "measured" },
+          { "id": "fence", "status": "na", "origin": "none" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "synthetic" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "na", "origin": "user" },
+          { "id": "manual.radius", "status": "na", "origin": "user" },
+          { "id": "manual.clear", "status": "na", "origin": "user" }
+        ],
+        "summary": { "verdict": "ready", "pass": 7, "warn": 0, "fail": 0, "na": 5 }
+      }
+    },
+    {
+      "name": "replay_synthetic_fault",
+      "note": "the replay with an injected battery_sag (a synthetic fault) and the critical alert it raises: faults is fail, origin synthetic; the voltage and charge it distorts are tested by their own rows",
+      "input": {
+        "hello": {
+          "rateHz": 20,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "measured",
+            "batteryCurrent": "measured"
+          }
+        },
+        "source": "replay",
+        "link": { "state": "open", "rxHz": 20, "starvedS": 0 },
+        "alerts": [{ "severity": "critical" }],
+        "faults": [{ "kind": "battery_sag" }],
+        "fence": null,
+        "manual": {},
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 13.2, "rem": 0.5 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 20, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "warn", "value": 50, "unit": "%", "origin": "estimated" },
+          { "id": "bat.cell", "status": "fail", "value": 3.3, "unit": "V", "origin": "measured" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "estimated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "measured" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "measured" },
+          { "id": "fence", "status": "na", "origin": "none" },
+          { "id": "faults", "status": "fail", "value": 2, "detail": "faults", "origin": "synthetic" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "na", "origin": "user" },
+          { "id": "manual.radius", "status": "na", "origin": "user" },
+          { "id": "manual.clear", "status": "na", "origin": "user" }
+        ],
+        "summary": { "verdict": "fail", "pass": 4, "warn": 1, "fail": 2, "na": 5 }
+      }
+    },
+    {
+      "name": "sim_outside_fence",
+      "note": "the simulator 130 m from the origin with a 120 m radius (10 m outside): fence is fail; armed in the air is fail too",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [130, 0, -20],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": true,
+          "landed": false
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "fail", "detail": "flying", "origin": "simulated" },
+          { "id": "fence", "status": "fail", "value": -10, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "fail", "pass": 9, "warn": 0, "fail": 2, "na": 1 }
+      }
+    },
+    {
+      "name": "sim_fence_margin_edge",
+      "note": "a 120 m radius and the vehicle 115 m out: margin exactly 5 m passes; at 115.01 m (margin 4.99 m) it is warn (shown as two inputs: `input` and `input_b`)",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [115, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 5, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "ready", "pass": 11, "warn": 0, "fail": 0, "na": 1 }
+      },
+      "input_b": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [115.01, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out_b": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "warn", "value": 4.99, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "warn", "pass": 10, "warn": 1, "fail": 0, "na": 1 }
+      }
+    },
+    {
+      "name": "link_late_and_slow",
+      "note": "the link is open but the last frame is 0.6 s old (> 0.5 s): link is warn \"late\"; below it, rxHz 29 of a 60 Hz stream (< 0.5 * rate) is warn \"slow\"; 30 Hz passes; the order of `input`, `input_b`, `input_c`",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0.6 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "warn", "value": 58, "unit": "Hz", "detail": "late", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "warn", "pass": 10, "warn": 1, "fail": 0, "na": 1 }
+      },
+      "input_b": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 29, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out_b": {
+        "items": [
+          { "id": "link", "status": "warn", "value": 29, "unit": "Hz", "detail": "slow", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "warn", "pass": 10, "warn": 1, "fail": 0, "na": 1 }
+      },
+      "input_c": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 30, "starvedS": 0.5 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out_c": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 30, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "ready", "pass": 11, "warn": 0, "fail": 0, "na": 1 }
+      }
+    },
+    {
+      "name": "link_closed",
+      "note": "a closed link is fail; the frame on screen is the last one received and is still evaluated",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "closed", "rxHz": 0, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "fail", "value": 0, "unit": "Hz", "detail": "closed", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "fail", "pass": 10, "warn": 0, "fail": 1, "na": 1 }
+      }
+    },
+    {
+      "name": "pass_edges",
+      "note": "every threshold on the pass side of its edge: charge 0.60, 3.70 V per cell (14.8 V on 4S), motor 64.99 C, battery 49.99 C, vibration 19.99: all pass",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 14.8, "rem": 0.6 },
+          "temp": [64.99, 30, 30, 30, 49.99, 30],
+          "vib": 19.99,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 60, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.7, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 49.99,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 19.99, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "ready", "pass": 11, "warn": 0, "fail": 0, "na": 1 }
+      }
+    },
+    {
+      "name": "warn_edges",
+      "note": "every threshold exactly on its warn edge: charge 0.30 (warn from 0.30 to 0.60), 3.50 V per cell (14.0 V), motor 65 C, battery 50 C, vibration 20, armed on the ground: all warn",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 14, "rem": 0.3 },
+          "temp": [65, 30, 30, 30, 50, 30],
+          "vib": 20,
+          "armed": true,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "warn", "value": 30, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "warn", "value": 3.5, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "warn",
+            "value": 65,
+            "unit": "°C",
+            "detail": "motor1",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "warn", "value": 20, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "warn", "detail": "armedGround", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "warn", "pass": 6, "warn": 5, "fail": 0, "na": 1 }
+      }
+    },
+    {
+      "name": "fail_edges",
+      "note": "every threshold on its fail edge: charge just under 0.30 (0.2999), 3.499 V per cell, motor 80 C (the hottest component decides), vibration 30, flying: fail; the alerts raised (warning battery, critical motor and vibration) make faults fail",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [{ "severity": "critical" }, { "severity": "warning" }],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [10, 5, -8],
+          "bat": { "v": 13.996, "rem": 0.2999 },
+          "temp": [30, 80, 30, 30, 55, 30],
+          "vib": 30,
+          "armed": true,
+          "landed": false
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "fail", "value": 29.99, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "fail", "value": 3.499, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "fail",
+            "value": 80,
+            "unit": "°C",
+            "detail": "motor2",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "fail", "value": 30, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "fail", "detail": "flying", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 52, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "fail", "value": 2, "detail": "critical", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "fail", "pass": 5, "warn": 0, "fail": 6, "na": 1 }
+      }
+    },
+    {
+      "name": "alert_warning_only",
+      "note": "only a warning alert (battery at 55 C: warn) and no fault: faults is warn and temp is warn on the battery; the verdict is \"warn\"",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "open", "rxHz": 58, "starvedS": 0 },
+        "alerts": [{ "severity": "warning" }],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 15.6, "rem": 0.8 },
+          "temp": [30, 30, 30, 30, 55, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 58, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 80, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "warn",
+            "value": 55,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "simulated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "pass", "value": 60, "unit": "m", "origin": "simulated" },
+          { "id": "faults", "status": "warn", "value": 1, "detail": "warning", "origin": "simulated" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "warn", "pass": 9, "warn": 2, "fail": 0, "na": 1 }
+      }
+    },
+    {
+      "name": "sitl_ready",
+      "note": "PX4 SITL on the ground on a 6S pack (23.4 V = 3.90 V per cell): fence na (the fence of PX4 does not reach the client), manual boxes shown (ticked), temperature origin estimated from the provenance, faults origin command",
+      "input": {
+        "hello": {
+          "rateHz": 30,
+          "batteryCells": 6,
+          "provenance": {
+            "rpm": "command",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "measured",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sitl",
+        "link": { "state": "open", "rxHz": 30, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": null,
+        "manual": { "manual.props": true, "manual.radius": true, "manual.clear": true },
+        "frame": {
+          "p": [0, 0, 0],
+          "bat": { "v": 23.4, "rem": 0.9 },
+          "temp": [30, 30, 30, 30, 28, 30],
+          "vib": 0.1,
+          "armed": false,
+          "landed": true
+        }
+      },
+      "out": {
+        "items": [
+          { "id": "link", "status": "pass", "value": 30, "unit": "Hz", "detail": "open", "origin": "app" },
+          { "id": "bat.rem", "status": "pass", "value": 90, "unit": "%", "origin": "simulated" },
+          { "id": "bat.cell", "status": "pass", "value": 3.9, "unit": "V", "origin": "simulated" },
+          {
+            "id": "temp",
+            "status": "pass",
+            "value": 28,
+            "unit": "°C",
+            "detail": "battery",
+            "origin": "estimated"
+          },
+          { "id": "vib", "status": "pass", "value": 0.1, "unit": "m/s²", "origin": "simulated" },
+          { "id": "armed", "status": "pass", "detail": "disarmed", "origin": "simulated" },
+          { "id": "fence", "status": "na", "origin": "none" },
+          { "id": "faults", "status": "pass", "value": 0, "detail": "none", "origin": "command" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "pass", "origin": "user" },
+          { "id": "manual.clear", "status": "pass", "origin": "user" }
+        ],
+        "summary": { "verdict": "ready", "pass": 10, "warn": 0, "fail": 0, "na": 2 }
+      }
+    },
+    {
+      "name": "no_frame_connecting",
+      "note": "the link is still connecting and no frame came: link is warn \"connecting\", every telemetry item is na, gps na, the manual ones follow the boxes",
+      "input": {
+        "hello": {
+          "rateHz": 60,
+          "batteryCells": 4,
+          "provenance": {
+            "rpm": "estimated",
+            "motorTemp": "estimated",
+            "batteryTemp": "estimated",
+            "fcTemp": "unavailable",
+            "batteryCurrent": "estimated"
+          }
+        },
+        "source": "sim",
+        "link": { "state": "connecting", "rxHz": 0, "starvedS": 0 },
+        "alerts": [],
+        "faults": [],
+        "fence": { "radius": 120, "ceiling": 60 },
+        "manual": { "manual.props": true },
+        "frame": null
+      },
+      "out": {
+        "items": [
+          {
+            "id": "link",
+            "status": "warn",
+            "value": 0,
+            "unit": "Hz",
+            "detail": "connecting",
+            "origin": "app"
+          },
+          { "id": "bat.rem", "status": "na", "origin": "none" },
+          { "id": "bat.cell", "status": "na", "origin": "none" },
+          { "id": "temp", "status": "na", "origin": "none" },
+          { "id": "vib", "status": "na", "origin": "none" },
+          { "id": "armed", "status": "na", "origin": "none" },
+          { "id": "fence", "status": "na", "origin": "none" },
+          { "id": "faults", "status": "na", "origin": "none" },
+          { "id": "gps", "status": "na", "origin": "none" },
+          { "id": "manual.props", "status": "pass", "origin": "user" },
+          { "id": "manual.radius", "status": "warn", "origin": "user" },
+          { "id": "manual.clear", "status": "warn", "origin": "user" }
+        ],
+        "summary": { "verdict": "warn", "pass": 1, "warn": 3, "fail": 0, "na": 8 }
+      }
+    }
+  ]
+}

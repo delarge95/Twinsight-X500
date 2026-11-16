@@ -34,3 +34,11 @@ filtro `WebGL.Telemetry`).
 - Copiados de `contracts/golden/`: `geofence.json`, `wind.json`, `motorfail.json` (nuevos) y `flightsim.json` (sustituido: `hoverThrottle` 0,62 calibrado con el vuelo real y los casos `motor_off` / `restore` de `replies` ahora aceptados).
 - Los demas goldens de esta carpeta no cambian (igual salvo fin de linea). `labels.json` y `telemetry.schema.json` NO se actualizan aqui (la web cambio `source.replay` y anadio rotulos de sesiones propias; eso es de otro paquete).
 - Los cuatro estan ignorados por `*~`: se anaden con `git add -f`.
+
+## Lote 1b (2026-11-16): mapa, comprobaciones previas y salud de la bateria
+
+- Origen: repo web `E:\twinsight-web-twin`, rama `web/telemetria-control`, commit `a8664fa98ee9592a50e8a45d65dcd290782d194b` (el ultimo commit que toca estos tres goldens es `6a4f68bf53731541d09e2514cc1566bd7d3d4e92`).
+- Copiados de `contracts/golden/`: `minimap.json`, `preflight.json` y `battery.json` (nuevos). Los demas goldens no cambian.
+- `battery.json` `real_flight` usa el TWF completo (`x500v2_flight.twf`), que se busca como en `history.json`; si no esta, ese caso queda *Inconclusive*.
+- `minimap.json` guarda los cuaterniones y los rumbos redondeados a 9 decimales: el test de `yaw` admite 1e-8 por ese redondeo de la entrada y el de `to_screen` toma los rumbos exactos de la lista del generador (`tools/contracts/golden_minimap.ts`).
+- Ignorados por `*~`: se anaden con `git add -f`.
