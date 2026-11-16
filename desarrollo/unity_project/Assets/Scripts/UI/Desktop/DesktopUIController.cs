@@ -473,6 +473,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-tools-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var tools = gameObject.AddComponent<DesktopCaptureTools>(); // Lote 1a: geofence, wind, motor cut, propeller table
+                    tools.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-tel-sim-ui", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var simUi = gameObject.AddComponent<DesktopCaptureSim>();

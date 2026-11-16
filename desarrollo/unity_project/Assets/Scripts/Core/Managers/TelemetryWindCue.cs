@@ -15,7 +15,7 @@ namespace WebGL.Core.Managers
     {
         /// <summary>Metres of arrow per m/s of wind (6 m/s = 0.9 m beside a drone that is about 0.5 m across).</summary>
         public const float MetresPerMs = 0.15f;
-        const float Head = 0.14f, HeadRadius = 0.03f, ShaftRadius = 0.008f, Side = 0.45f, MinLength = 0.35f;
+        const float Head = 0.12f, HeadRadius = 0.022f, ShaftRadius = 0.005f, Side = 0.45f, MinLength = 0.35f;
         static readonly Color Colour = new Color32(219, 228, 238, 255);
         static readonly int TintId = Shader.PropertyToID("_Tint");
 

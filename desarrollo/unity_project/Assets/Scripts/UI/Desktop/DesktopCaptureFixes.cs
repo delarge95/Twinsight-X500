@@ -762,7 +762,9 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(0.6f);
             Check("simulator: the Faults popover has no replay-injection buttons but the simulator's motor-cut controls (Lote 1a), and stays compact (<= 10 %)", !Shown(Root.Q<VisualElement>("DkFaultControls")) && Shown(Root.Q<VisualElement>("DkSimFaultControls")) && PopCoverage("DkPopFaults") <= 10.0f);
             Click(B("DkFaultExplain"));
-            yield return new WaitForSecondsRealtime(0.6f);
+            yield return new WaitForSecondsRealtime(0.4f);
+            Click(B("DkFxPick_motor_failure")); // Lote 1a: the simulator's own line is the motor failure's (the picker may have been left on another fault)
+            yield return new WaitForSecondsRealtime(0.4f);
             card = Tel.DockCard;
             Check("simulator: the card says the approved line (Lote 1a: the simulator cuts a motor in a simplified model, not PX4 nor a real drone)", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Simulator, 3, lang) && card.SourceText.Contains(lang == "es" ? "modelo simplificado; no es PX4 ni un dron real" : "simplified model; this is not PX4 or a real drone"));
             Check("simulator: the card badge is the simulator's, never SITL", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang) && !card.SourceBadgeText.ToUpperInvariant().Contains("SITL"));

@@ -67,11 +67,13 @@ namespace WebGL.UI.Desktop
             _sfRestore.AddToClassList("dk-b");
             _sfRestore.AddToClassList("dk-b--secondary");
             _sfRestore.AddToClassList("dk-fault-btn");
+            _sfRestore.AddToClassList("dk-fault-btn--wide");
             grid.Add(_sfRestore);
             _sfComp = new Button(() => OnSimComp()) { name = "DkSimComp" };
             _sfComp.AddToClassList("dk-b");
             _sfComp.AddToClassList("dk-b--secondary");
             _sfComp.AddToClassList("dk-fault-btn");
+            _sfComp.AddToClassList("dk-fault-btn--wide");
             grid.Add(_sfComp);
             _simFaultControls.Add(grid);
             _sfCompNote = Text("dk-note", _simFaultControls);
