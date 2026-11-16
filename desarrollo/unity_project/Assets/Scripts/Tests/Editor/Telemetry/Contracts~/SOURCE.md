@@ -27,3 +27,10 @@ git -C $web log -1 --format=%H -- contracts   # anotar el hash aquí arriba
 
 Después: subir `TelemetryProtocol.Version` si cambió `protocolVersion` y pasar los tests (Window > General > Test Runner > EditMode,
 filtro `WebGL.Telemetry`).
+
+## Lote 1a (2026-11-16): geocerca, viento y fallas del simulador
+
+- Origen: repo web, rama `fable/lote1` (worktree `E:\twinsight-web-twin-fable`), commit `1311a20bdb5b9917cb2dbf980acfa77795e0031e` (el contrato de los goldens es el de `47a905b`, ultimo commit que toca `contracts/`).
+- Copiados de `contracts/golden/`: `geofence.json`, `wind.json`, `motorfail.json` (nuevos) y `flightsim.json` (sustituido: `hoverThrottle` 0,62 calibrado con el vuelo real y los casos `motor_off` / `restore` de `replies` ahora aceptados).
+- Los demas goldens de esta carpeta no cambian (igual salvo fin de linea). `labels.json` y `telemetry.schema.json` NO se actualizan aqui (la web cambio `source.replay` y anadio rotulos de sesiones propias; eso es de otro paquete).
+- Los cuatro estan ignorados por `*~`: se anaden con `git add -f`.

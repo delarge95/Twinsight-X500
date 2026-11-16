@@ -68,6 +68,9 @@ namespace WebGL.UI.ProceduralIcons
             { "hold", new[] { "M3.5 12a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0", "M10 9v6M14 9v6" } },
             { "orbit_cmd", new[] { "~M5 12a7 7 0 1 0 14 0a7 7 0 1 0 -14 0", "M12 12v.1", "M15.45 7.05a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0" } },
             { "gamepad", new[] { "M7.5 8h9a4.5 4.5 0 0 1 4.4 5.4l-.8 3.6a2.5 2.5 0 0 1-4.2 1.2L14 16.5h-4l-1.9 1.7a2.5 2.5 0 0 1-4.2-1.2l-.8-3.6A4.5 4.5 0 0 1 7.5 8z", "M8 11v3M6.5 12.5h3", "M15.5 11.5v.1M17.5 13.5v.1" } },
+            // Lote 1a: added by hand on the same 24 grid (the maqueta has no such icons): the simulator tools «Geocerca» and «Viento».
+            { "fence", new[] { "~M3.5 12a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0", "M10.6 12a1.4 1.4 0 1 0 2.8 0a1.4 1.4 0 1 0 -2.8 0" } },
+            { "wind", new[] { "M3.5 9h10a2.4 2.4 0 1 0-2.4-2.4", "M3.5 13h14a2.4 2.4 0 1 1-2.4 2.4", "M3.5 17h6" } },
         };
     }
 }

@@ -89,7 +89,7 @@ namespace WebGL.Telemetry
         }
 
         /// <summary>Starts the flight simulator (kinematic model, not PX4). Its badge is HonestyLabels.TrySimText, never SITL.</summary>
-        public static bool StartSimulator() => Start(new SimTelemetrySource());
+        public static bool StartSimulator() => Start(new SimTelemetrySource { InitialConfig = SimSettings.Load() });
 
         public static void Stop()
         {

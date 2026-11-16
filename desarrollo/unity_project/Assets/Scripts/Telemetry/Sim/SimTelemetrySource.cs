@@ -30,12 +30,20 @@ namespace WebGL.Telemetry
 
         readonly object gate = new object();
         SimState sim = FlightSim.Create(AmbientC);
+        /// <summary>The local configuration a (re)started flight begins with (geofence, wind...); null = the defaults. Set it before Start.</summary>
+        public SimConfig InitialConfig;
         bool running;
         double carry, lastTickLocal = double.NaN, sinceFrame;
 
         /// <summary>The model (tests and the on-screen readout read it; mutate it only through Send).</summary>
         public SimState Model { get { lock (gate) return sim; } }
         public bool IsRunning => running;
+
+        /// <summary>Changes the local configuration of the running model (FlightSim.SetConfig): a refusal says why and changes nothing.</summary>
+        public ConfigCheck SetConfig(SimConfigPatch patch)
+        {
+            lock (gate) return FlightSim.SetConfig(sim, patch);
+        }
 
         // The classification the client/UI uses for honesty rules (measured -> simulated). The UI never shows it as SITL: DesktopTelemetry
         // checks IsSimulator first and takes the badge from HonestyLabels.TrySimText.
@@ -69,7 +77,7 @@ namespace WebGL.Telemetry
             double wall = WallNowMs(), local = LocalNowMs();
             lock (gate)
             {
-                sim = FlightSim.Create(AmbientC);
+                sim = FlightSim.Create(AmbientC, InitialConfig);
                 carry = 0;
                 sinceFrame = 0;
             }

@@ -32,14 +32,15 @@ namespace WebGL.Telemetry
         /// <summary>Extra tilt per m/s of speed (drag), 1/s.</summary>
         public const double DragTilt = 0.25;
         public const double MaxTiltDeg = 35;
-        /// <summary>Geofence: horizontal radius and ceiling, m.</summary>
+        /// <summary>Geofence DEFAULTS, m (the live values are in SimState.cfg, editable with FlightSim.SetConfig; these three stay so the golden keeps its limits).</summary>
         public const double Radius = 120;
         public const double Ceiling = 60;
         public const double RtlAltitude = 10;
         public const double OrbitSpeed = 2.5;
         /// <summary>No stick sample for this long while piloting = hold position (dead-man).</summary>
         public const double ManualTimeoutS = 0.6;
-        public const double HoverThrottle = 0.52;
+        /// <summary>Hover motor command, measured in the real flight (0.62; docs/CALIBRACION_MODELO_FALLAS.md of the web).</summary>
+        public const double HoverThrottle = 0.62;
         /// <summary>Battery: 5000 mAh 4S, about 22 A in hover.</summary>
         public const double CapacityAh = 5;
         public const double HoverAmps = 22;
@@ -103,6 +104,8 @@ namespace WebGL.Telemetry
         public double[] tempMotor = new double[4];
         public double tempBattery;
         public double ambientC;
+        /// <summary>Local configuration: geofence (radius, ceiling, RTL altitude) and what other tools add.</summary>
+        public SimConfig cfg = new SimConfig();
     }
 
     public static class FlightSim
@@ -115,9 +118,9 @@ namespace WebGL.Telemetry
 
         public const string NotAvailable = "no disponible en el simulador del navegador";
 
-        public static SimState Create(double ambientC = 22)
+        public static SimState Create(double ambientC = 22, SimConfig cfg = null)
         {
-            var s = new SimState { ambientC = ambientC, tempBattery = ambientC };
+            var s = new SimState { ambientC = ambientC, tempBattery = ambientC, cfg = cfg != null ? cfg.Clone() : new SimConfig() };
             for (int i = 0; i < 4; i++) s.tempMotor[i] = ambientC;
             return s;
         }
@@ -160,7 +163,7 @@ namespace WebGL.Telemetry
                 case "takeoff":
                 {
                     if (Flying(s)) return No("ya está en vuelo");
-                    double alt = Clamp(NumOr(msg.altitude, 5), 1, SimLimits.Ceiling);
+                    double alt = Clamp(NumOr(msg.altitude, 5), 1, s.cfg.ceiling);
                     string evt = "Despegue a " + JsMath.ToFixed(alt, 0) + " m";
                     if (s.rem < 0.2)
                     {
@@ -176,7 +179,7 @@ namespace WebGL.Telemetry
                 case "set_altitude":
                 {
                     if (NeedFlight(s, out no)) return no;
-                    s.target = new SimTarget { n = s.p[0], e = s.p[1], alt = Clamp(NumOr(msg.altitude, 5), 1, SimLimits.Ceiling) };
+                    s.target = new SimTarget { n = s.p[0], e = s.p[1], alt = Clamp(NumOr(msg.altitude, 5), 1, s.cfg.ceiling) };
                     s.orbit = null;
                     s.mode = SimMode.Hold;
                     return Ok();
@@ -195,8 +198,8 @@ namespace WebGL.Telemetry
                     double north = msg.north ?? double.NaN, east = msg.east ?? double.NaN;
                     double d = Math.Sqrt(north * north + east * east);
                     if (double.IsNaN(d) || double.IsInfinity(d)) return No("punto no válido");
-                    double k = d > SimLimits.Radius ? SimLimits.Radius / d : 1;
-                    s.target = new SimTarget { n = north * k, e = east * k, alt = Clamp(NumOr(msg.altitude, -s.p[2]), 1, SimLimits.Ceiling) };
+                    double k = d > s.cfg.radius ? s.cfg.radius / d : 1;
+                    s.target = new SimTarget { n = north * k, e = east * k, alt = Clamp(NumOr(msg.altitude, -s.p[2]), 1, s.cfg.ceiling) };
                     s.yawTarget = Math.Atan2(s.target.e - s.p[1], s.target.n - s.p[0]);
                     s.orbit = null;
                     s.mode = SimMode.Goto;
@@ -227,7 +230,7 @@ namespace WebGL.Telemetry
                 case "rtl":
                 {
                     if (NeedFlight(s, out no)) return no;
-                    s.target = new SimTarget { n = 0, e = 0, alt = Math.Max(-s.p[2], SimLimits.RtlAltitude) };
+                    s.target = new SimTarget { n = 0, e = 0, alt = Math.Max(-s.p[2], s.cfg.rtlAltitude) };
                     s.orbit = null;
                     s.rtlPhase = RtlPhase.Climb;
                     s.mode = SimMode.Rtl;
@@ -255,6 +258,22 @@ namespace WebGL.Telemetry
                 default:
                     return No(NotAvailable);
             }
+        }
+
+        /// <summary>
+        /// Changes the geofence (and later what other tools put in `cfg`). `next` is merged over the current `cfg` and checked with Geofence.Validate: in flight a
+        /// radius or ceiling the vehicle would already be outside of is refused with its reason, and nothing changes (never a teleport). Mutates `s` only when ok.
+        /// </summary>
+        public static ConfigCheck SetConfig(SimState s, SimConfigPatch next)
+        {
+            SimConfig merged = s.cfg.Clone();
+            if (next.radius.HasValue) merged.radius = next.radius.Value;
+            if (next.ceiling.HasValue) merged.ceiling = next.ceiling.Value;
+            if (next.rtlAltitude.HasValue) merged.rtlAltitude = next.rtlAltitude.Value;
+            ConfigCheck check = Geofence.Validate(merged, s.p, s.armed, s.landed);
+            if (!check.ok) return check;
+            s.cfg = merged;
+            return ConfigCheck.Ok;
         }
 
         /// <summary>A stick sample (MANUAL_CONTROL ranges). Mutates `s`.</summary>
@@ -376,8 +395,8 @@ namespace WebGL.Telemetry
                 s.p[0] += s.v[0] * dt; s.p[1] += s.v[1] * dt; s.p[2] = Math.Min(0, s.p[2] + s.v[2] * dt);
                 // Geofence: no further out, no higher.
                 double d = Math.Sqrt(s.p[0] * s.p[0] + s.p[1] * s.p[1]);
-                if (d > SimLimits.Radius) { s.p[0] *= SimLimits.Radius / d; s.p[1] *= SimLimits.Radius / d; }
-                if (-s.p[2] > SimLimits.Ceiling) { s.p[2] = -SimLimits.Ceiling; s.v[2] = Math.Max(0, s.v[2]); }
+                if (d > s.cfg.radius) { s.p[0] *= s.cfg.radius / d; s.p[1] *= s.cfg.radius / d; }
+                if (-s.p[2] > s.cfg.ceiling) { s.p[2] = -s.cfg.ceiling; s.v[2] = Math.Max(0, s.v[2]); }
                 s.yawRate += (yawRateCmd - s.yawRate) * Math.Min(1, dt / 0.12);
                 s.yaw = WrapPi(s.yaw + s.yawRate * dt);
                 // Touchdown.

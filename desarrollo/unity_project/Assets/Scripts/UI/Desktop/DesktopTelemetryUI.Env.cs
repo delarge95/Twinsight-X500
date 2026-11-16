@@ -36,6 +36,7 @@ namespace WebGL.UI.Desktop
             strip.Add(_btnGround);
             _btnGround.EnableInClassList("dk-strip-btn--on", TelemetryDroneDriver.ShowGroundReference);
             BuildCourseButton(strip);
+            BuildFenceButton(strip);
         }
 
         // the simulated test course (PLAN_PC 28.3, DesktopTelemetryUI.Course.cs) plugs in here; without it these do nothing
@@ -44,6 +45,10 @@ namespace WebGL.UI.Desktop
         partial void DisposeCourse();
         partial void RelabelCourse();
         partial void TickCourse(bool viewer);
+        // Lote 1a: the simulator tools (DesktopTelemetryUI.Fence.cs) plug in here, like the course
+        partial void BuildFenceButton(VisualElement strip);
+        partial void DisposeFence();
+        partial void TickFence(bool viewer);
 
         private void BuildEnvOverlay()
         {
@@ -55,6 +60,7 @@ namespace WebGL.UI.Desktop
         {
             _altLabel?.Dispose();
             DisposeCourse();
+            DisposeFence();
         }
 
         /// <summary>Shows or hides the environment (ground, shadow, altitude line and label). Remembered between runs.</summary>
@@ -73,6 +79,7 @@ namespace WebGL.UI.Desktop
             _groundLabel.text = T("env.ground");
             _btnGround.tooltip = T("env.ground.tip");
             RelabelCourse();
+            RelabelFence();
         }
 
         private void TickEnv()
@@ -80,6 +87,7 @@ namespace WebGL.UI.Desktop
             bool viewer = !_ui.IsHeroVisible && !_ui.IsOnboardingOpen;
             _altLabel?.Tick(viewer);
             TickCourse(viewer);
+            TickFence(viewer);
         }
     }
 }

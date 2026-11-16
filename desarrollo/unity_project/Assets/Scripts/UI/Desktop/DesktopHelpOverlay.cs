@@ -160,6 +160,7 @@ namespace WebGL.UI.Desktop
             AddSection(left, T("TELEMETRY", "TELEMETRÍA"));
             AddRow(left, new[] { "L" }, T("Data source", "Fuente de datos"));
             AddRow(left, new[] { "Shift+A" }, T("Alerts", "Alertas"));
+            AddRow(left, new[] { "Shift+G" }, T("Geofence (simulator)", "Geocerca (simulador)"));
             AddSection(left, T("WINDOW", "VENTANA"));
             AddRow(left, new[] { "F11", "Alt+Enter" }, T("Fullscreen", "Pantalla completa"));
             AddRow(left, new[] { "?", "F1" }, T("This help", "Esta ayuda"));

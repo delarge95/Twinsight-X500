@@ -108,6 +108,7 @@ namespace WebGL.UI.Desktop
             _container.Add(_popSource);
             _container.Add(_popAlerts);
             _container.Add(_popFaults);
+            BuildToolPopovers(); // Lote 1a: the simulator tools (geofence, wind) register their popovers here
         }
 
         private void BuildSourcePopover()
@@ -262,7 +263,8 @@ namespace WebGL.UI.Desktop
             OpenMode();
             if (!ModeOpen) return;
             CloseAllPopovers();
-            VisualElement pop = which == "source" ? _popSource : which == "alerts" ? _popAlerts : _popFaults;
+            VisualElement pop = which == "source" ? _popSource : which == "alerts" ? _popAlerts : which == "faults" ? _popFaults : _toolPops.TryGetValue(which, out var tp) ? tp : null;
+            if (pop == null) return;
             _openPop = which;
             _alertSig = null;
             pop.style.display = DisplayStyle.Flex;
@@ -280,6 +282,7 @@ namespace WebGL.UI.Desktop
             if (_popSource != null) _popSource.style.display = DisplayStyle.None;
             if (_popAlerts != null) _popAlerts.style.display = DisplayStyle.None;
             if (_popFaults != null) _popFaults.style.display = DisplayStyle.None;
+            HideToolPopovers();
         }
 
         public string OpenPopover => _openPop;
@@ -321,6 +324,7 @@ namespace WebGL.UI.Desktop
             _faultClear.text = T("faults.clear");
             RelabelFaultButtons();
             _alertSig = null;
+            RelabelTools();
         }
 
         private void RelabelFaultButtons()
@@ -348,6 +352,7 @@ namespace WebGL.UI.Desktop
             if (_openPop == "source") TickSource(running);
             else if (_openPop == "alerts") TickAlerts(client);
             else if (_openPop == "faults") TickFaults(client);
+            else TickToolPopover(_openPop);
         }
 
         private void TickSource(bool running)

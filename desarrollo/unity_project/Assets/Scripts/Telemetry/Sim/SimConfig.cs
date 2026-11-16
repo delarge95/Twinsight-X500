@@ -1,0 +1,21 @@
+// Lote 1a: the LOCAL configuration of the flight simulator (SimState.cfg of the web, src/shared/flightsim.ts). It never travels on the wire: the simulator
+// runs inside the app. With the defaults the model behaves exactly as it always did (contracts/golden/flightsim.json). Each tool of the lote adds its own
+// members next to the geofence: wind (tool 4) and the didactic compensation of a cut motor (tool 10).
+// Pure C#, no UnityEngine.
+
+namespace WebGL.Telemetry
+{
+    public sealed class SimConfig : FenceConfig
+    {
+        public SimConfig() { }
+
+        /// <summary>A copy with every member present, nothing shared with the original.</summary>
+        public SimConfig Clone() => new SimConfig { radius = radius, ceiling = ceiling, rtlAltitude = rtlAltitude };
+    }
+
+    /// <summary>What <see cref="FlightSim.SetConfig"/> takes: any members of the configuration (null = leave as is).</summary>
+    public sealed class SimConfigPatch
+    {
+        public double? radius, ceiling, rtlAltitude;
+    }
+}
