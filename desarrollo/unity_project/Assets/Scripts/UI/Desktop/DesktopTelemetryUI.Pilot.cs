@@ -95,6 +95,7 @@ namespace WebGL.UI.Desktop
 
             BuildEnvButtons(_pilotStrip); // PLAN_PC 28.2 / 28.3: «Suelo» and «Escenario»
             _container.Add(_pilotStrip);
+            BuildToolsStrip(); // Lote 1b / 1c: third pill (map, pre-flight, mission, record, training)
         }
 
         private void BuildPilotOverlay()

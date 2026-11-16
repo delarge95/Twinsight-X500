@@ -23,6 +23,33 @@ namespace WebGL.UI.Desktop
         partial void TickWindPopover();
         partial void RelabelFence();
         partial void TickFencePopover();
+        // ── Lote 1b / 1c: one partial per tool (its own file DesktopTelemetryUI.<Tool>.cs). A tool that has nothing to do for a hook just does not implement it. ──
+        partial void BuildMapTool(VisualElement strip);
+        partial void DisposeMap();
+        partial void RelabelMap();
+        partial void TickMap(bool viewer);
+        partial void BuildPreflightTool(VisualElement strip);
+        partial void DisposePreflight();
+        partial void RelabelPreflight();
+        partial void TickPreflight(bool viewer);
+        partial void BuildMissionTool(VisualElement strip);
+        partial void DisposeMission();
+        partial void RelabelMission();
+        partial void TickMission(bool viewer);
+        partial void BuildRecordTool(VisualElement strip);
+        partial void DisposeRecord();
+        partial void RelabelRecord();
+        partial void TickRecord(bool viewer);
+        partial void BuildTrainingTool(VisualElement strip);
+        partial void DisposeTraining();
+        partial void RelabelTraining();
+        partial void TickTraining(bool viewer);
+        partial void BuildPreflightPopover();
+        partial void TickPreflightPopover();
+        partial void BuildMissionPopover();
+        partial void TickMissionPopover();
+        partial void BuildTrainingPopover();
+        partial void TickTrainingPopover();
 
         private void RegisterToolPopover(string key, VisualElement pop)
         {
@@ -34,6 +61,42 @@ namespace WebGL.UI.Desktop
         {
             BuildFencePopover();
             BuildWindPopover();
+            BuildPreflightPopover();
+            BuildMissionPopover();
+            BuildTrainingPopover();
+        }
+
+        /// <summary>The third pill of the strip (Lote 1b / 1c): «Mapa», «Comprobar», «Misión», «Grabar», «Entrenar». The second pill has no room left.</summary>
+        private VisualElement _toolsStrip;
+
+        private void BuildToolsStrip()
+        {
+            _toolsStrip = new VisualElement { name = "DkTelToolsStrip" };
+            _toolsStrip.AddToClassList("dk-strip");
+            _toolsStrip.AddToClassList("dk-strip--tel");
+            _toolsStrip.AddToClassList("dk-strip--pilot");
+            BuildMapTool(_toolsStrip);
+            BuildPreflightTool(_toolsStrip);
+            BuildMissionTool(_toolsStrip);
+            BuildRecordTool(_toolsStrip);
+            BuildTrainingTool(_toolsStrip);
+            _container.Add(_toolsStrip);
+        }
+
+        private void DisposeTools()
+        {
+            DisposeMap(); DisposePreflight(); DisposeMission(); DisposeRecord(); DisposeTraining();
+            _toolsStrip?.RemoveFromHierarchy();
+        }
+
+        private void RelabelToolsLote1()
+        {
+            RelabelMap(); RelabelPreflight(); RelabelMission(); RelabelRecord(); RelabelTraining();
+        }
+
+        private void TickToolsLote1(bool viewer)
+        {
+            TickMap(viewer); TickPreflight(viewer); TickMission(viewer); TickRecord(viewer); TickTraining(viewer);
         }
 
         private void HideToolPopovers()
@@ -51,6 +114,9 @@ namespace WebGL.UI.Desktop
         {
             if (which == "fence") TickFencePopover();
             else if (which == "wind") TickWindPopover();
+            else if (which == "preflight") TickPreflightPopover();
+            else if (which == "mission") TickMissionPopover();
+            else if (which == "training") TickTrainingPopover();
         }
 
         /// <summary>The simulator source when it is the running one (not PX4 SITL, not a replay), else null.</summary>

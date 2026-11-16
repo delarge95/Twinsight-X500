@@ -38,7 +38,6 @@ namespace WebGL.UI.Desktop
             BuildCourseButton(strip);
             BuildFenceButton(strip);
             BuildWindButton(strip);
-            BuildMapTool(strip);
         }
 
         // the simulated test course (PLAN_PC 28.3, DesktopTelemetryUI.Course.cs) plugs in here; without it these do nothing
@@ -54,11 +53,6 @@ namespace WebGL.UI.Desktop
         partial void BuildWindButton(VisualElement strip);
         partial void DisposeWind();
         partial void TickWind(bool viewer);
-        // Lote 1b: the top-down map (DesktopTelemetryUI.Map.cs)
-        partial void BuildMapTool(VisualElement strip);
-        partial void DisposeMap();
-        partial void RelabelMap();
-        partial void TickMap(bool viewer);
 
         private void BuildEnvOverlay()
         {
@@ -72,7 +66,7 @@ namespace WebGL.UI.Desktop
             DisposeCourse();
             DisposeFence();
             DisposeWind();
-            DisposeMap();
+            DisposeTools();
         }
 
         /// <summary>Shows or hides the environment (ground, shadow, altitude line and label). Remembered between runs.</summary>
@@ -93,7 +87,7 @@ namespace WebGL.UI.Desktop
             RelabelCourse();
             RelabelFence();
             RelabelWind();
-            RelabelMap();
+            RelabelToolsLote1();
         }
 
         private void TickEnv()
@@ -103,7 +97,7 @@ namespace WebGL.UI.Desktop
             TickCourse(viewer);
             TickFence(viewer);
             TickWind(viewer);
-            TickMap(viewer);
+            TickToolsLote1(viewer);
         }
     }
 }
