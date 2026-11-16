@@ -267,11 +267,13 @@ namespace WebGL.Telemetry
             { "faults.clear", new[] { "Limpiar", "Clear" } },
             { "faults.active", new[] { "Activas", "Active" } },
             { "faults.off", new[] { "Activa la repetición local para inyectar fallas sintéticas.", "Turn the local replay on to inject synthetic faults." } },
-            { "faults.sitl", new[] { "En PX4 SITL no hay inyección sintética: las fallas se envían a PX4 con comandos (llegan al escritorio más adelante). PX4 acepta motor_off, pero el simulador Gazebo puede no aplicarlo.",
-                                     "PX4 SITL has no synthetic injection: faults are sent to PX4 with commands (they reach the desktop later). PX4 accepts motor_off, but the Gazebo simulator may not apply it." } }, // H-13/H-14 (approved D-5)
+            { "faults.sitl", new[] { "En PX4 SITL no hay inyección sintética: las fallas se envían a PX4 con comandos (llegan al escritorio más adelante). En SITL, `motor_off` corta de verdad el motor: el dron simulado cae y hay que reiniciar el SITL.",
+                                     "PX4 SITL has no synthetic injection: faults are sent to PX4 with commands (they reach the desktop later). In SITL, `motor_off` really cuts the motor: the simulated drone falls and the SITL must be restarted." } }, // user decision 2026-11-15 (replaces H-13/H-14/D-5)
             { "faults.sim", new[] { "El simulador no inyecta fallas: no es PX4 ni la repetición. Para fallas sintéticas usa la repetición local.",
                                     "The simulator does not inject faults: it is not PX4 nor the replay. Use the local replay for synthetic faults." } },
             { "faults.ack.ok",new[] { "aceptada", "accepted" } },
+            { "faults.ack.okMotorOff", new[] { "aceptada por PX4; en SITL el motor se corta y el dron simulado cae (reinicia el SITL)",
+                                               "accepted by PX4; in SITL the motor is cut and the simulated drone falls (restart the SITL)" } }, // cmd.ackOkMotorOff
             { "faults.ack.rejected", new[] { "rechazada", "rejected" } },               // cmd.ackRejected
 
             // flight tab (tel.*, motors.*, tag.*, prov.*)
@@ -416,8 +418,8 @@ namespace WebGL.Telemetry
                                    "A standard controller such as PX4's is not built to fly on three motors: the drone usually spins and falls. Research controllers can give up heading to descend under control; they are not part of standard PX4." } },
             { "fx.a.src.replay", new[] { "Falla sintética: solo cambian las cifras del motor {n} durante 30 s. La trayectoria y la actitud son las del vuelo grabado y no reaccionan; los otros motores tampoco compensan.",
                                          "Synthetic fault: only motor {n}'s figures change for 30 s. Trajectory and attitude are the recorded flight's and do not react; the other motors do not compensate either." } },
-            { "fx.a.src.sitl", new[] { "Orden enviada a PX4 (MAV_CMD_INJECT_FAILURE). PX4 la aceptó, pero en esta configuración Gazebo puede no detener el rotor. Si el dron sigue volando igual, la falla no se aplicó. Las RPM que ves son la orden de PX4, no la velocidad del rotor.",
-                                       "Command sent to PX4 (MAV_CMD_INJECT_FAILURE). PX4 accepted it, but in this setup Gazebo may not stop the rotor. If the drone keeps flying the same, the fault was not applied. The RPM shown are PX4's command, not rotor speed." } },
+            { "fx.a.src.sitl", new[] { "Orden enviada a PX4 (MAV_CMD_INJECT_FAILURE). En el SITL con la configuración del puente, apagar un motor corta de verdad su empuje: el dron simulado se voltea y cae en menos de un segundo, PX4 no lo compensa y hay que reiniciar el SITL después. Es lo que ocurre en la simulación, no una afirmación sobre un dron físico. Las RPM que ves son la orden de PX4 (Gazebo no mide la velocidad del rotor).",
+                                       "Command sent to PX4 (MAV_CMD_INJECT_FAILURE). In SITL with the bridge's configuration, turning a motor off really cuts its thrust: the simulated drone rolls over and falls in under a second, PX4 does not compensate, and the SITL must be restarted afterwards. This is what happens in the simulation, not a claim about a physical drone. The RPM shown are PX4's command (Gazebo does not measure rotor speed)." } },
             // B. battery sag / low charge (battery_sag, alert battery:rem)
             { "fx.bat.means", new[] { "Bajo carga, la resistencia interna de la batería hace caer la tensión; si la carga baja del 15 %, queda poco margen para volver.",
                                     "Under load the battery's internal resistance makes its voltage drop; below 15 % charge there is little margin left to return." } },

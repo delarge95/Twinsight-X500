@@ -63,16 +63,18 @@ namespace WebGL.Telemetry.Tests
         }
 
         [Test]
-        public void SitlMotorText_HasTheGazeboCaveat_AndTheRpmAreThePx4Command()
+        public void SitlMotorText_SaysTheMotorIsReallyCutInSitl_AndTheRpmAreThePx4Command()
         {
             string es = FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Sitl, 2, "es");
             StringAssert.Contains("MAV_CMD_INJECT_FAILURE", es);
-            StringAssert.Contains("PX4 la aceptó", es);
-            StringAssert.Contains("Gazebo puede no detener el rotor", es);
-            StringAssert.Contains("la falla no se aplicó", es);
+            StringAssert.Contains("corta de verdad su empuje", es);
+            StringAssert.Contains("hay que reiniciar el SITL", es);
+            StringAssert.Contains("no una afirmación sobre un dron físico", es);
+            StringAssert.DoesNotContain("puede no detener", es);
             StringAssert.Contains("son la orden de PX4", es);
             string en = FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Sitl, 2, "en");
-            StringAssert.Contains("Gazebo may not stop the rotor", en);
+            StringAssert.Contains("really cuts its thrust", en);
+            StringAssert.Contains("not a claim about a physical drone", en);
             StringAssert.Contains("PX4's command", en);
         }
 

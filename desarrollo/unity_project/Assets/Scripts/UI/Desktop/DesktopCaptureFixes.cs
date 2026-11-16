@@ -781,8 +781,8 @@ namespace WebGL.UI.Desktop
             Tel.ShowFaultExplanation(FaultTopic.MotorFailure, 3, null);
             yield return new WaitForSecondsRealtime(0.6f);
             card = Tel.DockCard;
-            Check("SITL: the card has the Gazebo caveat and says the RPM are PX4's command", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Sitl, 3, lang)
-                  && card.SourceText.Contains("MAV_CMD_INJECT_FAILURE") && card.SourceText.Contains(lang == "es" ? "Gazebo puede no detener el rotor" : "Gazebo may not stop the rotor") && card.SourceText.Contains(lang == "es" ? "orden de PX4" : "PX4's command"));
+            Check("SITL: the card says the motor is really cut in SITL and the RPM are PX4's command", card.SourceText == FaultExplain.InSource(FaultTopic.MotorFailure, ExplainSource.Sitl, 3, lang)
+                  && card.SourceText.Contains("MAV_CMD_INJECT_FAILURE") && card.SourceText.Contains(lang == "es" ? "corta de verdad su empuje" : "really cuts its thrust") && card.SourceText.Contains(lang == "es" ? "orden de PX4" : "PX4's command"));
             Check("SITL: the card badge is the SITL one from labels.json", card.SourceBadgeText == DesktopTelemetry.BadgeText(lang));
             yield return Shot("C10_explicacion_sitl", 0.2f);
             Tel.SetDockOpen(false);

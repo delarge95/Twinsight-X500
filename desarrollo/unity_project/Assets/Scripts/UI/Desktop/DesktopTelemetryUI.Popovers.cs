@@ -523,7 +523,7 @@ namespace WebGL.UI.Desktop
             {
                 _lastAckShown = client.LastAck;
                 AckMessage a = client.LastAck;
-                _ackText = a.command + ": " + (a.ok ? T("faults.ack.ok") : T("faults.ack.rejected") + (a.HasDetail ? " (" + a.detail + ")" : string.Empty));
+                _ackText = a.command + ": " + (a.ok ? T(a.command == "motor_off" ? "faults.ack.okMotorOff" : "faults.ack.ok") : T("faults.ack.rejected") + (a.HasDetail ? " (" + a.detail + ")" : string.Empty));
             }
 
             _faultAck.text = canInject ? _ackText : string.Empty;
