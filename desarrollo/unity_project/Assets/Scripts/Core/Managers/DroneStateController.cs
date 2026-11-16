@@ -255,21 +255,45 @@ namespace WebGL.Core.Managers
                 Transform propeller = propellers[i];
                 if (propeller == null) continue;
 
-                float direction = i % 2 == 0 ? 1f : -1f;
 #if UNITY_STANDALONE
                 // PLAN_PC F-6: the axis comes from the propeller's local bounds, which do not change: resolve it once per propeller
                 // (resolving it every frame allocated a renderer array per propeller, ~0.7 KB per frame).
                 if (!_spinAxisCache.TryGetValue(propeller, out Vector3 spinAxis))
                 {
                     spinAxis = ResolvePropellerSpinAxis(propeller);
+                    // Lote 1a: the axis points UP in the world at rest (the bounds give its line, not its sense), so +angle is clockwise seen from above
+                    // and the direction of every propeller can follow the CW / CCW table of PX4 Quad-X instead of alternating by index.
+                    Transform up = droneRoot != null ? droneRoot : propeller;
+                    if (Vector3.Dot(propeller.TransformDirection(spinAxis), up.up) < 0f) spinAxis = -spinAxis;
                     _spinAxisCache[propeller] = spinAxis;
                 }
+                float direction = SpinDirection(propeller.name, i);
 #else
+                float direction = i % 2 == 0 ? 1f : -1f;
                 Vector3 spinAxis = ResolvePropellerSpinAxis(propeller);
 #endif
                 propeller.Rotate(spinAxis, currentPropellerSpeed * direction * Time.deltaTime, Space.Self);
             }
         }
+
+#if UNITY_STANDALONE
+        /// <summary>
+        /// Lote 1a: +1 = clockwise seen from above, -1 = counter-clockwise, from the CW / CCW table of PX4 Quad-X (M1 and M2 counter-clockwise, M3 and M4 clockwise;
+        /// the diagonal pairs share a direction). The parts are matched to motors by position, with the model's names mirrored (nose = -Z): FR is M3, FL is M1,
+        /// BR is M2 and BL is M4. Any other name falls back to the old alternation by index.
+        /// </summary>
+        public static float SpinDirection(string partName, int index)
+        {
+            if (partName != null)
+            {
+                if (partName.EndsWith("_FR", StringComparison.Ordinal)) return 1f;   // M3, clockwise
+                if (partName.EndsWith("_FL", StringComparison.Ordinal)) return -1f;  // M1, counter-clockwise
+                if (partName.EndsWith("_BR", StringComparison.Ordinal)) return -1f;  // M2, counter-clockwise
+                if (partName.EndsWith("_BL", StringComparison.Ordinal)) return 1f;   // M4, clockwise
+            }
+            return index % 2 == 0 ? 1f : -1f;
+        }
+#endif
 
         private Vector3 ResolvePropellerSpinAxis(Transform propeller)
         {
