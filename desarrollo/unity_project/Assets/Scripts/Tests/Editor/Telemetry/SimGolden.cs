@@ -123,7 +123,17 @@ namespace WebGL.Telemetry.Tests
             if (cfg.ContainsKey("radius")) p.radius = C.N(cfg, "radius");
             if (cfg.ContainsKey("ceiling")) p.ceiling = C.N(cfg, "ceiling");
             if (cfg.ContainsKey("rtlAltitude")) p.rtlAltitude = C.N(cfg, "rtlAltitude");
-            // (wind and faultComp are read here from the lote's later tools)
+            if (cfg.ContainsKey("wind"))
+            {
+                var w = C.O(cfg, "wind");
+                p.wind = new WindPatch();
+                if (w.ContainsKey("speed")) p.wind.speed = C.N(w, "speed");
+                if (w.ContainsKey("fromDeg")) p.wind.fromDeg = C.N(w, "fromDeg");
+                if (w.ContainsKey("gustSigma")) p.wind.gustSigma = C.N(w, "gustSigma");
+                if (w.ContainsKey("gustTau")) p.wind.gustTau = C.N(w, "gustTau");
+                if (w.ContainsKey("seed")) p.wind.seed = C.N(w, "seed");
+            }
+            // (faultComp is read here by the motor-cut tool)
             return p;
         }
 

@@ -37,6 +37,7 @@ namespace WebGL.UI.Desktop
             _btnGround.EnableInClassList("dk-strip-btn--on", TelemetryDroneDriver.ShowGroundReference);
             BuildCourseButton(strip);
             BuildFenceButton(strip);
+            BuildWindButton(strip);
         }
 
         // the simulated test course (PLAN_PC 28.3, DesktopTelemetryUI.Course.cs) plugs in here; without it these do nothing
@@ -49,6 +50,9 @@ namespace WebGL.UI.Desktop
         partial void BuildFenceButton(VisualElement strip);
         partial void DisposeFence();
         partial void TickFence(bool viewer);
+        partial void BuildWindButton(VisualElement strip);
+        partial void DisposeWind();
+        partial void TickWind(bool viewer);
 
         private void BuildEnvOverlay()
         {
@@ -61,6 +65,7 @@ namespace WebGL.UI.Desktop
             _altLabel?.Dispose();
             DisposeCourse();
             DisposeFence();
+            DisposeWind();
         }
 
         /// <summary>Shows or hides the environment (ground, shadow, altitude line and label). Remembered between runs.</summary>
@@ -80,6 +85,7 @@ namespace WebGL.UI.Desktop
             _btnGround.tooltip = T("env.ground.tip");
             RelabelCourse();
             RelabelFence();
+            RelabelWind();
         }
 
         private void TickEnv()
@@ -88,6 +94,7 @@ namespace WebGL.UI.Desktop
             _altLabel?.Tick(viewer);
             TickCourse(viewer);
             TickFence(viewer);
+            TickWind(viewer);
         }
     }
 }

@@ -106,6 +106,8 @@ namespace WebGL.Telemetry
         public double ambientC;
         /// <summary>Local configuration: geofence (radius, ceiling, RTL altitude) and what other tools add.</summary>
         public SimConfig cfg = new SimConfig();
+        /// <summary>Gust of each horizontal axis and the state of its random generator (seeded from cfg.wind.seed).</summary>
+        public WindState wind;
     }
 
     public static class FlightSim
@@ -121,6 +123,7 @@ namespace WebGL.Telemetry
         public static SimState Create(double ambientC = 22, SimConfig cfg = null)
         {
             var s = new SimState { ambientC = ambientC, tempBattery = ambientC, cfg = cfg != null ? cfg.Clone() : new SimConfig() };
+            s.wind = new WindState(s.cfg.wind.seed);
             for (int i = 0; i < 4; i++) s.tempMotor[i] = ambientC;
             return s;
         }
@@ -270,10 +273,31 @@ namespace WebGL.Telemetry
             if (next.radius.HasValue) merged.radius = next.radius.Value;
             if (next.ceiling.HasValue) merged.ceiling = next.ceiling.Value;
             if (next.rtlAltitude.HasValue) merged.rtlAltitude = next.rtlAltitude.Value;
+            if (next.wind != null)
+            {
+                WindPatch w = next.wind;
+                if (w.speed.HasValue) merged.wind.speed = w.speed.Value;
+                if (w.fromDeg.HasValue) merged.wind.fromDeg = w.fromDeg.Value;
+                if (w.gustSigma.HasValue) merged.wind.gustSigma = w.gustSigma.Value;
+                if (w.gustTau.HasValue) merged.wind.gustTau = w.gustTau.Value;
+                if (w.seed.HasValue) merged.wind.seed = w.seed.Value;
+            }
             ConfigCheck check = Geofence.Validate(merged, s.p, s.armed, s.landed);
             if (!check.ok) return check;
+            ConfigCheck wind = Wind.Validate(merged.wind);
+            if (!wind.ok) return wind;
+            // A new seed starts a new sequence of gusts (from calm); the rest of the wind changes without touching the generator.
+            if (merged.wind.seed != s.cfg.wind.seed) s.wind = new WindState(merged.wind.seed);
             s.cfg = merged;
             return ConfigCheck.Ok;
+        }
+
+        /// <summary>Wind in force on the vehicle, NED m/s: the mean of cfg.wind plus the gust.</summary>
+        public static void WindNow(SimState s, out double n, out double e)
+        {
+            Wind.Mean(s.cfg.wind, out n, out e);
+            n += s.wind.gn;
+            e += s.wind.ge;
         }
 
         /// <summary>A stick sample (MANUAL_CONTROL ranges). Mutates `s`.</summary>
@@ -291,6 +315,7 @@ namespace WebGL.Telemetry
             if (dt == 0) return s;
             s.t += dt;
             s.manualAge += dt;
+            Wind.StepGusts(s.wind, s.cfg.wind, dt); // the gusts live on while landed; they only act in flight
             double alt = -s.p[2];
             double vn = 0, ve = 0, climb = 0, yawRateCmd = 0;
 
@@ -386,12 +411,15 @@ namespace WebGL.Telemetry
             // Velocity follows the command with a first-order lag and an acceleration limit.
             double Accel(double cmd, double cur) => Clamp((cmd - cur) / SimLimits.VelocityTau, -SimLimits.MaxAccel, SimLimits.MaxAccel);
             double an = 0, ae = 0, ad = 0;
+            // Wind (mean plus gust, NED m/s): it pushes the vehicle after the acceleration limit and the vehicle leans against it; it acts only in flight.
+            double wn = 0, we = 0;
             if (Flying(s))
             {
                 an = Accel(vn, s.v[0]);
                 ae = Accel(ve, s.v[1]);
                 ad = Accel(-climb, s.v[2]);
-                s.v[0] += an * dt; s.v[1] += ae * dt; s.v[2] += ad * dt;
+                WindNow(s, out wn, out we);
+                s.v[0] += (an + Wind.Push * wn) * dt; s.v[1] += (ae + Wind.Push * we) * dt; s.v[2] += ad * dt;
                 s.p[0] += s.v[0] * dt; s.p[1] += s.v[1] * dt; s.p[2] = Math.Min(0, s.p[2] + s.v[2] * dt);
                 // Geofence: no further out, no higher.
                 double d = Math.Sqrt(s.p[0] * s.p[0] + s.p[1] * s.p[1]);
@@ -409,11 +437,12 @@ namespace WebGL.Telemetry
                     s.p[2] = 0;
                     s.yawRate = 0;
                     an = ae = ad = 0;
+                    wn = we = 0;
                 }
             }
 
             // Attitude: the tilt that gives the horizontal acceleration (plus drag), in the body frame.
-            double fx = an + SimLimits.DragTilt * s.v[0], fy = ae + SimLimits.DragTilt * s.v[1];
+            double fx = an + SimLimits.DragTilt * (s.v[0] - wn), fy = ae + SimLimits.DragTilt * (s.v[1] - we);
             double fwd = fx * Math.Cos(s.yaw) + fy * Math.Sin(s.yaw);
             double right = -fx * Math.Sin(s.yaw) + fy * Math.Cos(s.yaw);
             double maxTilt = SimLimits.MaxTiltDeg * Deg;
@@ -427,7 +456,7 @@ namespace WebGL.Telemetry
             // Motor commands: collective from the thrust the manoeuvre needs, plus a small differential (Quad-X mixer signs).
             if (s.armed)
             {
-                double thrust = Hypot(G - ad, Hypot(an, ae)) / G / Math.Max(0.5, Math.Cos(s.roll) * Math.Cos(s.pitch));
+                double thrust = Hypot(G - ad, Hypot(an - SimLimits.DragTilt * wn, ae - SimLimits.DragTilt * we)) / G / Math.Max(0.5, Math.Cos(s.roll) * Math.Cos(s.pitch));
                 double bas = s.landed ? 0.12 : SimLimits.HoverThrottle * thrust;
                 for (int i = 0; i < 4; i++)
                 {

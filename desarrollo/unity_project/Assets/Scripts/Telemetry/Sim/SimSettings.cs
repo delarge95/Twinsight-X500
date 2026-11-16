@@ -10,6 +10,7 @@ namespace WebGL.Telemetry
     public static class SimSettings
     {
         public const string PrefFence = "Desk_SimFence";
+        public const string PrefWind = "Desk_SimWind";
 
         public static FenceConfig LoadFence() => Geofence.Parse(PlayerPrefs.GetString(PrefFence, string.Empty));
 
@@ -19,11 +20,19 @@ namespace WebGL.Telemetry
             PlayerPrefs.Save();
         }
 
+        public static WindConfig LoadWind() => Wind.Parse(PlayerPrefs.GetString(PrefWind, string.Empty));
+
+        public static void SaveWind(WindConfig w)
+        {
+            PlayerPrefs.SetString(PrefWind, Wind.ToJson(w));
+            PlayerPrefs.Save();
+        }
+
         /// <summary>The configuration a fresh simulator starts with: what was stored (defaults when nothing was).</summary>
         public static SimConfig Load()
         {
             FenceConfig f = LoadFence();
-            return new SimConfig { radius = f.radius, ceiling = f.ceiling, rtlAltitude = f.rtlAltitude };
+            return new SimConfig { radius = f.radius, ceiling = f.ceiling, rtlAltitude = f.rtlAltitude, wind = LoadWind() };
         }
     }
 }

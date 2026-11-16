@@ -2359,3 +2359,9 @@
 .dk-course-result { margin: 3px 6px 0 0; font-size: 12.5px; -unity-font-style: bold; color: rgb(63, 191, 138); }
 .dk-course--hit { border-color: rgba(255, 77, 77, 0.95); background-color: rgba(44, 14, 14, 0.92); }
 .dk-course--done { border-color: rgba(63, 191, 138, 0.8); }
+
+/* Lote 1a: simulator tools (geofence, wind) - tokens from design/tokens.json */
+.dk-wind-dirrow { flex-direction: row; align-items: center; margin: 4px 0 4px 0; }
+.dk-wind-dial { margin: 0 12px 0 0; flex-shrink: 0; }
+.dk-wind-dirtext { flex-grow: 1; flex-shrink: 1; }
+.dk-wind-dirvalue { font-size: 13px; color: rgb(232, 237, 243); -unity-text-align: upper-left; white-space: normal; }

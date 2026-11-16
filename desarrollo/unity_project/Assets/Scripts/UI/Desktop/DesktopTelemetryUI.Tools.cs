@@ -18,6 +18,9 @@ namespace WebGL.UI.Desktop
         private readonly Dictionary<string, VisualElement> _toolPops = new Dictionary<string, VisualElement>();
 
         partial void BuildFencePopover();
+        partial void BuildWindPopover();
+        partial void RelabelWind();
+        partial void TickWindPopover();
         partial void RelabelFence();
         partial void TickFencePopover();
 
@@ -30,6 +33,7 @@ namespace WebGL.UI.Desktop
         private void BuildToolPopovers()
         {
             BuildFencePopover();
+            BuildWindPopover();
         }
 
         private void HideToolPopovers()
@@ -40,11 +44,13 @@ namespace WebGL.UI.Desktop
         private void RelabelTools()
         {
             RelabelFence();
+            RelabelWind();
         }
 
         private void TickToolPopover(string which)
         {
             if (which == "fence") TickFencePopover();
+            else if (which == "wind") TickWindPopover();
         }
 
         /// <summary>The simulator source when it is the running one (not PX4 SITL, not a replay), else null.</summary>

@@ -7,15 +7,19 @@ namespace WebGL.Telemetry
 {
     public sealed class SimConfig : FenceConfig
     {
+        /// <summary>Simulated wind (tool 4 of Lote 1a). All zero by default = no wind.</summary>
+        public WindConfig wind = new WindConfig();
+
         public SimConfig() { }
 
         /// <summary>A copy with every member present, nothing shared with the original.</summary>
-        public SimConfig Clone() => new SimConfig { radius = radius, ceiling = ceiling, rtlAltitude = rtlAltitude };
+        public SimConfig Clone() => new SimConfig { radius = radius, ceiling = ceiling, rtlAltitude = rtlAltitude, wind = wind.Clone() };
     }
 
     /// <summary>What <see cref="FlightSim.SetConfig"/> takes: any members of the configuration (null = leave as is).</summary>
     public sealed class SimConfigPatch
     {
         public double? radius, ceiling, rtlAltitude;
+        public WindPatch wind;
     }
 }
