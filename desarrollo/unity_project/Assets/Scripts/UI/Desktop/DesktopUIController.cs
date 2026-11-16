@@ -19,6 +19,7 @@ namespace WebGL.UI.Desktop
     /// | 4               | Telemetry mode (WP-11)                        |
     /// | L / Shift+A     | Data source popover / alerts popover (WP-11)  |
     /// | Shift+G         | Geofence popover of the simulator (Lote 1a)    |
+    /// | M               | Top-down map (Lote 1b)                         |
     /// | F               | Focus the selected part (no selection: reset) |
     /// | Home or R       | Reset the view                                |
     /// | H / I / E       | Pins / Isolate / Explode                      |
@@ -397,6 +398,8 @@ namespace WebGL.UI.Desktop
             else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.L)) { Log("key L"); _chrome.Telemetry.OpenSourcePopover(); }
             else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.A)) { Log("key Shift+A"); _chrome.Telemetry.OpenAlertsPopover(); }
             else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.G)) { Log("key Shift+G"); _chrome.Telemetry.ToggleFencePopover(); } // Lote 1a: geofence of the simulator (before the plain G = filter)
+            else if (_chrome != null && !DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.M)) { Log("key M"); _chrome.Telemetry.ToggleMap(); } // Lote 1b: top-down map
+            else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.Home) && _chrome.Telemetry.MapHovered) { Log("key Home (map)"); _chrome.Telemetry.MapFit(); } // Home over the map = fit
             else if (DesktopKeyboardGate.Down(KeyCode.F)) { Log("key F"); _ui.ShortcutFocusSelection(); }
             else if (DesktopKeyboardGate.Down(KeyCode.Home) || DesktopKeyboardGate.Down(KeyCode.R)) { Log("key Home/R"); _ui.ShortcutResetView(); }
             else if (DesktopKeyboardGate.Down(KeyCode.H)) { Log("key H"); _ui.ShortcutTogglePins(); }

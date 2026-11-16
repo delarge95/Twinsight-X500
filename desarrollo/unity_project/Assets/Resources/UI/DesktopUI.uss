@@ -2366,3 +2366,48 @@
 .dk-wind-dirtext { flex-grow: 1; flex-shrink: 1; }
 .dk-wind-dirvalue { font-size: 13px; color: rgb(232, 237, 243); -unity-text-align: upper-left; white-space: normal; }
 .desktop-ui .dk-b.dk-fault-btn.dk-fault-btn--wide { width: 98.4%; }
+
+/* Lote 1b, tool 1: the top-down map (PC only). Sober monochrome, thin strokes, the accent only for the trail and the next checkpoint (design/tokens.json literals) */
+.dk-map {
+    position: absolute;
+    left: 56px;
+    bottom: 80px;
+    flex-direction: column;
+    padding: 6px 9px 8px 9px;
+    border-width: 1px;
+    border-radius: 12px;
+    border-color: rgba(255, 255, 255, 0.14);
+    background-color: rgba(14, 17, 22, 0.9);
+}
+.dk-map-head { flex-direction: row; align-items: center; justify-content: space-between; margin: 0 0 2px 0; }
+.dk-map-title { margin: 0; font-size: 11px; letter-spacing: 0.6px; -unity-font-style: bold; color: rgb(170, 180, 193); }
+.dk-ibtn.dk-ibtn--small { width: 20px; height: 20px; min-width: 20px; min-height: 20px; padding: 0; }
+.dk-map-readout { margin: 0 0 4px 0; font-size: 11.5px; color: rgb(204, 214, 226); -unity-text-align: upper-left; white-space: normal; }
+.dk-map-disc {
+    position: relative;
+    align-self: center;
+    border-width: 1px;
+    border-radius: 50%;
+    border-color: rgba(255, 255, 255, 0.16);
+    background-color: rgba(6, 8, 11, 0.92);
+    overflow: hidden;
+}
+.dk-map-canvas { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.dk-map-lbl {
+    position: absolute;
+    width: 64px;
+    height: 14px;
+    margin: 0;
+    padding: 0;
+    font-size: 10px;
+    color: rgb(139, 149, 163);
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+.dk-map-lbl--north { color: rgb(232, 237, 243); -unity-font-style: bold; }
+.dk-map-lbl--wait { color: rgb(139, 149, 163); }
+.dk-map-ctl { flex-direction: row; justify-content: center; margin: 6px 0 0 0; }
+.desktop-ui .dk-b.dk-map-btn { height: 22px; margin: 0 3px; padding: 0 9px; font-size: 11px; }
+.dk-map-caption { margin: 6px 0 0 0; font-size: 10px; letter-spacing: 0.2px; color: rgb(139, 149, 163); white-space: normal; -unity-text-align: upper-left; }
+.dk-map-honest { margin: 2px 0 0 0; font-size: 10px; color: rgb(120, 130, 144); white-space: normal; -unity-text-align: upper-left; }
+.dk-map--big .dk-map-readout { font-size: 12px; }
