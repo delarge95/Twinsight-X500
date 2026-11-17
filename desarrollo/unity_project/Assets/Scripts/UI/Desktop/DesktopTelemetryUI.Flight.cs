@@ -351,7 +351,7 @@ namespace WebGL.UI.Desktop
             _flData.style.display = f == null ? DisplayStyle.None : DisplayStyle.Flex;
             if (f == null) return;
 
-            ReadingOrigin baseOrigin = FlightOrigins.Base(cls);
+            ReadingOrigin baseOrigin = FlightOrigins.ForSession(FlightOrigins.Base(cls), sim); // the simulator and an own recording: every reading is simulated
             string baseTag = FlightOrigins.Text(baseOrigin, lang, labels);
 
             // state

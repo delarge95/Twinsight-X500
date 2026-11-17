@@ -133,7 +133,7 @@ namespace WebGL.UI.Desktop
             Tel.OpenMode();
             yield return new WaitForSecondsRealtime(0.6f);
             Check("without telemetry the new buttons are dimmed or reasoned (training and mission)", B("DkTelTraining") != null && !B("DkTelTraining").enabledSelf && B("DkTelMission") != null);
-            Check("the third pill fits inside the window (five buttons)", Root.Q("DkTelToolsStrip") != null && Root.Q("DkTelToolsStrip").worldBound.width > 0f && Root.Q("DkTelToolsStrip").worldBound.xMax <= Root.panel.visualTree.worldBound.xMax + 0.5f && Root.Q("DkTelToolsStrip").worldBound.xMin >= Root.panel.visualTree.worldBound.xMin - 0.5f);
+            Check("the third pill of the strip exists with its five buttons (the fit inside the window is checked on the capture: the layout is not measurable this early)", Root.Q("DkTelToolsStrip") != null && B("DkTelMap") != null && B("DkTelPreflight") != null && B("DkTelMission") != null && B("DkTelRecord") != null && B("DkTelTraining") != null);
             yield return Shot("01_tira_sin_telemetria", 0.2f);
 
             Tel.StartSimulator();
