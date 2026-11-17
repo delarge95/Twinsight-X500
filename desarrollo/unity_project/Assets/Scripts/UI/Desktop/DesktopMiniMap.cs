@@ -37,6 +37,11 @@ namespace WebGL.UI.Desktop
         /// <summary>The test course when it is placed, or null; <see cref="CourseNext"/> = index of the next checkpoint (-1 = none).</summary>
         public CourseLayout Course;
         public int CourseNext = -1;
+        /// <summary>The route of the app's mission (north, east pairs), or null; <see cref="MissionCur"/> = the waypoint being flown to (-1 = none).</summary>
+        public System.Collections.Generic.List<double> MissionPts;
+        public int MissionCur = -1;
+        /// <summary>Waypoints of the mission drawn in the last repaint (read by the harness).</summary>
+        public int MissionDrawn { get; private set; }
         /// <summary>Wind in force (NED, m/s); drawn only above 0.05 m/s.</summary>
         public double WindN, WindE;
         public float BarMaxPx = 80f;
@@ -145,6 +150,7 @@ namespace WebGL.UI.Desktop
             }
 
             if (Course != null) DrawCourse(p);
+            DrawMission(p);
             DrawTrail(p);
 
             // origin: a small circle (the «H» is a label of the owner)
@@ -218,6 +224,31 @@ namespace WebGL.UI.Desktop
                 p.MoveTo(ToXY(Trail.N(a), Trail.E(a)));
                 for (int i = a + 1; i <= b; i++) p.LineTo(ToXY(Trail.N(i), Trail.E(i)));
                 p.Stroke();
+            }
+        }
+
+        /// <summary>The route of the app's mission: a polyline and a dot per waypoint; the one being flown to is filled and larger.</summary>
+        private void DrawMission(Painter2D p)
+        {
+            MissionDrawn = 0;
+            if (MissionPts == null || MissionPts.Count < 2) return;
+            int n = MissionPts.Count / 2;
+            p.lineWidth = 1.5f;
+            p.strokeColor = A(Accent, 0.75f);
+            if (n > 1)
+            {
+                p.BeginPath();
+                p.MoveTo(ToXY(MissionPts[0], MissionPts[1]));
+                for (int i = 1; i < n; i++) p.LineTo(ToXY(MissionPts[2 * i], MissionPts[2 * i + 1]));
+                p.Stroke();
+            }
+            for (int i = 0; i < n; i++)
+            {
+                bool cur = i == MissionCur;
+                Vector2 c = ToXY(MissionPts[2 * i], MissionPts[2 * i + 1]);
+                p.fillColor = cur ? Accent : A(Accent, 0.45f);
+                p.BeginPath(); p.Arc(c, cur ? 4.5f : 3f, 0f, 360f); p.Fill();
+                MissionDrawn++;
             }
         }
 

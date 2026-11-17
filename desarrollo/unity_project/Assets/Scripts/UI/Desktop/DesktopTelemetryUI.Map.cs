@@ -312,6 +312,7 @@ namespace WebGL.UI.Desktop
             if (_mapFrame != null) { _mapPts.Add(_mapFrame.p[0]); _mapPts.Add(_mapFrame.p[1]); }
             BuildMapExtra(MapCourseNow());
             _mapPts.AddRange(_mapExtra);
+            MissionMapPoints(_mapPts); // Lote 1c: the route of the app's mission joins the fit
             MapFence fence = MapFenceNow();
             if (fence == null || _mapExtra.Count == 0) return Minimap.FitView(_mapPts, fence, size, MapMargin);
             MapView content = Minimap.FitView(_mapPts, null, size, MapMargin);
@@ -394,6 +395,7 @@ namespace WebGL.UI.Desktop
             m.Fence = MapFenceNow();
             m.Course = MapCourseNow();
             m.CourseNext = m.Course != null && _run != null && _run.Reached < _run.Total ? _run.Reached : -1;
+            MissionMapLayer(m); // Lote 1c: the route of the app's mission
             m.WindN = 0; m.WindE = 0;
             SimTelemetrySource sim = RunningSimulator;
             if (sim != null && sim.Model != null && sim.Model.armed && !sim.Model.landed)

@@ -398,6 +398,7 @@ namespace WebGL.UI.Desktop
             else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.L)) { Log("key L"); _chrome.Telemetry.OpenSourcePopover(); }
             else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.A)) { Log("key Shift+A"); _chrome.Telemetry.OpenAlertsPopover(); }
             else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.G)) { Log("key Shift+G"); _chrome.Telemetry.ToggleFencePopover(); } // Lote 1a: geofence of the simulator (before the plain G = filter)
+            else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.M)) { Log("key Shift+M"); _chrome.Telemetry.TogglePopover("mission"); } // Lote 1c: mission planner
             else if (_chrome != null && !DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.M)) { Log("key M"); _chrome.Telemetry.ToggleMap(); } // Lote 1b: top-down map
             else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.Home) && _chrome.Telemetry.MapHovered) { Log("key Home (map)"); _chrome.Telemetry.MapFit(); } // Home over the map = fit
             else if (DesktopKeyboardGate.Down(KeyCode.F)) { Log("key F"); _ui.ShortcutFocusSelection(); }

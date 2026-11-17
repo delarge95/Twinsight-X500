@@ -302,6 +302,7 @@ namespace WebGL.UI.Desktop
             }
             // Lote 1b, tool 3: with a failing pre-flight check «Despegar» asks once; «Despegar igualmente» comes back here with via = "preflight"
             if (c == PilotCommand.Takeoff && via != "preflight" && PreflightHoldsTakeoff()) return false;
+            MissionOnManualCommand(); // Lote 1c, tool 2: a command by hand pauses the app's mission first (its hold goes out before this command)
             bool ok = client.Send(PilotControls.CommandMessage(c), out string reason);
             _pilotAuto = false;
             if (ok && _pilotOn && c != PilotCommand.Takeoff) _pilotFlagLost = true; // the model drops the pilot flag on hold / land / rtl
@@ -342,6 +343,7 @@ namespace WebGL.UI.Desktop
         {
             // PLAN_PC 27.1: while typing in a text field a click on the scene only ends the typing (no fly_to, no deselection)
             if (DesktopKeyboardGate.Typing) { DesktopKeyboardGate.LeaveTextField(); return true; }
+            if (MissionGroundClick(screen)) return true; // Lote 1c, tool 2: while «Añadir en el suelo» is on the click adds a waypoint and never flies the drone
             var client = DesktopTelemetry.Client;
             var drv = TelemetryDroneDriver.Instance;
             if (client == null || drv == null || !DesktopTelemetry.AcceptsCommands) return false;
@@ -362,6 +364,7 @@ namespace WebGL.UI.Desktop
                 PilotControls.ClampToGeofence(ref north, ref east);
                 ShowToast(TelemetryStrings.F("toast.geofence.target", Lang, "r", SimLimits.Radius.ToString("0")), true);
             }
+            MissionOnManualCommand(); // a fly_to by hand pauses the app's mission first
             double alt = PilotControls.FlyToAltitude(client.Displayed);
             bool ok = client.Send(ClientMessage.FlyTo(north, east, alt), out string reason);
             Debug.Log("[Pilot] fly_to N " + north.ToString("0.0") + " E " + east.ToString("0.0") + " alt " + alt.ToString("0") + (beyond ? " (clamped to the geofence)" : string.Empty) + ": " + (ok ? "sent" : reason));
