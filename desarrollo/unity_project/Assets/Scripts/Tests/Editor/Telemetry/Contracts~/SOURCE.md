@@ -42,3 +42,10 @@ filtro `WebGL.Telemetry`).
 - `battery.json` `real_flight` usa el TWF completo (`x500v2_flight.twf`), que se busca como en `history.json`; si no esta, ese caso queda *Inconclusive*.
 - `minimap.json` guarda los cuaterniones y los rumbos redondeados a 9 decimales: el test de `yaw` admite 1e-8 por ese redondeo de la entrada y el de `to_screen` toma los rumbos exactos de la lista del generador (`tools/contracts/golden_minimap.ts`).
 - Ignorados por `*~`: se anaden con `git add -f`.
+
+## Lote 1 herramienta 5 (2026-11-17): circuito como datos y records
+
+- Origen: repo web `E:\twinsight-web-twin`, rama `web/telemetria-control` (ultimo commit que toca `contracts/courses/basic.json` y `contracts/golden/course.json`: `80330e3d2976a8fab625c3fbb830d4eb338a6dcd`).
+- Copiado `contracts/courses/basic.json` a `courses/basic.json` (aqui) y a `Assets/StreamingAssets/Telemetry/courses/basic.json` (lo carga `CourseLayout.Default()`; si falta, usa la copia en C# `CourseLayout.Builtin()`).
+- `golden/course.json` ya estaba copiado (identico al de la web); ahora lo usan `CourseGoldenTests` (trazado, volumen, aros, zonas, guiones, vueltas en polilinea) y `CourseRecordsTests` (puntuacion, records, almacenamiento y fantasma).
+- Ignorados por `*~`: se anaden con `git add -f`.

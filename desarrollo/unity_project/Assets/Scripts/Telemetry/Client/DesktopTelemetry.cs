@@ -53,7 +53,10 @@ namespace WebGL.Telemetry
         public static bool IsSimulator => Client?.Source is SimTelemetrySource;
         /// <summary>The running source takes flight commands (takeoff, land...): the simulator, or SITL once connected. Never a replay.</summary>
         public static bool AcceptsCommands => Client != null && Client.Hello != null && Client.Hello.Accepts("takeoff") && Client.Source != null && Client.Source.State == TransportState.Open;
-        public static bool IsLocalReplay => Client?.Source != null && Client.Source.IsLocal && Client.Source.Classification == SourceClassification.Replay;
+        /// <summary>True while the running source is the replay of one of the app's OWN recordings (Lote 1c, tool 7): not a real flight, never a "digital shadow".</summary>
+        public static bool IsOwnReplay => Client?.Source is OwnReplayTelemetrySource;
+        /// <summary>The bundled real flight replay ("sombra digital"); an own session is NOT this.</summary>
+        public static bool IsLocalReplay => Client?.Source != null && !(Client.Source is OwnReplayTelemetrySource) && Client.Source.IsLocal && Client.Source.Classification == SourceClassification.Replay;
 
         /// <summary>Raised on the main thread after a session starts (true) or stops (false).</summary>
         public static event Action<bool> RunningChanged;
@@ -85,6 +88,14 @@ namespace WebGL.Telemetry
                 double shift = startAtSeconds * 1000 - JsMath.Mod(ReplaySchedule.WallClockMs() - ReplaySchedule.ReplayEpochMs, src.Schedule.PeriodMs * src.Schedule.FrameCount);
                 src.WallNowMs = () => ReplaySchedule.WallClockMs() + shift;
             }
+            return Start(src);
+        }
+
+        /// <summary>Replays a recorded own session (TWF1 written by this app or the web). False (with LastError) when the bytes are not an own session.</summary>
+        public static bool StartOwnReplay(byte[] bytes, string name)
+        {
+            var src = OwnReplayTelemetrySource.FromBytes(bytes, name, out TwfWriter.OwnFail fail);
+            if (src == null) { LastError = "not an own session: " + fail; return false; }
             return Start(src);
         }
 
@@ -120,6 +131,7 @@ namespace WebGL.Telemetry
             if (c == null) return null;
             var labels = HonestyLabels.Load();
             if (c.Source is SimTelemetrySource && labels.TrySimText("title", lang, out string simTitle)) return simTitle;
+            if (c.Source is OwnReplayTelemetrySource own && labels.TryOwnReplayText(own.Kind, lang, out string ownTitle)) return ownTitle;
             if (c.Source != null && c.Source.IsLocal && c.Classification == SourceClassification.Replay && labels.TryLocalReplayText(lang, out string t)) return t;
             return labels.ClassificationTitle(c.Classification, lang);
         }

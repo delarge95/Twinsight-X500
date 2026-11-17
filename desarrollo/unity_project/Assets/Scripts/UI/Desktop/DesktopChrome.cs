@@ -355,6 +355,7 @@ namespace WebGL.UI.Desktop
             _top.Add(_chipPower);
             // second chip: an active telemetry session (same chip style; click = stop the session)
             _top.Add(_tel.SessionChip);
+            _top.Add(_tel.RecordChip); // Lote 1c: the red chip while an own session is being recorded (click = stop)
             _top.Add(_btnIso);
             _top.Add(reset);
             _top.Add(Sep());

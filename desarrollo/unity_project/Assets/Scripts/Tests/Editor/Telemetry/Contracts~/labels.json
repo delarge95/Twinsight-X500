@@ -13,6 +13,10 @@
       "localDetail": {
         "es": "Un vuelo real de PX4, reproducido en tu navegador sin servidor. Datos en un solo sentido; las fallas que inyectes son sintéticas.",
         "en": "A real PX4 flight, replayed in your browser with no server. One-way data; any fault you inject is synthetic."
+      },
+      "own": {
+        "sim": { "es": "Repetición · sesión propia (simulada)", "en": "Replay · own session (simulated)" },
+        "sitl": { "es": "Repetición · sesión propia (PX4 SITL)", "en": "Replay · own session (PX4 SITL)" }
       }
     },
     "sim": {

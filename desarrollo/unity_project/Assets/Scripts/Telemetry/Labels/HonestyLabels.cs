@@ -101,6 +101,16 @@ namespace WebGL.Telemetry
             return text != null;
         }
 
+        /// <summary>
+        /// Badge text of the replay of an OWN session (tool 7 of Lote 1, `classification.replay.own.sim|sitl`): "Repetición · sesión propia
+        /// (simulada)" / "(PX4 SITL)". Never "sombra digital": there is no physical drone behind a recording. kind: "sim" | "sitl".
+        /// </summary>
+        public bool TryOwnReplayText(string kind, string lang, out string text)
+        {
+            text = kind == "sim" || kind == "sitl" ? TryText(lang, "classification", "replay", "own", kind) : null;
+            return text != null;
+        }
+
         // ------------------------------------------------------------------------------------------------- lookup
 
         object Node(params string[] path)
