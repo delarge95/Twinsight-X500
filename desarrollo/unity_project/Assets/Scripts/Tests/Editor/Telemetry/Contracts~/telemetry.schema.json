@@ -3,12 +3,22 @@
   "$id": "urn:twinsight:contracts:telemetry",
   "title": "TwinSight telemetry contract",
   "description": "JSON over WebSocket shared by the Cloudflare worker (24/7 replay, 'Sombra digital'), the local PX4 SITL bridge ('Gemelo digital SITL') and every client (web, Unity desktop). Source of truth in code: src/shared/protocol.ts. The root validates any single wire message (server -> client or client -> server); use '#/$defs/<Name>' to validate a specific type. Units: NED metres, m/s; quaternion Hamilton scalar first rotating body FRD into world NED; u 0..1; rpm; degrees Celsius; ts in ms. Readers must ignore unknown fields (forward compatibility); this schema is strict (additionalProperties false) so that any new field in a server must be declared here first.",
-  "protocolVersion": "1.0.0",
+  "protocolVersion": "1.1.0",
   "oneOf": [
     { "$ref": "#/$defs/ServerMessage" },
     { "$ref": "#/$defs/ClientMessage" }
   ],
   "$defs": {
+    "Seq": {
+      "description": "Contract 1.1, optional. Sender sequence number: non-negative integer, strictly increasing per sender and per connection (one counter shared by 'command' and 'manual'; restarts on a new socket). Receivers drop a 'manual' whose seq is not above the last accepted one and refuse a 'command' in that case. Absent in 1.0.0 senders: receivers must accept its absence.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "SenderTs": {
+      "description": "Contract 1.1, optional. Sender wall clock when the message was produced, epoch ms. Clocks are not synchronised: receivers compare it only against the smallest (receive time - ts) seen on the connection; a 'manual' more than 150 ms older than that is dropped, a 'command' more than 2000 ms older is refused. Absent in 1.0.0 senders.",
+      "type": "number",
+      "minimum": 0
+    },
     "Vec3": {
       "type": "array",
       "items": { "type": "number" },
@@ -119,7 +129,7 @@
     },
     "CommandCapability": {
       "description": "Entries of HelloMessage.commands. Mixed vocabulary, as the servers emit it: message types the server accepts ('inject', 'clear', 'manual') and names of 'command' messages.",
-      "enum": ["inject", "clear", "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "pilot", "manual"]
+      "enum": ["inject", "clear", "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "battery_off", "pilot", "manual"]
     },
     "HelloMessage": {
       "description": "First message after connecting. A new hello means a new session: clear buffers, clock and ground reference.",
@@ -145,7 +155,8 @@
           "additionalProperties": false
         },
         "commands": { "description": "Commands the server accepts from the client.", "type": "array", "items": { "$ref": "#/$defs/CommandCapability" } },
-        "serverTime": { "description": "Server wall clock, epoch ms (0 for the local Inspector).", "type": "number" }
+        "serverTime": { "description": "Server wall clock, epoch ms (0 for the local Inspector).", "type": "number" },
+        "protocolVersion": { "description": "Contract 1.1, optional: version of this contract the server speaks. Absent = 1.0.0.", "type": "string", "pattern": "^[0-9]+[.][0-9]+[.][0-9]+$" }
       },
       "required": ["type", "mode", "rotors", "rateHz", "provenance", "batteryCells", "ambientC", "source", "commands", "serverTime"],
       "additionalProperties": false
@@ -205,7 +216,9 @@
         "type": { "const": "ack" },
         "command": { "type": "string" },
         "ok": { "type": "boolean" },
-        "detail": { "type": "string" }
+        "detail": { "type": "string" },
+        "seq": { "description": "1.1, optional: echo of the seq of the command being answered (absent when that command carried none).", "$ref": "#/$defs/Seq" },
+        "ts": { "description": "1.1, optional: clock of the server that answers, epoch ms.", "$ref": "#/$defs/SenderTs" }
       },
       "required": ["type", "command", "ok"],
       "additionalProperties": false
@@ -241,19 +254,19 @@
     },
     "CommandTakeoff": {
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "takeoff" }, "altitude": { "description": "Metres; the bridge clamps to 1..50.", "type": "number" } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "takeoff" }, "altitude": { "description": "Metres; the bridge clamps to 1..50.", "type": "number" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name", "altitude"],
       "additionalProperties": false
     },
     "CommandSetAltitude": {
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "set_altitude" }, "altitude": { "description": "Metres; the bridge clamps to 1..50.", "type": "number" } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "set_altitude" }, "altitude": { "description": "Metres; the bridge clamps to 1..50.", "type": "number" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name", "altitude"],
       "additionalProperties": false
     },
     "CommandLand": {
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "land" } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "land" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name"],
       "additionalProperties": false
     },
@@ -265,7 +278,9 @@
         "name": { "const": "fly_to" },
         "north": { "type": "number" },
         "east": { "type": "number" },
-        "altitude": { "type": "number" }
+        "altitude": { "type": "number" },
+        "seq": { "$ref": "#/$defs/Seq" },
+        "ts": { "$ref": "#/$defs/SenderTs" }
       },
       "required": ["type", "name", "north", "east", "altitude"],
       "additionalProperties": false
@@ -273,47 +288,54 @@
     "CommandYaw": {
       "description": "Turn the heading by 'degrees' (+ clockwise seen from above). The bridge rejects 0 and |degrees| > 180.",
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "yaw" }, "degrees": { "type": "number" } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "yaw" }, "degrees": { "type": "number" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name", "degrees"],
       "additionalProperties": false
     },
     "CommandOrbit": {
       "description": "Circle the current position at 'radius' m (the bridge clamps to 2..50).",
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "orbit" }, "radius": { "type": "number" } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "orbit" }, "radius": { "type": "number" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name", "radius"],
       "additionalProperties": false
     },
     "CommandRtl": {
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "rtl" } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "rtl" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name"],
       "additionalProperties": false
     },
     "CommandHold": {
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "hold" } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "hold" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name"],
       "additionalProperties": false
     },
     "CommandMotorOff": {
-      "description": "Real SITL fault: stop motor 1..4 (MAV_CMD_INJECT_FAILURE). PX4 accepts it; Gazebo may not apply it.",
+      "description": "Real SITL fault: stop motor 1..4 (MAV_CMD_INJECT_FAILURE). With the bridge configuration (CA_FAILURE_MODE = 1) the rotor command drops to 0 and the simulated vehicle falls.",
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "motor_off" }, "motor": { "type": "integer", "minimum": 1, "maximum": 4 } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "motor_off" }, "motor": { "type": "integer", "minimum": 1, "maximum": 4 }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name", "motor"],
       "additionalProperties": false
     },
     "CommandRestore": {
-      "description": "Undo motor_off on one motor (1..4) or on all (0 / omitted).",
+      "description": "Undo motor_off on one motor (1..4); with 0 or omitted, undo every injected fault (all motors and battery_off).",
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "restore" }, "motor": { "type": "integer", "minimum": 0, "maximum": 4 } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "restore" }, "motor": { "type": "integer", "minimum": 0, "maximum": 4 }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
+    "CommandBatteryOff": {
+      "description": "Contract 1.1. Real PX4 SITL fault: the battery simulator drains the battery (MAV_CMD_INJECT_FAILURE, unit battery, type off). Measured in PX4 v1.17 SITL with Gazebo: 70 % to 0 % in about 6 s, low-battery warning, emergency landing, disarm. Undone by 'restore' without motor (or motor 0). PX4 SITL only: the browser flight simulator (not PX4) refuses it.",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "battery_off" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name"],
       "additionalProperties": false
     },
     "CommandPilot": {
       "description": "Switch PX4 to Position mode (POSCTL) so it flies the 'manual' stick stream. Sent once when piloting starts.",
       "type": "object",
-      "properties": { "type": { "const": "command" }, "name": { "const": "pilot" } },
+      "properties": { "type": { "const": "command" }, "name": { "const": "pilot" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
       "required": ["type", "name"],
       "additionalProperties": false
     },
@@ -329,6 +351,7 @@
         { "$ref": "#/$defs/CommandHold" },
         { "$ref": "#/$defs/CommandMotorOff" },
         { "$ref": "#/$defs/CommandRestore" },
+        { "$ref": "#/$defs/CommandBatteryOff" },
         { "$ref": "#/$defs/CommandPilot" }
       ]
     },
@@ -340,7 +363,9 @@
         "x": { "description": "Pitch, forward +.", "type": "number", "minimum": -1000, "maximum": 1000 },
         "y": { "description": "Roll, right +.", "type": "number", "minimum": -1000, "maximum": 1000 },
         "z": { "description": "Throttle, 500 = hold altitude in Position mode.", "type": "number", "minimum": 0, "maximum": 1000 },
-        "r": { "description": "Yaw, clockwise +.", "type": "number", "minimum": -1000, "maximum": 1000 }
+        "r": { "description": "Yaw, clockwise +.", "type": "number", "minimum": -1000, "maximum": 1000 },
+        "seq": { "$ref": "#/$defs/Seq" },
+        "ts": { "$ref": "#/$defs/SenderTs" }
       },
       "required": ["type", "x", "y", "z", "r"],
       "additionalProperties": false

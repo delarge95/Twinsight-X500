@@ -31,6 +31,7 @@ namespace WebGL.Telemetry
         public static CommandMessage Orbit(double radius) => new CommandMessage { name = "orbit", radius = radius };
         public static CommandMessage Rtl() => new CommandMessage { name = "rtl" };
         public static CommandMessage Hold() => new CommandMessage { name = "hold" };
+        public static CommandMessage BatteryOff() => new CommandMessage { name = "battery_off" };
         public static CommandMessage MotorOff(int motor) => new CommandMessage { name = "motor_off", motor = motor };
         public static CommandMessage Restore(int? motor = null) => new CommandMessage { name = "restore", motor = motor };
         public static CommandMessage Pilot() => new CommandMessage { name = "pilot" };
@@ -74,6 +75,8 @@ namespace WebGL.Telemetry
         public string name;
         public double? altitude, north, east, degrees, radius;
         public int? motor;
+        /// <summary>Contract 1.1, optional: sender sequence number (non-negative integer, increasing per connection; one counter shared with manual) and sender clock (epoch ms).</summary>
+        public long? seq; public double? ts;
 
         public override string ToJson()
         {
@@ -84,6 +87,8 @@ namespace WebGL.Telemetry
             if (degrees.HasValue) sb.Append(",\"degrees\":").Append(N(degrees.Value));
             if (radius.HasValue) sb.Append(",\"radius\":").Append(N(radius.Value));
             if (motor.HasValue) sb.Append(",\"motor\":").Append(motor.Value.ToString(CultureInfo.InvariantCulture));
+            if (seq.HasValue) sb.Append(",\"seq\":").Append(seq.Value.ToString(CultureInfo.InvariantCulture));
+            if (ts.HasValue) sb.Append(",\"ts\":").Append(N(ts.Value));
             return sb.Append('}').ToString();
         }
 
@@ -99,7 +104,7 @@ namespace WebGL.Telemetry
                 case "orbit": return new[] { "radius" };
                 case "motor_off": return new[] { "motor" };
                 case "restore": return new[] { "motor?" };
-                case "land": case "rtl": case "hold": case "pilot": return Array.Empty<string>();
+                case "land": case "rtl": case "hold": case "pilot": case "battery_off": return Array.Empty<string>();
                 default: return null;
             }
         }
@@ -123,6 +128,8 @@ namespace WebGL.Telemetry
             }
             foreach (var kv in present)
                 if (kv.Value && !allowed.Contains(kv.Key)) return name + ": unexpected " + kv.Key;
+            if (seq.HasValue && seq.Value < 0) return name + ": seq must be a non-negative integer";
+            if (ts.HasValue && ts.Value < 0) return name + ": ts must be non-negative";
             if (name == "motor_off" && (motor < 1 || motor > 4)) return "motor_off: motor out of 1..4";
             if (name == "restore" && motor.HasValue && (motor < 0 || motor > 4)) return "restore: motor out of 0..4";
             return null;
@@ -140,12 +147,17 @@ namespace WebGL.Telemetry
         public double z;
         /// <summary>Yaw, clockwise +, -1000..1000.</summary>
         public double r;
+        /// <summary>Contract 1.1, optional (see CommandMessage).</summary>
+        public long? seq; public double? ts;
 
         public override string ToJson() =>
-            "{\"type\":\"manual\",\"x\":" + N(x) + ",\"y\":" + N(y) + ",\"z\":" + N(z) + ",\"r\":" + N(r) + "}";
+            "{\"type\":\"manual\",\"x\":" + N(x) + ",\"y\":" + N(y) + ",\"z\":" + N(z) + ",\"r\":" + N(r)
+            + (seq.HasValue ? ",\"seq\":" + seq.Value.ToString(CultureInfo.InvariantCulture) : string.Empty) + (ts.HasValue ? ",\"ts\":" + N(ts.Value) : string.Empty) + "}";
 
         public override string Validate()
         {
+            if (seq.HasValue && seq.Value < 0) return "manual: seq must be a non-negative integer";
+            if (ts.HasValue && ts.Value < 0) return "manual: ts must be non-negative";
             if (Math.Abs(x) > 1000 || Math.Abs(y) > 1000 || Math.Abs(r) > 1000) return "manual axis out of -1000..1000";
             if (z < 0 || z > 1000) return "manual throttle out of 0..1000";
             return null;

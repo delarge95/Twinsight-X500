@@ -1,6 +1,6 @@
 {
   "_doc": "Index of the fixtures. `def` is the name in telemetry.schema.json \"$defs\" the file validates against (each: true = array of def). valid=false files MUST be rejected by the schema. kind: wire-server / wire-client = a WebSocket JSON message (also valid against the schema root); derived = computed by the client; http / file = other.",
-  "protocolVersion": "1.0.0",
+  "protocolVersion": "1.1.0",
   "entries": [
     {
       "file": "fixtures/hello.replay.json",
@@ -137,6 +137,22 @@
       "producer": "bridge",
       "valid": true,
       "note": "bridge up but no MAVLink connection yet"
+    },
+    {
+      "file": "fixtures/ack.sitl.stamped.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.1: answer to a stamped command (client.command.stamped.json): seq echoes the seq of that command, ts is the bridge clock"
+    },
+    {
+      "file": "fixtures/ack.sitl.stale.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.1: a stamped command that is repeated, out of order (seq) or older than 2000 ms (ts) is refused; hold / rtl / land are never refused for this"
     },
     {
       "file": "fixtures/ack.sitl.invalid.json",
@@ -307,6 +323,30 @@
       "note": "client -> server: manual"
     },
     {
+      "file": "fixtures/client.command.battery_off.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command battery_off"
+    },
+    {
+      "file": "fixtures/client.command.stamped.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command set_altitude"
+    },
+    {
+      "file": "fixtures/client.manual.stamped.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: manual"
+    },
+    {
       "file": "fixtures/alerts.example.json",
       "def": "Alert",
       "kind": "derived",
@@ -452,6 +492,46 @@
       "note": "throttle z is 0..1000"
     },
     {
+      "file": "fixtures/invalid/client.negative_seq.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "seq is a non-negative integer"
+    },
+    {
+      "file": "fixtures/invalid/client.fractional_seq.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "seq is an integer"
+    },
+    {
+      "file": "fixtures/invalid/client.inject_with_seq.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "inject / clear (replay only) do not carry the 1.1 stamp"
+    },
+    {
+      "file": "fixtures/invalid/client.battery_off_with_motor.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "battery_off takes no arguments"
+    },
+    {
+      "file": "fixtures/invalid/hello.bad_version.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "protocolVersion is MAJOR.MINOR.PATCH"
+    },
+    {
       "file": "fixtures/invalid/client.motor_off_zero.json",
       "def": "ClientMessage",
       "kind": "wire-client",
@@ -473,7 +553,10 @@
     "fixtures/client.command.restore.json",
     "fixtures/client.command.restore_all.json",
     "fixtures/client.command.pilot.json",
-    "fixtures/client.manual.json"
+    "fixtures/client.manual.json",
+    "fixtures/client.command.battery_off.json",
+    "fixtures/client.command.stamped.json",
+    "fixtures/client.manual.stamped.json"
   ],
   "motor_needed_fault_kinds": ["motor_failure", "motor_overheat"]
 }

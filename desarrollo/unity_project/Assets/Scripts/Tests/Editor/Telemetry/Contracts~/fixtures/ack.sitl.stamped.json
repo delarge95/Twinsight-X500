@@ -1,0 +1,8 @@
+{
+  "type": "ack",
+  "command": "set_altitude",
+  "ok": true,
+  "detail": "MAV_RESULT 0 (ACCEPTED)",
+  "seq": 41,
+  "ts": 1792195330180
+}

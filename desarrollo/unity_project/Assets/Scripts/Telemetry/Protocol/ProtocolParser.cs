@@ -69,6 +69,7 @@ namespace WebGL.Telemetry
                 case "inject":
                 {
                     o.Allow("type", "kind", "motor");
+                    if (o.Has("seq") || o.Has("ts")) throw new ProtocolException("inject takes no seq or ts (contract 1.1 stamps only command and manual)");
                     var m = new InjectMessage { kind = FaultKindOf(o.Str("kind"), o.Path + ".kind") };
                     if (o.Has("motor")) m.motor = o.Int("motor", 1, 4);
                     string err = m.Validate();
@@ -83,7 +84,7 @@ namespace WebGL.Telemetry
                     string name = o.Str("name");
                     var fields = CommandMessage.FieldsOf(name);
                     if (fields == null) throw new ProtocolException("unknown command '" + name + "'");
-                    var allowed = new List<string> { "type", "name" };
+                    var allowed = new List<string> { "type", "name", "seq", "ts" };
                     foreach (var f in fields) allowed.Add(f.TrimEnd('?'));
                     o.Allow(allowed.ToArray());
                     var m = new CommandMessage { name = name };
@@ -93,25 +94,34 @@ namespace WebGL.Telemetry
                     if (o.Has("degrees")) m.degrees = o.Num("degrees");
                     if (o.Has("radius")) m.radius = o.Num("radius");
                     if (o.Has("motor")) m.motor = o.Int("motor", name == "restore" ? 0 : 1, 4);
+                    Stamp(o, out m.seq, out m.ts);
                     string err = m.Validate();
                     if (err != null) throw new ProtocolException(err);
                     return m;
                 }
                 case "manual":
                 {
-                    o.Allow("type", "x", "y", "z", "r");
+                    o.Allow("type", "x", "y", "z", "r", "seq", "ts");
                     var m = new ManualMessage { x = o.Num("x", -1000, 1000), y = o.Num("y", -1000, 1000), z = o.Num("z", 0, 1000), r = o.Num("r", -1000, 1000) };
+                    Stamp(o, out m.seq, out m.ts);
                     return m;
                 }
                 default: throw new ProtocolException("unknown client message type '" + type + "'");
             }
         }
 
+        /// <summary>Contract 1.1, optional `seq` (non-negative integer) and `ts` (non-negative number, epoch ms): absent in 1.0.0 senders.</summary>
+        static void Stamp(Obj o, out long? seq, out double? ts)
+        {
+            seq = o.Has("seq") ? (long?)o.Int("seq", 0, int.MaxValue) : null;
+            ts = o.Has("ts") ? (double?)o.Num("ts", 0, double.MaxValue) : null;
+        }
+
         // ------------------------------------------------------------------------------------------------- messages
 
         static HelloMessage Hello(Obj o)
         {
-            o.Allow("type", "mode", "rotors", "rateHz", "provenance", "batteryCells", "ambientC", "source", "commands", "serverTime");
+            o.Allow("type", "mode", "rotors", "rateHz", "provenance", "batteryCells", "ambientC", "source", "commands", "serverTime", "protocolVersion");
             var h = new HelloMessage();
             if (!WireNames.TryMode(o.Str("mode"), out h.mode)) throw new ProtocolException(o.Path + ".mode: unknown mode '" + o.Str("mode") + "'");
             var rotors = o.Arr("rotors");
@@ -138,7 +148,12 @@ namespace WebGL.Telemetry
             }
             h.serverTime = o.Num("serverTime");
             // Not in protocol 1.0.0; read when a future server adds it (README discrepancy 14). Strict mode rejects it above.
-            if (o.Has("protocolVersion") && o.Raw("protocolVersion") is string pv) { h.protocolVersion = pv; h.HasProtocolVersion = true; }
+            if (o.Has("protocolVersion") && o.Raw("protocolVersion") is string pv)
+            {
+                // contract 1.1: x.y.z; a malformed one is an error in strict mode and ignored by the tolerant reader
+                if (!System.Text.RegularExpressions.Regex.IsMatch(pv, "^[0-9]+[.][0-9]+[.][0-9]+$")) throw new ProtocolException(o.Path + ".protocolVersion: not x.y.z");
+                else { h.protocolVersion = pv; h.HasProtocolVersion = true; }
+            }
             return h;
         }
 
@@ -206,8 +221,9 @@ namespace WebGL.Telemetry
 
         static AckMessage Ack(Obj o)
         {
-            o.Allow("type", "command", "ok", "detail");
+            o.Allow("type", "command", "ok", "detail", "seq", "ts");
             var a = new AckMessage { command = o.Str("command"), ok = o.Bool("ok") };
+            Stamp(o, out a.seq, out a.ts);
             if (o.Has("detail")) { a.detail = o.Str("detail"); a.HasDetail = true; }
             return a;
         }
@@ -339,6 +355,7 @@ namespace WebGL.Telemetry
             public Obj Child(object raw, string suffix) => new Obj(raw, Path + suffix, opt);
             public Obj Sub(string key) => new Obj(Required(key), Path + "." + key, opt);
 
+            public bool IsStrict => opt.Strict;
             public bool Has(string key) => Dict.ContainsKey(key);
             public object Raw(string key) => Dict.TryGetValue(key, out var v) ? v : null;
 

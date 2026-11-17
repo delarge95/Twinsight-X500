@@ -1,6 +1,6 @@
 {
   "_doc": "Honesty labels and enum texts, copied from src/web/i18n/{es,en}.ts by tools/contracts. Never write these by hand in a client: generate them from this file. A telemetry value is never shown without its origin; the replay is a \"shadow\", only SITL is a \"twin\"; the replay is never called \"live\".",
-  "protocolVersion": "1.0.0",
+  "protocolVersion": "1.1.0",
   "classification": {
     "replay": {
       "title": { "es": "Sombra digital", "en": "Digital shadow" },

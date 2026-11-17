@@ -11,7 +11,7 @@ namespace WebGL.Telemetry
     public static class TelemetryProtocol
     {
         /// <summary>Version of the contract this client implements (contracts/telemetry.schema.json "protocolVersion").</summary>
-        public const string Version = "1.0.0";
+        public const string Version = "1.1.0";
         public const int VersionMajor = 1;
 
         /// <summary>Servers drop longer client messages without answering (contracts README).</summary>
@@ -20,9 +20,9 @@ namespace WebGL.Telemetry
         public static readonly string[] Modes = { "replay", "sitl" };
         public static readonly string[] SourceClassifications = { "replay", "sitl", "inspector" };
         public static readonly string[] CommandCapabilities =
-            { "inject", "clear", "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "pilot", "manual" };
+            { "inject", "clear", "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "battery_off", "pilot", "manual" };
         public static readonly string[] CommandNames =
-            { "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "pilot" };
+            { "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "battery_off", "pilot" };
         public static readonly string[] FaultKinds = { "motor_failure", "motor_overheat", "battery_sag", "vibration" };
         public static readonly string[] EventSeverities = { "info", "warning", "critical" };
         public static readonly string[] ProvenanceRpm = { "measured", "estimated", "command" };
@@ -233,6 +233,8 @@ namespace WebGL.Telemetry
         public string command;
         public bool ok;
         public string detail; public bool HasDetail;
+        /// <summary>Contract 1.1, optional: echo of the seq of the command being answered, and the clock of the server that answers (epoch ms).</summary>
+        public long? seq; public double? ts;
     }
 
     // ------------------------------------------------------------------------------------- derived / other channels

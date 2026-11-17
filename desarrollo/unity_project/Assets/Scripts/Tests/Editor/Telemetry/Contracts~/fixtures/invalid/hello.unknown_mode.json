@@ -29,8 +29,10 @@
     "hold",
     "motor_off",
     "restore",
+    "battery_off",
     "pilot",
     "manual"
   ],
-  "serverTime": 1792195320000
+  "serverTime": 1792195320000,
+  "protocolVersion": "1.1.0"
 }

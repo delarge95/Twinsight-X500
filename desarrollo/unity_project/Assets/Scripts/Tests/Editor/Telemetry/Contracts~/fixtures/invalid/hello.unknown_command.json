@@ -19,5 +19,6 @@
   "ambientC": 20,
   "source": { "label": "PX4 SITL local (gz_x500) vía pymavlink", "vehicle": "gz_x500 · Gazebo Harmonic" },
   "commands": ["takeoff", "reboot"],
-  "serverTime": 1792195320000
+  "serverTime": 1792195320000,
+  "protocolVersion": "1.1.0"
 }

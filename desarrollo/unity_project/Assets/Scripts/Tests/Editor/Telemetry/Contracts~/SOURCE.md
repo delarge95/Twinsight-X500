@@ -49,3 +49,9 @@ filtro `WebGL.Telemetry`).
 - Copiado `contracts/courses/basic.json` a `courses/basic.json` (aqui) y a `Assets/StreamingAssets/Telemetry/courses/basic.json` (lo carga `CourseLayout.Default()`; si falta, usa la copia en C# `CourseLayout.Builtin()`).
 - `golden/course.json` ya estaba copiado (identico al de la web); ahora lo usan `CourseGoldenTests` (trazado, volumen, aros, zonas, guiones, vueltas en polilinea) y `CourseRecordsTests` (puntuacion, records, almacenamiento y fantasma).
 - Ignorados por `*~`: se anaden con `git add -f`.
+
+## Contrato 1.1 (2026-11-17)
+- Origen: repo web, rama `fable/contrato-1-1` (worktree `E:\twinsight-web-fable-c11`), commit `e086d776fcc5a6cea6bd6d7e454aa27c1a47acc6` («contrato 1.1: seq/ts opcionales, battery_off»; aun no fusionado en `web/telemetria-control`).
+- Copiados: `telemetry.schema.json` (protocolVersion 1.1.0), `fixtures/**` (nuevos: `client.command.battery_off`, `client.command.stamped`, `client.manual.stamped`, `ack.sitl.stamped`, `ack.sitl.stale`, e invalidos `battery_off_with_motor`, `fractional_seq`, `inject_with_seq`, `negative_seq`, `hello.bad_version`; `hello.sitl` lleva `protocolVersion`).
+- `labels.json` (aqui y en `Resources/TelemetryLabels.json`): solo cambia `protocolVersion` a 1.1.0; el resto de su texto NO se tomo de esa rama (otras ediciones de la web).
+- No se copio `golden/stamp.json`: el emisor y el filtro de sellos (`src/shared/stamp.ts`) son del relay y del cliente web; el escritorio solo lee y escribe `seq`/`ts` y envia `battery_off` si se le pide.
