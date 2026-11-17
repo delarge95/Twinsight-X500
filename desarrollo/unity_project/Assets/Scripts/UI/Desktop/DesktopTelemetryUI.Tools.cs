@@ -44,6 +44,7 @@ namespace WebGL.UI.Desktop
         partial void DisposeTraining();
         partial void RelabelTraining();
         partial void TickTraining(bool viewer);
+        partial void TickRecordPopover();
         partial void BuildPreflightPopover();
         partial void TickPreflightPopover();
         partial void BuildMissionPopover();
@@ -115,6 +116,7 @@ namespace WebGL.UI.Desktop
         {
             if (which == "fence") TickFencePopover();
             else if (which == "wind") TickWindPopover();
+            else if (which == "record") TickRecordPopover();
             else if (which == "preflight") TickPreflightPopover();
             else if (which == "mission") TickMissionPopover();
             else if (which == "training") TickTrainingPopover();

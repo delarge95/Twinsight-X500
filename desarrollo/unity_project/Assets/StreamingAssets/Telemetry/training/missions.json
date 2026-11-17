@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "_doc": "Guided training lessons as data (tool 6 of Lote 1, docs/ESPECIFICACION_HERRAMIENTAS_LOTE1.md §6). Hand-written; read by src/shared/training.ts (parseLessons), the web and the desktop port. Frame: the simulator's own, metres from the take-off point (n north, e east), alt = height over the ground, deg = heading clockwise from north (0 north, 90 east). Every step is checked ONLY against telemetry frames (not against the input used): takeoff { alt, tol = 0.5, withinS = 20 } armed, in flight and |alt - target| < tol (withinS: seconds before the hint appears); hold { seconds, tolH = 1, tolAlt = 0.5 } stays inside the sphere captured when the step starts for `seconds` (leaving resets the count); reach { n, e, alt, tol = 1.5 } within tol of the point (3D, inclusive); orbit { turns = 1, rMin, rMax } the unwrapped angle around the centre captured when the step starts reaches 2*pi*turns, in either direction, without leaving [rMin, rMax] (leaving resets it); yaw { deg, tol = 10 } absolute heading within tol; land { n, e, radius } landed and disarmed within radius of the point; course { courseId } delegates to the test course of tool 5 (contracts/courses/<courseId>.json, src/shared/course.ts). Step ids are unique and key the texts of design/training.json (title, objective, hint).",
+  "lessons": [
+    {
+      "id": "takeoff-hold",
+      "steps": [
+        { "id": "takeoff-hold.takeoff", "type": "takeoff", "alt": 3 },
+        { "id": "takeoff-hold.hold", "type": "hold", "seconds": 5 }
+      ]
+    },
+    {
+      "id": "square",
+      "steps": [
+        { "id": "square.takeoff", "type": "takeoff", "alt": 3 },
+        { "id": "square.c1", "type": "reach", "n": 10, "e": 0, "alt": 3 },
+        { "id": "square.c2", "type": "reach", "n": 10, "e": 10, "alt": 3 },
+        { "id": "square.c3", "type": "reach", "n": 0, "e": 10, "alt": 3 },
+        { "id": "square.c4", "type": "reach", "n": 0, "e": 0, "alt": 3 }
+      ]
+    },
+    {
+      "id": "manual-beacon",
+      "steps": [
+        { "id": "manual-beacon.takeoff", "type": "takeoff", "alt": 3 },
+        { "id": "manual-beacon.yaw", "type": "yaw", "deg": 90 },
+        { "id": "manual-beacon.reach", "type": "reach", "n": 0, "e": 15, "alt": 3, "tol": 2 }
+      ]
+    },
+    {
+      "id": "orbit",
+      "steps": [
+        { "id": "orbit.takeoff", "type": "takeoff", "alt": 4 },
+        { "id": "orbit.hold", "type": "hold", "seconds": 2 },
+        { "id": "orbit.orbit", "type": "orbit", "turns": 1, "rMin": 4, "rMax": 14 }
+      ]
+    },
+    {
+      "id": "return-land",
+      "steps": [
+        { "id": "return-land.takeoff", "type": "takeoff", "alt": 4 },
+        { "id": "return-land.away", "type": "reach", "n": 15, "e": 10, "alt": 4, "tol": 2 },
+        { "id": "return-land.land", "type": "land", "n": 0, "e": 0, "radius": 3 }
+      ]
+    },
+    {
+      "id": "course-lap",
+      "steps": [
+        { "id": "course-lap.course", "type": "course", "courseId": "basic" }
+      ]
+    }
+  ]
+}

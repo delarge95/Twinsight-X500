@@ -45,6 +45,8 @@ namespace WebGL.UI.Desktop
         /// <summary>Wind in force (NED, m/s); drawn only above 0.05 m/s.</summary>
         public double WindN, WindE;
         public float BarMaxPx = 80f;
+        /// <summary>The objective of the training step in progress (Lote 1c), or null.</summary>
+        public TargetMark Target;
 
         // ── computed (labels of the owner and the verification probe) ──
         public float Size { get; private set; }
@@ -152,6 +154,7 @@ namespace WebGL.UI.Desktop
             if (Course != null) DrawCourse(p);
             DrawMission(p);
             DrawTrail(p);
+            DrawTarget(p);
 
             // origin: a small circle (the «H» is a label of the owner)
             p.lineWidth = 1f;
@@ -205,6 +208,25 @@ namespace WebGL.UI.Desktop
                 p.fillColor = Secondary;
                 p.BeginPath(); p.MoveTo(tip); p.LineTo(left); p.LineTo(right); p.ClosePath(); p.Fill();
             }
+        }
+
+        /// <summary>The objective of the training step: a ring (point, hold, pad) or a band of two rings (orbit), in the accent colour, thin.</summary>
+        private void DrawTarget(Painter2D p)
+        {
+            TargetMark t = Target;
+            if (t == null) return;
+            p.lineWidth = 1.5f;
+            p.strokeColor = A(Accent, 0.95f);
+            Vector2 c = ToXY(t.n, t.e);
+            if (t.kind == "band")
+            {
+                p.BeginPath(); p.Arc(c, Mathf.Max(2f, (float)(t.rMin / View.scale)), 0f, 360f); p.Stroke();
+                p.BeginPath(); p.Arc(c, Mathf.Max(3f, (float)(t.rMax / View.scale)), 0f, 360f); p.Stroke();
+                return;
+            }
+            p.BeginPath(); p.Arc(c, Mathf.Max(4f, (float)(t.r / View.scale)), 0f, 360f); p.Stroke();
+            p.fillColor = A(Accent, 0.95f);
+            p.BeginPath(); p.Arc(c, 1.6f, 0f, 360f); p.Fill();
         }
 
         /// <summary>The trail as a few strokes that fade in towards the present (oldest faintest); neighbours share a point so the line stays continuous.</summary>

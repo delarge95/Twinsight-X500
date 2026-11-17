@@ -398,6 +398,8 @@ namespace WebGL.UI.Desktop
             else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.L)) { Log("key L"); _chrome.Telemetry.OpenSourcePopover(); }
             else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.A)) { Log("key Shift+A"); _chrome.Telemetry.OpenAlertsPopover(); }
             else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.G)) { Log("key Shift+G"); _chrome.Telemetry.ToggleFencePopover(); } // Lote 1a: geofence of the simulator (before the plain G = filter)
+            else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.T)) { Log("key Shift+T"); _chrome.Telemetry.ToggleTrainingPopover(); } // Lote 1c: guided training (Shift+T never takes off)
+            else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.R)) { Log("key Shift+R"); _chrome.Telemetry.ToggleRecording(); } // Lote 1c: record an own session (before the plain R = reset view)
             else if (_chrome != null && DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.M)) { Log("key Shift+M"); _chrome.Telemetry.TogglePopover("mission"); } // Lote 1c: mission planner
             else if (_chrome != null && !DesktopKeyboardGate.Shift && DesktopKeyboardGate.Down(KeyCode.M)) { Log("key M"); _chrome.Telemetry.ToggleMap(); } // Lote 1b: top-down map
             else if (_chrome != null && DesktopKeyboardGate.Down(KeyCode.Home) && _chrome.Telemetry.MapHovered) { Log("key Home (map)"); _chrome.Telemetry.MapFit(); } // Home over the map = fit
@@ -481,6 +483,13 @@ namespace WebGL.UI.Desktop
                 {
                     var tools = gameObject.AddComponent<DesktopCaptureTools>(); // Lote 1a: geofence, wind, motor cut, propeller table
                     tools.OutputDirectory = args[i + 1];
+                    return;
+                }
+
+                if (args[i].Equals("-lote1c-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var l1c = gameObject.AddComponent<DesktopCaptureLote1C>(); // Lote 1c: mission, course records, own sessions, training
+                    l1c.OutputDirectory = args[i + 1];
                     return;
                 }
 

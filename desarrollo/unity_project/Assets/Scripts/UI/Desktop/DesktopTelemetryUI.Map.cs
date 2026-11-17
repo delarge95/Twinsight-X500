@@ -403,6 +403,7 @@ namespace WebGL.UI.Desktop
                 FlightSim.WindNow(sim.Model, out double wn, out double we); // the wind only acts in flight
                 m.WindN = wn; m.WindE = we;
             }
+            m.Target = _trTarget;
             m.View = CurrentMapView();
             m.Compute();
             m.MarkDirtyRepaint();

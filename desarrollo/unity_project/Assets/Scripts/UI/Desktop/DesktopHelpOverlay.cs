@@ -162,6 +162,8 @@ namespace WebGL.UI.Desktop
             AddRow(left, new[] { "Shift+A" }, T("Alerts", "Alertas"));
             AddRow(left, new[] { "Shift+G" }, T("Geofence (simulator)", "Geocerca (simulador)"));
             AddRow(left, new[] { "M" }, T("Top-down map", "Mapa cenital"));
+            AddRow(left, new[] { "Shift+T" }, T("Guided training (simulator)", "Entrenamiento guiado (simulador)"));
+            AddRow(left, new[] { "Shift+R" }, T("Record / stop an own session", "Grabar / parar una sesión propia"));
             AddSection(left, T("WINDOW", "VENTANA"));
             AddRow(left, new[] { "F11", "Alt+Enter" }, T("Fullscreen", "Pantalla completa"));
             AddRow(left, new[] { "?", "F1" }, T("This help", "Esta ayuda"));

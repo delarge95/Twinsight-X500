@@ -1,0 +1,339 @@
+{
+  "version": 1,
+  "$comment": "Texts of the guided training lessons (tool 6 of Lote 1), ES/EN, hand-written. One entry per lesson of contracts/training/missions.json (same ids) and per step (same step ids): title, objective and the hint shown after 20 s without progress. Generated for the web as src/shared/training.generated.ts by tools/design/gen_web.mjs (npm run design:gen). The disclaimer and the button labels live in the app dictionaries (src/web/i18n).",
+  "lessons": [
+    {
+      "id": "takeoff-hold",
+      "title": {
+        "es": "Despegar y mantener",
+        "en": "Take off and hold"
+      },
+      "summary": {
+        "es": "Sube a 3 m y quédate quieto 5 s.",
+        "en": "Climb to 3 m and stay still for 5 s."
+      },
+      "steps": [
+        {
+          "id": "takeoff-hold.takeoff",
+          "title": {
+            "es": "Despegar",
+            "en": "Take off"
+          },
+          "objective": {
+            "es": "Despega y sube hasta unos 3 m de altura.",
+            "en": "Take off and climb to about 3 m."
+          },
+          "hint": {
+            "es": "Pulsa «Despegar» en Pilotaje con altura 3 m. Debe quedar a menos de 0,5 m de esa altura.",
+            "en": "Press \"Take off\" in Pilot with altitude 3 m. It has to settle within 0.5 m of that height."
+          }
+        },
+        {
+          "id": "takeoff-hold.hold",
+          "title": {
+            "es": "Mantener la posición",
+            "en": "Hold position"
+          },
+          "objective": {
+            "es": "Quédate dentro de la esfera durante 5 s sin moverte.",
+            "en": "Stay inside the sphere for 5 s without moving."
+          },
+          "hint": {
+            "es": "Suelta los mandos o pulsa «Mantener». Si sales de la esfera la cuenta vuelve a 0; si el dron aún subía, pulsa «Reintentar».",
+            "en": "Release the sticks or press \"Hold\". If you leave the sphere the count goes back to 0; if the drone was still climbing, press \"Retry\"."
+          }
+        }
+      ]
+    },
+    {
+      "id": "square",
+      "title": {
+        "es": "Cuadrado con órdenes",
+        "en": "Square with commands"
+      },
+      "summary": {
+        "es": "Despega y vuela las cuatro esquinas de un cuadrado de 10 m con fly_to.",
+        "en": "Take off and fly the four corners of a 10 m square with fly_to."
+      },
+      "steps": [
+        {
+          "id": "square.takeoff",
+          "title": {
+            "es": "Despegar",
+            "en": "Take off"
+          },
+          "objective": {
+            "es": "Despega y sube hasta unos 3 m de altura.",
+            "en": "Take off and climb to about 3 m."
+          },
+          "hint": {
+            "es": "Pulsa «Despegar» en Pilotaje con altura 3 m. Debe quedar a menos de 0,5 m de esa altura.",
+            "en": "Press \"Take off\" in Pilot with altitude 3 m. It has to settle within 0.5 m of that height."
+          }
+        },
+        {
+          "id": "square.c1",
+          "title": {
+            "es": "Esquina 1 (10 m al norte)",
+            "en": "Corner 1 (10 m north)"
+          },
+          "objective": {
+            "es": "Vuela hasta la baliza: 10 m al norte del punto de despegue.",
+            "en": "Fly to the beacon: 10 m north of the take-off point."
+          },
+          "hint": {
+            "es": "Toca el suelo cerca de la baliza para enviar fly_to hacia ella.",
+            "en": "Tap the ground near the beacon to send fly_to there."
+          }
+        },
+        {
+          "id": "square.c2",
+          "title": {
+            "es": "Esquina 2 (10 m norte, 10 m este)",
+            "en": "Corner 2 (10 m north, 10 m east)"
+          },
+          "objective": {
+            "es": "Vuela hasta la siguiente baliza, 10 m al este de la anterior.",
+            "en": "Fly to the next beacon, 10 m east of the previous one."
+          },
+          "hint": {
+            "es": "Toca el suelo junto a la baliza marcada.",
+            "en": "Tap the ground next to the marked beacon."
+          }
+        },
+        {
+          "id": "square.c3",
+          "title": {
+            "es": "Esquina 3 (10 m este)",
+            "en": "Corner 3 (10 m east)"
+          },
+          "objective": {
+            "es": "Vuela hasta la baliza que vuelve a la altura del punto de despegue.",
+            "en": "Fly to the beacon level with the take-off point again."
+          },
+          "hint": {
+            "es": "Toca el suelo junto a la baliza marcada.",
+            "en": "Tap the ground next to the marked beacon."
+          }
+        },
+        {
+          "id": "square.c4",
+          "title": {
+            "es": "Cierra el cuadrado",
+            "en": "Close the square"
+          },
+          "objective": {
+            "es": "Vuelve sobre la «H» para cerrar el cuadrado.",
+            "en": "Come back over the \"H\" to close the square."
+          },
+          "hint": {
+            "es": "Toca el suelo sobre la «H»; el mapa te ayuda a situarla.",
+            "en": "Tap the ground on the \"H\"; the map helps you find it."
+          }
+        }
+      ]
+    },
+    {
+      "id": "manual-beacon",
+      "title": {
+        "es": "Pilotaje manual hasta una baliza",
+        "en": "Manual flight to a beacon"
+      },
+      "summary": {
+        "es": "Gira hacia el este y llega a la baliza con los mandos.",
+        "en": "Turn east and reach the beacon with the sticks."
+      },
+      "steps": [
+        {
+          "id": "manual-beacon.takeoff",
+          "title": {
+            "es": "Despegar",
+            "en": "Take off"
+          },
+          "objective": {
+            "es": "Despega y sube hasta unos 3 m de altura.",
+            "en": "Take off and climb to about 3 m."
+          },
+          "hint": {
+            "es": "Pulsa «Despegar» en Pilotaje con altura 3 m. Debe quedar a menos de 0,5 m de esa altura.",
+            "en": "Press \"Take off\" in Pilot with altitude 3 m. It has to settle within 0.5 m of that height."
+          }
+        },
+        {
+          "id": "manual-beacon.yaw",
+          "title": {
+            "es": "Mira al este",
+            "en": "Face east"
+          },
+          "objective": {
+            "es": "Gira hasta que la nariz apunte al este (90°).",
+            "en": "Turn until the nose points east (90°)."
+          },
+          "hint": {
+            "es": "Usa la palanca de guiñada (o Q y E) hasta que el rumbo marque unos 90°.",
+            "en": "Use the yaw stick (or Q and E) until the heading reads about 90°."
+          }
+        },
+        {
+          "id": "manual-beacon.reach",
+          "title": {
+            "es": "Llega a la baliza",
+            "en": "Reach the beacon"
+          },
+          "objective": {
+            "es": "Pilota hacia delante hasta la baliza, 15 m al este.",
+            "en": "Fly forward to the beacon, 15 m east."
+          },
+          "hint": {
+            "es": "Empuja la palanca de avance (W) y suéltala al acercarte: el dron frena solo.",
+            "en": "Push the forward stick (W) and let go as you close in: the drone brakes by itself."
+          }
+        }
+      ]
+    },
+    {
+      "id": "orbit",
+      "title": {
+        "es": "Órbita completa",
+        "en": "Full orbit"
+      },
+      "summary": {
+        "es": "Quédate quieto y da una vuelta completa en órbita.",
+        "en": "Settle and fly one full circle in orbit."
+      },
+      "steps": [
+        {
+          "id": "orbit.takeoff",
+          "title": {
+            "es": "Despegar",
+            "en": "Take off"
+          },
+          "objective": {
+            "es": "Despega y sube hasta unos 4 m de altura.",
+            "en": "Take off and climb to about 4 m."
+          },
+          "hint": {
+            "es": "Pulsa «Despegar» en Pilotaje con altura 4 m. Debe quedar a menos de 0,5 m de esa altura.",
+            "en": "Press \"Take off\" in Pilot with altitude 4 m. It has to settle within 0.5 m of that height."
+          }
+        },
+        {
+          "id": "orbit.hold",
+          "title": {
+            "es": "Quédate quieto",
+            "en": "Stay put"
+          },
+          "objective": {
+            "es": "Mantén la posición 2 s: ese punto será el centro de la órbita.",
+            "en": "Hold still for 2 s: that point will be the centre of the orbit."
+          },
+          "hint": {
+            "es": "Suelta los mandos o pulsa «Mantener».",
+            "en": "Release the sticks or press \"Hold\"."
+          }
+        },
+        {
+          "id": "orbit.orbit",
+          "title": {
+            "es": "Una vuelta en órbita",
+            "en": "One lap in orbit"
+          },
+          "objective": {
+            "es": "Da una vuelta completa alrededor del centro, a entre 4 y 14 m de él.",
+            "en": "Fly one full circle around the centre, between 4 and 14 m from it."
+          },
+          "hint": {
+            "es": "Pulsa «Órbita» con radio 10 m y espera: una vuelta tarda unos 25 s.",
+            "en": "Press \"Orbit\" with radius 10 m and wait: a lap takes about 25 s."
+          }
+        }
+      ]
+    },
+    {
+      "id": "return-land",
+      "title": {
+        "es": "Volver y aterrizar en la H",
+        "en": "Return and land on the H"
+      },
+      "summary": {
+        "es": "Aléjate y vuelve a aterrizar a menos de 3 m de la «H».",
+        "en": "Fly away and land within 3 m of the \"H\"."
+      },
+      "steps": [
+        {
+          "id": "return-land.takeoff",
+          "title": {
+            "es": "Despegar",
+            "en": "Take off"
+          },
+          "objective": {
+            "es": "Despega y sube hasta unos 4 m de altura.",
+            "en": "Take off and climb to about 4 m."
+          },
+          "hint": {
+            "es": "Pulsa «Despegar» en Pilotaje con altura 4 m. Debe quedar a menos de 0,5 m de esa altura.",
+            "en": "Press \"Take off\" in Pilot with altitude 4 m. It has to settle within 0.5 m of that height."
+          }
+        },
+        {
+          "id": "return-land.away",
+          "title": {
+            "es": "Aléjate",
+            "en": "Fly away"
+          },
+          "objective": {
+            "es": "Vuela hasta la baliza, a unos 18 m de la «H».",
+            "en": "Fly to the beacon, about 18 m from the \"H\"."
+          },
+          "hint": {
+            "es": "Toca el suelo junto a la baliza para enviar fly_to.",
+            "en": "Tap the ground next to the beacon to send fly_to."
+          }
+        },
+        {
+          "id": "return-land.land",
+          "title": {
+            "es": "Vuelve y aterriza",
+            "en": "Return and land"
+          },
+          "objective": {
+            "es": "Aterriza a menos de 3 m de la «H».",
+            "en": "Land within 3 m of the \"H\"."
+          },
+          "hint": {
+            "es": "Pulsa «Volver (RTL)»: sube, regresa y aterriza solo. Sin RTL, vuela sobre la «H» y pulsa «Aterrizar».",
+            "en": "Press \"Return (RTL)\": it climbs, comes back and lands by itself. Without RTL, fly over the \"H\" and press \"Land\"."
+          }
+        }
+      ]
+    },
+    {
+      "id": "course-lap",
+      "title": {
+        "es": "Vuelta guiada al circuito",
+        "en": "Guided lap of the course"
+      },
+      "summary": {
+        "es": "Completa una vuelta del circuito básico (herramienta Circuito).",
+        "en": "Complete one lap of the basic course (Course tool)."
+      },
+      "steps": [
+        {
+          "id": "course-lap.course",
+          "title": {
+            "es": "Una vuelta al circuito",
+            "en": "One lap of the course"
+          },
+          "objective": {
+            "es": "Pasa por todos los puntos del circuito, en orden, hasta la zona de la «H».",
+            "en": "Go through every point of the course, in order, back to the \"H\" zone."
+          },
+          "hint": {
+            "es": "Sigue el aro o la zona resaltados; los choques solo suman penalización, no acaban la lección.",
+            "en": "Follow the highlighted ring or zone; collisions only add a penalty, they do not end the lesson."
+          }
+        }
+      ]
+    }
+  ]
+}
