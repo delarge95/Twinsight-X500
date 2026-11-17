@@ -1,0 +1,942 @@
+{
+  "_doc": "src/shared/mission.ts (tool 2 of Lote 1): a mission of the APP, not a PX4 mission; it is flown with the commands that already exist (takeoff, fly_to, hold, land, rtl), nothing new on the wire. `limits` are MISSION_LIMITS. `validate`: validateMission(mission, limits) -> the issue codes in order with their waypoint index (the Spanish `detail` is recorded too and must match). `scripts`: a run is created with createRun(mission); for every step, in this order, missionControl(run, control, frame, t) if `control`, missionAck(run, ack, t) if `ack`, then missionStep(run, frame, t); `send` is everything the three returned, `phase`/`i`/`reason` the run after the step. A frame `f` is [north, east, altitude up, landed] (p = [n, e, -alt], armed = !landed). Rabbit: fly_to to start + dir·min(L, v·(t − t0) + v/1.1) at the waypoint altitude, at most every 0.5 s, the last one exactly the waypoint; arrival = horizontal < 1.0 m and |altitude error| < 0.5 m; leg deadline 2·L/v + 20 s (takeoff: alt/1 + 20 s); reaching a waypoint with holdS > 0 sends one fly_to exactly to it and waits holdS; the finish is sent once and the run is `done` at once (the phase `finish` is transient). `integration`: the square SQUARE (20 m sides, 5 m, 3 m/s) on a fresh createSim(22) stepped at 0.01 s, the runner ticked every 0.05 s from t = 0 (missionControl start, then missionStep), each command applied with simCommand at once and its reply fed to missionAck; `legs` measures each leg from the tick that starts it to the tick that leaves it (length from the leg start, meanSpeed = length / duration), `samples` is [t, n, e, alt] every 1 s, `log` every command. Measured result against the acceptance targets (< 90 s, arrival < 1 m, mean speed 3 ± 0.5 m/s): see `integration.check` (done at 29.25 s, arrival error 0.91-0.94 m measured at the tick that detects it, mean speed 2.98-2.99 m/s; the arrival error is under 1 m by construction, since it is the arrival rule). The desktop port must reproduce the scripts exactly (numbers within `tolerance.command`) and the integration within `tolerance.position` (m), `tolerance.time` (s) and `tolerance.speed` (m/s).",
+  "tolerance": { "command": 1e-9, "position": 0.002, "time": 0.051, "speed": 0.02 },
+  "limits": {
+    "maxWaypoints": 50,
+    "speedMin": 0.5,
+    "speedMax": 6,
+    "holdMax": 120,
+    "arriveH": 1,
+    "arriveV": 0.5,
+    "rabbitPeriod": 0.5,
+    "leadDiv": 1.1,
+    "legFactor": 2,
+    "legSlack": 20,
+    "takeoffRate": 1
+  },
+  "sim_limits_default": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+  "sitl_limits": { "radius": 200, "minAlt": 1, "maxAlt": 50 },
+  "validate": [
+    {
+      "name": "one waypoint, all fine",
+      "target": "sim",
+      "limits": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 10, "e": 0, "alt": 5, "speed": 3 }],
+        "finish": "hold"
+      },
+      "issues": []
+    },
+    {
+      "name": "no waypoints",
+      "target": "sim",
+      "limits": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+      "mission": { "version": 1, "id": "golden", "name": "golden", "waypoints": [], "finish": "hold" },
+      "issues": [{ "code": "count", "index": null, "detail": "la misión necesita de 1 a 50 waypoints (tiene 0)" }]
+    },
+    {
+      "name": "51 waypoints",
+      "target": "sim",
+      "limits": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [
+          { "n": 0, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 1, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 2, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 3, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 4, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 5, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 6, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 7, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 8, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 9, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 10, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 11, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 12, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 13, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 14, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 15, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 16, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 17, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 18, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 19, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 20, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 21, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 22, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 23, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 24, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 25, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 26, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 27, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 28, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 29, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 30, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 31, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 32, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 33, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 34, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 35, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 36, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 37, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 38, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 39, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 40, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 41, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 42, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 43, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 44, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 45, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 46, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 47, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 48, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 49, "e": 0, "alt": 5, "speed": 3 },
+          { "n": 50, "e": 0, "alt": 5, "speed": 3 }
+        ],
+        "finish": "hold"
+      },
+      "issues": [{ "code": "count", "index": null, "detail": "la misión necesita de 1 a 50 waypoints (tiene 51)" }]
+    },
+    {
+      "name": "outside the simulator geofence (121 m)",
+      "target": "sim",
+      "limits": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 121, "e": 0, "alt": 5, "speed": 3 }],
+        "finish": "hold"
+      },
+      "issues": [{ "code": "radius", "index": 0, "detail": "waypoint 1: fuera de la geocerca (120 m del origen)" }]
+    },
+    {
+      "name": "above the simulator ceiling",
+      "target": "sim",
+      "limits": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 10, "e": 0, "alt": 61, "speed": 3 }],
+        "finish": "hold"
+      },
+      "issues": [{ "code": "altitude", "index": 0, "detail": "waypoint 1: la altura debe estar entre 1 y 60 m" }]
+    },
+    {
+      "name": "SITL: 200 m and 50 m are allowed",
+      "target": "sitl",
+      "limits": { "radius": 200, "minAlt": 1, "maxAlt": 50 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 120, "e": 160, "alt": 50, "speed": 3 }],
+        "finish": "hold"
+      },
+      "issues": []
+    },
+    {
+      "name": "SITL: beyond 200 m and under 1 m",
+      "target": "sitl",
+      "limits": { "radius": 200, "minAlt": 1, "maxAlt": 50 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 200, "e": 1, "alt": 0.5, "speed": 3 }],
+        "finish": "hold"
+      },
+      "issues": [
+        { "code": "radius", "index": 0, "detail": "waypoint 1: fuera de la geocerca (200 m del origen)" },
+        { "code": "altitude", "index": 0, "detail": "waypoint 1: la altura debe estar entre 1 y 50 m" }
+      ]
+    },
+    {
+      "name": "speed under 0.5 and over 6",
+      "target": "sim",
+      "limits": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 5, "e": 0, "alt": 5, "speed": 0.4 }, { "n": 10, "e": 0, "alt": 5, "speed": 6.1 }],
+        "finish": "hold"
+      },
+      "issues": [
+        { "code": "speed", "index": 0, "detail": "waypoint 1: la velocidad debe estar entre 0.5 y 6 m/s" },
+        { "code": "speed", "index": 1, "detail": "waypoint 2: la velocidad debe estar entre 0.5 y 6 m/s" }
+      ]
+    },
+    {
+      "name": "hold 120 is fine, 121 and -1 are not",
+      "target": "sim",
+      "limits": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [
+          { "n": 5, "e": 0, "alt": 5, "speed": 3, "holdS": 120 },
+          { "n": 10, "e": 0, "alt": 5, "speed": 3, "holdS": 121 },
+          { "n": 15, "e": 0, "alt": 5, "speed": 3, "holdS": -1 }
+        ],
+        "finish": "hold"
+      },
+      "issues": [
+        { "code": "hold", "index": 1, "detail": "waypoint 2: la espera debe estar entre 0 y 120 s" },
+        { "code": "hold", "index": 2, "detail": "waypoint 3: la espera debe estar entre 0 y 120 s" }
+      ]
+    },
+    {
+      "name": "a non-finite value and a bad finish",
+      "target": "sim",
+      "limits": { "radius": 120, "minAlt": 1, "maxAlt": 60 },
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 5, "e": 0, "alt": 5, "speed": 3 }, { "n": "NaN", "e": 0, "alt": 5, "speed": 3 }],
+        "finish": "orbit"
+      },
+      "issues": [
+        { "code": "finish", "index": null, "detail": "acción final no válida" },
+        { "code": "not_finite", "index": 1, "detail": "waypoint 2: valores no válidos" }
+      ]
+    }
+  ],
+  "storage": [
+    {
+      "name": "valid",
+      "raw": "{\"version\":1,\"id\":\"a\",\"name\":\"A\",\"waypoints\":[{\"n\":1,\"e\":2,\"alt\":5,\"speed\":3,\"holdS\":4}],\"finish\":\"rtl\"}",
+      "out": {
+        "version": 1,
+        "id": "a",
+        "name": "A",
+        "waypoints": [{ "n": 1, "e": 2, "alt": 5, "speed": 3, "holdS": 4 }],
+        "finish": "rtl"
+      }
+    },
+    { "name": "not JSON", "raw": "{version", "out": null },
+    { "name": "version 2", "raw": "{\"version\":2,\"waypoints\":[],\"finish\":\"hold\"}", "out": null },
+    {
+      "name": "a string in a number",
+      "raw": "{\"version\":1,\"waypoints\":[{\"n\":\"1\",\"e\":2,\"alt\":5,\"speed\":3}],\"finish\":\"hold\"}",
+      "out": null
+    },
+    {
+      "name": "finish missing, holdS 0 dropped",
+      "raw": "{\"version\":1,\"id\":\"b\",\"name\":\"B\",\"waypoints\":[{\"n\":1,\"e\":2,\"alt\":5,\"speed\":3,\"holdS\":0}]}",
+      "out": {
+        "version": 1,
+        "id": "b",
+        "name": "B",
+        "waypoints": [{ "n": 1, "e": 2, "alt": 5, "speed": 3 }],
+        "finish": "hold"
+      }
+    }
+  ],
+  "scripts": [
+    {
+      "name": "two_waypoints_land",
+      "note": "from the ground: takeoff to the first altitude, the rabbit every 0.5 s (not at 0.3 s), arrival under 1 m / 0.5 m, a 2 s hold, the second leg and the final land",
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 10, "e": 0, "alt": 5, "speed": 2, "holdS": 2 }, { "n": 10, "e": 10, "alt": 8, "speed": 4 }],
+        "finish": "land"
+      },
+      "steps": [
+        { "t": 0, "f": [0, 0, 0, true], "control": "start" },
+        { "t": 1, "f": [0, 0, 2, false] },
+        { "t": 3, "f": [0, 0, 4.6, false] },
+        { "t": 3.3, "f": [0.2, 0, 4.8, false] },
+        { "t": 3.5, "f": [0.5, 0, 4.9, false] },
+        { "t": 4, "f": [1.4, 0, 5, false] },
+        { "t": 6, "f": [5, 0, 5, false] },
+        { "t": 8, "f": [9.1, 0, 5.2, false] },
+        { "t": 8.2, "f": [9.3, 0.1, 5.1, false] },
+        { "t": 9.5, "f": [10, 0, 5, false] },
+        { "t": 10.25, "f": [10, 0, 5, false] },
+        { "t": 10.75, "f": [10, 0.6, 6, false] },
+        { "t": 12, "f": [10, 5, 7.5, false] },
+        { "t": 13.5, "f": [10.2, 9.5, 7.7, false] },
+        { "t": 14, "f": [10, 10, 7.9, false] },
+        { "t": 15, "f": [10, 10, 8, false] }
+      ],
+      "expect": [
+        {
+          "t": 0,
+          "phase": "takeoff",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "takeoff", "altitude": 5 }]
+        },
+        { "t": 1, "phase": "takeoff", "i": 0, "reason": null, "send": [] },
+        {
+          "t": 3,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 1.818181818, "east": 0, "altitude": 5 }]
+        },
+        { "t": 3.3, "phase": "leg", "i": 0, "reason": null, "send": [] },
+        {
+          "t": 3.5,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 2.818181818, "east": 0, "altitude": 5 }]
+        },
+        {
+          "t": 4,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 3.818181818, "east": 0, "altitude": 5 }]
+        },
+        {
+          "t": 6,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 7.818181818, "east": 0, "altitude": 5 }]
+        },
+        {
+          "t": 8,
+          "phase": "hold",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 10, "east": 0, "altitude": 5 }]
+        },
+        { "t": 8.2, "phase": "hold", "i": 0, "reason": null, "send": [] },
+        { "t": 9.5, "phase": "hold", "i": 0, "reason": null, "send": [] },
+        {
+          "t": 10.25,
+          "phase": "leg",
+          "i": 1,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 10, "east": 3.636363636, "altitude": 8 }]
+        },
+        {
+          "t": 10.75,
+          "phase": "leg",
+          "i": 1,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 10, "east": 5.636363636, "altitude": 8 }]
+        },
+        {
+          "t": 12,
+          "phase": "leg",
+          "i": 1,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 10, "east": 10, "altitude": 8 }]
+        },
+        { "t": 13.5, "phase": "done", "i": 1, "reason": null, "send": [{ "name": "land" }] },
+        { "t": 14, "phase": "done", "i": 1, "reason": null, "send": [] },
+        { "t": 15, "phase": "done", "i": 1, "reason": null, "send": [] }
+      ]
+    },
+    {
+      "name": "pause_resume",
+      "note": "pause in a leg sends hold and nothing more while paused; resume starts the leg again from where the vehicle is, with a new deadline",
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 20, "e": 0, "alt": 5, "speed": 3 }],
+        "finish": "hold"
+      },
+      "steps": [
+        { "t": 0, "f": [0, 0, 5, false], "control": "start" },
+        { "t": 0.5, "f": [1, 0, 5, false] },
+        { "t": 1, "f": [2.4, 0, 5, false], "control": "pause" },
+        { "t": 1.5, "f": [2.8, 0, 5, false] },
+        { "t": 5, "f": [3, 0, 5, false] },
+        { "t": 6, "f": [3, 0, 5, false], "control": "resume" },
+        { "t": 6.5, "f": [4, 0, 5, false] },
+        { "t": 12, "f": [19.5, 0, 5, false] }
+      ],
+      "expect": [
+        {
+          "t": 0,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 2.727272727, "east": 0, "altitude": 5 }]
+        },
+        {
+          "t": 0.5,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 4.227272727, "east": 0, "altitude": 5 }]
+        },
+        { "t": 1, "phase": "paused", "i": 0, "reason": "por el usuario", "send": [{ "name": "hold" }] },
+        { "t": 1.5, "phase": "paused", "i": 0, "reason": "por el usuario", "send": [] },
+        { "t": 5, "phase": "paused", "i": 0, "reason": "por el usuario", "send": [] },
+        {
+          "t": 6,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 5.727272727, "east": 0, "altitude": 5 }]
+        },
+        {
+          "t": 6.5,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 7.227272727, "east": 0, "altitude": 5 }]
+        },
+        { "t": 12, "phase": "done", "i": 0, "reason": null, "send": [{ "name": "hold" }] }
+      ]
+    },
+    {
+      "name": "negative_ack",
+      "note": "a refused fly_to pauses the run with the ack text and a hold; a refused command that the mission does not send (yaw) changes nothing",
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 20, "e": 0, "alt": 5, "speed": 3 }],
+        "finish": "hold"
+      },
+      "steps": [
+        { "t": 0, "f": [0, 0, 5, false], "control": "start" },
+        { "t": 0.5, "f": [1, 0, 5, false], "ack": { "command": "yaw", "ok": false, "detail": "x" } },
+        {
+          "t": 1,
+          "f": [2, 0, 5, false],
+          "ack": { "command": "fly_to", "ok": false, "detail": "el dron está en tierra: despega primero" }
+        },
+        { "t": 1.5, "f": [2, 0, 5, false] }
+      ],
+      "expect": [
+        {
+          "t": 0,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 2.727272727, "east": 0, "altitude": 5 }]
+        },
+        {
+          "t": 0.5,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 4.227272727, "east": 0, "altitude": 5 }]
+        },
+        {
+          "t": 1,
+          "phase": "paused",
+          "i": 0,
+          "reason": "el dron está en tierra: despega primero",
+          "send": [{ "name": "hold" }]
+        },
+        {
+          "t": 1.5,
+          "phase": "paused",
+          "i": 0,
+          "reason": "el dron está en tierra: despega primero",
+          "send": []
+        }
+      ]
+    },
+    {
+      "name": "deadline",
+      "note": "a 10 m leg at 2 m/s has 2·10/2 + 20 = 30 s; at 30 s it still flies, after it fails with \"no llegó\" and a hold",
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 10, "e": 0, "alt": 5, "speed": 2 }],
+        "finish": "hold"
+      },
+      "steps": [
+        { "t": 0, "f": [0, 0, 5, false], "control": "start" },
+        { "t": 29.9, "f": [2, 0, 5, false] },
+        { "t": 30, "f": [2, 0, 5, false] },
+        { "t": 30.1, "f": [2, 0, 5, false] },
+        { "t": 31, "f": [2, 0, 5, false] }
+      ],
+      "expect": [
+        {
+          "t": 0,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 1.818181818, "east": 0, "altitude": 5 }]
+        },
+        {
+          "t": 29.9,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 10, "east": 0, "altitude": 5 }]
+        },
+        { "t": 30, "phase": "leg", "i": 0, "reason": null, "send": [] },
+        { "t": 30.1, "phase": "failed", "i": 0, "reason": "no llegó", "send": [{ "name": "hold" }] },
+        { "t": 31, "phase": "failed", "i": 0, "reason": "no llegó", "send": [] }
+      ]
+    },
+    {
+      "name": "landed_midleg_and_restart",
+      "note": "landing in a leg fails the run (\"el dron aterrizó\"); start again from failed takes off once more",
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 10, "e": 0, "alt": 5, "speed": 3 }],
+        "finish": "hold"
+      },
+      "steps": [
+        { "t": 0, "f": [0, 0, 5, false], "control": "start" },
+        { "t": 1, "f": [2, 0, 0.1, true] },
+        { "t": 2, "f": [2, 0, 0, true], "control": "start" }
+      ],
+      "expect": [
+        {
+          "t": 0,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 2.727272727, "east": 0, "altitude": 5 }]
+        },
+        { "t": 1, "phase": "failed", "i": 0, "reason": "el dron aterrizó", "send": [{ "name": "hold" }] },
+        {
+          "t": 2,
+          "phase": "takeoff",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "takeoff", "altitude": 5 }]
+        }
+      ]
+    },
+    {
+      "name": "pause_in_hold_rtl_finish",
+      "note": "airborne start goes straight to leg 1; a pause 4 s into a 10 s hold keeps 6 s, resume waits them and the finish is rtl",
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 0, "e": 5, "alt": 5, "speed": 3, "holdS": 10 }],
+        "finish": "rtl"
+      },
+      "steps": [
+        { "t": 0, "f": [0, 0, 5, false], "control": "start" },
+        { "t": 2, "f": [0, 4.5, 5, false] },
+        { "t": 6, "f": [0, 4.6, 5, false], "control": "pause" },
+        { "t": 20, "f": [0, 4.6, 5, false], "control": "resume" },
+        { "t": 25.9, "f": [0, 4.6, 5, false] },
+        { "t": 26, "f": [0, 4.6, 5, false] }
+      ],
+      "expect": [
+        {
+          "t": 0,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 0, "east": 2.727272727, "altitude": 5 }]
+        },
+        {
+          "t": 2,
+          "phase": "hold",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 0, "east": 5, "altitude": 5 }]
+        },
+        { "t": 6, "phase": "paused", "i": 0, "reason": "por el usuario", "send": [{ "name": "hold" }] },
+        { "t": 20, "phase": "hold", "i": 0, "reason": null, "send": [] },
+        { "t": 25.9, "phase": "hold", "i": 0, "reason": null, "send": [] },
+        { "t": 26, "phase": "done", "i": 0, "reason": null, "send": [{ "name": "rtl" }] }
+      ]
+    },
+    {
+      "name": "abort_rtl_and_takeoff_timeout",
+      "note": "abort with \"Volver (RTL)\" sends rtl and goes back to idle; a takeoff that never reaches 5 m fails after 5 / 1 + 20 = 25 s",
+      "mission": {
+        "version": 1,
+        "id": "golden",
+        "name": "golden",
+        "waypoints": [{ "n": 10, "e": 0, "alt": 5, "speed": 3 }],
+        "finish": "hold"
+      },
+      "steps": [
+        { "t": 0, "f": [0, 0, 5, false], "control": "start" },
+        { "t": 1, "f": [1, 0, 5, false], "control": "abort_rtl" },
+        { "t": 2, "f": [0, 0, 0, true], "control": "start" },
+        { "t": 27, "f": [0, 0, 1, false] },
+        { "t": 27.1, "f": [0, 0, 1, false] }
+      ],
+      "expect": [
+        {
+          "t": 0,
+          "phase": "leg",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "fly_to", "north": 2.727272727, "east": 0, "altitude": 5 }]
+        },
+        { "t": 1, "phase": "idle", "i": 0, "reason": null, "send": [{ "name": "rtl" }] },
+        {
+          "t": 2,
+          "phase": "takeoff",
+          "i": 0,
+          "reason": null,
+          "send": [{ "name": "takeoff", "altitude": 5 }]
+        },
+        { "t": 27, "phase": "takeoff", "i": 0, "reason": null, "send": [] },
+        { "t": 27.1, "phase": "failed", "i": 0, "reason": "no llegó", "send": [{ "name": "hold" }] }
+      ]
+    }
+  ],
+  "integration": {
+    "mission": {
+      "version": 1,
+      "id": "golden",
+      "name": "golden",
+      "waypoints": [
+        { "n": 20, "e": 0, "alt": 5, "speed": 3 },
+        { "n": 20, "e": 20, "alt": 5, "speed": 3 },
+        { "n": 0, "e": 20, "alt": 5, "speed": 3 },
+        { "n": 0, "e": 0, "alt": 5, "speed": 3 }
+      ],
+      "finish": "hold"
+    },
+    "sim_dt": 0.01,
+    "tick": 0.05,
+    "done_at": 29.25,
+    "phase": "done",
+    "legs": [
+      {
+        "leg": 1,
+        "start": 2.45,
+        "end": 9.15,
+        "length": 20,
+        "arrivalError": 0.925,
+        "altError": 0.002,
+        "meanSpeed": 2.985075
+      },
+      {
+        "leg": 2,
+        "start": 9.15,
+        "end": 15.85,
+        "length": 20.021379,
+        "arrivalError": 0.939852,
+        "altError": 0,
+        "meanSpeed": 2.988266
+      },
+      {
+        "leg": 3,
+        "start": 15.85,
+        "end": 22.55,
+        "length": 19.982075,
+        "arrivalError": 0.912877,
+        "altError": 0,
+        "meanSpeed": 2.982399
+      },
+      {
+        "leg": 4,
+        "start": 22.55,
+        "end": 29.25,
+        "length": 19.980824,
+        "arrivalError": 0.911792,
+        "altError": 0,
+        "meanSpeed": 2.982213
+      }
+    ],
+    "check": { "under_90_s": true, "arrival_under_1_m": true, "speed_3_pm_0_5": true },
+    "samples": [
+      [0, 0, 0, 0],
+      [1, 0, 0, 1.365],
+      [2, 0, 0, 3.671],
+      [3, 0.591, 0, 5.152],
+      [4, 3.405, 0, 5.251],
+      [5, 6.772, 0, 5.04],
+      [6, 9.939, 0, 4.97],
+      [7, 12.942, 0, 4.986],
+      [8, 15.917, 0, 5.001],
+      [9, 18.745, 0, 5.003],
+      [10, 19.825, 1.285, 5],
+      [11, 19.593, 4.423, 5],
+      [12, 19.44, 7.751, 5],
+      [13, 19.529, 10.849, 5],
+      [14, 19.696, 13.831, 5],
+      [15, 19.853, 16.806, 5],
+      [16, 19.915, 19.332, 5],
+      [17, 17.87, 19.789, 5],
+      [18, 14.54, 19.508, 5],
+      [19, 11.267, 19.441, 5],
+      [20, 8.22, 19.572, 5],
+      [21, 5.249, 19.742, 5],
+      [22, 2.286, 19.895, 5],
+      [23, 0.31, 19.57, 5],
+      [24, 0.275, 16.906, 5],
+      [25, 0.525, 13.521, 5],
+      [26, 0.517, 10.327, 5],
+      [27, 0.366, 7.318, 5],
+      [28, 0.203, 4.348, 5],
+      [29, 0.064, 1.479, 5],
+      [30, -0.011, -0.169, 5],
+      [31, -0.024, -0.468, 5]
+    ],
+    "log": [
+      { "t": 0, "cmd": { "name": "takeoff", "altitude": 5 }, "ok": true },
+      {
+        "t": 2.45,
+        "cmd": { "name": "fly_to", "north": 2.727272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 2.95,
+        "cmd": { "name": "fly_to", "north": 4.227272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 3.45,
+        "cmd": { "name": "fly_to", "north": 5.727272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 3.95,
+        "cmd": { "name": "fly_to", "north": 7.227272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 4.45,
+        "cmd": { "name": "fly_to", "north": 8.727272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 4.95,
+        "cmd": { "name": "fly_to", "north": 10.227272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 5.45,
+        "cmd": { "name": "fly_to", "north": 11.727272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 5.95,
+        "cmd": { "name": "fly_to", "north": 13.227272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 6.45,
+        "cmd": { "name": "fly_to", "north": 14.727272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 6.95,
+        "cmd": { "name": "fly_to", "north": 16.227272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 7.45,
+        "cmd": { "name": "fly_to", "north": 17.727272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 7.95,
+        "cmd": { "name": "fly_to", "north": 19.227272727, "east": 0, "altitude": 5 },
+        "ok": true
+      },
+      { "t": 8.45, "cmd": { "name": "fly_to", "north": 20, "east": 0, "altitude": 5 }, "ok": true },
+      { "t": 8.95, "cmd": { "name": "fly_to", "north": 20, "east": 0, "altitude": 5 }, "ok": true },
+      {
+        "t": 9.15,
+        "cmd": { "name": "fly_to", "north": 19.201001673, "east": 2.724360495, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 9.65,
+        "cmd": { "name": "fly_to", "north": 19.270302593, "east": 4.222758767, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 10.15,
+        "cmd": { "name": "fly_to", "north": 19.339603513, "east": 5.72115704, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 10.65,
+        "cmd": { "name": "fly_to", "north": 19.408904433, "east": 7.219555312, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 11.15,
+        "cmd": { "name": "fly_to", "north": 19.478205353, "east": 8.717953584, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 11.65,
+        "cmd": { "name": "fly_to", "north": 19.547506273, "east": 10.216351857, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 12.15,
+        "cmd": { "name": "fly_to", "north": 19.616807193, "east": 11.714750129, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 12.65,
+        "cmd": { "name": "fly_to", "north": 19.686108114, "east": 13.213148401, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 13.15,
+        "cmd": { "name": "fly_to", "north": 19.755409034, "east": 14.711546674, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 13.65,
+        "cmd": { "name": "fly_to", "north": 19.824709954, "east": 16.209944946, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 14.15,
+        "cmd": { "name": "fly_to", "north": 19.894010874, "east": 17.708343218, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 14.65,
+        "cmd": { "name": "fly_to", "north": 19.963311794, "east": 19.206741491, "altitude": 5 },
+        "ok": true
+      },
+      { "t": 15.15, "cmd": { "name": "fly_to", "north": 20, "east": 20, "altitude": 5 }, "ok": true },
+      { "t": 15.65, "cmd": { "name": "fly_to", "north": 20, "east": 20, "altitude": 5 }, "ok": true },
+      {
+        "t": 15.85,
+        "cmd": { "name": "fly_to", "north": 17.235740199, "east": 19.189160318, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 16.35,
+        "cmd": { "name": "fly_to", "north": 15.737397309, "east": 19.259648493, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 16.85,
+        "cmd": { "name": "fly_to", "north": 14.239054419, "east": 19.330136668, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 17.35,
+        "cmd": { "name": "fly_to", "north": 12.740711528, "east": 19.400624843, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 17.85,
+        "cmd": { "name": "fly_to", "north": 11.242368638, "east": 19.471113018, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 18.35,
+        "cmd": { "name": "fly_to", "north": 9.744025747, "east": 19.541601194, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 18.85,
+        "cmd": { "name": "fly_to", "north": 8.245682857, "east": 19.612089369, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 19.35,
+        "cmd": { "name": "fly_to", "north": 6.747339967, "east": 19.682577544, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 19.85,
+        "cmd": { "name": "fly_to", "north": 5.248997076, "east": 19.753065719, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 20.35,
+        "cmd": { "name": "fly_to", "north": 3.750654186, "east": 19.823553894, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 20.85,
+        "cmd": { "name": "fly_to", "north": 2.252311295, "east": 19.894042069, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 21.35,
+        "cmd": { "name": "fly_to", "north": 0.753968405, "east": 19.964530244, "altitude": 5 },
+        "ok": true
+      },
+      { "t": 21.85, "cmd": { "name": "fly_to", "north": 0, "east": 20, "altitude": 5 }, "ok": true },
+      { "t": 22.35, "cmd": { "name": "fly_to", "north": 0, "east": 20, "altitude": 5 }, "ok": true },
+      {
+        "t": 22.55,
+        "cmd": { "name": "fly_to", "north": 0.787517012, "east": 17.23556969, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 23.05,
+        "cmd": { "name": "fly_to", "north": 0.719051368, "east": 15.737133019, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 23.55,
+        "cmd": { "name": "fly_to", "north": 0.650585725, "east": 14.238696349, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 24.05,
+        "cmd": { "name": "fly_to", "north": 0.582120081, "east": 12.740259678, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 24.55,
+        "cmd": { "name": "fly_to", "north": 0.513654438, "east": 11.241823008, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 25.05,
+        "cmd": { "name": "fly_to", "north": 0.445188795, "east": 9.743386337, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 25.55,
+        "cmd": { "name": "fly_to", "north": 0.376723151, "east": 8.244949667, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 26.05,
+        "cmd": { "name": "fly_to", "north": 0.308257508, "east": 6.746512996, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 26.55,
+        "cmd": { "name": "fly_to", "north": 0.239791864, "east": 5.248076325, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 27.05,
+        "cmd": { "name": "fly_to", "north": 0.171326221, "east": 3.749639655, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 27.55,
+        "cmd": { "name": "fly_to", "north": 0.102860577, "east": 2.251202984, "altitude": 5 },
+        "ok": true
+      },
+      {
+        "t": 28.05,
+        "cmd": { "name": "fly_to", "north": 0.034394934, "east": 0.752766314, "altitude": 5 },
+        "ok": true
+      },
+      { "t": 28.55, "cmd": { "name": "fly_to", "north": 0, "east": 0, "altitude": 5 }, "ok": true },
+      { "t": 29.05, "cmd": { "name": "fly_to", "north": 0, "east": 0, "altitude": 5 }, "ok": true },
+      { "t": 29.25, "cmd": { "name": "hold" }, "ok": true }
+    ]
+  }
+}

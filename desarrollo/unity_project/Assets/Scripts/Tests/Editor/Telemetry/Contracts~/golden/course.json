@@ -1,0 +1,1218 @@
+{
+  "_doc": "src/shared/course.ts (tool 5 of Lote 1: the simulated test course with scoring) against contracts/courses/basic.json, a hand-written copy of CourseLayout.Default() in TestCourse.cs (the C# is the source of truth; `layout_checks` pins the layout). The simulator has no physics: a collision is a simple volume test (a sphere of `constants.droneRadius` around the position against cylinders, boxes and the tube of each ring). Frame: metres from the take-off point (north, east) and height over the ground. `volume`: hitsPylon / hitsBox / hitsRing (and the wall gap of the layout) at their borders, every case `{ name, p: [n, e, alt], out }` against `shape` (hit = true; the bounds are inclusive). `gates`: crossesGate(gate, segment prev -> now = [pn, pe, pa, n, e, alt]) = the segment starts strictly behind the ring's plane (axial < 0), ends on or past it (axial >= 0), and crosses it within `ring radius - ringTube` of the axis. `zones`: zoneContains (inclusive). `scripts`: CourseRun on synthetic samples `[dt, n, e, alt, count = 1]` (the sample repeated `count` times, courseStep each); `expect.events` are the events with the 0-based index of the sample that raised them, `after_each` the state after every row of `steps`; `resetAfter` = resetCourse() before that row. A lap waits for the take-off (the drone was at or under 0.3 m and climbs over `startAltitude` within `startRadius` of the pad) or, after a reset in the air, for the first checkpoint; the time adds dt only when 0 < dt < 1; collisions are edge-triggered per obstacle id (`pylon:i`, `wall:i`, `gate:i`); the checkpoints go in order. `laps`: `polyline_clean` flies `route` as TestCourseTests.FlyRoute does (40 take-off steps of +0.1 m, then straight legs at 6 m/s, dt 1/30 s, steps = ceil(length / (6 dt))); `polyline_two_pylons` is the same with the slalom flown through pylons 0 and 1 (exactly two collisions); `simulator` flies the route with the browser simulator (createSim(22), takeoff 3.5 m, fly_to every waypoint, dt 1/30 s, 7/7 and 0 collisions; the simulator's own numbers are pinned by flightsim.json, here times are compared within `tolerance.sim_time`). `score`: score(run) with a penalty of `penalty_s` per collision [APROBAR]. `records`: updateRecords step by step (best clean time = the fastest attempt with 0 collisions, best penalised time = the fastest time plus the penalty, 10 last attempts newest first) and parseRecords of the text kept under twinsight.course.records.v1 (anything invalid gives empty records). `ghost`: the trace of the best attempt at 10 Hz [n, e, alt, yaw] (pushGhost keeps a sample for every 0.1 s of lap time), ghostPose interpolation (yaw the short way round) and parseGhost. Times are in seconds.",
+  "tolerance": { "exact": 0, "time": 1e-9, "sim_time": 0.05, "pose": 1e-9 },
+  "constants": {
+    "drone_radius": 0.45,
+    "ring_tube": 0.12,
+    "start_altitude": 0.5,
+    "start_radius": 6,
+    "penalty_s": 2,
+    "max_attempts": 10,
+    "ghost_hz": 10
+  },
+  "layout_checks": {
+    "file": "courses/basic.json",
+    "counts": { "gates": 4, "zones": 3, "pylons": 5, "wall": 4, "checkpoints": 7, "route": 16 },
+    "last_checkpoint": { "kind": "zone", "index": 2 },
+    "farthest_from_origin": 80
+  },
+  "volume": {
+    "pylon": {
+      "shape": { "n": 0, "e": 0, "r": 0.5, "h": 5 },
+      "cases": [
+        { "name": "within radius + drone radius", "p": [0.9, 0, 2], "out": true },
+        { "name": "beyond it", "p": [1.1, 0, 2], "out": false },
+        { "name": "exactly at radius + drone radius (0.95)", "p": [0.95, 0, 2], "out": true },
+        { "name": "just beyond it", "p": [0.9500001, 0, 2], "out": false },
+        { "name": "flying over the top", "p": [0, 0, 6], "out": false },
+        { "name": "the top plus the drone radius (5.45)", "p": [0, 0, 5.45], "out": true },
+        { "name": "just over it", "p": [0, 0, 5.4500001], "out": false },
+        { "name": "the ground minus the drone radius (-0.45)", "p": [0, 0, -0.45], "out": true },
+        { "name": "just under it", "p": [0, 0, -0.4500001], "out": false },
+        { "name": "diagonal inside (0.6, 0.6)", "p": [0.6, 0.6, 2], "out": true },
+        { "name": "diagonal outside (0.7, 0.7)", "p": [0.7, 0.7, 2], "out": false }
+      ]
+    },
+    "box": {
+      "shape": { "n0": 0, "n1": 5, "e0": 0, "e1": 1, "altMin": 0, "altMax": 9 },
+      "cases": [
+        { "name": "inside", "p": [2, 0.5, 4], "out": true },
+        { "name": "touching within the drone radius", "p": [2, 1.3, 4], "out": true },
+        { "name": "clear", "p": [2, 1.6, 4], "out": false },
+        { "name": "exactly the drone radius from a face (1.45)", "p": [2, 1.45, 4], "out": true },
+        { "name": "just beyond it", "p": [2, 1.4500001, 4], "out": false },
+        { "name": "above the box by the drone radius (9.45)", "p": [2, 0.5, 9.45], "out": true },
+        { "name": "just above that", "p": [2, 0.5, 9.4500001], "out": false },
+        { "name": "beyond the north end by the drone radius", "p": [5.45, 0.5, 4], "out": false },
+        { "name": "corner, inside (0.3, 0.3 from the edges)", "p": [5.3, 1.3, 4], "out": true },
+        { "name": "corner, outside (0.35, 0.35)", "p": [5.35, 1.35, 4], "out": false },
+        { "name": "edge of the box, on it", "p": [0, 0, 0], "out": true }
+      ]
+    },
+    "ring": {
+      "shape": { "n": 0, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "cases": [
+        { "name": "the opening is free", "p": [0, 0, 3], "out": false },
+        { "name": "the tube", "p": [0, 2.6, 3], "out": true },
+        { "name": "just outside the tube, within the drone radius", "p": [0.2, 2.9, 3], "out": true },
+        { "name": "away along the axis", "p": [3, 0, 3], "out": false },
+        { "name": "in the opening near the tube (0.7 m from it)", "p": [0, 1.9, 3], "out": false },
+        { "name": "outside the tube by 0.5 m", "p": [0, 3.1, 3], "out": true },
+        { "name": "outside the tube by 0.6 m", "p": [0, 3.2, 3], "out": false },
+        { "name": "the top of the ring", "p": [0, 0, 5.6], "out": true },
+        { "name": "behind the plane by 0.5 m, on the tube", "p": [-0.5, 2.6, 3], "out": true },
+        { "name": "behind the plane by 0.6 m, on the tube", "p": [-0.6, 2.6, 3], "out": false }
+      ]
+    },
+    "wall_gap": [
+      { "name": "the middle of the gap", "p": [60, 20, 3.5], "out": false },
+      { "name": "through a slab", "p": [54, 20, 3.5], "out": true },
+      { "name": "through the lintel", "p": [60, 20, 7.5], "out": true },
+      { "name": "through the sill", "p": [60, 20, 0.3], "out": true },
+      { "name": "the gap at its lowest clear height (1.5)", "p": [60, 20, 1.5], "out": false },
+      { "name": "the gap at its highest clear height (5.5)", "p": [60, 20, 5.5], "out": false },
+      { "name": "in the gap, a wing away from the wall (e 19)", "p": [60, 19, 0.2], "out": false }
+    ]
+  },
+  "gates": [
+    {
+      "name": "through the middle, northwards",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [9, 0, 3, 11, 0, 3],
+      "out": true
+    },
+    {
+      "name": "the wrong way (southwards)",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [11, 0, 3, 9, 0, 3],
+      "out": false
+    },
+    {
+      "name": "beside the ring",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [9, 4, 3, 11, 4, 3],
+      "out": false
+    },
+    {
+      "name": "above the ring",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [9, 0, 6.5, 11, 0, 6.5],
+      "out": false
+    },
+    {
+      "name": "across the tube itself is not the opening",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [9, 2.55, 3, 11, 2.55, 3],
+      "out": false
+    },
+    {
+      "name": "just inside the opening (r - tube - 0.01)",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [9, 2.47, 3, 11, 2.47, 3],
+      "out": true
+    },
+    {
+      "name": "just outside the opening (r - tube + 0.01)",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [9, 2.49, 3, 11, 2.49, 3],
+      "out": false
+    },
+    {
+      "name": "a ring facing east is crossed eastwards",
+      "gate": { "n": 0, "e": 10, "alt": 3, "azimuthDeg": 90, "r": 2.6 },
+      "seg": [0, 9, 3, 0, 11, 3],
+      "out": true
+    },
+    {
+      "name": "and not northwards",
+      "gate": { "n": 0, "e": 10, "alt": 3, "azimuthDeg": 90, "r": 2.6 },
+      "seg": [9, 0, 3, 11, 0, 3],
+      "out": false
+    },
+    {
+      "name": "nor westwards",
+      "gate": { "n": 0, "e": 10, "alt": 3, "azimuthDeg": 90, "r": 2.6 },
+      "seg": [0, 11, 3, 0, 9, 3],
+      "out": false
+    },
+    {
+      "name": "a ring facing south is crossed southwards",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 180, "r": 2.6 },
+      "seg": [11, 0, 3, 9, 0, 3],
+      "out": true
+    },
+    {
+      "name": "and not northwards (south ring)",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 180, "r": 2.6 },
+      "seg": [9, 0, 3, 11, 0, 3],
+      "out": false
+    },
+    {
+      "name": "a ring facing west is crossed westwards",
+      "gate": { "n": 0, "e": -10, "alt": 3, "azimuthDeg": 270, "r": 2.6 },
+      "seg": [0, -9, 3, 0, -11, 3],
+      "out": true
+    },
+    {
+      "name": "ending exactly on the plane counts (axial 0)",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [9, 0, 3, 10, 0, 3],
+      "out": true
+    },
+    {
+      "name": "starting exactly on the plane does not (axial 0 is not behind it)",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [10, 0, 3, 11, 0, 3],
+      "out": false
+    },
+    {
+      "name": "oblique through the opening",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [8, -3, 3, 12, 1, 3.5],
+      "out": true
+    },
+    {
+      "name": "oblique, the crossing point is outside the opening",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [8, -6, 3, 12, -1, 3],
+      "out": false
+    },
+    {
+      "name": "a short segment that does not reach the plane",
+      "gate": { "n": 10, "e": 0, "alt": 3, "azimuthDeg": 0, "r": 2.6 },
+      "seg": [8, 0, 3, 9.9, 0, 3],
+      "out": false
+    }
+  ],
+  "zones": [
+    {
+      "name": "the centre",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [24, 0, 4],
+      "out": true
+    },
+    {
+      "name": "the north edge (inclusive)",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [28, 0, 4],
+      "out": true
+    },
+    {
+      "name": "just past the north edge",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [28.0001, 0, 4],
+      "out": false
+    },
+    {
+      "name": "the west edge",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [24, -4, 4],
+      "out": true
+    },
+    {
+      "name": "just past the east edge",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [24, 4.0001, 4],
+      "out": false
+    },
+    {
+      "name": "the lowest altitude (0)",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [24, 0, 0],
+      "out": true
+    },
+    {
+      "name": "under the zone",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [24, 0, -0.01],
+      "out": false
+    },
+    {
+      "name": "the highest altitude (9)",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [24, 0, 9],
+      "out": true
+    },
+    {
+      "name": "over the zone",
+      "zone": { "n": 24, "e": 0, "halfN": 4, "halfE": 4, "altMin": 0, "altMax": 9 },
+      "p": [24, 0, 9.01],
+      "out": false
+    }
+  ],
+  "scripts": [
+    {
+      "name": "timer_starts_with_takeoff",
+      "note": "on the pad (0.2 m) the timer waits; 0.3 m is still ground; 0.8 m starts the lap (started event, time 0) and then 30 frames add 30 dt",
+      "steps": [
+        [0.03333333333333333, 0, 0, 0.2, 100],
+        [0.03333333333333333, 0, 0, 0.3],
+        [0.03333333333333333, 0, 0, 0.8],
+        [0.03333333333333333, 0, 0, 1, 30]
+      ],
+      "expect": {
+        "events": [{ "step": 101, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } }],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 1.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          }
+        ],
+        "final": {
+          "state": "running",
+          "elapsed": 1.033333333,
+          "reached": 0,
+          "collisions": 0,
+          "finish_time": 0,
+          "total": 7
+        }
+      }
+    },
+    {
+      "name": "takeoff_needs_the_ground",
+      "note": "a drone that was never at or under 0.3 m does not start the lap by climbing (it was in the air from the first sample)",
+      "steps": [[0.03333333333333333, 0, 0, 1, 5], [0.03333333333333333, 0, 0, 3]],
+      "expect": {
+        "events": [],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 }
+        ],
+        "final": { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 }
+      }
+    },
+    {
+      "name": "takeoff_far_from_the_pad",
+      "note": "a take-off 56 m from the pad does not start the lap; one 6.0 m away does, one 6.1 m away does not",
+      "steps": [
+        [0.03333333333333333, 40, 40, 0.1, 10],
+        [0.03333333333333333, 40, 40, 3],
+        [0.03333333333333333, 6.1, 0, 0.1, 3],
+        [0.03333333333333333, 6.1, 0, 1],
+        [0.03333333333333333, 6, 0, 0.1, 3],
+        [0.03333333333333333, 6, 0, 1]
+      ],
+      "expect": {
+        "events": [{ "step": 18, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } }],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          }
+        ],
+        "final": {
+          "state": "running",
+          "elapsed": 0.033333333,
+          "reached": 0,
+          "collisions": 0,
+          "finish_time": 0,
+          "total": 7
+        }
+      }
+    },
+    {
+      "name": "checkpoints_are_ordered",
+      "note": "the second ring first does not count; then the first ring and the zone do (TestCourseTests.Checkpoints_AreOrdered)",
+      "steps": [
+        [0.03333333333333333, 0, 0, 0.1, 5],
+        [0.03333333333333333, 0, 0, 1],
+        [0.03333333333333333, 0, 30, 4.5],
+        [0.03333333333333333, 51, 30, 4.5],
+        [0.03333333333333333, 51, 0, 4.5],
+        [0.03333333333333333, 53, 0, 4.5],
+        [0.03333333333333333, 5, 20, 3.5],
+        [0.03333333333333333, 11, 0, 3.5],
+        [0.03333333333333333, 13, 0, 3.5],
+        [0.03333333333333333, 24, 0, 3.5]
+      ],
+      "expect": {
+        "events": [
+          { "step": 5, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } },
+          {
+            "step": 12,
+            "event": { "kind": "checkpoint", "number": 1, "obstacle": null, "time": 0.266666667 }
+          },
+          { "step": 13, "event": { "kind": "checkpoint", "number": 2, "obstacle": null, "time": 0.3 } }
+        ],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.066666667,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "running", "elapsed": 0.1, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.133333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.166666667,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "running", "elapsed": 0.2, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.233333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.266666667,
+            "reached": 1,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "running", "elapsed": 0.3, "reached": 2, "collisions": 0, "finish_time": 0, "total": 7 }
+        ],
+        "final": { "state": "running", "elapsed": 0.3, "reached": 2, "collisions": 0, "finish_time": 0, "total": 7 }
+      }
+    },
+    {
+      "name": "collision_once_per_contact",
+      "note": "inside the first pylon for 20 frames is one collision; away and back in is a second one (TestCourseTests.ACollision_IsCountedOncePerContact: the lap there starts because the jump from (0, 0, 1) to the pylon crosses the first ring)",
+      "steps": [
+        [0.03333333333333333, 0, 0, 1],
+        [0.03333333333333333, 32, -2.2, 3, 20],
+        [0.03333333333333333, 32, 3.5, 3, 5],
+        [0.03333333333333333, 32, -2.7, 2, 5]
+      ],
+      "expect": {
+        "events": [
+          { "step": 1, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } },
+          {
+            "step": 1,
+            "event": { "kind": "collision", "number": null, "obstacle": "pylon:0", "time": 0.033333333 }
+          },
+          { "step": 1, "event": { "kind": "checkpoint", "number": 1, "obstacle": null, "time": 0.033333333 } },
+          {
+            "step": 26,
+            "event": { "kind": "collision", "number": null, "obstacle": "pylon:0", "time": 0.866666667 }
+          }
+        ],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.666666667,
+            "reached": 1,
+            "collisions": 1,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.833333333,
+            "reached": 1,
+            "collisions": 1,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "running", "elapsed": 1, "reached": 1, "collisions": 2, "finish_time": 0, "total": 7 }
+        ],
+        "final": { "state": "running", "elapsed": 1, "reached": 1, "collisions": 2, "finish_time": 0, "total": 7 }
+      }
+    },
+    {
+      "name": "collisions_independent_obstacles",
+      "note": "take-off, then at (57.5, 20, 7) the drone touches two slabs of the wall at once (wall:0 and wall:2, one collision each); moving to (53, 20, 7) leaves wall:2 and keeps wall:0 (no new count); coming back counts wall:2 again",
+      "steps": [
+        [0.03333333333333333, 0, 0, 0.1],
+        [0.03333333333333333, 0, 0, 1],
+        [0.03333333333333333, 57.5, 20, 7, 3],
+        [0.03333333333333333, 53, 20, 7, 3],
+        [0.03333333333333333, 57.5, 20, 7, 3]
+      ],
+      "expect": {
+        "events": [
+          { "step": 1, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } },
+          {
+            "step": 2,
+            "event": { "kind": "collision", "number": null, "obstacle": "wall:0", "time": 0.066666667 }
+          },
+          {
+            "step": 2,
+            "event": { "kind": "collision", "number": null, "obstacle": "wall:2", "time": 0.066666667 }
+          },
+          {
+            "step": 8,
+            "event": { "kind": "collision", "number": null, "obstacle": "wall:2", "time": 0.266666667 }
+          }
+        ],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.133333333,
+            "reached": 0,
+            "collisions": 2,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.233333333,
+            "reached": 0,
+            "collisions": 2,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.333333333,
+            "reached": 0,
+            "collisions": 3,
+            "finish_time": 0,
+            "total": 7
+          }
+        ],
+        "final": {
+          "state": "running",
+          "elapsed": 0.333333333,
+          "reached": 0,
+          "collisions": 3,
+          "finish_time": 0,
+          "total": 7
+        }
+      }
+    },
+    {
+      "name": "ring_tube_is_a_collision",
+      "note": "after the take-off, touching the tube of the first ring (12, 0, 3.5) at 2.6 m from its axis is a collision (gate:0), counted once for the two frames",
+      "steps": [
+        [0.03333333333333333, 0, 0, 0.1],
+        [0.03333333333333333, 0, 0, 1],
+        [0.03333333333333333, 12, 2.6, 3.5, 2]
+      ],
+      "expect": {
+        "events": [
+          { "step": 1, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } },
+          {
+            "step": 2,
+            "event": { "kind": "collision", "number": null, "obstacle": "gate:0", "time": 0.066666667 }
+          }
+        ],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "running", "elapsed": 0.1, "reached": 0, "collisions": 1, "finish_time": 0, "total": 7 }
+        ],
+        "final": { "state": "running", "elapsed": 0.1, "reached": 0, "collisions": 1, "finish_time": 0, "total": 7 }
+      }
+    },
+    {
+      "name": "reset_in_the_air",
+      "note": "a reset in the air does not start the lap by itself; the first ring (crossed from 11 to 13 m) does, and counts as the first checkpoint",
+      "steps": [
+        [0.03333333333333333, 0, 0, 0.1, 10],
+        [0.03333333333333333, 0, 0, 3.5],
+        [0.03333333333333333, 1, 1, 3.5, 50],
+        [0.03333333333333333, 11, 0, 3.5],
+        [0.03333333333333333, 13, 0, 3.5]
+      ],
+      "resetAfter": 2,
+      "expect": {
+        "events": [
+          { "step": 10, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } },
+          { "step": 62, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } },
+          {
+            "step": 62,
+            "event": { "kind": "checkpoint", "number": 1, "obstacle": null, "time": 0.033333333 }
+          }
+        ],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 1,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          }
+        ],
+        "final": {
+          "state": "running",
+          "elapsed": 0.033333333,
+          "reached": 1,
+          "collisions": 0,
+          "finish_time": 0,
+          "total": 7
+        }
+      }
+    },
+    {
+      "name": "dt_outside_the_range_does_not_count",
+      "note": "a step of dt 0 or dt 1 s or more (a stall) adds no time; dt = 0.5 does",
+      "steps": [
+        [0.03333333333333333, 0, 0, 0.1],
+        [0.03333333333333333, 0, 0, 1],
+        [0, 0, 0, 1],
+        [1, 0, 0, 1],
+        [2, 0, 0, 1],
+        [0.5, 0, 0, 1],
+        [0.999, 0, 0, 1]
+      ],
+      "expect": {
+        "events": [{ "step": 1, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } }],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.533333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 1.532333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          }
+        ],
+        "final": {
+          "state": "running",
+          "elapsed": 1.532333333,
+          "reached": 0,
+          "collisions": 0,
+          "finish_time": 0,
+          "total": 7
+        }
+      }
+    },
+    {
+      "name": "finished_run_ignores_more_samples",
+      "note": "the zone over the pad as the only left checkpoint: after the finish nothing changes (no more time, no more collisions)",
+      "steps": [
+        [0.03333333333333333, 0, 0, 0.1],
+        [0.03333333333333333, 0, 0, 1],
+        [0.03333333333333333, 11, 0, 3.5],
+        [0.03333333333333333, 13, 0, 3.5],
+        [0.03333333333333333, 24, 0, 3.5],
+        [0.03333333333333333, 51, 0, 4.5],
+        [0.03333333333333333, 53, 0, 4.5],
+        [0.03333333333333333, 60, 29, 3.5],
+        [0.03333333333333333, 60, 31, 3.5],
+        [0.03333333333333333, 60, 44, 3.5],
+        [0.03333333333333333, 41, 44, 5],
+        [0.03333333333333333, 39, 44, 5],
+        [0.03333333333333333, 0, 0, 1],
+        [0.03333333333333333, 32, -2.5, 3, 10],
+        [0.03333333333333333, 0, 0, 1, 10]
+      ],
+      "expect": {
+        "events": [
+          { "step": 1, "event": { "kind": "started", "number": null, "obstacle": null, "time": 0 } },
+          { "step": 3, "event": { "kind": "checkpoint", "number": 1, "obstacle": null, "time": 0.1 } },
+          { "step": 4, "event": { "kind": "checkpoint", "number": 2, "obstacle": null, "time": 0.133333333 } },
+          { "step": 6, "event": { "kind": "checkpoint", "number": 3, "obstacle": null, "time": 0.2 } },
+          { "step": 8, "event": { "kind": "checkpoint", "number": 4, "obstacle": null, "time": 0.266666667 } },
+          { "step": 9, "event": { "kind": "checkpoint", "number": 5, "obstacle": null, "time": 0.3 } },
+          {
+            "step": 11,
+            "event": { "kind": "checkpoint", "number": 6, "obstacle": null, "time": 0.366666667 }
+          },
+          { "step": 12, "event": { "kind": "checkpoint", "number": 7, "obstacle": null, "time": 0.4 } },
+          { "step": 12, "event": { "kind": "finished", "number": 7, "obstacle": null, "time": 0.4 } }
+        ],
+        "after_each": [
+          { "state": "waiting", "elapsed": 0, "reached": 0, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.033333333,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.066666667,
+            "reached": 0,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "running", "elapsed": 0.1, "reached": 1, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.133333333,
+            "reached": 2,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.166666667,
+            "reached": 2,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "running", "elapsed": 0.2, "reached": 3, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.233333333,
+            "reached": 3,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.266666667,
+            "reached": 4,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          { "state": "running", "elapsed": 0.3, "reached": 5, "collisions": 0, "finish_time": 0, "total": 7 },
+          {
+            "state": "running",
+            "elapsed": 0.333333333,
+            "reached": 5,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "running",
+            "elapsed": 0.366666667,
+            "reached": 6,
+            "collisions": 0,
+            "finish_time": 0,
+            "total": 7
+          },
+          {
+            "state": "finished",
+            "elapsed": 0.4,
+            "reached": 7,
+            "collisions": 0,
+            "finish_time": 0.4,
+            "total": 7
+          },
+          {
+            "state": "finished",
+            "elapsed": 0.4,
+            "reached": 7,
+            "collisions": 0,
+            "finish_time": 0.4,
+            "total": 7
+          },
+          {
+            "state": "finished",
+            "elapsed": 0.4,
+            "reached": 7,
+            "collisions": 0,
+            "finish_time": 0.4,
+            "total": 7
+          }
+        ],
+        "final": {
+          "state": "finished",
+          "elapsed": 0.4,
+          "reached": 7,
+          "collisions": 0,
+          "finish_time": 0.4,
+          "total": 7
+        }
+      }
+    }
+  ],
+  "laps": {
+    "polyline_clean": {
+      "route": [
+        [0, 0, 3.5],
+        [12, 0, 3.5],
+        [24, 0, 3.5],
+        [32, 2, 3.5],
+        [38, -2, 3.5],
+        [44, 2, 3.5],
+        [52, 0, 4.5],
+        [60, 0, 3.5],
+        [60, 12, 3.5],
+        [60, 30, 3.5],
+        [60, 44, 3.5],
+        [40, 44, 5],
+        [30, 36, 3.5],
+        [22, 27, 3.5],
+        [12, 13, 3.5],
+        [2, 1, 3.5]
+      ],
+      "samples": 975,
+      "events": [
+        { "step": 5, "kind": "started", "number": null, "obstacle": null, "time": 0 },
+        { "step": 102, "kind": "checkpoint", "number": 1, "obstacle": null, "time": 3.266666667 },
+        { "step": 142, "kind": "checkpoint", "number": 2, "obstacle": null, "time": 4.6 },
+        { "step": 320, "kind": "checkpoint", "number": 3, "obstacle": null, "time": 10.533333333 },
+        { "step": 511, "kind": "checkpoint", "number": 4, "obstacle": null, "time": 16.9 },
+        { "step": 561, "kind": "checkpoint", "number": 5, "obstacle": null, "time": 18.566666667 },
+        { "step": 682, "kind": "checkpoint", "number": 6, "obstacle": null, "time": 22.6 },
+        { "step": 967, "kind": "checkpoint", "number": 7, "obstacle": null, "time": 32.1 },
+        { "step": 967, "kind": "finished", "number": 7, "obstacle": null, "time": 32.1 }
+      ],
+      "final": {
+        "state": "finished",
+        "elapsed": 32.1,
+        "reached": 7,
+        "collisions": 0,
+        "finish_time": 32.1,
+        "total": 7
+      },
+      "score": { "timeS": 32.10000000000074, "penalisedS": 32.10000000000074, "collisions": 0 }
+    },
+    "polyline_two_pylons": {
+      "route": [
+        [0, 0, 3.5],
+        [12, 0, 3.5],
+        [24, 0, 3.5],
+        [32, -2.5, 3.5],
+        [38, 2.5, 3.5],
+        [44, 2, 3.5],
+        [52, 0, 4.5],
+        [60, 0, 3.5],
+        [60, 12, 3.5],
+        [60, 30, 3.5],
+        [60, 44, 3.5],
+        [40, 44, 5],
+        [30, 36, 3.5],
+        [22, 27, 3.5],
+        [12, 13, 3.5],
+        [2, 1, 3.5]
+      ],
+      "samples": 972,
+      "events": [
+        { "step": 5, "kind": "started", "number": null, "obstacle": null, "time": 0 },
+        { "step": 102, "kind": "checkpoint", "number": 1, "obstacle": null, "time": 3.266666667 },
+        { "step": 142, "kind": "checkpoint", "number": 2, "obstacle": null, "time": 4.6 },
+        { "step": 200, "kind": "collision", "number": null, "obstacle": "pylon:0", "time": 6.533333333 },
+        { "step": 240, "kind": "collision", "number": null, "obstacle": "pylon:1", "time": 7.866666667 },
+        { "step": 317, "kind": "checkpoint", "number": 3, "obstacle": null, "time": 10.433333333 },
+        { "step": 508, "kind": "checkpoint", "number": 4, "obstacle": null, "time": 16.8 },
+        { "step": 558, "kind": "checkpoint", "number": 5, "obstacle": null, "time": 18.466666667 },
+        { "step": 679, "kind": "checkpoint", "number": 6, "obstacle": null, "time": 22.5 },
+        { "step": 964, "kind": "checkpoint", "number": 7, "obstacle": null, "time": 32 },
+        { "step": 964, "kind": "finished", "number": 7, "obstacle": null, "time": 32 }
+      ],
+      "final": { "state": "finished", "elapsed": 32, "reached": 7, "collisions": 2, "finish_time": 32, "total": 7 },
+      "score": { "timeS": 32.000000000000746, "penalisedS": 36.000000000000746, "collisions": 2 }
+    },
+    "simulator": {
+      "legs": [
+        { "to": [12, 0, 3.5], "arrived_s": 4.866667 },
+        { "to": [24, 0, 3.5], "arrived_s": 7.266667 },
+        { "to": [32, 2, 3.5], "arrived_s": 9.066667 },
+        { "to": [38, -2, 3.5], "arrived_s": 10.766667 },
+        { "to": [44, 2, 3.5], "arrived_s": 12.533333 },
+        { "to": [52, 0, 4.5], "arrived_s": 14.4 },
+        { "to": [60, 0, 3.5], "arrived_s": 16.166667 },
+        { "to": [60, 12, 3.5], "arrived_s": 18.9 },
+        { "to": [60, 30, 3.5], "arrived_s": 22.3 },
+        { "to": [60, 44, 3.5], "arrived_s": 25.033333 },
+        { "to": [40, 44, 5], "arrived_s": 29.1 },
+        { "to": [30, 36, 3.5], "arrived_s": 31.666667 },
+        { "to": [22, 27, 3.5], "arrived_s": 34.1 },
+        { "to": [12, 13, 3.5], "arrived_s": 37.366667 },
+        { "to": [2, 1, 3.5], "arrived_s": 40.366667 }
+      ],
+      "events": [
+        { "t": 0.533333, "kind": "started", "number": null, "obstacle": null, "time": 0 },
+        { "t": 5.133333, "kind": "checkpoint", "number": 1, "obstacle": null, "time": 4.633333333 },
+        { "t": 6.6, "kind": "checkpoint", "number": 2, "obstacle": null, "time": 6.1 },
+        { "t": 14.666667, "kind": "checkpoint", "number": 3, "obstacle": null, "time": 14.166666667 },
+        { "t": 22.566667, "kind": "checkpoint", "number": 4, "obstacle": null, "time": 22.066666667 },
+        { "t": 24.366667, "kind": "checkpoint", "number": 5, "obstacle": null, "time": 23.866666667 },
+        { "t": 29.366667, "kind": "checkpoint", "number": 6, "obstacle": null, "time": 28.866666667 },
+        { "t": 40.233333, "kind": "checkpoint", "number": 7, "obstacle": null, "time": 39.733333333 },
+        { "t": 40.233333, "kind": "finished", "number": 7, "obstacle": null, "time": 39.733333333 }
+      ],
+      "final": {
+        "state": "finished",
+        "elapsed": 39.733333333,
+        "reached": 7,
+        "collisions": 0,
+        "finish_time": 39.733333333,
+        "total": 7
+      },
+      "sim_time": 40.366667,
+      "score": { "timeS": 39.73333333333364, "penalisedS": 39.73333333333364, "collisions": 0 }
+    }
+  },
+  "score": [
+    {
+      "name": "clean lap",
+      "run": { "state": "finished", "finish_time": 60, "elapsed": 60, "collisions": 0 },
+      "out": { "timeS": 60, "penalisedS": 60, "collisions": 0 }
+    },
+    {
+      "name": "two collisions: +4 s",
+      "run": { "state": "finished", "finish_time": 60, "elapsed": 60, "collisions": 2 },
+      "out": { "timeS": 60, "penalisedS": 64, "collisions": 2 }
+    },
+    {
+      "name": "not finished: the running time",
+      "run": { "state": "running", "finish_time": 0, "elapsed": 12.5, "collisions": 1 },
+      "out": { "timeS": 12.5, "penalisedS": 14.5, "collisions": 1 }
+    }
+  ],
+  "records": {
+    "steps": [
+      {
+        "name": "the first attempt, clean: both records",
+        "courseId": "basic",
+        "result": { "timeS": 60, "penalisedS": 60, "collisions": 0 },
+        "now": 1000,
+        "new_best_clean": true,
+        "new_best_penalised": true,
+        "records": {
+          "version": 1,
+          "courses": {
+            "basic": {
+              "bestClean": 60,
+              "bestPenalised": 60,
+              "attempts": [{ "at": 1000, "timeS": 60, "penalisedS": 60, "collisions": 0 }]
+            }
+          }
+        }
+      },
+      {
+        "name": "a slower clean attempt: no record",
+        "courseId": "basic",
+        "result": { "timeS": 65, "penalisedS": 65, "collisions": 0 },
+        "now": 2000,
+        "new_best_clean": false,
+        "new_best_penalised": false,
+        "records": {
+          "version": 1,
+          "courses": {
+            "basic": {
+              "bestClean": 60,
+              "bestPenalised": 60,
+              "attempts": [
+                { "at": 2000, "timeS": 65, "penalisedS": 65, "collisions": 0 },
+                { "at": 1000, "timeS": 60, "penalisedS": 60, "collisions": 0 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "a faster attempt with 2 collisions: 52 s + 4 s = 56 s beats the 60 s penalised record but is not clean",
+        "courseId": "basic",
+        "result": { "timeS": 52, "penalisedS": 56, "collisions": 2 },
+        "now": 3000,
+        "new_best_clean": false,
+        "new_best_penalised": true,
+        "records": {
+          "version": 1,
+          "courses": {
+            "basic": {
+              "bestClean": 60,
+              "bestPenalised": 56,
+              "attempts": [
+                { "at": 3000, "timeS": 52, "penalisedS": 56, "collisions": 2 },
+                { "at": 2000, "timeS": 65, "penalisedS": 65, "collisions": 0 },
+                { "at": 1000, "timeS": 60, "penalisedS": 60, "collisions": 0 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "a faster clean attempt: both records",
+        "courseId": "basic",
+        "result": { "timeS": 55, "penalisedS": 55, "collisions": 0 },
+        "now": 4000,
+        "new_best_clean": true,
+        "new_best_penalised": true,
+        "records": {
+          "version": 1,
+          "courses": {
+            "basic": {
+              "bestClean": 55,
+              "bestPenalised": 55,
+              "attempts": [
+                { "at": 4000, "timeS": 55, "penalisedS": 55, "collisions": 0 },
+                { "at": 3000, "timeS": 52, "penalisedS": 56, "collisions": 2 },
+                { "at": 2000, "timeS": 65, "penalisedS": 65, "collisions": 0 },
+                { "at": 1000, "timeS": 60, "penalisedS": 60, "collisions": 0 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "an equal time is not a record",
+        "courseId": "basic",
+        "result": { "timeS": 55, "penalisedS": 55, "collisions": 0 },
+        "now": 5000,
+        "new_best_clean": false,
+        "new_best_penalised": false,
+        "records": {
+          "version": 1,
+          "courses": {
+            "basic": {
+              "bestClean": 55,
+              "bestPenalised": 55,
+              "attempts": [
+                { "at": 5000, "timeS": 55, "penalisedS": 55, "collisions": 0 },
+                { "at": 4000, "timeS": 55, "penalisedS": 55, "collisions": 0 },
+                { "at": 3000, "timeS": 52, "penalisedS": 56, "collisions": 2 },
+                { "at": 2000, "timeS": 65, "penalisedS": 65, "collisions": 0 },
+                { "at": 1000, "timeS": 60, "penalisedS": 60, "collisions": 0 }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "another course has its own records",
+        "courseId": "other",
+        "result": { "timeS": 80, "penalisedS": 82, "collisions": 1 },
+        "now": 6000,
+        "new_best_clean": false,
+        "new_best_penalised": true,
+        "records": {
+          "version": 1,
+          "courses": {
+            "basic": {
+              "bestClean": 55,
+              "bestPenalised": 55,
+              "attempts": [
+                { "at": 5000, "timeS": 55, "penalisedS": 55, "collisions": 0 },
+                { "at": 4000, "timeS": 55, "penalisedS": 55, "collisions": 0 },
+                { "at": 3000, "timeS": 52, "penalisedS": 56, "collisions": 2 },
+                { "at": 2000, "timeS": 65, "penalisedS": 65, "collisions": 0 },
+                { "at": 1000, "timeS": 60, "penalisedS": 60, "collisions": 0 }
+              ]
+            },
+            "other": {
+              "bestClean": null,
+              "bestPenalised": 82,
+              "attempts": [{ "at": 6000, "timeS": 80, "penalisedS": 82, "collisions": 1 }]
+            }
+          }
+        }
+      },
+      {
+        "name": "with collisions only: a penalised record, no clean one (other)",
+        "courseId": "other",
+        "result": { "timeS": 70, "penalisedS": 72, "collisions": 1 },
+        "now": 7000,
+        "new_best_clean": false,
+        "new_best_penalised": true,
+        "records": {
+          "version": 1,
+          "courses": {
+            "basic": {
+              "bestClean": 55,
+              "bestPenalised": 55,
+              "attempts": [
+                { "at": 5000, "timeS": 55, "penalisedS": 55, "collisions": 0 },
+                { "at": 4000, "timeS": 55, "penalisedS": 55, "collisions": 0 },
+                { "at": 3000, "timeS": 52, "penalisedS": 56, "collisions": 2 },
+                { "at": 2000, "timeS": 65, "penalisedS": 65, "collisions": 0 },
+                { "at": 1000, "timeS": 60, "penalisedS": 60, "collisions": 0 }
+              ]
+            },
+            "other": {
+              "bestClean": null,
+              "bestPenalised": 72,
+              "attempts": [
+                { "at": 7000, "timeS": 70, "penalisedS": 72, "collisions": 1 },
+                { "at": 6000, "timeS": 80, "penalisedS": 82, "collisions": 1 }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "twelve_attempts": {
+      "max_attempts": 10,
+      "count": 10,
+      "first_time_s": 111,
+      "last_time_s": 102,
+      "best_clean": 101,
+      "best_penalised": 101
+    },
+    "storage": [
+      {
+        "name": "valid",
+        "raw": "{\"version\":1,\"courses\":{\"basic\":{\"bestClean\":55,\"bestPenalised\":55,\"attempts\":[{\"at\":4000,\"timeS\":55,\"penalisedS\":55,\"collisions\":0}]}}}",
+        "out": {
+          "version": 1,
+          "courses": {
+            "basic": {
+              "bestClean": 55,
+              "bestPenalised": 55,
+              "attempts": [{ "at": 4000, "timeS": 55, "penalisedS": 55, "collisions": 0 }]
+            }
+          }
+        }
+      },
+      { "name": "nothing stored", "raw": null, "out": { "version": 1, "courses": {} } },
+      { "name": "not JSON", "raw": "{version", "out": { "version": 1, "courses": {} } },
+      {
+        "name": "another version",
+        "raw": "{\"version\":2,\"courses\":{}}",
+        "out": { "version": 1, "courses": {} }
+      },
+      {
+        "name": "a negative best",
+        "raw": "{\"version\":1,\"courses\":{\"basic\":{\"bestClean\":-1,\"bestPenalised\":null,\"attempts\":[]}}}",
+        "out": { "version": 1, "courses": {} }
+      },
+      {
+        "name": "a bad attempt",
+        "raw": "{\"version\":1,\"courses\":{\"basic\":{\"bestClean\":null,\"bestPenalised\":null,\"attempts\":[{\"at\":1,\"timeS\":\"5\",\"penalisedS\":5,\"collisions\":0}]}}}",
+        "out": { "version": 1, "courses": {} }
+      },
+      {
+        "name": "no records yet",
+        "raw": "{\"version\":1,\"courses\":{}}",
+        "out": { "version": 1, "courses": {} }
+      }
+    ]
+  },
+  "ghost": {
+    "hz": 10,
+    "samples": 31,
+    "first": [0, 0, 3, 0],
+    "last": [18, -9, 3.06, 4.5],
+    "pose": [
+      { "t": 0, "out": [0, 0, 3, 0] },
+      { "t": 0.05, "out": [0.3, -0.15, 3.015, 0.075] },
+      { "t": 0.1, "out": [0.6, -0.3, 3.03, 0.15] },
+      { "t": 0.25, "out": [1.5, -0.75, 3.04, 0.375] },
+      { "t": 1, "out": [6, -3, 3.02, 1.5] },
+      { "t": 2.9, "out": [17.4, -8.7, 3.03, -1.933185307] },
+      { "t": 3, "out": [18, -9, 3.06, 4.5] },
+      { "t": 5, "out": [18, -9, 3.06, 4.5] }
+    ],
+    "yaw_wraps_the_short_way": {
+      "trace": [[0, 0, 3, 3.1], [1, 1, 4, -3.1], [2, 0, 5, -3]],
+      "poses": [
+        { "t": 0, "out": [0, 0, 3, 3.1] },
+        { "t": 0.05, "out": [0.5, 0.5, 3.5, 3.141592654] },
+        { "t": 0.1, "out": [1, 1, 4, -3.1] },
+        { "t": 0.15, "out": [1.5, 0.5, 4.5, -3.05] },
+        { "t": 0.2, "out": [2, 0, 5, -3] }
+      ]
+    },
+    "empty": null,
+    "storage": [
+      { "name": "valid", "raw": "[[0,0,3,0],[1,1,3,0.1]]", "ok": true },
+      { "name": "empty array", "raw": "[]", "ok": false },
+      { "name": "a short sample", "raw": "[[0,0,3]]", "ok": false },
+      { "name": "not JSON", "raw": "[[", "ok": false }
+    ]
+  }
+}
