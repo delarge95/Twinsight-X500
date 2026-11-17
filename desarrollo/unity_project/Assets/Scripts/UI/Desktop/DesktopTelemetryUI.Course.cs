@@ -28,6 +28,49 @@ namespace WebGL.UI.Desktop
         private float _courseHitUntil;
         private float _courseNextText;
         private string _courseLang;
+        private CourseRecordSet _courseRecords;
+        private string _courseRecordKey; // what the result line says about the records: "clean" | "pen" | "both" | null (computed once per lap, text per language)
+        private double _courseRecordPen;
+        public CourseRecordSet CourseRecordsNow { get { EnsureCourseRecords(); return _courseRecords; } }
+        public static string CourseRecordsFile => System.IO.Path.Combine(Application.persistentDataPath, "twinsight", "records.json");
+
+        private void EnsureCourseRecords()
+        {
+            if (_courseRecords != null) return;
+            try { _courseRecords = CourseRecords.Parse(System.IO.File.Exists(CourseRecordsFile) ? System.IO.File.ReadAllText(CourseRecordsFile) : null); }
+            catch (Exception e) { Debug.LogWarning("[TestCourse] records not read: " + e.Message); _courseRecords = CourseRecords.Empty(); }
+        }
+
+        /// <summary>A finished lap: scores it (time + 2 s per collision [APROBADO 2026-11-13]), updates the records of this course and keeps them (the same JSON as the web's).</summary>
+        private void RecordCourseResult()
+        {
+            EnsureCourseRecords();
+            CourseResult res = CourseRecords.Score(_run);
+            double nowMs = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
+            CourseRecordUpdate u = CourseRecords.Update(_courseRecords, _run.Layout.Id, res, nowMs);
+            _courseRecords = u.Records;
+            _courseRecordPen = res.PenalisedS;
+            _courseRecordKey = u.NewBestClean && u.NewBestPenalised ? "both" : u.NewBestClean ? "clean" : u.NewBestPenalised ? "pen" : "none";
+            try
+            {
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(CourseRecordsFile));
+                System.IO.File.WriteAllText(CourseRecordsFile, CourseRecords.ToJson(_courseRecords));
+            }
+            catch (Exception e) { Debug.LogWarning("[TestCourse] records not saved: " + e.Message); }
+        }
+
+        /// <summary>The second line of the result: the time with the penalty and, when it is one, the record it beats.</summary>
+        private string CourseRecordLine(string lang)
+        {
+            if (_courseRecordKey == null) return string.Empty;
+            string s = TelemetryStrings.T("course.penalised", lang) + " " + FormatLap(_courseRecordPen);
+            if (_courseRecordKey == "clean" || _courseRecordKey == "both") s += " · " + TelemetryStrings.T("course.newClean", lang);
+            if (_courseRecordKey == "pen" || _courseRecordKey == "both") s += " · " + TelemetryStrings.T("course.newPenalised", lang);
+            CourseRecord r = _courseRecords?.Of(_run.Layout.Id);
+            if (r != null && r.BestClean.HasValue) s += "\n" + TelemetryStrings.T("course.bestClean", lang) + " " + FormatLap(r.BestClean.Value);
+            if (r != null && r.BestPenalised.HasValue) s += "\n" + TelemetryStrings.T("course.bestPenalised", lang) + " " + FormatLap(r.BestPenalised.Value);
+            return s;
+        }
 
         // ── read by the verification harness ──
         public bool CourseOn => _courseOn;
@@ -112,13 +155,14 @@ namespace WebGL.UI.Desktop
             _courseOn = on;
             _btnCourse?.EnableInClassList("dk-strip-btn--on", on);
             if (!on) DestroyCourse();
-            else _run?.Reset();
+            else { _run?.Reset(); _courseRecordKey = null; }
         }
 
         /// <summary>Starts a new lap (timer, checkpoints and collisions back to zero; the course stays where it is).</summary>
         public void ResetCourse()
         {
             _run?.Reset();
+            _courseRecordKey = null;
             _course?.SetProgress(0, false);
             _courseResult.style.display = DisplayStyle.None;
             _coursePill.RemoveFromClassList("dk-course--done");
@@ -180,6 +224,7 @@ namespace WebGL.UI.Desktop
                         Debug.Log("[TestCourse] collision with " + ev.Obstacle + " (" + _run.Collisions + ") at " + ev.Time.ToString("F1", CultureInfo.InvariantCulture) + " s");
                         break;
                     case CourseEventKind.Finished:
+                        RecordCourseResult();
                         Debug.Log("[TestCourse] lap finished in " + ev.Time.ToString("F1", CultureInfo.InvariantCulture) + " s with " + _run.Collisions + " collision(s)");
                         break;
                 }
@@ -204,7 +249,7 @@ namespace WebGL.UI.Desktop
             bool done = _run.State == CourseState.Finished;
             _coursePill.EnableInClassList("dk-course--done", done);
             _courseResult.style.display = done ? DisplayStyle.Flex : DisplayStyle.None;
-            if (done) _courseResult.text = TelemetryStrings.F("course.done", lang, "t", FormatLap(_run.FinishTime), "c", _run.Collisions.ToString(CultureInfo.InvariantCulture));
+            if (done) _courseResult.text = TelemetryStrings.F("course.done", lang, "t", FormatLap(_run.FinishTime), "c", _run.Collisions.ToString(CultureInfo.InvariantCulture)) + (_courseRecordKey != null ? "\n" + CourseRecordLine(lang) : string.Empty);
         }
 
         /// <summary>m:ss.d with a dot (locale independent).</summary>

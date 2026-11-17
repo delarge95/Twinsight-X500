@@ -44,6 +44,19 @@ namespace WebGL.Telemetry
 
     public sealed class CourseLayout
     {
+        /// <summary>Path of the bundled course under StreamingAssets (a copy of the web's contracts/courses/basic.json).</summary>
+        public const string StreamingRelativePath = "Telemetry/courses/basic.json";
+        /// <summary>Text of <see cref="Source"/> when the layout is the C# fallback (the JSON was not found or not valid).</summary>
+        public const string BuiltinSource = "builtin";
+
+        /// <summary>Course id: the key of its records (records.json) and of its ghost.</summary>
+        public string Id = "basic";
+        public string Name = "Circuito básico";
+        /// <summary>Where this layout came from: the JSON file path, "json" (parsed from text) or <see cref="BuiltinSource"/>.</summary>
+        public string Source = BuiltinSource;
+        /// <summary>The test constants written in the JSON (`constants`); the run itself uses the CourseRun constants, so a JSON whose values differ is not loaded by Default().</summary>
+        public double DroneRadius = CourseRun.DroneRadius, RingTube = CourseRun.RingTube, StartAltitude = CourseRun.StartAltitude, StartRadius = CourseRun.StartRadius;
+
         public double PadN, PadE, PadRadius = 1.5;
         public readonly List<CourseGate> Gates = new List<CourseGate>();
         public readonly List<CourseZone> Zones = new List<CourseZone>();
@@ -54,8 +67,147 @@ namespace WebGL.Telemetry
         /// <summary>A line of waypoints of the intended lap (north, east, altitude); the verification flight follows it. Not shown in the scene.</summary>
         public readonly List<double[]> Route = new List<double[]>();
 
-        /// <summary>Every element sits well inside the 120 m geofence (the farthest point is about 78 m from the take-off point).</summary>
+        /// <summary>
+        /// The course of the app: the bundled JSON (StreamingAssets/Telemetry/courses/basic.json, the same file as the web's contracts/courses/basic.json) when it
+        /// is there and valid, else the C# copy (<see cref="Builtin"/>). A test requires both to be the same layout.
+        /// </summary>
         public static CourseLayout Default()
+        {
+            CourseLayout json = LoadBundled(out _);
+            return json ?? Builtin();
+        }
+
+#if UNITY_STANDALONE || UNITY_EDITOR
+        /// <summary>Path of the bundled course in the player / Editor.</summary>
+        public static string BundledPath => System.IO.Path.Combine(UnityEngine.Application.streamingAssetsPath, "Telemetry", "courses", "basic.json");
+
+        /// <summary>The bundled course; null (with `error`) when it is missing, not a version-1 course, or its test constants are not the ones the run uses.</summary>
+        public static CourseLayout LoadBundled(out string error)
+        {
+            error = null;
+            try
+            {
+                string p = BundledPath;
+                if (!System.IO.File.Exists(p)) { error = "missing " + p; return null; }
+                CourseLayout c = Parse(System.IO.File.ReadAllText(p));
+                if (c == null) { error = "not a version 1 course: " + p; return null; }
+                if (!c.ConstantsMatchTheRun()) { error = "constants differ from CourseRun: " + p; return null; }
+                c.Source = p;
+                return c;
+            }
+            catch (Exception e)
+            {
+                error = e.GetType().Name + ": " + e.Message;
+                return null;
+            }
+        }
+#else
+        /// <summary>No file access on this platform (WebGL): the C# copy is used.</summary>
+        public static CourseLayout LoadBundled(out string error) { error = "no bundled course on this platform"; return null; }
+#endif
+
+        /// <summary>The `constants` of the JSON are the ones CourseRun uses (the run does not read them from the layout).</summary>
+        public bool ConstantsMatchTheRun() => DroneRadius == CourseRun.DroneRadius && RingTube == CourseRun.RingTube && StartAltitude == CourseRun.StartAltitude && StartRadius == CourseRun.StartRadius;
+
+        /// <summary>
+        /// The layout from its JSON (contracts/courses/*.json), a port of the web's parseCourse (src/shared/course.ts): anything that is not a version-1 course
+        /// gives null (nothing is guessed). The name defaults to the id.
+        /// </summary>
+        public static CourseLayout Parse(string json)
+        {
+            if (string.IsNullOrEmpty(json)) return null;
+            object root;
+            try { root = WebGL.Telemetry.Json.TelemetryJson.Parse(json); } catch { return null; }
+            var d = root as Dictionary<string, object>;
+            if (d == null) return null;
+            if (!d.TryGetValue("version", out object ver) || !(ver is double) || (double)ver != 1) return null;
+            if (!d.TryGetValue("id", out object idObj) || !(idObj is string id) || id.Length == 0) return null;
+            var pad = Obj(d, "pad");
+            var k = Obj(d, "constants");
+            if (!AllNum(pad, "n", "e", "r") || !AllNum(k, "droneRadius", "ringTube", "startAltitude", "startRadius")) return null;
+            var gates = List(d, "gates", "n", "e", "alt", "azimuthDeg", "r");
+            var zones = List(d, "zones", "n", "e", "halfN", "halfE", "altMin", "altMax");
+            var pylons = List(d, "pylons", "n", "e", "r", "h");
+            var wall = List(d, "wall", "n0", "n1", "e0", "e1", "altMin", "altMax");
+            if (gates == null || zones == null || pylons == null || wall == null) return null;
+            if (!d.TryGetValue("checkpoints", out object cpo) || !(cpo is List<object> cps) || cps.Count == 0) return null;
+            if (!d.TryGetValue("route", out object ro) || !(ro is List<object> route)) return null;
+
+            string name = id;
+            if (d.TryGetValue("name", out object nm) && nm is string nms) name = nms;
+            var c = new CourseLayout
+            {
+                Id = id,
+                Name = name,
+                Source = "json",
+                PadN = N(pad, "n"), PadE = N(pad, "e"), PadRadius = N(pad, "r"),
+                DroneRadius = N(k, "droneRadius"), RingTube = N(k, "ringTube"), StartAltitude = N(k, "startAltitude"), StartRadius = N(k, "startRadius"),
+            };
+            foreach (var g in gates) c.Gates.Add(new CourseGate { N = N(g, "n"), E = N(g, "e"), Alt = N(g, "alt"), AzimuthDeg = N(g, "azimuthDeg"), Radius = N(g, "r") });
+            foreach (var z in zones) c.Zones.Add(new CourseZone { N = N(z, "n"), E = N(z, "e"), HalfN = N(z, "halfN"), HalfE = N(z, "halfE"), AltMin = N(z, "altMin"), AltMax = N(z, "altMax") });
+            foreach (var p in pylons) c.Pylons.Add(new CoursePylon { N = N(p, "n"), E = N(p, "e"), Radius = N(p, "r"), Height = N(p, "h") });
+            foreach (var b in wall) c.Wall.Add(new CourseBox { N0 = N(b, "n0"), N1 = N(b, "n1"), E0 = N(b, "e0"), E1 = N(b, "e1"), AltMin = N(b, "altMin"), AltMax = N(b, "altMax") });
+            foreach (object o in cps)
+            {
+                var cp = o as Dictionary<string, object>;
+                if (cp == null || !cp.TryGetValue("kind", out object kindObj) || !(kindObj is string kind)) return null;
+                int count = kind == "gate" ? c.Gates.Count : kind == "zone" ? c.Zones.Count : -1;
+                if (count < 0 || !cp.TryGetValue("index", out object io) || !(io is double ix) || ix != Math.Floor(ix) || ix < 0 || ix >= count) return null;
+                c.Checkpoints.Add(new Checkpoint(kind == "gate" ? CheckpointKind.Gate : CheckpointKind.Zone, (int)ix));
+            }
+            foreach (object o in route)
+            {
+                if (!(o is List<object> w) || w.Count != 3 || !(w[0] is double) || !(w[1] is double) || !(w[2] is double)) return null;
+                c.Route.Add(new[] { (double)w[0], (double)w[1], (double)w[2] });
+            }
+            return c;
+        }
+
+        static Dictionary<string, object> Obj(Dictionary<string, object> d, string key) => d.TryGetValue(key, out object o) ? o as Dictionary<string, object> : null;
+        static double N(Dictionary<string, object> o, string key) => (double)o[key];
+
+        static bool AllNum(Dictionary<string, object> o, params string[] keys)
+        {
+            if (o == null) return false;
+            foreach (string key in keys) if (!o.TryGetValue(key, out object v) || !(v is double x) || double.IsNaN(x) || double.IsInfinity(x)) return false;
+            return true;
+        }
+
+        static List<Dictionary<string, object>> List(Dictionary<string, object> d, string key, params string[] keys)
+        {
+            if (!d.TryGetValue(key, out object o) || !(o is List<object> l)) return null;
+            var r = new List<Dictionary<string, object>>(l.Count);
+            foreach (object x in l)
+            {
+                var e = x as Dictionary<string, object>;
+                if (!AllNum(e, keys)) return null;
+                r.Add(e);
+            }
+            return r;
+        }
+
+        /// <summary>Every number of the layout in a fixed order and invariant text (id, name, pad, gates, zones, pylons, wall, checkpoints, route, constants): two layouts are the same course when their texts are equal.</summary>
+        public string Canonical()
+        {
+            var sb = new System.Text.StringBuilder(2048);
+            string F(double x) => x.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
+            sb.Append("id ").Append(Id).Append('\n').Append("name ").Append(Name).Append('\n');
+            sb.Append("pad ").Append(F(PadN)).Append(' ').Append(F(PadE)).Append(' ').Append(F(PadRadius)).Append('\n');
+            for (int i = 0; i < Gates.Count; i++) { var g = Gates[i]; sb.Append("gate ").Append(i).Append(' ').Append(F(g.N)).Append(' ').Append(F(g.E)).Append(' ').Append(F(g.Alt)).Append(' ').Append(F(g.AzimuthDeg)).Append(' ').Append(F(g.Radius)).Append('\n'); }
+            for (int i = 0; i < Zones.Count; i++) { var z = Zones[i]; sb.Append("zone ").Append(i).Append(' ').Append(F(z.N)).Append(' ').Append(F(z.E)).Append(' ').Append(F(z.HalfN)).Append(' ').Append(F(z.HalfE)).Append(' ').Append(F(z.AltMin)).Append(' ').Append(F(z.AltMax)).Append('\n'); }
+            for (int i = 0; i < Pylons.Count; i++) { var p = Pylons[i]; sb.Append("pylon ").Append(i).Append(' ').Append(F(p.N)).Append(' ').Append(F(p.E)).Append(' ').Append(F(p.Radius)).Append(' ').Append(F(p.Height)).Append('\n'); }
+            for (int i = 0; i < Wall.Count; i++) { var b = Wall[i]; sb.Append("wall ").Append(i).Append(' ').Append(F(b.N0)).Append(' ').Append(F(b.N1)).Append(' ').Append(F(b.E0)).Append(' ').Append(F(b.E1)).Append(' ').Append(F(b.AltMin)).Append(' ').Append(F(b.AltMax)).Append('\n'); }
+            for (int i = 0; i < Checkpoints.Count; i++) sb.Append("checkpoint ").Append(i).Append(' ').Append(Checkpoints[i].Kind == CheckpointKind.Gate ? "gate" : "zone").Append(' ').Append(Checkpoints[i].Index).Append('\n');
+            for (int i = 0; i < Route.Count; i++) sb.Append("route ").Append(i).Append(' ').Append(F(Route[i][0])).Append(' ').Append(F(Route[i][1])).Append(' ').Append(F(Route[i][2])).Append('\n');
+            sb.Append("constants ").Append(F(DroneRadius)).Append(' ').Append(F(RingTube)).Append(' ').Append(F(StartAltitude)).Append(' ').Append(F(StartRadius)).Append('\n');
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// The C# copy of the course (the fallback when the bundled JSON is missing). Every element sits well inside the 120 m geofence (the farthest point is
+        /// about 78 m from the take-off point). It must stay equal to contracts/courses/basic.json (CourseLayoutJsonTests).
+        /// </summary>
+        public static CourseLayout Builtin()
         {
             var c = new CourseLayout();
             // pad «H» at the take-off point
