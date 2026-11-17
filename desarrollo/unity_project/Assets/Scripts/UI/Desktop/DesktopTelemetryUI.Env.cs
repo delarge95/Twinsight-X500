@@ -31,7 +31,6 @@ namespace WebGL.UI.Desktop
             // test aids for the FPS runs: -env-noground starts without the environment, -env-course starts with the course placed (needs -tel-sim)
             string[] args = Environment.GetCommandLineArgs();
             if (Array.IndexOf(args, "-env-noground") >= 0) TelemetryDroneDriver.ShowGroundReference = false;
-            strip.Add(MakeSep());
             _btnGround = StripButton("DkTelGround", "env_studio", out _groundLabel, () => SetGround(!TelemetryDroneDriver.ShowGroundReference));
             strip.Add(_btnGround);
             _btnGround.EnableInClassList("dk-strip-btn--on", TelemetryDroneDriver.ShowGroundReference);

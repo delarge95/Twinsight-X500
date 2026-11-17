@@ -8,7 +8,7 @@ using WebGL.UI.Panels;
 
 namespace WebGL.UI.Desktop
 {
-    internal enum TelSource { Inspector, LocalReplay, Simulator, Sitl }
+    internal enum TelSource { Inspector, LocalReplay, Simulator, Sitl, OwnReplay }
 
     /// <summary>
     /// PC only (WP-11, PLAN_PC 22). The desktop face of the telemetry session (<see cref="DesktopTelemetry"/>):
@@ -325,6 +325,7 @@ namespace WebGL.UI.Desktop
             {
                 if (!DesktopTelemetry.IsRunning) return TelSource.Inspector;
                 var c = DesktopTelemetry.Client;
+                if (DesktopTelemetry.IsOwnReplay) return TelSource.OwnReplay; // an own recording: simulated readings, never a shadow
                 if (DesktopTelemetry.IsSimulator) return TelSource.Simulator; // checked first: the simulator rides the wire as mode sitl but is NOT SITL
                 if (c.Classification == SourceClassification.Sitl) return TelSource.Sitl;
                 return TelSource.LocalReplay;
@@ -374,6 +375,7 @@ namespace WebGL.UI.Desktop
                 case TelSource.LocalReplay: return TelemetryStrings.LocalReplayDetail(labels, Lang);
                 case TelSource.Sitl: return TelemetryStrings.ForDesktop(labels.ClassificationDetail(SourceClassification.Sitl, Lang), Lang);
                 case TelSource.Simulator: return labels.TrySimText("detail", Lang, out string d) ? d : string.Empty;
+                case TelSource.OwnReplay: return T("own.detail");
                 default: return T("src.inspector.detail");
             }
         }
@@ -533,6 +535,7 @@ namespace WebGL.UI.Desktop
                 case TelSource.LocalReplay: return T("src.replay");
                 case TelSource.Sitl: return T("src.sitl");
                 case TelSource.Simulator: return HonestyLabels.Load().TrySimText("title", Lang, out string s) ? s : string.Empty;
+                case TelSource.OwnReplay: return DesktopTelemetry.BadgeText(Lang) ?? string.Empty;
                 default: return T("src.inspector");
             }
         }

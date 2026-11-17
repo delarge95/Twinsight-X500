@@ -395,6 +395,7 @@ namespace WebGL.UI.Desktop
         public static TelSource Active()
         {
             if (!DesktopTelemetry.IsRunning) return TelSource.Inspector;
+            if (DesktopTelemetry.IsOwnReplay) return TelSource.OwnReplay;
             if (DesktopTelemetry.IsSimulator) return TelSource.Simulator;
             if (DesktopTelemetry.Client.Classification == SourceClassification.Sitl) return TelSource.Sitl;
             return TelSource.LocalReplay;

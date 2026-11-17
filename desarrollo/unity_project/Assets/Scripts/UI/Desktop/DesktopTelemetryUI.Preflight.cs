@@ -207,7 +207,7 @@ namespace WebGL.UI.Desktop
             inp.fence = sim ? FenceNow() : null;
             inp.manual = _pfTicked;
             inp.source = _pfSource;
-            inp.own = false;
+            inp.own = DesktopTelemetry.IsOwnReplay;
             _pfResult = Preflight.Evaluate(inp);
             return _pfResult;
         }

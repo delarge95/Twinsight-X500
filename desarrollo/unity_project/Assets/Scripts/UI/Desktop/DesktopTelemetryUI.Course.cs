@@ -68,7 +68,7 @@ namespace WebGL.UI.Desktop
             if (_courseRecordKey == "pen" || _courseRecordKey == "both") s += " · " + TelemetryStrings.T("course.newPenalised", lang);
             CourseRecord r = _courseRecords?.Of(_run.Layout.Id);
             if (r != null && r.BestClean.HasValue) s += "\n" + TelemetryStrings.T("course.bestClean", lang) + " " + FormatLap(r.BestClean.Value);
-            if (r != null && r.BestPenalised.HasValue) s += "\n" + TelemetryStrings.T("course.bestPenalised", lang) + " " + FormatLap(r.BestPenalised.Value);
+            if (r != null && r.BestPenalised.HasValue && _courseRecordKey != "pen" && _courseRecordKey != "both") s += "\n" + TelemetryStrings.T("course.bestPenalised", lang) + " " + FormatLap(r.BestPenalised.Value);
             return s;
         }
 

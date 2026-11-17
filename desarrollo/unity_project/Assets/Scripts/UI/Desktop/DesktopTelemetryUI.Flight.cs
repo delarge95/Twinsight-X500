@@ -334,8 +334,9 @@ namespace WebGL.UI.Desktop
             var labels = HonestyLabels.Load();
             SourceClassification cls = client.Classification;
             _flBadge.text = DesktopTelemetry.BadgeText(lang);
-            bool sim = DesktopTelemetry.IsSimulator; // E-5: the flight simulator is NOT SITL and NOT a shadow: its own approved texts, every reading simulated
-            _flBadgeDetail.text = sim && labels.TrySimText("detail", lang, out string simDetail)
+            bool sim = DesktopTelemetry.ReadingsSimulated; // E-5 (and own sessions): the flight simulator is NOT SITL and NOT a shadow: its own approved texts, every reading simulated
+            _flBadgeDetail.text = DesktopTelemetry.IsOwnReplay ? T("own.detail") + " " + T("own.readings")
+                : sim && labels.TrySimText("detail", lang, out string simDetail)
                 ? TelemetryStrings.ForDesktop(simDetail, lang)
                 : cls == SourceClassification.Replay && DesktopTelemetry.IsLocalReplay
                     ? TelemetryStrings.LocalReplayDetail(labels, lang)

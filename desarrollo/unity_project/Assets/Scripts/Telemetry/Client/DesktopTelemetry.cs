@@ -54,6 +54,8 @@ namespace WebGL.Telemetry
         /// <summary>The running source takes flight commands (takeoff, land...): the simulator, or SITL once connected. Never a replay.</summary>
         public static bool AcceptsCommands => Client != null && Client.Hello != null && Client.Hello.Accepts("takeoff") && Client.Source != null && Client.Source.State == TransportState.Open;
         /// <summary>True while the running source is the replay of one of the app's OWN recordings (Lote 1c, tool 7): not a real flight, never a "digital shadow".</summary>
+        /// <summary>Every reading of the session is simulated: the flight simulator and the replay of an own recording (never a measurement).</summary>
+        public static bool ReadingsSimulated => IsSimulator || IsOwnReplay;
         public static bool IsOwnReplay => Client?.Source is OwnReplayTelemetrySource;
         /// <summary>The bundled real flight replay ("sombra digital"); an own session is NOT this.</summary>
         public static bool IsLocalReplay => Client?.Source != null && !(Client.Source is OwnReplayTelemetrySource) && Client.Source.IsLocal && Client.Source.Classification == SourceClassification.Replay;

@@ -130,7 +130,7 @@ namespace WebGL.UI.Desktop
             bool flying = f.armed && !f.landed;
             BatteryReport r = BatteryHealth.Health(_bat, cells, flying, sim ? BatteryHealth.SimCapacityAh : (double?)null);
             _batReport = r;
-            BatteryOrigins o = BatteryHealth.Origins(src, h != null && h.provenance.HasBatteryCurrent ? h.provenance.batteryCurrent : null);
+            BatteryOrigins o = BatteryHealth.Origins(src, h != null && h.provenance.HasBatteryCurrent ? h.provenance.batteryCurrent : null, DesktopTelemetry.IsOwnReplay);
             string tag = FlightOrigins.Text(o.derived, lang, labels);
             string calc = TelemetryStrings.F("battery.calculating", lang, "n", r.quality, "min", BatteryHealth.MinAccepted);
             string perCell = T("unit.vPerCell");

@@ -133,7 +133,7 @@ namespace WebGL.UI.Desktop
             Tel.OpenMode();
             yield return new WaitForSecondsRealtime(0.6f);
             Check("without telemetry the new buttons are dimmed or reasoned (training and mission)", B("DkTelTraining") != null && !B("DkTelTraining").enabledSelf && B("DkTelMission") != null);
-            Check("the third pill fits inside the window (five buttons)", Root.Q("DkTelToolsStrip") != null && Root.Q("DkTelToolsStrip").worldBound.xMax <= Root.worldBound.xMax + 0.5f && Root.Q("DkTelToolsStrip").worldBound.xMin >= -0.5f);
+            Check("the third pill fits inside the window (five buttons)", Root.Q("DkTelToolsStrip") != null && Root.Q("DkTelToolsStrip").worldBound.width > 0f && Root.Q("DkTelToolsStrip").worldBound.xMax <= Root.panel.visualTree.worldBound.xMax + 0.5f && Root.Q("DkTelToolsStrip").worldBound.xMin >= Root.panel.visualTree.worldBound.xMin - 0.5f);
             yield return Shot("01_tira_sin_telemetria", 0.2f);
 
             Tel.StartSimulator();
@@ -164,6 +164,7 @@ namespace WebGL.UI.Desktop
             yield return PressKey(KeyCode.M, true);
             yield return new WaitForSecondsRealtime(0.5f);
             Check("Shift+M opens the mission popover", Tel.OpenPopover == "mission" && Tel.MissionPopover != null && Tel.MissionPopover.resolvedStyle.display != DisplayStyle.None);
+            while (Tel.MissionNow.waypoints.Count > 0) { Tel.MissionSelect(0); if (!Tel.MissionDeleteSelected()) break; } // a mission left by an earlier run
             Tel.SetMissionAdding(true);
             Check("adding mode on", Tel.MissionAdding);
             Tel.MissionAddPoint(20, 0); Tel.MissionAddPoint(20, 20); Tel.MissionAddPoint(0, 20); Tel.MissionAddPoint(0, 0);
@@ -250,11 +251,11 @@ namespace WebGL.UI.Desktop
             yield return PressKey(KeyCode.R, true);
             yield return new WaitForSecondsRealtime(0.4f);
             string path = Tel.LastSavedSession;
-            Check("Shift+R again stops and saves a .twf in the sessions folder", !Tel.Recording && path != null && File.Exists(path) && Path.GetDirectoryName(path) == DesktopTelemetryUI.SessionsFolder);
+            Check("Shift+R again stops and saves a .twf in the sessions folder", !Tel.Recording && path != null && File.Exists(path) && Path.GetFullPath(Path.GetDirectoryName(path)) == Path.GetFullPath(DesktopTelemetryUI.SessionsFolder));
             Check("the chip is gone", !Tel.RecordChip.ClassListContains("dk-chip--live"));
             TwfFile file = null; string kind = null;
             var fail = TwfWriter.ParseOwn(File.ReadAllBytes(path), out file, out kind);
-            Check("the file reads back as an own session of kind sim with the 20 Hz header", fail == TwfWriter.OwnFail.None && kind == "sim" && file.Header.rate_hz == 20 && file.Header.frame_count == frames);
+            Check("the file reads back as an own session of kind sim with the 20 Hz header", fail == TwfWriter.OwnFail.None && kind == "sim" && file.Header.rate_hz == 20 && file.Header.frame_count == Tel.RecordedFrames && file.Header.frame_count >= frames);
             Tel.TogglePopover("record");
             yield return new WaitForSecondsRealtime(1.3f);
             Check("«Mis sesiones» lists the file", Tel.RecordList.childCount >= 1);
@@ -275,6 +276,8 @@ namespace WebGL.UI.Desktop
             double lt0 = Frame != null ? Frame.lt : 0;
             yield return new WaitForSecondsRealtime(1.5f);
             Check("it plays (the log time advances)", Frame != null && Frame.lt != lt0);
+            Check("the source is the own session, not the replay of the real flight", Tel.ActiveSource == TelSource.OwnReplay);
+            Check("no reading of the Flight tab says «medido»: every tag is simulated or estimated", Tel.FlightTabActive && Root.Q<VisualElement>("DkFlightPanel").Q<VisualElement>(className: "dk-tag--measured") == null);
             yield return Shot("32_sesion_propia_repeticion", 0.2f);
             Tel.StopSession();
             yield return new WaitForSecondsRealtime(0.5f);

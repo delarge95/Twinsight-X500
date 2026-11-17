@@ -68,10 +68,17 @@ namespace WebGL.UI.Desktop
         }
 
         /// <summary>The third pill of the strip (Lote 1b / 1c): «Mapa», «Comprobar», «Misión», «Grabar», «Entrenar». The second pill has no room left.</summary>
-        private VisualElement _toolsStrip;
+        private VisualElement _toolsStrip, _envStrip;
 
         private void BuildToolsStrip()
         {
+            // the environment pill (ground, course, geofence, wind): the pilot pill had no room left in English at 1280 px
+            var envStrip = _envStrip = new VisualElement { name = "DkTelEnvStrip" };
+            envStrip.AddToClassList("dk-strip");
+            envStrip.AddToClassList("dk-strip--tel");
+            envStrip.AddToClassList("dk-strip--pilot");
+            BuildEnvButtons(envStrip); // PLAN_PC 28.2 / 28.3 and Lote 1a: «Suelo», «Escenario», «Geocerca», «Viento»
+            _container.Add(envStrip);
             _toolsStrip = new VisualElement { name = "DkTelToolsStrip" };
             _toolsStrip.AddToClassList("dk-strip");
             _toolsStrip.AddToClassList("dk-strip--tel");
@@ -88,6 +95,7 @@ namespace WebGL.UI.Desktop
         {
             DisposeMap(); DisposePreflight(); DisposeMission(); DisposeRecord(); DisposeTraining();
             _toolsStrip?.RemoveFromHierarchy();
+            _envStrip?.RemoveFromHierarchy();
         }
 
         private void RelabelToolsLote1()
