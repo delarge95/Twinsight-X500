@@ -355,7 +355,6 @@ namespace WebGL.UI.Desktop
             _top.Add(_chipPower);
             // second chip: an active telemetry session (same chip style; click = stop the session)
             _top.Add(_tel.SessionChip);
-            _top.Add(_tel.RecordChip); // Lote 1c: the red chip while an own session is being recorded (click = stop)
             _top.Add(_btnIso);
             _top.Add(reset);
             _top.Add(Sep());
@@ -793,6 +792,20 @@ namespace WebGL.UI.Desktop
             }
 
             for (int i = 1; i <= BarLevelBelow.Length; i++) _root.EnableInClassList(_barLevelClasses[i], _barLevel >= i); // F-6: no string per frame
+        }
+
+        /// <summary>Verification harness: the sliding pills and the item each one belongs under.</summary>
+        internal SlidingPill SegPill => _segPill;
+        internal SlidingPill LangPill => _langPill;
+        internal Button ActiveModeSeg { get { for (int i = 3; i >= 0; i--) if (_modeSeg[i] != null && _modeSeg[i].ClassListContains("dk-seg-btn--on")) return _modeSeg[i]; return null; } }
+        internal Button ActiveLangButton => AppLanguageManager.IsSpanish ? _btnLangEs : _btnLangEn;
+
+        /// <summary>Puts a chip that is only needed sometimes (the red recording chip) into the top bar the first time it is needed, right after the session chip: while it is not there it costs the bar nothing.</summary>
+        internal void AttachTopChip(VisualElement chip)
+        {
+            if (chip == null || chip.parent != null || _top == null) return;
+            int at = _tel != null && _tel.SessionChip != null ? _top.IndexOf(_tel.SessionChip) : -1;
+            if (at >= 0) _top.Insert(at + 1, chip); else _top.Add(chip);
         }
 
         public void Tick(float logicalWidth)

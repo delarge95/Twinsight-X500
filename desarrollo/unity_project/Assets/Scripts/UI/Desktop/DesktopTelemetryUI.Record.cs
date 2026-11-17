@@ -303,7 +303,8 @@ namespace WebGL.UI.Desktop
             _btnRecord.EnableInClassList("dk-strip-btn--rec", _twOn);
             string tip = _twOn ? T("rec.stopAria").Replace("{time}", FmtTime(_twr.Seconds)) : T("sc.tools.record");
             if (_btnRecord.tooltip != tip) _btnRecord.tooltip = tip;
-            UpdateChipVisibility(RecordChip, _twOn);
+            if (_twOn) _chrome.AttachTopChip(RecordChip);
+            if (RecordChip.parent != null) UpdateChipVisibility(RecordChip, _twOn);
             if (_twOn && Time.unscaledTime >= _nextChipText)
             {
                 _nextChipText = Time.unscaledTime + 0.25f;

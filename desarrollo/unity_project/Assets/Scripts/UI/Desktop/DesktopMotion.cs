@@ -131,8 +131,16 @@ namespace WebGL.UI.Desktop
             container.Insert(0, _pill);
         }
 
+        /// <summary>The pill as drawn now (resolved style: it follows the transition) and the item it is meant to sit under, both in the container's space (verification harness).</summary>
+        public Rect PillRect => new Rect(_pill.resolvedStyle.left, _pill.resolvedStyle.top, _pill.resolvedStyle.width, _pill.resolvedStyle.height);
+        public float PillOpacity => _pill.resolvedStyle.opacity;
+        public VisualElement Target => _target;
+        public int Updates { get; private set; }
+        public int Placements { get; private set; }
+
         public void Update(VisualElement active)
         {
+            Updates++;
             if (active == null)
             {
                 _pill.style.opacity = 0f;
@@ -144,6 +152,7 @@ namespace WebGL.UI.Desktop
             if (float.IsNaN(r.width) || r.width < 4f) return;
 
             if (_target == active && Mathf.Approximately(r.x, _lastX) && Mathf.Approximately(r.width, _lastW)) return;
+            Placements++;
             _lastX = r.x;
             _lastW = r.width;
             _pill.style.opacity = 1f;

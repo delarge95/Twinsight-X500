@@ -1812,8 +1812,8 @@
 .dk-pop .submenu-back-btn:active { scale: 0.96 0.96; translate: 0 0; }
 
 .dk-seg, .dk-lang { position: relative; }
-.dk-seg-btn--on, .dk-seg-btn--on:hover { background-color: rgba(0, 0, 0, 0); border-width: 0; }
-.dk-lang-btn--on, .dk-lang-btn--on:hover { background-color: rgba(0, 0, 0, 0); }
+/* the active mode / language highlights ITSELF (its own background and border, see .dk-seg-btn--on above): the sliding pills measured the layout of items that the narrow top bar squeezes, and ended up as a circle on the wrong item. */
+.dk-pill { display: none; }
 .dk-pill { position: absolute; left: 0; width: 0; opacity: 0; transition-property: left, width, opacity; transition-duration: 0.2s; transition-timing-function: ease-out; }
 .dk-seg-pill { border-radius: 13px; background-color: rgba(70, 175, 255, 0.16); border-width: 1px; border-color: rgba(70, 175, 255, 0.55); }
 .dk-lang-pill { border-radius: 10px; background-color: rgba(70, 175, 255, 0.22); }
@@ -2096,7 +2096,7 @@
 .dk-bar-l5 .dk-seg-btn { padding: 0 8px; }
 .dk-bar-l5 .dk-seg-btn .dk-icon { margin-right: 4px; }
 .dk-bar-l6 .dk-seg-btn .dk-kbd { display: none; }
-.dk-bar-l6 .dk-stchip { max-width: 120px; }
+.dk-bar-l6 .dk-stchip { max-width: 150px; }
 
 .dk-reduce-motion .dk-stchip,
 .dk-reduce-motion .dk-dot,

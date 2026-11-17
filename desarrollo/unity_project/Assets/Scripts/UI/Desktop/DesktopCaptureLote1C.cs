@@ -104,6 +104,26 @@ namespace WebGL.UI.Desktop
             while (Time.realtimeSinceStartup < until && !Frame.landed) yield return null;
         }
 
+        /// <summary>
+        /// The active mode and the active language highlight THEMSELVES (own background and border; the old sliding pills measured the layout and ended up as a circle on the
+        /// wrong item when the narrow top bar squeezed it): the active item has a visible highlight, no other item of its group has one, and the old pills stay hidden.
+        /// </summary>
+        private void PillCheck(string when)
+        {
+            DesktopChrome ch = DesktopUIController.Instance.Chrome;
+            foreach (string group in new[] { "mode switch", "language toggle" })
+            {
+                VisualElement item = group == "mode switch" ? ch.ActiveModeSeg : ch.ActiveLangButton;
+                int others = 0;
+                if (item != null && item.parent != null)
+                    foreach (VisualElement c in item.parent.Children())
+                        if (c != item && c.ClassListContains(group == "mode switch" ? "dk-seg-btn" : "dk-lang-btn") && c.resolvedStyle.backgroundColor.a > 0.1f) others++;
+                float a = item != null ? item.resolvedStyle.backgroundColor.a : 0f;
+                Log("highlight " + group + " (" + when + "): " + (item != null ? item.name + " '" + (item is Button b ? b.text : "") + "'" : "none") + " background alpha " + a.ToString("F2", CultureInfo.InvariantCulture) + ", other items highlighted " + others);
+                Check("the " + group + ": the active item is highlighted by itself and no other item is (" + when + ")", item != null && a > 0.1f && others == 0);
+            }
+        }
+
         private IEnumerator Run()
         {
             Directory.CreateDirectory(OutputDirectory);
@@ -134,11 +154,13 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(0.6f);
             Check("without telemetry the new buttons are dimmed or reasoned (training and mission)", B("DkTelTraining") != null && !B("DkTelTraining").enabledSelf && B("DkTelMission") != null);
             Check("the third pill of the strip exists with its five buttons (the fit inside the window is checked on the capture: the layout is not measurable this early)", Root.Q("DkTelToolsStrip") != null && B("DkTelMap") != null && B("DkTelPreflight") != null && B("DkTelMission") != null && B("DkTelRecord") != null && B("DkTelTraining") != null);
+            PillCheck("no telemetry");
             yield return Shot("01_tira_sin_telemetria", 0.2f);
 
             Tel.StartSimulator();
             yield return new WaitForSecondsRealtime(2.5f);
             Check("simulator running", DesktopTelemetry.IsSimulator && Sim != null);
+            PillCheck("simulator running");
 
             yield return MissionChecks();
             yield return CourseChecks();
