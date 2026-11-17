@@ -2524,3 +2524,7 @@
 .dk-game-badge { position: absolute; left: 50%; top: 212px; translate: -50% 0; flex-direction: row; align-items: center; padding: 5px 14px 5px 10px; border-width: 1px; border-radius: 14px; border-color: rgba(70, 175, 255, 0.75); background-color: rgba(14, 17, 22, 0.92); }
 .dk-game-icon { width: 16px; height: 16px; margin: 0 8px 0 0; }
 .dk-game-text { margin: 0; font-size: 12.5px; -unity-font-style: bold; letter-spacing: 0.4px; color: rgb(191, 234, 255); }
+
+/* MVP P1 - tool chips of the active-effect registry: the same chip, a little tighter when the bar gives up room (1280 px windows) */
+.dk-chip--tool { margin-left: 0; margin-right: 0; }
+.dk-bar-l3 .dk-chip--tool, .dk-narrowbar .dk-chip--tool { width: 28px; height: 28px; border-radius: 14px; }

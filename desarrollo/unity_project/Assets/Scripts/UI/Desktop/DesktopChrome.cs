@@ -52,6 +52,10 @@ namespace WebGL.UI.Desktop
         private DesktopTelemetryUI _tel;
         private readonly Button[] _modeSrc = new Button[3];
         private Button _chipFilter, _chipExplode, _chipCut, _chipPower;
+        private DesktopActiveEffects _fx; // MVP P1: the registry of active-effect chips of the top bar
+
+        /// <summary>The registry of active effects (one chip per toggleable tool that is on).</summary>
+        internal DesktopActiveEffects Effects => _fx;
         private SlidingPill _segPill, _langPill;
         private Label _sheetTitle;
         private string _lastCrumb, _lastTitle;
@@ -164,6 +168,48 @@ namespace WebGL.UI.Desktop
                 chip.AddToClassList("dk-chip--out");
                 chip.schedule.Execute(() => { if (!chip.ClassListContains("dk-chip--live")) chip.style.display = DisplayStyle.None; }).StartingIn(DesktopMotion.Reduce ? 1 : 200);
             }
+        }
+
+        /// <summary>
+        /// MVP P1: every active effect of the top bar, in the order it shows. Existing chips keep their element names (DkChipFilter...); the tool chips are new. The tooltip of a
+        /// chip says what a click does: «Quitar …» (the tool goes back to how it was). Mission, training and piloting are not removable things but things that stop: «Detener …».
+        /// </summary>
+        private void RegisterActiveEffects()
+        {
+            _fx = new DesktopActiveEffects(T);
+            _fx.Add("filter", _chipFilter, () => _ui.FilterActive, "Quitar filtro", "Remove filter", false);
+            _fx.Add("explode", _chipExplode, () => ExplodedViewManager.Instance != null && ExplodedViewManager.Instance.GetExplosionFactor() > 0.001f, "Quitar vista explosiva", "Remove exploded view", false);
+            _fx.Add("cut", _chipCut, () => CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled, "Quitar corte", "Remove cut", false);
+            _fx.Add("power", _chipPower, () => DroneStateController.Instance != null && DroneStateController.Instance.IsOn, "Apagar energía simulada", "Switch off simulated power", false);
+
+            // render mode other than the realistic one (the V key, the Studio mode)
+            AddToolChip("view", "xray", "DkChipView",
+                () => ViewModeManager.Instance != null && ViewModeManager.Instance.CurrentMode != ViewMode.Realistic,
+                () => ViewModeManager.Instance?.SetViewMode(ViewMode.Realistic), "Volver a la vista realista", "Back to the realistic view", false);
+            // the tools of the telemetry mode (state read from DesktopTelemetryUI)
+            AddToolChip("pilot", "gamepad", "DkChipPilot", () => _tel.Piloting, () => _tel.SetPilot(false, "chip"), "Dejar de pilotar", "Stop piloting");
+            AddToolChip("wind", "wind", "DkChipWind", () => _tel.IsRunning && DesktopTelemetry.IsSimulator && (_tel.WindRemembered.speed > 0 || _tel.WindRemembered.gustSigma > 0),
+                () => { var w = _tel.WindRemembered.Clone(); w.speed = 0; w.gustSigma = 0; _tel.ApplyWind(w); }, "Quitar viento", "Remove wind");
+            AddToolChip("fence", "fence", "DkChipFence", () => _tel.IsRunning && DesktopTelemetry.IsSimulator && !FenceIsDefault(_tel.FenceRemembered),
+                () => _tel.ApplyFence(Geofence.Default()), "Quitar geocerca personalizada", "Remove custom geofence");
+            AddToolChip("course", "studio", "DkChipCourse", () => _tel.CourseOn, () => _tel.SetCourse(false), "Quitar circuito", "Remove circuit");
+            AddToolChip("map", "focus", "DkChipMap", () => _tel.MapOn, () => _tel.SetMap(false), "Quitar mapa", "Remove map");
+            AddToolChip("mission", "pins", "DkChipMission", () => _tel.MissionBusy, () => _tel.MissionDo(MissionControl.Abort), "Detener misión", "Stop mission");
+            AddToolChip("training", "check", "DkChipTraining", () => _tel.TrainingActive, () => _tel.QuitTraining(), "Salir del entrenamiento", "Leave training");
+            AddToolChip("ground", "env_studio", "DkChipGround", () => _tel.IsRunning && !_tel.GroundOn, () => _tel.SetGround(true), "Mostrar suelo", "Show ground");
+        }
+
+        private void AddToolChip(string id, string icon, string name, Func<bool> isActive, Action off, string tipEs, string tipEn, bool tool = true)
+        {
+            Button chip = MakeChip(icon, name, off);
+            _top.Add(chip);
+            _fx.Add(id, chip, isActive, tipEs, tipEn, tool);
+        }
+
+        private static bool FenceIsDefault(FenceConfig f)
+        {
+            FenceConfig d = Geofence.Default();
+            return f == null || (f.radius == d.radius && f.ceiling == d.ceiling && f.rtlAltitude == d.rtlAltitude);
         }
 
         internal Button MakeChipPublic(string shape, string name, Action off) => MakeChip(shape, name, off);
@@ -353,6 +399,7 @@ namespace WebGL.UI.Desktop
             // drone power chip (provisional home of the power-off control; see PLAN_PC.md section 19b): visible while the drone is on, click powers it off
             _chipPower = MakeChip("power", "DkChipPower", () => DroneStateController.Instance?.TurnOff());
             _top.Add(_chipPower);
+            RegisterActiveEffects(); // MVP P1: the same registry holds the four chips above and one chip per toggleable tool of the telemetry mode
             // second chip: an active telemetry session (same chip style; click = stop the session)
             _top.Add(_tel.SessionChip);
             _top.Add(_btnIso);
@@ -854,17 +901,14 @@ namespace WebGL.UI.Desktop
             bool pinsVisible = HotspotManager.Instance != null && HotspotManager.Instance.IsVisible;
             SetOn(_btnPins, pinsVisible);
             (_qHotspotBtn ?? (_qHotspotBtn = _root.Q<Button>("ToolHotspotBtn")))?.EnableInClassList("submenu-card--active", pinsVisible);
-            UpdateChip(_chipFilter, _ui.FilterActive);
-            UpdateChip(_chipExplode, ExplodedViewManager.Instance != null && ExplodedViewManager.Instance.GetExplosionFactor() > 0.001f);
-            UpdateChip(_chipCut, CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled);
-            UpdateChip(_chipPower, DroneStateController.Instance != null && DroneStateController.Instance.IsOn);
             _tel.Tick();
+            _fx.Tick(); // MVP P1: filter, explode, cut, power and every tool chip, read from their owners
             RelabelPowerCard();
             // narrow windows (1280x720 = 1391 logical px): the mode keys, a long part name and the status chip give way so the bar never overlaps
             // what the bar shows, as a key: its change (not the layout, which the levels themselves change) restarts the overflow guard
             _barKey = (_ui.FilterActive ? 1 : 0) | (ExplodedViewManager.Instance != null && ExplodedViewManager.Instance.GetExplosionFactor() > 0.001f ? 2 : 0)
                       | (CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled ? 4 : 0) | (DroneStateController.Instance != null && DroneStateController.Instance.IsOn ? 8 : 0)
-                      | (_tel.IsRunning ? 16 : 0) | (hasSel ? 32 : 0);
+                      | (_tel.IsRunning ? 16 : 0) | (hasSel ? 32 : 0) | (_fx.Mask << 6);
             UpdateBarLevel(logicalWidth);
             SetOn(_btnIso, (_qIsolateBtn ?? (_qIsolateBtn = _root.Q<Button>("ToolIsolateBtn")))?.ClassListContains("submenu-card--active") == true);
             SetOn(_btnGear, _settingsOpen);
@@ -1062,10 +1106,7 @@ namespace WebGL.UI.Desktop
             var il = _root.Q<Label>("DkIsolateLabel");
             if (il != null) il.text = T("Isolate", "Aislar");
             _btnPins.tooltip = T("Pins", "Puntos");
-            _chipFilter.tooltip = T("Remove filter", "Quitar filtro");
-            _chipExplode.tooltip = T("Remove exploded view", "Quitar vista explosiva");
-            _chipCut.tooltip = T("Remove cut", "Quitar corte");
-            _chipPower.tooltip = T("Switch off simulated power", "Apagar energía simulada");
+            _fx?.Relabel();
             _btnIso.tooltip = T("Isolate selected part", "Aislar la pieza seleccionada");
             _root.Q<Button>("DkReset").tooltip = T("Reset view", "Restablecer vista");
             _btnTree.tooltip = T("Parts tree", "Árbol de piezas");

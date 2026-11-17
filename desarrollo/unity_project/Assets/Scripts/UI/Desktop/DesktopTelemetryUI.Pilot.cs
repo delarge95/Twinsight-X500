@@ -256,6 +256,7 @@ namespace WebGL.UI.Desktop
                 _pilotOn = true;
                 _pilotAuto = false;
                 _pilotFlagLost = false;
+                _padSeen = false; // a pad unplugged while piloting was off must not end the NEXT piloting as a dead-man (the first stick read sets it again when a pad is there)
                 _held = PilotKeys.None;
                 _nextManual = 0;
                 _lastSticks = SimSticks.Neutral;
