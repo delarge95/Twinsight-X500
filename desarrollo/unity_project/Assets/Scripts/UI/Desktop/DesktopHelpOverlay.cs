@@ -231,6 +231,9 @@ namespace WebGL.UI.Desktop
             AddPadRow(drone, new[] { "LS" }, T("Climb / descend (up-down) and turn (left-right)", "Subir / bajar (arriba-abajo) y girar (izq.-der.)"));
             AddPadRow(drone, new[] { "RS" }, T("Move: forward, back, left, right", "Mover: adelante, atrás, izquierda, derecha"));
             AddPadRow(drone, new[] { "A", "B", "X", "Y" }, T("Take off · land · hold · return", "Despegar · aterrizar · mantener · volver"));
+            AddPadRow(drone, new[] { "LB", "RS" }, T("Camera: hold LB and move the right stick to orbit (the drone gets nothing from RS then); it glides back behind the drone 1.5 s after you let go", "Cámara: mantén LB y mueve el stick derecho para orbitar (el dron no recibe nada de RS entonces); vuelve detrás del dron 1,5 s después de soltar"));
+            AddPadRow(drone, new[] { "D-pad" }, T("Camera: orbit in steps (left / right turns, up / down tilts)", "Cámara: orbitar por pasos (izq. / der. gira, arriba / abajo inclina)"));
+            AddPadRow(drone, new[] { "R3" }, T("Camera: Follow / Free", "Cámara: Seguir / Libre"));
             AddPadRow(drone, new[] { "Start" }, T("Switch to MENUS mode", "Cambiar al modo MENÚS"));
             AddNote(drone, T("The pad flies the drone only with «Pilot» on (flight simulator or PX4 SITL; a replay is read-only). In this mode the menus receive nothing from the pad.",
                              "El mando pilota solo con «Pilotar» activado (simulador de vuelo o PX4 SITL; la repetición es de solo lectura). En este modo los menús no reciben nada del mando."));
@@ -291,6 +294,8 @@ namespace WebGL.UI.Desktop
             AddPilotRow(column, new[] { "Q", "E" }, T("Turn left / right", "Girar a izquierda / derecha"));
             AddPilotRow(column, new[] { "Space", "Shift" }, T("Climb / descend", "Subir / bajar"));
             AddPilotRow(column, new[] { "T", "L", "H", "R" }, T("Take off · land · hold · return", "Despegar · aterrizar · mantener · volver"));
+            AddPilotRow(column, new[] { "B" }, T("Camera: Follow (behind the drone) / Free", "Cámara: Seguir (detrás del dron) / Libre"));
+            AddPilotRow(column, new[] { "X" }, T("Game mode: the mouse orbits the camera (Esc or X to exit)", "Modo juego: el ratón orbita la cámara (Esc o X para salir)"));
             AddPilotRow(column, new[] { "Esc" }, T("Leave piloting (hold)", "Soltar el pilotaje (mantener)"));
             AddPilotRow(column, new[] { T("Click", "Clic") }, T("On the ground grid: fly there", "En la rejilla del suelo: volar allí"));
             var note = new Label(Piloting

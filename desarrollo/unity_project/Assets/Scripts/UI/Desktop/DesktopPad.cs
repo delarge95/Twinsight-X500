@@ -38,7 +38,7 @@ namespace WebGL.UI.Desktop
         private readonly List<PadEvent> _events = new List<PadEvent>();
         private VisualElement _badge;
         private DesktopVectorIcon _icon;
-        private Label _modeLabel, _hintLabel;
+        private Label _modeLabel, _hintLabel, _camLabel;
         private string _lastBadge, _lastLang;
         private bool _navHooked;
         private bool _ringAdded;
@@ -95,6 +95,10 @@ namespace WebGL.UI.Desktop
             _hintLabel = new Label { name = "DkPadHint", pickingMode = PickingMode.Ignore };
             _hintLabel.AddToClassList("dk-pad-hint");
             _badge.Add(_hintLabel);
+            // MVP P0: the camera mapping of the pad, shown in DRON mode (LB held + right stick orbits the camera, R3 switches «Seguir» / «Libre»)
+            _camLabel = new Label { name = "DkPadCam", pickingMode = PickingMode.Ignore };
+            _camLabel.AddToClassList("dk-pad-hint");
+            _badge.Add(_camLabel);
             _root.Add(_badge);
         }
 
@@ -111,6 +115,8 @@ namespace WebGL.UI.Desktop
             _lastBadge = sig;
             _modeLabel.text = T(key);
             _hintLabel.text = T("pad.badge.hint");
+            _camLabel.text = T("pad.badge.cam");
+            _camLabel.style.display = Machine.Mode == PadMode.Drone ? DisplayStyle.Flex : DisplayStyle.None;
             _badge.tooltip = T("pad.badge.tip");
             _badge.EnableInClassList("dk-pad-badge--menus", Machine.Mode == PadMode.Menus);
             _badge.EnableInClassList("dk-pad-badge--drone", Machine.Mode == PadMode.Drone);

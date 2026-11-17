@@ -36,7 +36,7 @@ namespace WebGL.Telemetry
 
         const uint Success = 0;
         const ushort DpadUp = 0x0001, DpadDown = 0x0002, DpadLeft = 0x0004, DpadRight = 0x0008, StartBtn = 0x0010, BackBtn = 0x0020;
-        const ushort LbBtn = 0x0100, RbBtn = 0x0200;
+        const ushort LbBtn = 0x0100, RbBtn = 0x0200, LsBtn = 0x0040, RsBtn = 0x0080;
         const ushort ButtonA = 0x1000, ButtonB = 0x2000, ButtonX = 0x4000, ButtonY = 0x8000;
         static bool broken;
         static int slot = -1;           // the slot that answered last
@@ -68,6 +68,8 @@ namespace WebGL.Telemetry
             if ((g.wButtons & RbBtn) != 0) b |= PadButtons.RB;
             if ((g.wButtons & StartBtn) != 0) b |= PadButtons.Start;
             if ((g.wButtons & BackBtn) != 0) b |= PadButtons.Back;
+            if ((g.wButtons & LsBtn) != 0) b |= PadButtons.LeftStick;
+            if ((g.wButtons & RsBtn) != 0) b |= PadButtons.RightStick;
             if ((g.wButtons & DpadUp) != 0) b |= PadButtons.DpadUp;
             if ((g.wButtons & DpadDown) != 0) b |= PadButtons.DpadDown;
             if ((g.wButtons & DpadLeft) != 0) b |= PadButtons.DpadLeft;

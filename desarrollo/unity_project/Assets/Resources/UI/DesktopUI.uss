@@ -2514,3 +2514,13 @@
 .dk-tr-donetitle { margin: 3px 0 0 0; font-size: 14px; -unity-font-style: bold; color: rgb(63, 191, 138); }
 .dk-tr-actions { flex-direction: row; margin: 8px 0 0 0; flex-wrap: wrap; }
 .desktop-ui .dk-b.dk-tr-btn { height: 24px; margin: 0 6px 0 0; padding: 0 10px; font-size: 11.5px; }
+
+/* ================================================================
+   MVP P0 - camera while piloting (PLAN_PC 32, PC only): «Modo juego». A full-screen shield takes the pointer while the cursor is locked in the middle of the
+   screen (nothing under it may be pressed), a crosshair marks the middle and a pill says how to leave. Colours from design/tokens.json (same literals as above).
+   ================================================================ */
+.dk-game-shield { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0); }
+.dk-game-cross { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin-left: -9px; margin-top: -9px; border-width: 1px; border-radius: 9px; border-color: rgba(191, 234, 255, 0.55); }
+.dk-game-badge { position: absolute; left: 50%; top: 212px; translate: -50% 0; flex-direction: row; align-items: center; padding: 5px 14px 5px 10px; border-width: 1px; border-radius: 14px; border-color: rgba(70, 175, 255, 0.75); background-color: rgba(14, 17, 22, 0.92); }
+.dk-game-icon { width: 16px; height: 16px; margin: 0 8px 0 0; }
+.dk-game-text { margin: 0; font-size: 12.5px; -unity-font-style: bold; letter-spacing: 0.4px; color: rgb(191, 234, 255); }

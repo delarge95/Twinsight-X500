@@ -16,6 +16,7 @@ namespace WebGL.Telemetry
             AddTraining(d);
             AddCourse(d);
             AddDesktop(d);
+            AddMvp(d);
             return d;
         }
 
@@ -26,6 +27,8 @@ namespace WebGL.Telemetry
         static partial void AddCourse(Dictionary<string, string[]> d);
         // texts that only the desktop needs (files on disk instead of a download, reasons in both languages...): ExtraStrings.Desktop.cs
         static partial void AddDesktop(Dictionary<string, string[]> d);
+        // MVP priorities (camera while piloting, active-effect chips, thermal field, battery): ExtraStrings.Mvp.cs
+        static partial void AddMvp(Dictionary<string, string[]> d);
 
         public static bool TryGet(string key, out string[] v) => Table.TryGetValue(key, out v);
 

@@ -71,6 +71,9 @@ namespace WebGL.UI.ProceduralIcons
             // Lote 1a: added by hand on the same 24 grid (the maqueta has no such icons): the simulator tools «Geocerca» and «Viento».
             { "fence", new[] { "~M3.5 12a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0", "M10.6 12a1.4 1.4 0 1 0 2.8 0a1.4 1.4 0 1 0 -2.8 0" } },
             { "wind", new[] { "M3.5 9h10a2.4 2.4 0 1 0-2.4-2.4", "M3.5 13h14a2.4 2.4 0 1 1-2.4 2.4", "M3.5 17h6" } },
+            // MVP P0 / P1: by hand on the same 24 grid: «Seguir» camera, «Modo juego» (mouse).
+            { "camera", new[] { "M6.5 8.5h11a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z", "M9.2 8.5l1-2.2h3.6l1 2.2", "M10 13.5a2 2 0 1 0 4 0a2 2 0 1 0-4 0" } },
+            { "mouse", new[] { "M12 3.5c-3.3 0-5 2-5 5v7c0 3 1.7 5 5 5s5-2 5-5v-7c0-3-1.7-5-5-5z", "M12 3.5v6M7 9.5h10" } },
         };
     }
 }

@@ -433,6 +433,9 @@ namespace WebGL.Core.Managers
         private void ApplyOrbit(float x, float y)
         {
             float orbitFactor = GetAdaptiveOrbitFactor();
+#if UNITY_STANDALONE
+            if (_chaseLive) { _chase.AddInput(x * orbitFactor, -y * orbitFactor); return; } // MVP P0: while chasing, the user's orbit is an offset that recentres
+#endif
             targetX += x * orbitFactor;
             targetY -= y * orbitFactor;
             targetY = Mathf.Clamp(targetY, minVerticalAngle, maxVerticalAngle);
@@ -440,6 +443,9 @@ namespace WebGL.Core.Managers
 
         private void ApplyPan(float x, float y)
         {
+#if UNITY_STANDALONE
+            if (_chaseLive) return; // MVP P0: the chase keeps the drone in the middle
+#endif
             // Pan in camera-local space so the drag direction stays aligned with the current view.
             Vector3 right = transform.right.normalized;
             Vector3 up = transform.up.normalized;
@@ -515,6 +521,9 @@ namespace WebGL.Core.Managers
         {
             float dt = Time.deltaTime;
             float damp = _isTouchInput ? touchDampingFactor : dampingFactor;
+#if UNITY_STANDALONE
+            ApplyDesktopChase(dt);
+#endif
 
             // Smooth Orbit Angles
             currentX = Mathf.Lerp(currentX, targetX, dt * damp);
@@ -661,6 +670,9 @@ namespace WebGL.Core.Managers
 
             CalibrateDefaultNavigationContext(immediate: false);
 
+#if UNITY_STANDALONE
+            _chase.ClearUser(); // MVP P0: Reset drops the user's orbit; the chase goes on behind the drone
+#endif
             // Reset Orbit & Zoom
             targetX = 0f;
             targetY = DEFAULT_VERTICAL_ANGLE;

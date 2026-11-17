@@ -18,6 +18,8 @@ namespace WebGL.Telemetry
         A = 1 << 0, B = 1 << 1, X = 1 << 2, Y = 1 << 3,
         LB = 1 << 4, RB = 1 << 5, Start = 1 << 6, Back = 1 << 7,
         DpadUp = 1 << 8, DpadDown = 1 << 9, DpadLeft = 1 << 10, DpadRight = 1 << 11,
+        /// <summary>Stick clicks (L3 / R3). R3 toggles the camera mode «Seguir» / «Libre» while piloting (MVP P0).</summary>
+        LeftStick = 1 << 12, RightStick = 1 << 13,
     }
 
     /// <summary>One poll of a connected pad: sticks in -1..1 (Y positive UP, the XInput convention) and the buttons.</summary>

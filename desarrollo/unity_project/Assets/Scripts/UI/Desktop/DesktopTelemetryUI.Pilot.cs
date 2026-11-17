@@ -93,6 +93,7 @@ namespace WebGL.UI.Desktop
                 _pilotStrip.Add(b);
             }
 
+            BuildCameraButtons(); // MVP P0: «Seguir / Libre» and «Modo juego»
             _container.Add(_pilotStrip);
             BuildToolsStrip(); // Lote 1b / 1c: third pill (map, pre-flight, mission, record, training)
         }
@@ -129,6 +130,8 @@ namespace WebGL.UI.Desktop
 
             _root.Add(_legend);
             _root.Add(_toast);
+            BuildGameOverlay(); // MVP P0: the shield, the crosshair and the badge of «Modo juego»
+            _toast.BringToFront();
         }
 
         private VisualElement LegendRow(params object[] parts)
@@ -190,14 +193,17 @@ namespace WebGL.UI.Desktop
             _legendTexts.Clear();
             _legendKeys.Add(LegendRow(new[] { "W", "A", "S", "D" }, T("pilot.legend.move"), new[] { "Q", "E" }, T("pilot.legend.yaw"), new[] { "Space", "Shift" }, T("pilot.legend.alt")));
             _legendKeys.Add(LegendRow(new[] { "T" }, T("cmd.takeoff"), new[] { "L" }, T("cmd.land"), new[] { "H" }, T("cmd.hold"), new[] { "R" }, T("cmd.rtl"), new[] { "Esc" }, T("pilot.legend.release")));
+            _legendKeys.Add(CameraLegendRow()); // MVP P0: camera mode and game mode
             // the pad mapping, shown only while a pad is connected (PLAN_PC 27.2); its caps are NOT registered in _caps (A is also the roll-left key)
             _legendPadBox = new VisualElement { pickingMode = PickingMode.Ignore };
             _legendPadBox.AddToClassList("dk-pilot-padbox");
             _legendPadBox.Add(PadLegendRow(new[] { "LS" }, T("pilot.legend.alt") + " · " + T("pilot.legend.yaw"), new[] { "RS" }, T("pilot.legend.move"), new[] { "Start" }, T("pad.leg.menus")));
             _legendPadBox.Add(PadLegendRow(new[] { "A" }, T("cmd.takeoff"), new[] { "B" }, T("cmd.land"), new[] { "X" }, T("cmd.hold"), new[] { "Y" }, T("cmd.rtl")));
+            _legendPadBox.Add(CameraPadLegendRow()); // MVP P0: LB + right stick = camera, R3 = Seguir / Libre, D-pad = orbit
             _legendPadBox.style.display = DesktopPad.Instance != null && DesktopPad.Instance.Connected ? DisplayStyle.Flex : DisplayStyle.None;
             _legendKeys.Add(_legendPadBox);
             _lastPadText = null;
+            RelabelCamera();
         }
 
         private static VisualElement PadLegendRow(params object[] parts)
@@ -267,6 +273,7 @@ namespace WebGL.UI.Desktop
             }
             _btnPilot.EnableInClassList("dk-strip-btn--on", _pilotOn);
             _legend.style.display = _pilotOn ? DisplayStyle.Flex : DisplayStyle.None;
+            OnPilotChangedForCamera(_pilotOn); // MVP P0: «Seguir» chases while piloting; the cursor is released when piloting ends
             RelabelPilot();
             return _pilotOn;
         }
@@ -400,6 +407,7 @@ namespace WebGL.UI.Desktop
             if (_btnPilot.tooltip != tip) _btnPilot.tooltip = tip;
 
             if (_toast.style.display != DisplayStyle.None && Time.unscaledTime >= _toastUntil) _toast.style.display = DisplayStyle.None;
+            TickCamera();
 
             if (_pilotOn)
             {
@@ -448,6 +456,7 @@ namespace WebGL.UI.Desktop
                 if (DesktopKeyboardGate.Down(KeyCode.L)) SendPilotCommand(PilotCommand.Land, "key L");
                 if (DesktopKeyboardGate.Down(KeyCode.H)) SendPilotCommand(PilotCommand.Hold, "key H");
                 if (DesktopKeyboardGate.Down(KeyCode.R)) SendPilotCommand(PilotCommand.Rtl, "key R");
+                ReadCameraKeys(); // MVP P0: B = Seguir / Libre, X = Modo juego
             }
             if (held != _held) { _held = held; RefreshCaps(); }
 
@@ -467,7 +476,10 @@ namespace WebGL.UI.Desktop
                         PilotCommand? c = PilotControls.ButtonToCommand(i);
                         if (c.HasValue) SendPilotCommand(c.Value, "pad " + "ABXY"[i]);
                     }
-                    if (PilotControls.PadActive(pad.LeftX, pad.LeftY, pad.RightX, pad.RightY)) sticks = PilotControls.PadToSticks(pad.LeftX, pad.LeftY, pad.RightX, pad.RightY);
+                    // MVP P0: with LB held the right stick belongs to the camera (it would be pitch / roll of the drone otherwise); LB + RS orbits, R3 switches the mode, the D-pad orbits
+                    ReadCameraPad(padSrc, pad);
+                    double rx = pad.Has(PadButtons.LB) ? 0 : pad.RightX, ry = pad.Has(PadButtons.LB) ? 0 : pad.RightY;
+                    if (PilotControls.PadActive(pad.LeftX, pad.LeftY, rx, ry)) sticks = PilotControls.PadToSticks(pad.LeftX, pad.LeftY, rx, ry);
                 }
                 SetPadText(T(padSrc.Mode == PadMode.Menus ? "pad.badge.menus" : "pad.badge.drone"));
             }
@@ -568,6 +580,7 @@ namespace WebGL.UI.Desktop
         {
             if (_pilotOn) { _pilotOn = false; _held = PilotKeys.None; Debug.Log("[Pilot] OFF (session stopped): the desktop shortcuts are back"); }
             if (_legend != null) _legend.style.display = DisplayStyle.None;
+            OnPilotChangedForCamera(false);
             _btnPilot?.EnableInClassList("dk-strip-btn--on", false);
             ClearFlyTarget();
         }

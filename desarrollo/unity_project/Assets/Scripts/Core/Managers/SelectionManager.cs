@@ -103,6 +103,14 @@ namespace WebGL.Core.Managers
         private void Update()
         {
             if (!ShouldProcessInput()) return;
+#if UNITY_STANDALONE
+            // MVP P0, «Modo juego»: the cursor is locked in the middle of the screen; the scene neither hovers nor selects nor flies to a click
+            if (DesktopGameMode.Active)
+            {
+                if (hoveredObject != null) ClearHover();
+                return;
+            }
+#endif
 
             HandleHover();
             HandleClick();

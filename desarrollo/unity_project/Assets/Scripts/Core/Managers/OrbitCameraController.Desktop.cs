@@ -252,13 +252,25 @@ namespace WebGL.Core.Managers
         {
             bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
+            // MVP P0, «Modo juego»: the cursor is locked, the mouse orbits, the wheel dollies; no click reaches the scene or the UI (the shield, SelectionManager)
+            if (DesktopGameMode.Active)
+            {
+                _leftOrbitCandidate = _leftOrbiting = false;
+                _orbitGestureBlockedByUI = _panGestureBlockedByUI = false;
+                Vector2 md = DesktopGameMode.ReadMouseDelta();
+                ApplyOrbit(md.x * rotationSpeed, md.y * rotationSpeed);
+                float gscroll = Input.GetAxis("Mouse ScrollWheel");
+                if (Mathf.Abs(gscroll) > 0.001f) ApplyZoom(gscroll * MOUSE_SCROLL_SCALE);
+                return;
+            }
+
             // ── Right button: orbit (Shift: pan) ──
             if (Input.GetMouseButtonDown(1))
             {
                 _orbitGestureBlockedByUI = IsPointerOverCameraBlockingUI();
                 _rightPan = shift;
                 if (!_orbitGestureBlockedByUI) Debug.Log("[DesktopUI] camera: right button down, " + (_rightPan ? "Shift+right-drag pan" : "orbit"));
-                if (!_orbitGestureBlockedByUI && !_rightPan)
+                if (!_orbitGestureBlockedByUI && !_rightPan && !_chaseLive) // chasing: the pivot pick would move the focus off the drone
                 {
                     PickPivot(Input.mousePosition);
                 }
@@ -333,7 +345,8 @@ namespace WebGL.Core.Managers
             if (Mathf.Abs(scroll) > 0.001f && !IsPointerOverCameraBlockingUI()
                 && !(InputManager.Instance != null && InputManager.Instance.IsPointerOverPickableUIForWheel()))
             {
-                DesktopZoomAt(Input.mousePosition, scroll * MOUSE_SCROLL_SCALE);
+                if (_chaseLive) ApplyZoom(scroll * MOUSE_SCROLL_SCALE); // chasing: a plain dolly, the drone stays in the middle
+                else DesktopZoomAt(Input.mousePosition, scroll * MOUSE_SCROLL_SCALE);
             }
         }
 
@@ -406,6 +419,114 @@ namespace WebGL.Core.Managers
                 targetFocusPoint.y = Mathf.Clamp(targetFocusPoint.y, -panLimit.y, panLimit.y);
                 targetFocusPoint.z = Mathf.Clamp(targetFocusPoint.z, -panLimit.y, panLimit.y);
             }
+        }
+
+        // -- MVP P0: «Seguir» chase camera while piloting (PLAN_PC 32) ------------------------------------------------
+        // The camera keeps orbiting the drone (focus = the drone, so it never leaves the frame; the side-panel shift keeps it in the middle of the
+        // free area). While chasing, the yaw follows the heading of the drone with a lag, the user's orbit (mouse drag, game mode, pad) is an
+        // OFFSET that glides back after 1.5 s (ChaseCamera). Zoom is a plain dolly (no zoom-to-cursor), pan and the right-button pivot pick are
+        // off (they would move the drone off the centre). Reset, isolate, explode, cut and the selection keep working: the chase only drives the two
+        // orbit angles, and only while the camera frames the whole drone (a focused or isolated part is the user's to inspect: the chase waits).
+        private readonly WebGL.Telemetry.ChaseCamera _chase = new WebGL.Telemetry.ChaseCamera();
+        private bool _chaseWanted;
+        private bool _chaseLive;
+        private bool _chaseEngagePending;
+
+        /// <summary>Distance of the chase camera in metres (the wheel changes it; remembered between runs).</summary>
+        public const float ChaseDefaultMeters = 2.4f, ChaseMinMeters = 0.8f, ChaseMaxMeters = 40f;
+        private const string ChaseDistancePref = "Desk_ChaseDist";
+
+        /// <summary>The chase camera is engaged right now (piloting with «Seguir», framing the whole drone).</summary>
+        public bool ChaseActive => _chaseLive;
+        public bool ChaseWanted => _chaseWanted;
+        public WebGL.Telemetry.ChaseCamera Chase => _chase;
+
+        public static float ChaseDistanceMeters
+        {
+            get
+            {
+                float v = ChaseDefaultMeters;
+                try { v = PlayerPrefs.GetFloat(ChaseDistancePref, ChaseDefaultMeters); } catch (System.Exception) { }
+                return WebGL.Telemetry.ChaseCamera.Clamp(v, ChaseMinMeters, ChaseMaxMeters);
+            }
+            set
+            {
+                try { PlayerPrefs.SetFloat(ChaseDistancePref, WebGL.Telemetry.ChaseCamera.Clamp(value, ChaseMinMeters, ChaseMaxMeters)); } catch (System.Exception) { }
+            }
+        }
+
+        /// <summary>Asks for the chase camera (piloting on and mode «Seguir»). Off returns the view to the free orbit exactly where it is.</summary>
+        public void DesktopSetChase(bool wanted)
+        {
+            if (wanted == _chaseWanted) return;
+            _chaseWanted = wanted;
+            if (wanted)
+            {
+                _chase.Unprime();
+                _chaseEngagePending = true;
+            }
+            else
+            {
+                SaveChaseDistance();
+                _chaseLive = false;
+                _chase.Unprime();
+                _chaseEngagePending = false;
+            }
+        }
+
+        private void SaveChaseDistance()
+        {
+            float upm = TelemetryDroneDriver.Instance != null ? TelemetryDroneDriver.Instance.UnitsPerMeter : 0f;
+            if (_chaseLive && upm > 0f) ChaseDistanceMeters = targetDistance / upm;
+        }
+
+        /// <summary>Verification / tests: the camera angles and the chase offsets.</summary>
+        public void DesktopChaseState(out float yaw, out float pitch, out float userYaw, out float userPitch)
+        {
+            yaw = currentX; pitch = currentY; userYaw = _chase.UserYaw; userPitch = _chase.UserPitch;
+        }
+
+        /// <summary>Orbit by a pad / UI step (degrees). While chasing it is the offset that recentres; otherwise it orbits like the mouse.</summary>
+        public void DesktopOrbitBy(float dYaw, float dPitch)
+        {
+            if (dYaw == 0f && dPitch == 0f) return;
+            if (_chaseLive) { _chase.AddInput(dYaw, dPitch); return; }
+            targetX += dYaw;
+            targetY = Mathf.Clamp(targetY + dPitch, minVerticalAngle, maxVerticalAngle);
+        }
+
+        private void ApplyDesktopChase(float dt)
+        {
+            bool framingBody = _telemetryFollow && !LegacyTelemetryFollow && _telemetryBody != null && ReferenceEquals(target, _telemetryBody);
+            bool live = _chaseWanted && framingBody;
+            if (live != _chaseLive)
+            {
+                if (!live) SaveChaseDistance();
+                _chaseLive = live;
+                if (live) _chaseEngagePending = true; else _chase.Unprime();
+            }
+
+            if (!_chaseLive) return;
+
+            float upm = TelemetryDroneDriver.Instance != null ? TelemetryDroneDriver.Instance.UnitsPerMeter : 0f;
+            Quaternion rel = _telemetryBody.rotation * Quaternion.Inverse(_telemetryRestRotation);
+            Vector3 fwd = rel * Vector3.back; // the nose of the model is -Z at rest (DronePose)
+            bool has = WebGL.Telemetry.ChaseCamera.TryHeading(fwd.x, fwd.z, out float bodyYaw);
+
+            if (_chaseEngagePending)
+            {
+                _chaseEngagePending = false;
+                _chase.Prime(has ? bodyYaw : currentX);
+                // the whole drone centred (its visible centre, like Reset) and the chase distance; the angles glide there through the normal smoothing
+                targetOffset = DesktopResetOffset(initialTargetOffset);
+                if (upm > 0f) targetDistance = Mathf.Clamp(ChaseDistanceMeters * upm, GetZoomMinDistance(), GetZoomMaxDistance());
+            }
+
+            bool reduce = AccessibilityManager.Instance != null && AccessibilityManager.Instance.ReducedMotion;
+            _chase.Step(dt, bodyYaw, has, reduce);
+            targetX = currentX + WebGL.Telemetry.ChaseCamera.DeltaAngle(currentX, _chase.Yaw); // the shortest way round: the viewer's own damping does the gliding
+            targetY = _chase.Pitch;
+            if (upm > 0f) targetDistance = Mathf.Clamp(targetDistance, ChaseMinMeters * upm, ChaseMaxMeters * upm);
         }
 
         // ── Verification helpers (used by the capture demo / Editor tests) ──

@@ -197,6 +197,14 @@ namespace WebGL.UI.Desktop
 
             UIManager.OverlayBackHandler = () =>
             {
+                // MVP P0: Esc first releases the cursor of «Modo juego» (a second Esc leaves piloting, as always)
+                if (DesktopGameMode.Active)
+                {
+                    Log("Esc -> game mode released");
+                    DesktopGameMode.Release("Esc");
+                    return true;
+                }
+
                 // PLAN_PC 27.1: Esc while typing only leaves the field (the tree search clears first, like before); the layers below wait for the next Esc.
                 if (DesktopKeyboardGate.Typing)
                 {
@@ -483,6 +491,13 @@ namespace WebGL.UI.Desktop
                 {
                     var tools = gameObject.AddComponent<DesktopCaptureTools>(); // Lote 1a: geofence, wind, motor cut, propeller table
                     tools.OutputDirectory = args[i + 1];
+                    return;
+                }
+
+                if (args[i].Equals("-mvp-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var mvp = gameObject.AddComponent<DesktopCaptureMvp>(); // MVP priorities: camera while piloting, active-effect chips, thermal field, battery
+                    mvp.OutputDirectory = args[i + 1];
                     return;
                 }
 
