@@ -66,6 +66,7 @@ function setLang(next, persist = true) {
   }
   for (const a of $$('#rail a')) a.textContent = t('rail_' + a.dataset.ch);
   for (const [id, tag] of tags) { $('b', tag.el).textContent = t('a_' + id); $('i', tag.el).textContent = t('a_' + id + '_c'); tag.w = undefined; }
+  paintPieces();
   if (persist) store.set('twinsight.lang', lang); // la web app lee esta misma clave
 }
 
@@ -79,6 +80,7 @@ const KEYS = {
   xray: { az: 0.35, el: 0.22, dist: 0.92, sx: 0.2, sy: 0, sweep: 1, kind: 'xray', sway: 0.16, grid: 0.3 },
   thermal: { az: -0.95, el: 0.78, dist: 1.02, sx: -0.2, sy: 0, thermal: 1, sway: 0.1 },
   flight: { az: 2.6, el: 0.2, dist: 1.34, sx: 0.1, sy: -0.1, flight: 1, grid: 1, sway: 0.05 },
+  connect: { az: 1.3, el: 0.3, dist: 1.7, sx: 0, sy: -0.04, o: 0.12, sway: 0.1 },
   apps: { az: 0.9, el: 0.3, dist: 1.7, sx: 0, sy: -0.08, o: 0.14, sway: 0.1 },
   evidence: { az: 0.4, el: 0.3, dist: 1.7, sx: 0, sy: 0, o: 0 },
   engineering: { az: 0.4, el: 0.3, dist: 1.7, sx: 0, sy: 0, o: 0 },
@@ -176,6 +178,7 @@ function compute() {
   stage.style.setProperty('--stage-o', s.o.toFixed(3));
   flightOn = s.flight > 0.02;
   if (twin) { twin.setState(s); twin.setVisible(s.o > 0.01 && !portal.covered); }
+  applySelection();
 
   const max = root.scrollHeight - vh;
   progress.style.transform = `scaleX(${max > 0 ? clamp(scrollY / max) : 0})`;
@@ -250,6 +253,104 @@ function placeTags(list, alpha) {
       tag.line.setAttribute('x2', x.toFixed(1)); tag.line.setAttribute('y2', y.toFixed(1));
       tag.dot.setAttribute('cx', a.x.toFixed(1)); tag.dot.setAttribute('cy', a.y.toFixed(1));
     }
+  }
+}
+
+// ───────────── pieza interactiva (capítulo «Taxonomía») ─────────────
+// Se elige una pieza con el ratón, el dedo o la lista de chips; la escena la resalta (celeste de acento) y atenúa el resto, y la
+// tarjeta muestra su ficha. Los datos salen de landing/data/parts.json, generado de las fichas técnicas del proyecto
+// (desarrollo/landing/build-parts.mjs). Lo que la ficha no trae no se muestra.
+const partsReq = fetch('landing/data/parts.json').then((r) => (r.ok ? r.json() : null)).catch(() => null);
+const pz = { data: null, id: null, hover: null, root: $('#pieza'), chips: $('#piezaChips'), card: $('#pcard'), byId: new Map(), btn: new Map(), applied: '' };
+const loc = (o) => (o ? o[lang] ?? o.es : '');
+function make(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+function initPieces(data) {
+  if (!data?.groups?.length || !pz.root) return;
+  pz.data = data;
+  for (const g of data.groups) {
+    const li = make('li');
+    const b = make('button', 'pchip');
+    b.type = 'button'; b.dataset.id = g.id; b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => selectPart(pz.id === g.id ? null : g.id));
+    b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') hoverPart(g.id); });
+    b.addEventListener('pointerleave', () => hoverPart(null));
+    b.addEventListener('keydown', chipKeys);
+    li.append(b); pz.chips.append(li);
+    pz.btn.set(g.id, b); pz.byId.set(g.id, g);
+  }
+  pz.root.hidden = false;
+  paintPieces();
+  applySelection();
+}
+function chipKeys(e) {
+  const list = [...pz.btn.values()];
+  const i = list.indexOf(e.currentTarget);
+  const to = { ArrowRight: i + 1, ArrowDown: i + 1, ArrowLeft: i - 1, ArrowUp: i - 1, Home: 0, End: list.length - 1 }[e.key];
+  if (to === undefined) return;
+  e.preventDefault();
+  list[(to + list.length) % list.length].focus();
+}
+function paintPieces() {
+  if (!pz.data) return;
+  pz.chips.setAttribute('aria-label', t('pzList'));
+  pz.card.setAttribute('aria-label', t('pzCard'));
+  for (const [id, b] of pz.btn) { b.textContent = loc(pz.byId.get(id).short); b.setAttribute('aria-pressed', String(pz.id === id)); }
+  const g = pz.id && pz.byId.get(pz.id);
+  pz.card.className = 'pcard' + (g ? '' : ' pcard--empty');
+  pz.card.replaceChildren();
+  if (!g) { pz.card.append(make('p', '', t('pzHint'))); return; }
+  const top = make('div', 'pcard__top');
+  const x = make('button', 'pcard__x');
+  x.type = 'button'; x.setAttribute('aria-label', t('pzClear'));
+  x.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg>';
+  x.addEventListener('click', () => selectPart(null, true));
+  top.append(make('span', 'pcard__cat', loc(g.cat)), x);
+  const facts = make('dl', 'pcard__facts');
+  const row = (label, value, note) => {
+    const d = make('div'), dd = make('dd', '', value);
+    if (note) dd.append(' ', make('small', '', '(' + note + ')'));
+    d.append(make('dt', '', label), dd);
+    facts.append(d);
+  };
+  if (g.material) row(t('pzMaterial'), loc(g.material));
+  if (g.dims) row(t('pzDims'), loc(g.dims));
+  if (g.massG != null) row(t('pzMass'), fmt(g.massG, 0) + ' g', t('pzMassNote'));
+  if (g.qty != null) row(t('pzQty'), fmt(g.qty, 0));
+  if (g.sizes?.length) row(t('pzSizes'), g.sizes.join(', '));
+  pz.card.append(top, make('h3', 'pcard__name', loc(g.name)), make('p', 'pcard__role', loc(g.role)), facts);
+  if (g.massG != null) pz.card.append(make('p', 'pcard__src', t('pzSrc')));
+}
+function selectPart(id, restoreFocus = false) {
+  const prev = pz.id;
+  pz.id = id && pz.byId.has(id) ? id : null;
+  paintPieces();
+  applySelection();
+  if (restoreFocus && prev) pz.btn.get(prev)?.focus({ preventScroll: true });
+}
+function hoverPart(id) {
+  if (id === pz.hover) return;
+  pz.hover = id;
+  twin?.hover(id);
+}
+// La escena y los rótulos solo reflejan la selección mientras el capítulo «Taxonomía» está activo.
+function applySelection() {
+  const inChapter = sections[active]?.dataset.chapter === 'explode';
+  const on = !!twin && inChapter;
+  pz.root?.classList.toggle('is-away', !inChapter);
+  const key = (on ? pz.id ?? '' : '·') + '|' + (twin ? 1 : 0);
+  if (key === pz.applied) return;
+  pz.applied = key;
+  twin?.select(on ? pz.id : null);
+  for (const [id, tag] of tags) {
+    const dim = on && !!pz.id && pz.id !== id;
+    tag.el.classList.toggle('is-sel', on && pz.id === id);
+    tag.el.classList.toggle('is-dim', dim);
+    tag.line.style.opacity = tag.dot.style.opacity = dim ? '0.25' : '';
   }
 }
 
@@ -458,11 +559,45 @@ addEventListener('pointerdown', (e) => {
 addEventListener('pointermove', (e) => { if (dragX !== null) { twin.drag((dragX - e.clientX) * 0.006, true); dragX = e.clientX; } });
 addEventListener('pointerup', () => { if (dragX !== null) { dragX = null; twin.drag(0, false); root.style.cursor = ''; } });
 
+// Elegir una pieza tocando el modelo: solo en el capítulo «Taxonomía» y fuera de textos y botones. El rayo se lanza al soltar
+// (un toque, sin arrastre) y, con el ratón, como máximo cada 90 ms para la vista previa; nunca por cuadro.
+const INERT = 'a, button, p, h1, h2, h3, li, dl, aside, article, header, footer, .arch, .pieza, .flow, .dock';
+const canPick = (e) => !!twin?.canSelect && !!pz.data && !portal.open && sections[active].dataset.chapter === 'explode' && !e.target.closest?.(INERT);
+const tap = { id: -1, x: 0, y: 0, t: 0 };
+addEventListener('pointerdown', (e) => {
+  tap.id = canPick(e) && (e.pointerType !== 'mouse' || e.button === 0) ? e.pointerId : -1;
+  tap.x = e.clientX; tap.y = e.clientY; tap.t = performance.now();
+});
+addEventListener('pointerup', (e) => {
+  if (e.pointerId !== tap.id) return;
+  tap.id = -1;
+  if (Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 8 || performance.now() - tap.t > 700) return;
+  const g = twin.pick(e.clientX, e.clientY);
+  selectPart(g && g !== pz.id ? g : null);
+  if (g && g !== null && e.pointerType !== 'mouse') {
+    const r = pz.card.getBoundingClientRect();
+    if (r.bottom > innerHeight - 12) pz.card.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+  }
+});
+addEventListener('pointercancel', () => { tap.id = -1; });
+let hoverAt = 0;
+addEventListener('pointermove', (e) => {
+  if (e.pointerType !== 'mouse' || dragX !== null || e.target.closest?.('.pieza')) return;
+  const now = performance.now();
+  if (now - hoverAt < 90) return;
+  hoverAt = now;
+  const id = canPick(e) ? twin.pick(e.clientX, e.clientY) : null;
+  hoverPart(id);
+  root.style.cursor = id ? 'pointer' : '';
+}, { passive: true });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && !portal.open && pz.id) selectPart(null); });
+
 // ───────────── arranque ─────────────
 const query = new URLSearchParams(location.search).get('lang');
 applyLinks();
 setLang(query || store.get('twinsight.lang') || (/^es/i.test(navigator.language || 'es') ? 'es' : 'en'), !!query);
 setupReveals();
+partsReq.then(initPieces);
 introT = reduced || scrollY >= 40 ? 1 : 0;
 compute();
 requestAnimationFrame(tick);
@@ -472,7 +607,9 @@ new IntersectionObserver((entries, io) => { if (entries.some((e) => e.isIntersec
 async function boot3d() {
   try {
     const { createTwin } = await import('./scene.js');
+    const parts = await partsReq; // sin estos datos la escena arranca igual, solo que sin selección de piezas
     twin = await createTwin(stage, {
+      groups: parts?.nodes,
       modelUrl: 'models/holybro-x500.glb', // el mismo archivo que usa la web app: se descarga una sola vez
       reducedMotion: reduced,
       onProgress: (p) => { loadReal = clamp(p); },
