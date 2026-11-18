@@ -1179,3 +1179,6 @@ P0: «Seguir», «Libre», «Modo juego», «Cámara: Seguir» / «Cámara: Libr
 - Sonda `-hero-gate <carpeta>` (`DesktopCaptureHeroGate.cs`): capturas del heroe, del menu Modelo y del visor, y PASS/FAIL de etiquetas del menu Modelo y de los puntos apagados.
 
 **Arreglos de interfaz de escritorio en la misma build:** los puntos (pins) **empiezan apagados** (`HotspotManager.IsVisible` y `UIManager` bajo `UNITY_STANDALONE`; el boton queda apagado y `-desk-check` pasa con la comprobacion adaptada); en el menu **Modelo** las ranuras extra pasan a «Proximamente» / «Coming soon» con el texto completo en el tooltip y `DesktopUI.uss` recorta con puntos suspensivos (verificado a 1280x720 y 1904x984, ES y EN).
+
+## 34. Aprobaciones del usuario (2026-11-18)
+Aprobados todos los textos nuevos listados en §32.4 (Seguir, Libre, Modo juego, avisos de cámara, «LB + stick der.: cámara», filas de ayuda y chips «Quitar …» / «Detener misión» / «Salir del entrenamiento» / «Dejar de pilotar» / «Mostrar suelo» / «Volver a la vista realista») y los de §31.3. Los pins empiezan apagados (hecho en el zip `20261117c`). Despliegue del 2026-11-18: la web app compilada (650c554) y la landing se publicaron desde `master` del repo de la tesis; `pc-desktop` se sube como rama (no publica nada).
