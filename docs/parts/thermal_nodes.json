@@ -44,23 +44,6 @@
   },
   {
    "id": "x500v2_arm_FL",
-   "partName": "Arm Tube Front-Left",
-   "partType": "Arm",
-   "materialType": "Carbon fiber with reinforced nylon connectors",
-   "category": "SkeletonAirframe",
-   "operatingTemp": 80,
-   "operatingTempMin": -20,
-   "operatingTempMax": 80,
-   "thermalPeak": 45,
-   "thermalHover": 30,
-   "thermalWarmupSeconds": 8,
-   "thermalExposure": 0.8,
-   "thermalConductionScale": 1,
-   "thermalSourceWeight": 0.2,
-   "isThermallyCritical": true
-  },
-  {
-   "id": "x500v2_arm_FR",
    "partName": "Arm Tube Front-Right",
    "partType": "Arm",
    "materialType": "Carbon fiber with reinforced nylon connectors",
@@ -77,8 +60,25 @@
    "isThermallyCritical": true
   },
   {
+   "id": "x500v2_arm_FR",
+   "partName": "Arm Tube Front-Left",
+   "partType": "Arm",
+   "materialType": "Carbon fiber with reinforced nylon connectors",
+   "category": "SkeletonAirframe",
+   "operatingTemp": 80,
+   "operatingTempMin": -20,
+   "operatingTempMax": 80,
+   "thermalPeak": 45,
+   "thermalHover": 30,
+   "thermalWarmupSeconds": 8,
+   "thermalExposure": 0.8,
+   "thermalConductionScale": 1,
+   "thermalSourceWeight": 0.2,
+   "isThermallyCritical": true
+  },
+  {
    "id": "x500v2_arm_BL",
-   "partName": "Arm Tube Back-Left",
+   "partName": "Arm Tube Back-Right",
    "partType": "Arm",
    "materialType": "Carbon fiber with reinforced nylon connectors",
    "category": "SkeletonAirframe",
@@ -95,7 +95,7 @@
   },
   {
    "id": "x500v2_arm_BR",
-   "partName": "Arm Tube Back-Right",
+   "partName": "Arm Tube Back-Left",
    "partType": "Arm",
    "materialType": "Carbon fiber with reinforced nylon connectors",
    "category": "SkeletonAirframe",
@@ -248,7 +248,7 @@
   },
   {
    "id": "x500v2_motor_FL",
-   "partName": "Motor 2216 KV920 FL",
+   "partName": "Motor 1 · front-right (2216 KV920)",
    "partType": "Motor",
    "materialType": "CNC aluminum alloy, steel shaft, enamelled copper windings",
    "category": "PropulsionSystem",
@@ -265,7 +265,7 @@
   },
   {
    "id": "x500v2_motor_FR",
-   "partName": "Motor 2216 KV920 FR",
+   "partName": "Motor 3 · front-left (2216 KV920)",
    "partType": "Motor",
    "materialType": "CNC aluminum alloy, steel shaft, enamelled copper windings",
    "category": "PropulsionSystem",
@@ -282,7 +282,7 @@
   },
   {
    "id": "x500v2_motor_BL",
-   "partName": "Motor 2216 KV920 BL",
+   "partName": "Motor 4 · rear-right (2216 KV920)",
    "partType": "Motor",
    "materialType": "CNC aluminum alloy, steel shaft, enamelled copper windings",
    "category": "PropulsionSystem",
@@ -299,7 +299,7 @@
   },
   {
    "id": "x500v2_motor_BR",
-   "partName": "Motor 2216 KV920 BR",
+   "partName": "Motor 2 · rear-left (2216 KV920)",
    "partType": "Motor",
    "materialType": "CNC aluminum alloy, steel shaft, enamelled copper windings",
    "category": "PropulsionSystem",
@@ -316,7 +316,7 @@
   },
   {
    "id": "x500v2_esc_FL",
-   "partName": "ESC BLHeli-S 20A FL",
+   "partName": "ESC BLHeli-S 20A FR",
    "partType": "ESC",
    "materialType": "PCB FR4 con MOSFETs de silicio y pistas de cobre",
    "category": "PropulsionSystem",
@@ -333,7 +333,7 @@
   },
   {
    "id": "x500v2_esc_FR",
-   "partName": "ESC BLHeli-S 20A FR",
+   "partName": "ESC BLHeli-S 20A FL",
    "partType": "ESC",
    "materialType": "PCB FR4 con MOSFETs y cobre",
    "category": "PropulsionSystem",
@@ -350,23 +350,6 @@
   },
   {
    "id": "x500v2_esc_BL",
-   "partName": "ESC BLHeli-S 20A BL",
-   "partType": "ESC",
-   "materialType": "PCB FR4 con MOSFETs y cobre",
-   "category": "PropulsionSystem",
-   "operatingTemp": 80,
-   "operatingTempMin": 0,
-   "operatingTempMax": 0,
-   "thermalPeak": 90,
-   "thermalHover": 50,
-   "thermalWarmupSeconds": 6,
-   "thermalExposure": 0.8,
-   "thermalConductionScale": 1,
-   "thermalSourceWeight": 0.92,
-   "isThermallyCritical": true
-  },
-  {
-   "id": "x500v2_esc_BR",
    "partName": "ESC BLHeli-S 20A BR",
    "partType": "ESC",
    "materialType": "PCB FR4 con MOSFETs y cobre",
@@ -383,8 +366,25 @@
    "isThermallyCritical": true
   },
   {
+   "id": "x500v2_esc_BR",
+   "partName": "ESC BLHeli-S 20A BL",
+   "partType": "ESC",
+   "materialType": "PCB FR4 con MOSFETs y cobre",
+   "category": "PropulsionSystem",
+   "operatingTemp": 80,
+   "operatingTempMin": 0,
+   "operatingTempMax": 0,
+   "thermalPeak": 90,
+   "thermalHover": 50,
+   "thermalWarmupSeconds": 6,
+   "thermalExposure": 0.8,
+   "thermalConductionScale": 1,
+   "thermalSourceWeight": 0.92,
+   "isThermallyCritical": true
+  },
+  {
    "id": "x500v2_prop_FL",
-   "partName": "Propeller 1045 FL",
+   "partName": "Propeller 1 · front-right (1045)",
    "partType": "Propeller",
    "materialType": "Compuesto plástico reforzado (nylon/ABS)",
    "category": "PropulsionSystem",
@@ -401,7 +401,7 @@
   },
   {
    "id": "x500v2_prop_FR",
-   "partName": "Propeller 1045 FR",
+   "partName": "Propeller 3 · front-left (1045)",
    "partType": "Propeller",
    "materialType": "Compuesto plástico reforzado",
    "category": "PropulsionSystem",
@@ -418,7 +418,7 @@
   },
   {
    "id": "x500v2_prop_BL",
-   "partName": "Propeller 1045 BL",
+   "partName": "Propeller 4 · rear-right (1045)",
    "partType": "Propeller",
    "materialType": "Compuesto plástico reforzado",
    "category": "PropulsionSystem",
@@ -435,7 +435,7 @@
   },
   {
    "id": "x500v2_prop_BR",
-   "partName": "Propeller 1045 BR",
+   "partName": "Propeller 2 · rear-left (1045)",
    "partType": "Propeller",
    "materialType": "Compuesto plástico reforzado",
    "category": "PropulsionSystem",
