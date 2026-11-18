@@ -44,6 +44,11 @@ namespace WebGL.UI.Desktop
         partial void RelabelRecord();
         partial void TickRecord(bool viewer);
         partial void BuildTrainingTool(VisualElement strip);
+        // MVP P3: the thermal field card (DesktopTelemetryUI.Thermal.cs)
+        partial void BuildThermalCard();
+        partial void DisposeThermal();
+        partial void RelabelThermal();
+        partial void TickThermal(bool viewer);
         partial void DisposeTraining();
         partial void RelabelTraining();
         partial void TickTraining(bool viewer);
@@ -92,25 +97,26 @@ namespace WebGL.UI.Desktop
             BuildMissionTool(_toolsStrip);
             BuildRecordTool(_toolsStrip);
             BuildTrainingTool(_toolsStrip);
+            BuildThermalCard();
             _container.Add(_toolsStrip);
         }
 
         private void DisposeTools()
         {
-            DisposeMap(); DisposePreflight(); DisposeMission(); DisposeRecord(); DisposeTraining();
+            DisposeMap(); DisposePreflight(); DisposeMission(); DisposeRecord(); DisposeTraining(); DisposeThermal();
             _toolsStrip?.RemoveFromHierarchy();
             _envStrip?.RemoveFromHierarchy();
         }
 
         private void RelabelToolsLote1()
         {
-            RelabelMap(); RelabelPreflight(); RelabelMission(); RelabelRecord(); RelabelTraining();
+            RelabelMap(); RelabelPreflight(); RelabelMission(); RelabelRecord(); RelabelTraining(); RelabelThermal();
         }
 
         private void TickToolsLote1(bool viewer)
         {
             TickBatterySampler();
-            TickMap(viewer); TickPreflight(viewer); TickMission(viewer); TickRecord(viewer); TickTraining(viewer);
+            TickMap(viewer); TickPreflight(viewer); TickMission(viewer); TickRecord(viewer); TickTraining(viewer); TickThermal(viewer);
         }
 
         private void HideToolPopovers()

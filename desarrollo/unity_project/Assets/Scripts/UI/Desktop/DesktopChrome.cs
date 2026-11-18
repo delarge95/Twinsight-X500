@@ -932,7 +932,8 @@ namespace WebGL.UI.Desktop
 
             // thermal legend, horizontal, from the original (hidden) legend
             VisualElement legend = _qLegend ?? (_qLegend = _root.Q<VisualElement>("ThermalLegendContainer"));
-            bool thermal = legend != null && !legend.ClassListContains("thermal-legend--hidden");
+            // MVP P3: with the telemetry field the card of DesktopTelemetryUI.Thermal owns the legend (its own scale and origins): the didactic 20-100 C one stands down
+            bool thermal = legend != null && !legend.ClassListContains("thermal-legend--hidden") && !WebGL.Core.Thermal.ThermalFieldPC.Active;
             _tlg.style.display = thermal ? DisplayStyle.Flex : DisplayStyle.None;
             if (thermal)
             {

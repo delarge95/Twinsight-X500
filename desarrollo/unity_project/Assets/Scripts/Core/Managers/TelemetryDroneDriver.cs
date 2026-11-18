@@ -418,6 +418,47 @@ namespace WebGL.Core.Managers
             foreach (string c in release) ReleaseAlert(c);
         }
 
+        /// <summary>
+        /// MVP P3: the centre of a heat-source component (motor1..4, battery, fc) in the LOCAL space of the model root, from the mesh bounds of its parts (the same
+        /// parts the alerts pulse), so it does not move with the pose. False while the model is not engaged or the component has no renderer.
+        /// </summary>
+        public bool TryComponentCentreLocal(string component, out Vector3 centre)
+        {
+            centre = Vector3.zero;
+            if (root == null || string.IsNullOrEmpty(component)) return false;
+            var names = new List<string>();
+            if (component.StartsWith("motor", StringComparison.Ordinal) && int.TryParse(component.Substring(5), out int m) && m >= 1 && m <= 4)
+            {
+                if (motorPart[m] == null) return false;
+                names.Add(motorPart[m].name);
+            }
+            else if (component == "battery") names.AddRange(BatteryParts);
+            else if (component == "fc") names.AddRange(FcParts);
+            else return false;
+            bool any = false;
+            Vector3 lo = Vector3.zero, hi = Vector3.zero;
+            foreach (string n in names)
+            {
+                Transform t = FindDeep(root, n);
+                if (t == null) continue;
+                foreach (Renderer r in t.GetComponentsInChildren<Renderer>(true))
+                {
+                    MeshFilter mf = r.GetComponent<MeshFilter>();
+                    if (mf == null || mf.sharedMesh == null) continue;
+                    Bounds b = mf.sharedMesh.bounds;
+                    for (int c = 0; c < 8; c++)
+                    {
+                        Vector3 corner = b.center + Vector3.Scale(b.extents, new Vector3((c & 1) == 0 ? -1 : 1, (c & 2) == 0 ? -1 : 1, (c & 4) == 0 ? -1 : 1));
+                        Vector3 p = root.InverseTransformPoint(r.transform.TransformPoint(corner));
+                        if (!any) { lo = hi = p; any = true; } else { lo = Vector3.Min(lo, p); hi = Vector3.Max(hi, p); }
+                    }
+                }
+            }
+            if (!any) return false;
+            centre = (lo + hi) * 0.5f;
+            return true;
+        }
+
         static Transform FindDeep(Transform parent, string name)
         {
             if (parent == null) return null;

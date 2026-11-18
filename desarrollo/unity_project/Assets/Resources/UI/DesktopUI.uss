@@ -2540,3 +2540,25 @@
     min-height: 48px;
     padding: 0 16px;
 }
+
+/* MVP P3: card of the thermal field of the telemetry (source selector, legend, origin of each source) */
+.dk-thermal {
+    position: absolute;
+    left: 56px;
+    top: 214px;
+    width: 272px;
+    flex-direction: column;
+    padding: 7px 10px 8px 10px;
+    border-width: 1px;
+    border-radius: 12px;
+    border-color: rgba(255, 255, 255, 0.14);
+    background-color: rgba(14, 17, 22, 0.9);
+}
+.dk-thermal-sel { flex-direction: row; margin: 4px 0 6px 0; }
+.dk-thermal-sel .dk-fault-btn { flex-grow: 1; flex-basis: 0; margin: 0 3px 0 0; padding: 0 4px; font-size: 11.5px; }
+.dk-thermal-bar { flex-direction: row; align-items: center; margin: 0 0 3px 0; }
+.dk-thermal-lbl { margin: 0 6px; font-size: 11px; color: rgb(204, 214, 226); min-width: 44px; -unity-text-align: middle-center; }
+.dk-thermal-grad { flex-grow: 1; height: 10px; border-radius: 5px; border-width: 1px; border-color: rgba(255, 255, 255, 0.16); background-size: 100% 100%; }
+.dk-thermal-row { flex-direction: row; align-items: center; margin: 0 0 2px 0; }
+.dk-thermal-name { width: 84px; margin: 0; font-size: 11.5px; color: rgb(182, 192, 204); }
+.dk-thermal-val { flex-grow: 1; margin: 0 6px 0 0; font-size: 11.5px; color: rgb(238, 242, 247); -unity-text-align: middle-right; }

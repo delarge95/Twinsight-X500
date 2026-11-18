@@ -51,6 +51,13 @@ namespace WebGL.Core.Managers
         [SerializeField] private Material ghostedMaterial;
         [SerializeField] private Material thermalMaterial;
         private Material blueprintFastenerDetailMaterial;
+#if UNITY_STANDALONE
+        // MVP P3 (PC only): the quantitative thermal field of the telemetry (ThermalFieldPC). While ThermalFieldRequested the Thermal mode paints it instead of the
+        // didactic simulation's "WebGL/Thermal" material; the WebGL shaders are untouched.
+        private Material thermalFieldMaterial;
+        public static bool ThermalFieldRequested;
+        public Material ThermalFieldMaterial => thermalFieldMaterial;
+#endif
         private Material solidFastenerDetailMaterial;
 
         [Header("Settings")]
@@ -296,6 +303,7 @@ namespace WebGL.Core.Managers
 #if UNITY_STANDALONE
             // PC (fase 3B, G11): rayos X aditivo y alambre limpio (los shaders no existen en WebGL).
             xRayMaterial = PcViewMaterial("PC_XRay", xRayMaterial);
+            if (thermalFieldMaterial == null) thermalFieldMaterial = PcViewMaterial("PC_Thermal", null);
             wireframeMaterial = PcViewMaterial("PC_Wireframe", wireframeMaterial);
 #endif
             CalibrateViewModeMaterials();
@@ -510,6 +518,13 @@ namespace WebGL.Core.Managers
                     break;
 
                 case ViewMode.Thermal:
+#if UNITY_STANDALONE
+                    if (ThermalFieldRequested && thermalFieldMaterial != null)
+                    {
+                        ApplyMaterialToRenderer(renderer, thermalFieldMaterial, Color.white);
+                        break;
+                    }
+#endif
                     ApplyMaterialToRenderer(renderer, thermalMaterial, Color.red);
                     break;
             }

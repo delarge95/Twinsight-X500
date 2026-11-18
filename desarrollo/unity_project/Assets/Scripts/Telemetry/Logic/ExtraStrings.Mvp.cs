@@ -41,6 +41,18 @@ namespace WebGL.Telemetry
             d["tools.battery"] = new[] { "Batería", "Battery" };
             d["tools.battery.need"] = new[] { "La batería del simulador es del simulador: elige la fuente Simulador.", "The battery tool belongs to the simulator: choose the Simulator source." };
 
+            // ── P3: the thermal field of the telemetry (web dictionaries: studio.thermalSource, studio.src*, legend.*; the row names are neutral labels of the desktop) ──
+            d["studio.thermalSource"] = new[] { "Fuente térmica", "Thermal source" };
+            d["studio.srcTelemetry"] = new[] { "Telemetría", "Telemetry" };
+            d["studio.srcSim"] = new[] { "Simulación didáctica", "Teaching simulation" };
+            d["legend.note"] = new[] { "Escala automática. Isotermas cada 5 °C.", "Automatic scale. Isotherms every 5 °C." };
+            d["legend.noData"] = new[] { "Sin telemetría — sin datos térmicos", "No telemetry — no thermal data" };
+            d["legend.noDataHint"] = new[] { "El modelo se muestra en gris neutro: no se inventan temperaturas.", "The model is shown in neutral grey: no temperatures are made up." };
+            d["legend.noteSim"] = new[] { "Un color por pieza (simulación didáctica, ilustrativo, no FEA).", "One colour per part (didactic simulation, illustrative, not FEA)." };
+            d["thermal.src.motor"] = new[] { "Motor {n}", "Motor {n}" };
+            d["thermal.src.battery"] = new[] { "Batería", "Battery" };
+            d["thermal.src.fc"] = new[] { "Controladora", "Flight controller" };
+
             // ── P4: «Agotar batería» of PX4 SITL (contract 1.1, battery_off; web dictionaries: cmd.batteryOff, cmd.batteryNote, cmd.ackOkBatteryOff, cmd.restore) ──
             d["cmd.batteryOff"] = new[] { "Agotar batería", "Drain battery" };
             d["cmd.batteryOffConfirm"] = new[] { "¿Agotar batería? Toca otra vez", "Drain battery? Tap again" };

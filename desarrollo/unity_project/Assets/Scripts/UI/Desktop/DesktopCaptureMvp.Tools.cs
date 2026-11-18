@@ -118,7 +118,6 @@ namespace WebGL.UI.Desktop
             yield return Shot("41_p1_sin_chips", 0.2f);
         }
 
-        private IEnumerator ThermalChecks() { yield break; }
     }
 }
 #endif

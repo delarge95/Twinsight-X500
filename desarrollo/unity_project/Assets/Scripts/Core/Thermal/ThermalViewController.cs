@@ -82,6 +82,11 @@ namespace WebGL.Core.Thermal
             ClearLegendBinding();
         }
 
+#if UNITY_STANDALONE
+        /// <summary>MVP P3 (PC only): ThermalFieldPC paints the quantitative field of the telemetry and owns the legend; this controller (the didactic simulation) stands down.</summary>
+        public static bool FieldActive;
+#endif
+
         private void Update()
         {
             AttachManagers();
@@ -90,6 +95,13 @@ namespace WebGL.Core.Thermal
             {
                 return;
             }
+
+#if UNITY_STANDALONE
+            if (FieldActive)
+            {
+                return;
+            }
+#endif
 
             TryBindLegendUI();
 
