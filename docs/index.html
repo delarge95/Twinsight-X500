@@ -151,6 +151,10 @@
             <div class="stat"><b>28</b><span data-i18n="c2s1">piezas canónicas</span></div>
             <div class="stat"><b>93</b><span data-i18n="c2s2">fichas técnicas</span></div>
           </div>
+          <div class="pieza" id="pieza" hidden>
+            <ul class="pieza__chips" id="piezaChips" role="list"></ul>
+            <article class="pcard pcard--empty" id="pcard" aria-live="polite" aria-atomic="true"></article>
+          </div>
         </div>
       </div>
     </section>
@@ -253,11 +257,80 @@
       </div>
     </section>
 
-    <!-- 06 · APPS -->
+    <!-- 06 · CONEXIÓN CON EL GEMELO DIGITAL -->
+    <section class="block" id="conexion" data-chapter="connect">
+      <div class="wrap">
+        <header class="block__head">
+          <p class="kicker" data-reveal><b>06</b><span data-i18n="c10k">Conexión</span></p>
+          <h2 class="title"><span class="ln"><span data-i18n="c10a">Conexión con el</span></span><span class="ln"><span data-i18n="c10b">gemelo digital SITL.</span></span></h2>
+        </header>
+
+        <p class="sitl__lead" data-reveal data-i18n="cxLead">Es un dron simulado, no uno físico. Vuela en un simulador con el mismo piloto automático que usaría uno real.</p>
+
+        <figure class="flowdia" data-reveal>
+          <p class="sr" id="cxAlt" data-i18n="cxAlt">Flujo: Gazebo, PX4 SITL, puente MAVLink y app web, con intercambio de datos en ambos sentidos.</p>
+          <svg class="flowdia__h" viewBox="0 0 1040 150" role="img" aria-labelledby="cxAlt" focusable="false">
+            <g class="fd-link"><path d="M236 75h28M242 69l-6 6 6 6M258 69l6 6-6 6"/><path d="M506 75h28M512 69l-6 6 6 6M528 69l6 6-6 6"/><path d="M776 75h28M782 69l-6 6 6 6M798 69l6 6-6 6"/></g>
+            <g aria-hidden="true">
+              <rect class="fd-node" x="1" y="1" width="234" height="148" rx="16"/>
+              <text class="fd-k" x="22" y="40" data-i18n="cx1k">Simulador</text><text class="fd-t" x="22" y="78">Gazebo</text><text class="fd-s" x="22" y="108" data-i18n="cxD1s">X500 simulado</text>
+              <rect class="fd-node fd-node--real" x="271" y="1" width="234" height="148" rx="16"/>
+              <text class="fd-k" x="292" y="40" data-i18n="cx2k">Piloto automático real</text><text class="fd-t" x="292" y="78">PX4 SITL</text><text class="fd-s" x="292" y="108">Software in the loop</text>
+              <rect class="fd-node" x="541" y="1" width="234" height="148" rx="16"/>
+              <text class="fd-k" x="562" y="40" data-i18n="cxD3k">Conexión</text><text class="fd-t" x="562" y="78" data-i18n="cxD3t">Puente</text><text class="fd-s" x="562" y="108">MAVLink</text>
+              <rect class="fd-node fd-node--app" x="805" y="1" width="234" height="148" rx="16"/>
+              <text class="fd-k" x="826" y="40" data-i18n="cxD4k">App web</text><text class="fd-t" x="826" y="78" data-i18n="cxD4t">Gemelo digital SITL</text><text class="fd-s" x="826" y="108" data-i18n="cxD4s">Muestra y controla</text>
+            </g>
+          </svg>
+          <svg class="flowdia__v" viewBox="0 0 320 548" role="img" aria-labelledby="cxAlt" focusable="false">
+            <g class="fd-link"><path d="M160 105v32M154 111l6-6 6 6M154 131l6 6 6-6"/><path d="M160 241v32M154 247l6-6 6 6M154 267l6 6 6-6"/><path d="M160 377v32M154 383l6-6 6 6M154 403l6 6 6-6"/></g>
+            <g aria-hidden="true">
+              <rect class="fd-node" x="1" y="1" width="318" height="104" rx="16"/>
+              <text class="fd-k" x="20" y="32" data-i18n="cx1k">Simulador</text><text class="fd-t" x="20" y="62">Gazebo</text><text class="fd-s" x="20" y="88" data-i18n="cxD1s">X500 simulado</text>
+              <rect class="fd-node fd-node--real" x="1" y="137" width="318" height="104" rx="16"/>
+              <text class="fd-k" x="20" y="168" data-i18n="cx2k">Piloto automático real</text><text class="fd-t" x="20" y="198">PX4 SITL</text><text class="fd-s" x="20" y="224">Software in the loop</text>
+              <rect class="fd-node" x="1" y="273" width="318" height="104" rx="16"/>
+              <text class="fd-k" x="20" y="304" data-i18n="cxD3k">Conexión</text><text class="fd-t" x="20" y="334" data-i18n="cxD3t">Puente</text><text class="fd-s" x="20" y="360">MAVLink</text>
+              <rect class="fd-node fd-node--app" x="1" y="409" width="318" height="104" rx="16"/>
+              <text class="fd-k" x="20" y="440" data-i18n="cxD4k">App web</text><text class="fd-t" x="20" y="470" data-i18n="cxD4t">Gemelo digital SITL</text><text class="fd-s" x="20" y="496" data-i18n="cxD4s">Muestra y controla</text>
+            </g>
+          </svg>
+        </figure>
+
+        <div class="sitl__steps">
+          <article class="cell" data-reveal>
+            <p class="cell__tag" data-i18n="cx1k">Simulador</p>
+            <h3>Gazebo</h3>
+            <p data-i18n="cx1p">Simulador físico de robótica. En él vuela un X500 simulado: un modelo en software, no un dron físico.</p>
+          </article>
+          <article class="cell" data-reveal>
+            <p class="cell__tag" data-i18n="cx2k">Piloto automático real</p>
+            <h3 data-i18n="cx2t">PX4 en modo SITL</h3>
+            <p data-i18n="cx2p">PX4 es el piloto automático real del X500. En modo SITL (software in the loop) corre en un computador y pilota el dron simulado de Gazebo.</p>
+          </article>
+          <article class="cell" data-reveal>
+            <p class="cell__tag" data-i18n="cxD4k">App web</p>
+            <h3 data-i18n="cx3t">La app muestra y controla</h3>
+            <p data-i18n="cx3p">Un puente MAVLink lleva los datos de PX4 a la app. La app muestra el vuelo y envía órdenes: ese es el Gemelo digital SITL.</p>
+          </article>
+        </div>
+        <p class="fine" data-reveal data-i18n="cxNote">Gemelo digital SITL: un dron simulado que usa el piloto automático real PX4. Ningún dron físico está conectado.</p>
+
+        <div class="sitl__cta" data-reveal>
+          <div>
+            <h3 data-i18n="cxCtaT">¿Quieres verlo funcionando?</h3>
+            <p data-i18n="cxCtaP">Escribe al autor para coordinar una demo conectada a Gazebo. No es una demo pública: se muestra en una sesión acordada.</p>
+          </div>
+          <a class="btn btn--primary" id="cxCta" href="mailto:3d@alexwoodcock.me?subject=Demo%20de%20TwinSight%20conectada%20a%20Gazebo"><span data-i18n="cxCtaB">Pedir una demo</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 · APPS -->
     <section class="block" id="apps" data-chapter="apps">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>06</b><span data-i18n="c6k">Apps</span></p>
+          <p class="kicker" data-reveal><b>07</b><span data-i18n="c6k">Apps</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c6a">Dos clientes,</span></span><span class="ln"><span data-i18n="c6b">un sistema.</span></span></h2>
         </header>
 
@@ -294,11 +367,11 @@
       </div>
     </section>
 
-    <!-- 07 · EVIDENCIA -->
+    <!-- 08 · EVIDENCIA -->
     <section class="block" id="evidencia" data-chapter="evidence">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>07</b><span data-i18n="c7k">Evidencia</span></p>
+          <p class="kicker" data-reveal><b>08</b><span data-i18n="c7k">Evidencia</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c7a">Validado con</span></span><span class="ln"><span data-i18n="c7b">usuarios reales.</span></span></h2>
         </header>
         <div class="evidence">
@@ -334,11 +407,11 @@
       </div>
     </section>
 
-    <!-- 08 · INGENIERÍA -->
+    <!-- 09 · INGENIERÍA -->
     <section class="block" data-chapter="engineering">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>08</b><span data-i18n="c8k">Ingeniería</span></p>
+          <p class="kicker" data-reveal><b>09</b><span data-i18n="c8k">Ingeniería</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c8a">Construido para</span></span><span class="ln"><span data-i18n="c8b">mantenerse.</span></span></h2>
         </header>
         <div class="bento">
@@ -375,11 +448,11 @@
       </div>
     </section>
 
-    <!-- 09 · DOCS -->
+    <!-- 10 · DOCS -->
     <section class="block" id="docs" data-chapter="docs">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>09</b><span data-i18n="c9k">Documentación</span></p>
+          <p class="kicker" data-reveal><b>10</b><span data-i18n="c9k">Documentación</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c9a">Todo queda</span></span><span class="ln"><span data-i18n="c9b">por escrito.</span></span></h2>
         </header>
         <div class="docs" data-reveal>
