@@ -134,6 +134,15 @@ namespace WebGL.Telemetry.Tests
                 if (w.ContainsKey("seed")) p.wind.seed = C.N(w, "seed");
             }
             if (cfg.ContainsKey("faultComp")) p.faultComp = C.B(cfg, "faultComp");
+            if (cfg.ContainsKey("battery"))
+            {
+                var b = C.O(cfg, "battery");
+                p.battery = new BatteryPatch();
+                if (b.ContainsKey("react")) p.battery.react = C.B(b, "react");
+                if (b.ContainsKey("lowRem")) p.battery.lowRem = C.N(b, "lowRem");
+                if (b.ContainsKey("critRem")) p.battery.critRem = C.N(b, "critRem");
+                if (b.ContainsKey("emptyRem")) p.battery.emptyRem = C.N(b, "emptyRem");
+            }
             return p;
         }
 

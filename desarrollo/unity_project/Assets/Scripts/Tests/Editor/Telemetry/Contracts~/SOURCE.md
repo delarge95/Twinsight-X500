@@ -55,3 +55,8 @@ filtro `WebGL.Telemetry`).
 - Copiados: `telemetry.schema.json` (protocolVersion 1.1.0), `fixtures/**` (nuevos: `client.command.battery_off`, `client.command.stamped`, `client.manual.stamped`, `ack.sitl.stamped`, `ack.sitl.stale`, e invalidos `battery_off_with_motor`, `fractional_seq`, `inject_with_seq`, `negative_seq`, `hello.bad_version`; `hello.sitl` lleva `protocolVersion`).
 - `labels.json` (aqui y en `Resources/TelemetryLabels.json`): solo cambia `protocolVersion` a 1.1.0; el resto de su texto NO se tomo de esa rama (otras ediciones de la web).
 - No se copio `golden/stamp.json`: el emisor y el filtro de sellos (`src/shared/stamp.ts`) son del relay y del cliente web; el escritorio solo lee y escribe `seq`/`ts` y envia `battery_off` si se le pide.
+
+## P2 bateria agotada del simulador (2026-11-18)
+- Origen: repo web `E:	winsight-web-twin`, rama `web/telemetria-control`; ultimo commit que toca `contracts/golden/batteryreact.json`: `b1ec5c95be8cf4614b82bad0259b6037a69b6f8c` (HEAD de la web al copiar: `cbd57e9`).
+- Copiado `golden/batteryreact.json` (nuevo; 10 escenarios + defaults, limites, textos, validacion y almacenamiento). Los demas goldens no cambian. Ignorado por `*~`: se anade con `git add -f`.
+- Contrato 1.1: el codigo de `battery_off` ya esta en `ClientMessages`/`TelemetryProtocol`; no hizo falta tocar `fixtures/`.

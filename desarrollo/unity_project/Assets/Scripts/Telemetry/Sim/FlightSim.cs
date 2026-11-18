@@ -117,6 +117,8 @@ namespace WebGL.Telemetry
         public bool recovering;
         /// <summary>Events raised by Step (impact, forced landing), waiting for the client: read and empty them with FlightSim.TakeEvents.</summary>
         public List<SimEvent> events = new List<SimEvent>();
+        /// <summary>What the battery reaction remembers (stage announced, emergency in progress); see BatteryReact.cs. Exposed so a UI chip can show the emergency.</summary>
+        public BatteryReactState batReact = BatteryReact.CreateState();
     }
 
     /// <summary>An event raised while stepping (not the reply of a command).</summary>
@@ -173,6 +175,16 @@ namespace WebGL.Telemetry
             s.target = new SimTarget { n = s.p[0] + s.v[0] * SimLimits.VelocityTau, e = s.p[1] + s.v[1] * SimLimits.VelocityTau, alt = alt };
             s.yawTarget = null;
             s.orbit = null;
+        }
+
+        /// <summary>Return to the take-off point: climb to the RTL altitude of the geofence rule (never lower than the current one), fly back, land. Shared by the rtl command and the battery.</summary>
+        static void StartRtl(SimState s)
+        {
+            s.target = new SimTarget { n = 0, e = 0, alt = Math.Max(-s.p[2], s.cfg.rtlAltitude) };
+            s.orbit = null;
+            s.rtlPhase = RtlPhase.Climb;
+            s.mode = SimMode.Rtl;
+            s.pilot = false;
         }
 
         static SimReply Ok(string evt = null) => new SimReply { ok = true, evt = evt };
@@ -235,6 +247,7 @@ namespace WebGL.Telemetry
             s.p[2] = 0;
             s.yawRate = 0;
             s.u = new double[4];
+            s.batReact = BatteryReact.CreateState();
         }
 
         /// <summary>One step with a motor cut: MotorFail.cs carries position, velocity and attitude; sticks, targets, wind and geofence do not act.</summary>
@@ -258,6 +271,7 @@ namespace WebGL.Telemetry
             SimReply no;
             if (s.fail != null) return FailCommand(s, s.fail, msg);
             if (s.groundCut != 0) return GroundCutCommand(s, s.groundCut, msg);
+            if (s.batReact.emergency && Flying(s) && Array.IndexOf(BatteryReact.EmergencyAllowed, msg.name) < 0) return No(BatteryReact.EmergencyDetail);
             switch (msg.name)
             {
                 case "takeoff":
@@ -273,6 +287,7 @@ namespace WebGL.Telemetry
                     s.armed = true;
                     s.landed = false;
                     s.mode = SimMode.Takeoff;
+                    s.batReact = BatteryReact.CreateState(); // a new flight: stages and emergency start again (a pending disarm is cancelled)
                     HoldHere(s, alt);
                     return Ok(evt);
                 }
@@ -330,11 +345,7 @@ namespace WebGL.Telemetry
                 case "rtl":
                 {
                     if (NeedFlight(s, out no)) return no;
-                    s.target = new SimTarget { n = 0, e = 0, alt = Math.Max(-s.p[2], s.cfg.rtlAltitude) };
-                    s.orbit = null;
-                    s.rtlPhase = RtlPhase.Climb;
-                    s.mode = SimMode.Rtl;
-                    s.pilot = false;
+                    StartRtl(s);
                     return Ok("Volviendo al punto de despegue");
                 }
                 case "hold":
@@ -391,6 +402,14 @@ namespace WebGL.Telemetry
             if (next.ceiling.HasValue) merged.ceiling = next.ceiling.Value;
             if (next.rtlAltitude.HasValue) merged.rtlAltitude = next.rtlAltitude.Value;
             if (next.faultComp.HasValue) merged.faultComp = next.faultComp.Value;
+            if (next.battery != null)
+            {
+                BatteryPatch bp = next.battery;
+                if (bp.react.HasValue) merged.battery.react = bp.react.Value;
+                if (bp.lowRem.HasValue) merged.battery.lowRem = bp.lowRem.Value;
+                if (bp.critRem.HasValue) merged.battery.critRem = bp.critRem.Value;
+                if (bp.emptyRem.HasValue) merged.battery.emptyRem = bp.emptyRem.Value;
+            }
             if (next.wind != null)
             {
                 WindPatch w = next.wind;
@@ -404,6 +423,8 @@ namespace WebGL.Telemetry
             if (!check.ok) return check;
             ConfigCheck wind = Wind.Validate(merged.wind);
             if (!wind.ok) return wind;
+            ConfigCheck battery = BatteryReact.Validate(merged.battery);
+            if (!battery.ok) return battery;
             // A new seed starts a new sequence of gusts (from calm); the rest of the wind changes without touching the generator.
             if (merged.wind.seed != s.cfg.wind.seed) s.wind = new WindState(merged.wind.seed);
             // The switch also acts on a motor that is already cut (the didactic comparison is live).
@@ -568,7 +589,9 @@ namespace WebGL.Telemetry
                 if (s.p[2] >= 0 && s.v[2] >= 0 && (s.mode == SimMode.Land || (s.mode == SimMode.Rtl && s.rtlPhase == RtlPhase.Land) || (s.mode == SimMode.Manual && climb < 0)))
                 {
                     s.landed = true;
-                    s.armed = false;
+                    // After an emergency landing the vehicle stays armed a little longer (the disarm comes from StepBatteryReact); otherwise it disarms at once.
+                    if (s.batReact.emergency && s.cfg.battery.react) s.batReact.disarmIn = BatteryReact.DisarmDelayS;
+                    else s.armed = false;
                     s.mode = SimMode.Idle;
                     s.v[0] = s.v[1] = s.v[2] = 0;
                     s.p[2] = 0;
@@ -621,7 +644,90 @@ namespace WebGL.Telemetry
                 s.tempMotor[i] += (s.ambientC + rise - s.tempMotor[i]) * Math.Min(1, dt / 45);
             }
             s.tempBattery += (s.ambientC + 9 * Math.Pow(s.amps / SimLimits.HoverAmps, 2) - s.tempBattery) * Math.Min(1, dt / 240);
+            StepBatteryReact(s, dt);
             return s;
+        }
+
+        /// <summary>
+        /// The battery acts on the flight (cfg.battery.react): warning at lowRem, critical event and automatic return at critRem, and at emptyRem a hold of
+        /// EmergencyHoldS where the vehicle is, the emergency landing and, after the touchdown, the disarm. Each stage is raised once per flight. Called at the
+        /// end of every step with the charge just computed; the mode it sets acts from the next step. With a cut motor (the rigid-body model) only the events
+        /// are raised: no manoeuvre is possible. Off (react false): nothing happens and the state is forgotten.
+        /// </summary>
+        static void StepBatteryReact(SimState s, double dt)
+        {
+            BatteryReactConfig c = s.cfg.battery;
+            BatteryReactState b = s.batReact;
+            if (!c.react)
+            {
+                if (b.disarmIn.HasValue) s.armed = false; // switched off while waiting for the disarm: disarmed at touchdown, as before
+                s.batReact = BatteryReact.CreateState();
+                return;
+            }
+            if (b.disarmIn.HasValue)
+            {
+                b.disarmIn -= dt;
+                if (b.disarmIn <= 0)
+                {
+                    s.armed = false;
+                    s.u = new double[4];
+                    s.events.Add(new SimEvent { severity = EventSeverity.Info, text = BatteryReact.Text.Disarmed });
+                    s.batReact = BatteryReact.CreateState();
+                }
+                return;
+            }
+            if (!Flying(s))
+            {
+                if (!s.armed) s.batReact = BatteryReact.CreateState();
+                return;
+            }
+            bool act = s.fail == null;
+            if (b.stage < 1 && s.rem <= c.lowRem)
+            {
+                b.stage = 1;
+                s.events.Add(new SimEvent { severity = EventSeverity.Warning, text = BatteryReact.Text.Low(s.rem) });
+            }
+            if (b.stage < 2 && s.rem <= c.critRem)
+            {
+                b.stage = 2;
+                if (act && s.mode != SimMode.Rtl && s.mode != SimMode.Land)
+                {
+                    StartRtl(s);
+                    s.events.Add(new SimEvent { severity = EventSeverity.Critical, text = BatteryReact.Text.Crit(s.rem) });
+                }
+                else s.events.Add(new SimEvent { severity = EventSeverity.Critical, text = BatteryReact.Text.CritNoAction(s.rem) });
+            }
+            if (b.stage < 3 && s.rem <= c.emptyRem)
+            {
+                b.stage = 3;
+                if (!act) s.events.Add(new SimEvent { severity = EventSeverity.Critical, text = BatteryReact.Text.EmptyNoAction });
+                else
+                {
+                    b.emergency = true;
+                    s.pilot = false;
+                    if (s.mode == SimMode.Land || (s.mode == SimMode.Rtl && s.rtlPhase == RtlPhase.Land))
+                        s.events.Add(new SimEvent { severity = EventSeverity.Critical, text = BatteryReact.Text.EmptyLanding });
+                    else
+                    {
+                        HoldHere(s);
+                        s.mode = SimMode.Hold;
+                        b.holdLeft = BatteryReact.EmergencyHoldS;
+                        s.events.Add(new SimEvent { severity = EventSeverity.Critical, text = BatteryReact.Text.Empty(BatteryReact.EmergencyHoldS) });
+                    }
+                }
+            }
+            if (b.holdLeft.HasValue && act)
+            {
+                b.holdLeft -= dt;
+                if (b.holdLeft <= 0)
+                {
+                    b.holdLeft = null;
+                    HoldHere(s);
+                    s.mode = SimMode.Land;
+                    s.pilot = false;
+                    s.events.Add(new SimEvent { severity = EventSeverity.Critical, text = BatteryReact.Text.Landing });
+                }
+            }
         }
 
         /// <summary>Math.hypot of two values.</summary>
