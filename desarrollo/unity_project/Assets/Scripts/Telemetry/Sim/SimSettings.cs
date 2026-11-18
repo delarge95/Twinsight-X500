@@ -11,6 +11,8 @@ namespace WebGL.Telemetry
     {
         public const string PrefFence = "Desk_SimFence";
         public const string PrefWind = "Desk_SimWind";
+        /// <summary>P2: the switch «Ignorar batería» ("0" = the battery does not act on the flight; anything else or nothing = it acts). The web keeps it under twinsight.sim.battery.react.v1.</summary>
+        public const string PrefBatteryReact = "Desk_SimBatteryReact";
 
         public static FenceConfig LoadFence() => Geofence.Parse(PlayerPrefs.GetString(PrefFence, string.Empty));
 
@@ -28,11 +30,19 @@ namespace WebGL.Telemetry
             PlayerPrefs.Save();
         }
 
+        public static bool LoadBatteryReact() => BatteryReact.ParseReact(PlayerPrefs.HasKey(PrefBatteryReact) ? PlayerPrefs.GetString(PrefBatteryReact) : null);
+
+        public static void SaveBatteryReact(bool react)
+        {
+            PlayerPrefs.SetString(PrefBatteryReact, react ? "1" : "0");
+            PlayerPrefs.Save();
+        }
+
         /// <summary>The configuration a fresh simulator starts with: what was stored (defaults when nothing was).</summary>
         public static SimConfig Load()
         {
             FenceConfig f = LoadFence();
-            return new SimConfig { radius = f.radius, ceiling = f.ceiling, rtlAltitude = f.rtlAltitude, wind = LoadWind() };
+            return new SimConfig { radius = f.radius, ceiling = f.ceiling, rtlAltitude = f.rtlAltitude, wind = LoadWind(), battery = new BatteryReactConfig { react = LoadBatteryReact() } };
         }
     }
 }

@@ -192,6 +192,8 @@ namespace WebGL.UI.Desktop
                 () => { var w = _tel.WindRemembered.Clone(); w.speed = 0; w.gustSigma = 0; _tel.ApplyWind(w); }, "Quitar viento", "Remove wind");
             AddToolChip("fence", "fence", "DkChipFence", () => _tel.IsRunning && DesktopTelemetry.IsSimulator && !FenceIsDefault(_tel.FenceRemembered),
                 () => _tel.ApplyFence(Geofence.Default()), "Quitar geocerca personalizada", "Remove custom geofence");
+            AddToolChip("batteryignore", "battery", "DkChipBatteryIgnore", () => _tel.IsRunning && DesktopTelemetry.IsSimulator && !_tel.BatteryReactOn,
+                () => _tel.ApplyBatteryReact(true), "Quitar «Ignorar batería»", "Remove “Ignore battery”");
             AddToolChip("course", "studio", "DkChipCourse", () => _tel.CourseOn, () => _tel.SetCourse(false), "Quitar circuito", "Remove circuit");
             AddToolChip("map", "focus", "DkChipMap", () => _tel.MapOn, () => _tel.SetMap(false), "Quitar mapa", "Remove map");
             AddToolChip("mission", "pins", "DkChipMission", () => _tel.MissionBusy, () => _tel.MissionDo(MissionControl.Abort), "Detener misión", "Stop mission");

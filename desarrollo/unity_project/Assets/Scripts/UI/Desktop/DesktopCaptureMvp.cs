@@ -155,7 +155,9 @@ namespace WebGL.UI.Desktop
 
             yield return CameraChecks();
             yield return ChipChecks();
+            yield return BatteryChecks();
             yield return ThermalChecks();
+            yield return SitlBatteryChecks();
 
             DesktopKeyboardGate.KeyHeld = UnityEngine.Input.GetKey;
             DesktopKeyboardGate.KeyPressed = UnityEngine.Input.GetKeyDown;

@@ -507,10 +507,7 @@ namespace WebGL.Telemetry
                                    "PX4 warns at 15 % and 7 % (its defaults) and can command return or land depending on its settings." } },
             { "fx.bat.src.replay", new[] { "Falla sintética: −2,4 V y −30 % sobre la cifra grabada. El vuelo grabado no vuelve ni aterriza por ello.",
                                          "Synthetic fault: −2.4 V and −30 % on the recorded figure. The recorded flight does not return or land because of it." } },
-            { "fx.bat.src.sim", new[] { "El simulador descarga la batería, pero no reacciona a la batería baja: sigue volando hasta que aterrices.",
-                                      "The simulator drains the battery but does not react to low charge: it keeps flying until you land." } },
-            { "fx.bat.src.sitl", new[] { "Batería simulada por PX4. Su reacción depende de sus parámetros; en SITL puede no llegar a descargarse lo suficiente para que salte el aviso.",
-                                       "Battery simulated by PX4. Its reaction depends on its parameters; in SITL it may not drain enough for the warning to trigger." } },      // (translation)
+            // fx.bat.src.sim / fx.bat.src.sitl (section 2.4 B) were retired: the simulator uses simbat.note and SITL cmd.batteryNote (ExtraStrings.Mvp.cs)
             // C. hot motor (motor_overheat, alert motorN:temp)
             { "fx.c.means", new[] { "Un motor muy caliente pierde par y daña su bobinado; los umbrales que usa la app (65 / 80 °C) son de demostración, no del fabricante.",
                                     "A very hot motor loses torque and damages its windings; the app's thresholds (65 / 80 °C) are demo values, not the manufacturer's." } },

@@ -126,8 +126,11 @@ namespace WebGL.UI.Desktop
 
             _meansHead.text = TelemetryStrings.T("fx.h.means", lang);
             _means.text = FaultExplain.Means(i.Topic, lang);
+            string ctrl = FaultExplain.Controller(i.Topic, i.Source, lang);
+            _ctrlHead.style.display = ctrl == null ? DisplayStyle.None : DisplayStyle.Flex;
+            _ctrl.style.display = ctrl == null ? DisplayStyle.None : DisplayStyle.Flex;
             _ctrlHead.text = FaultExplain.ControllerHeading(i.Topic, lang);
-            _ctrl.text = FaultExplain.Controller(i.Topic, lang);
+            _ctrl.text = ctrl ?? string.Empty;
 
             string src = FaultExplain.InSource(i.Topic, i.Source, i.Motor, lang);
             _srcBlock.style.display = src == null ? DisplayStyle.None : DisplayStyle.Flex;

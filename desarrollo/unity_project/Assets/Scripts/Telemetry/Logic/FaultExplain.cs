@@ -96,16 +96,24 @@ namespace WebGL.Telemetry
 
         public static string Controller(FaultTopic t, string lang) => TelemetryStrings.T("fx." + Key(t) + ".ctrl", lang);
 
+        /// <summary>The controller block for the active source: null = the block is not shown. The simulator's battery is not PX4: its own behaviour is the approved `simbat.note`
+        /// (shown in «En esta fuente»), so PX4's 15 % / 7 % line is left out (web: controllerBySource { sim: null }).</summary>
+        public static string Controller(FaultTopic t, ExplainSource s, string lang) =>
+            t == FaultTopic.BatterySag && s == ExplainSource.Simulator ? null : Controller(t, lang);
+
         /// <summary>"En esta fuente": what the ACTIVE source does with this fault. No session = null (the block is not shown).</summary>
         public static string InSource(FaultTopic t, ExplainSource s, int motor, string lang)
         {
             switch (s)
             {
                 case ExplainSource.LocalReplay: return TelemetryStrings.F("fx." + Key(t) + ".src.replay", lang, "n", Motor(motor));
-                case ExplainSource.Sitl: return TelemetryStrings.F("fx." + Key(t) + ".src.sitl", lang, "n", Motor(motor));
+                case ExplainSource.Sitl:
+                    // battery in SITL: the approved and verified text of 2026-11-17 (cmd.batteryNote) replaces the old line of section 2.4 B
+                    if (t == FaultTopic.BatterySag) return TelemetryStrings.T("cmd.batteryNote", lang);
+                    return TelemetryStrings.F("fx." + Key(t) + ".src.sitl", lang, "n", Motor(motor));
                 case ExplainSource.Simulator:
-                    // the battery and (Lote 1a) the motor failure have their own simulator text; every other fault: the simulator does not inject faults
-                    if (t == FaultTopic.BatterySag) return TelemetryStrings.T("fx.bat.src.sim", lang);
+                    // the battery (P2: the approved simbat.note, it warns, returns and lands) and (Lote 1a) the motor failure have their own simulator text; every other fault: the simulator does not inject faults
+                    if (t == FaultTopic.BatterySag) return TelemetryStrings.T("simbat.note", lang);
                     if (t == FaultTopic.MotorFailure) return TelemetryStrings.T("fx.a.src.sim", lang);
                     return TelemetryStrings.T("fx.src.sim", lang);
                 default: return null;

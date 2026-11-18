@@ -37,6 +37,7 @@ namespace WebGL.UI.Desktop
             BuildCourseButton(strip);
             BuildFenceButton(strip);
             BuildWindButton(strip);
+            BuildBatteryReactButton(strip); // MVP P2: «Batería» (the reaction of the simulator to a low battery)
         }
 
         // the simulated test course (PLAN_PC 28.3, DesktopTelemetryUI.Course.cs) plugs in here; without it these do nothing
@@ -52,6 +53,9 @@ namespace WebGL.UI.Desktop
         partial void BuildWindButton(VisualElement strip);
         partial void DisposeWind();
         partial void TickWind(bool viewer);
+        partial void BuildBatteryReactButton(VisualElement strip);
+        partial void DisposeBatteryReact();
+        partial void TickBatteryReact(bool viewer);
 
         private void BuildEnvOverlay()
         {
@@ -65,6 +69,7 @@ namespace WebGL.UI.Desktop
             DisposeCourse();
             DisposeFence();
             DisposeWind();
+            DisposeBatteryReact();
             DisposeTools();
         }
 
@@ -96,6 +101,7 @@ namespace WebGL.UI.Desktop
             TickCourse(viewer);
             TickFence(viewer);
             TickWind(viewer);
+            TickBatteryReact(viewer);
             TickToolsLote1(viewer);
         }
     }

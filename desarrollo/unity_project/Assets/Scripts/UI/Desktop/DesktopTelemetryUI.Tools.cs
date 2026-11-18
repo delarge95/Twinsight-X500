@@ -21,6 +21,9 @@ namespace WebGL.UI.Desktop
         partial void BuildWindPopover();
         partial void RelabelWind();
         partial void TickWindPopover();
+        partial void BuildBatteryReactPopover();
+        partial void RelabelBatteryReact();
+        partial void TickBatteryReactPopover();
         partial void RelabelFence();
         partial void TickFencePopover();
         // ── Lote 1b / 1c: one partial per tool (its own file DesktopTelemetryUI.<Tool>.cs). A tool that has nothing to do for a hook just does not implement it. ──
@@ -62,6 +65,7 @@ namespace WebGL.UI.Desktop
         {
             BuildFencePopover();
             BuildWindPopover();
+            BuildBatteryReactPopover();
             BuildPreflightPopover();
             BuildMissionPopover();
             BuildTrainingPopover();
@@ -118,12 +122,14 @@ namespace WebGL.UI.Desktop
         {
             RelabelFence();
             RelabelWind();
+            RelabelBatteryReact();
         }
 
         private void TickToolPopover(string which)
         {
             if (which == "fence") TickFencePopover();
             else if (which == "wind") TickWindPopover();
+            else if (which == "batteryreact") TickBatteryReactPopover();
             else if (which == "record") TickRecordPopover();
             else if (which == "preflight") TickPreflightPopover();
             else if (which == "mission") TickMissionPopover();

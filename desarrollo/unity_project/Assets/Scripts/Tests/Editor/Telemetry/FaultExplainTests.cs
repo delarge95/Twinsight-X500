@@ -61,8 +61,16 @@ namespace WebGL.Telemetry.Tests
                 StringAssert.Contains("no inyecta fallas", FaultExplain.InSource(t, ExplainSource.Simulator, 1, "es"));
                 StringAssert.Contains("does not inject faults", FaultExplain.InSource(t, ExplainSource.Simulator, 1, "en"));
             }
-            StringAssert.Contains("no reacciona a la batería baja", FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Simulator, 1, "es"));
-            StringAssert.Contains("does not react to low charge", FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Simulator, 1, "en"));
+            // P2: the simulator's battery warns, returns and lands: the approved simbat.note (the old line of section 2.4 B, "no reacciona a la batería baja", is no longer true)
+            StringAssert.Contains("vuelve solo y, al agotarse, aterriza y se desarma", FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Simulator, 1, "es"));
+            StringAssert.Contains("returns by itself and, when it runs out, lands and disarms", FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Simulator, 1, "en"));
+            StringAssert.DoesNotContain("no reacciona", FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Simulator, 1, "es"));
+            Assert.IsNull(FaultExplain.Controller(FaultTopic.BatterySag, ExplainSource.Simulator, "es"), "the simulator's battery is not PX4: no PX4 controller block");
+            Assert.IsNotNull(FaultExplain.Controller(FaultTopic.BatterySag, ExplainSource.Sitl, "es"));
+            // battery in SITL: cmd.batteryNote
+            StringAssert.Contains("MAV_CMD_INJECT_FAILURE", FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Sitl, 1, "es"));
+            StringAssert.Contains("de 70 % a 0 % en unos 6 s", FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Sitl, 1, "es"));
+            StringAssert.Contains("from 70% to 0% in about 6 s", FaultExplain.InSource(FaultTopic.BatterySag, ExplainSource.Sitl, 1, "en"));
         }
 
         [Test]

@@ -222,6 +222,7 @@ namespace WebGL.UI.Desktop
             _faultControls.Add(grid);
             _popFaults.Add(_faultControls);
             BuildSimFaultControls(); // Lote 1a, tool 10: «Cortar motor N», «Restaurar» and the didactic compensation, only with the simulator
+            BuildSitlFaultControls(); // MVP P4: «Agotar batería» (battery_off) of PX4 SITL, only when the bridge announces it
             _faultActiveTitle = Text("dk-field-label", _popFaults);
             _faultActiveList = new VisualElement();
             _faultActiveList.AddToClassList("dk-fault-active");
@@ -320,6 +321,7 @@ namespace WebGL.UI.Desktop
             RelabelFaultExplain();
             _faultSyntheticTag.text = labels.FaultSynthetic(lang);
             RelabelSimFaults();
+            RelabelSitlFaults();
             _faultExplain.text = T("fx.open");
             _faultMotorLabel.text = T("faults.motor");
             _faultActiveTitle.text = T("faults.active");
@@ -538,6 +540,7 @@ namespace WebGL.UI.Desktop
             _faultAck.text = canInject ? _ackText : string.Empty;
             _faultAck.style.display = canInject && !string.IsNullOrEmpty(_ackText) ? DisplayStyle.Flex : DisplayStyle.None;
             TickSimFaults(client, simulator);
+            TickSitlFaults(client, sitl);
         }
 
         /// <summary>Synthetic injection on the local replay: validated like the web (Faults.Validate), sent as a normal client message.</summary>
