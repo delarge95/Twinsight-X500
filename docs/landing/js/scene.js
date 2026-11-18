@@ -4,7 +4,7 @@
 import {
   WebGLRenderer, Scene, PerspectiveCamera, Group, Mesh, Color, Vector3, Vector4, Box3, MathUtils,
   PMREMGenerator, Quaternion, DirectionalLight, HemisphereLight, ShaderMaterial, PlaneGeometry, BufferGeometry,
-  BufferAttribute, MeshBasicMaterial, AdditiveBlending, DoubleSide, SRGBColorSpace,
+  BufferAttribute, MeshBasicMaterial, AdditiveBlending, DoubleSide, SRGBColorSpace, Vector2, Matrix4,
   ACESFilmicToneMapping, GLTFLoader, MeshoptDecoder, RoomEnvironment,
 } from '../vendor/three.bundle.js';
 
@@ -69,6 +69,7 @@ const THERMAL_HEAD = /* glsl */ `
   varying vec3 vTwinW;
   uniform vec4 uClip; uniform float uThermal; uniform float uRim;
   uniform vec4 uHeat[${HEAT_COUNT}]; uniform float uHeatSigma[${HEAT_COUNT}];
+  uniform vec2 uSel; // selección de pieza: x = atenuar, y = resaltar (uno por material, ver patchMaterial)
   vec3 twinRamp(float t) {
     vec3 c = mix(vec3(0.03, 0.07, 0.30), vec3(0.36, 0.10, 0.55), smoothstep(0.0, 0.28, t));
     c = mix(c, vec3(0.86, 0.20, 0.36), smoothstep(0.24, 0.50, t));
@@ -95,6 +96,14 @@ const THERMAL_MIX = /* glsl */ `
     float lum = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
     vec3 th = twinRamp(twinHeat(vTwinW)) * (0.5 + 0.85 * lum);
     gl_FragColor.rgb = mix(gl_FragColor.rgb, th, uThermal);
+  }
+  if (uSel.x + uSel.y > 0.001) {
+    // pieza elegida: celeste de acento con luz de contorno; el resto, casi apagado
+    float lumS = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
+    float rimS = pow(1.0 - clamp(dot(normalize(normal), normalize(vViewPosition)), 0.0, 1.0), 2.0);
+    vec3 dimmed = mix(gl_FragColor.rgb, vec3(lumS), 0.75) * 0.3 + vec3(0.012, 0.024, 0.038); // sin color: los rojos y azules del modelo no compiten con la pieza
+    vec3 lit = mix(gl_FragColor.rgb, vec3(0.275, 0.686, 1.0) * (0.34 + 0.95 * lumS), 0.55) + vec3(0.30, 0.70, 1.0) * rimS * 0.6;
+    gl_FragColor.rgb = mix(mix(gl_FragColor.rgb, dimmed, uSel.x), lit, uSel.y);
   }`;
 
 const GRID_FRAG = /* glsl */ `
@@ -125,7 +134,8 @@ const SHEET_FRAG = /* glsl */ `
     gl_FragColor = vec4(uColor, a * uAlpha);
   }`;
 
-export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, reducedMotion = false, capture = false } = {}) {
+export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, groups = null, reducedMotion = false, capture = false } = {}) {
+  // groups: { nombreDeNodo: idDeGrupo } (landing/data/parts.json). Sin él no hay selección de piezas.
   // capture: conserva el búfer para poder exportar el lienzo a PNG (solo lo usan las plantillas de imagen)
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: capture });
   renderer.setClearColor(0x000000, 0);
@@ -209,17 +219,17 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
     });
   }
 
-  // Materiales sólidos: recorte de escáner + mezcla térmica inyectados en el PBR original.
+  // Materiales sólidos: recorte de escáner + mezcla térmica + selección inyectados en el PBR original.
+  // Cada material lleva su propio uniforme uSel; el programa se comparte (misma customProgramCacheKey).
   const meshes = [];
   root.traverse((o) => { if (o.isMesh) meshes.push(o); });
-  const patched = new Set();
-  for (const m of meshes) {
-    const mat = m.material;
-    if (patched.has(mat)) continue;
-    patched.add(mat);
+  function patchMaterial(mat) {
+    const sel = { value: new Vector2(0, 0) };
+    mat.userData.twinSel = sel;
     mat.envMapIntensity = 1;
     mat.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, shared);
+      shader.uniforms.uSel = sel;
       shader.vertexShader = 'varying vec3 vTwinW;\n' + shader.vertexShader.replace(
         '#include <project_vertex>',
         '#include <project_vertex>\n  vTwinW = (modelMatrix * vec4(transformed, 1.0)).xyz;',
@@ -229,6 +239,33 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
         .replace('#include <dithering_fragment>', '#include <dithering_fragment>\n' + THERMAL_MIX);
     };
     mat.customProgramCacheKey = () => 'twinsight-landing';
+    return mat;
+  }
+  // Grupos de selección: cada malla hereda el grupo del nodo raíz del que cuelga. Un material por (grupo, material original).
+  const groupMats = new Map(); // idGrupo → Set de materiales
+  const pickables = [];
+  if (groups) {
+    const clones = new Map();
+    for (const p of parts) {
+      const g = groups[p.node.name];
+      if (!g) continue;
+      p.node.traverse((o) => {
+        if (!o.isMesh) return;
+        const key = g + '|' + o.material.uuid;
+        if (!clones.has(key)) clones.set(key, patchMaterial(o.material.clone()));
+        o.material = clones.get(key);
+        o.userData.group = g;
+        if (!groupMats.has(g)) groupMats.set(g, new Set());
+        groupMats.get(g).add(o.material);
+        pickables.push(o);
+      });
+    }
+  }
+  const patched = new Set();
+  for (const m of meshes) {
+    if (patched.has(m.material) || m.material.userData.twinSel) continue;
+    patched.add(m.material);
+    patchMaterial(m.material);
   }
   const overlays = meshes.map((m) => {
     const fill = new Mesh(m.geometry, fillMat); fill.visible = false;
@@ -329,6 +366,69 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
   let running = true, visible = true;
   let pixelCap = Math.min(window.devicePixelRatio || 1, matchMedia('(pointer: coarse)').matches ? 1.5 : 2);
   let slowFrames = 0, measured = 0;
+
+  // ---- selección de piezas ----
+  // selId: grupo elegido (resaltado, el resto atenuado); hoverId: vista previa suave al pasar el ratón.
+  let selId = null, hoverId = null;
+  const selAnim = new Map([...groupMats.keys()].map((g) => [g, { x: 0, y: 0 }]));
+  function updateSelection(dt) {
+    if (!selAnim.size) return;
+    const k = reducedMotion ? 1 : 1 - Math.exp(-dt * 10);
+    for (const [g, a] of selAnim) {
+      let tx = 0, ty = 0;
+      if (selId) { ty = g === selId ? 1 : 0; tx = g === selId ? 0 : 1; }
+      else if (hoverId === g) ty = 0.3;
+      if (Math.abs(tx - a.x) < 0.002 && Math.abs(ty - a.y) < 0.002) { if (a.x === tx && a.y === ty) continue; a.x = tx; a.y = ty; } else { a.x += (tx - a.x) * k; a.y += (ty - a.y) * k; }
+      for (const m of groupMats.get(g)) m.userData.twinSel.value.set(a.x, a.y);
+    }
+  }
+  // Rayo cámara → modelo, a mano (el paquete de three no trae Raycaster): esfera envolvente y Möller–Trumbore.
+  // Solo se llama al hacer clic o, con límite de frecuencia, al pasar el ratón; nunca por cuadro.
+  const pickInv = new Matrix4(), pickO = new Vector3(), pickD = new Vector3(), pickE1 = new Vector3(), pickE2 = new Vector3();
+  const pickP = new Vector3(), pickQ = new Vector3(), pickT = new Vector3(), pickA = new Vector3(), pickB = new Vector3(), pickC = new Vector3();
+  function pickGroup(clientX, clientY) {
+    if (!pickables.length) return null;
+    const r = canvas.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    const ox = camera.position.x, oy = camera.position.y, oz = camera.position.z;
+    pickD.set(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1, 0.5).unproject(camera).sub(camera.position).normalize();
+    let best = Infinity, hit = null;
+    for (const mesh of pickables) {
+      const geo = mesh.geometry;
+      if (!geo.boundingSphere) geo.computeBoundingSphere();
+      pickInv.copy(mesh.matrixWorld).invert();
+      pickO.set(ox, oy, oz).applyMatrix4(pickInv);
+      const dx = pickD.x, dy = pickD.y, dz = pickD.z;
+      // dirección local sin normalizar: el parámetro t sigue siendo el del mundo
+      const ld = pickT.set(ox + dx, oy + dy, oz + dz).applyMatrix4(pickInv).sub(pickO);
+      const s = geo.boundingSphere;
+      const cx = s.center.x - pickO.x, cy = s.center.y - pickO.y, cz = s.center.z - pickO.z;
+      const dd = ld.lengthSq();
+      const tc = (cx * ld.x + cy * ld.y + cz * ld.z) / dd;
+      const d2 = cx * cx + cy * cy + cz * cz - tc * tc * dd;
+      if (d2 > s.radius * s.radius) continue;
+      const pos = geo.attributes.position, idx = geo.index;
+      const n = idx ? idx.count : pos.count;
+      for (let i = 0; i < n; i += 3) {
+        const ia = idx ? idx.getX(i) : i, ib = idx ? idx.getX(i + 1) : i + 1, ic = idx ? idx.getX(i + 2) : i + 2;
+        pickA.fromBufferAttribute(pos, ia); pickB.fromBufferAttribute(pos, ib); pickC.fromBufferAttribute(pos, ic);
+        pickE1.subVectors(pickB, pickA); pickE2.subVectors(pickC, pickA);
+        pickP.crossVectors(ld, pickE2);
+        const det = pickE1.dot(pickP);
+        if (Math.abs(det) < 1e-12) continue;
+        const inv = 1 / det;
+        pickQ.subVectors(pickO, pickA);
+        const u = pickQ.dot(pickP) * inv;
+        if (u < 0 || u > 1) continue;
+        pickQ.cross(pickE1);
+        const w = ld.dot(pickQ) * inv;
+        if (w < 0 || u + w > 1) continue;
+        const t = pickE2.dot(pickQ) * inv;
+        if (t > 1e-5 && t < best) { best = t; hit = mesh.userData.group; }
+      }
+    }
+    return hit;
+  }
 
   const v = new Vector3();
   const v2 = new Vector3();
@@ -466,6 +566,7 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
     sheet.position.copy(clipNormal).multiplyScalar(cut);
 
     applyExplode(cur.explode);
+    updateSelection(dt);
     updateFlight(cur.flight, dt, time);
 
     const spin = reducedMotion ? 0 : (cur.spin * 1.6 + cur.flight * 38 + cur.thermal * 9) * (1 - smooth(cur.explode * 1.6));
@@ -525,6 +626,13 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, redu
     setFlight(frames) { flight = { frames, index: 0 }; },
     setFlightIndex(i) { if (flight) flight.index = i; },
     setVisible(vis) { visible = vis; },
+    /** Resalta un grupo de piezas (id de landing/data/parts.json) y atenúa el resto; null lo quita. */
+    select(id) { selId = id && groupMats.has(id) ? id : null; },
+    /** Vista previa suave de un grupo (ratón encima). */
+    hover(id) { hoverId = id && groupMats.has(id) ? id : null; },
+    /** Grupo bajo un punto de la pantalla (px de cliente) o null. Cuesta un recorrido de mallas: úsese solo en clic o con límite. */
+    pick: pickGroup,
+    get canSelect() { return groupMats.size > 0; },
     renderNow() { update(0.016); }, // un cuadro inmediato, sin esperar a requestAnimationFrame
     get state() { return cur; },
     /** Radio del modelo en metros (el GLB está en metros): la escena lo normaliza a 1. */
