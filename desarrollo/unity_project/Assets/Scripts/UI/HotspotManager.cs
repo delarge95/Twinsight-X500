@@ -438,7 +438,11 @@ public class HotspotManager : Singleton<HotspotManager>
     /// <summary>
     /// Show or hide all hotspots without destroying them.
     /// </summary>
+    #if UNITY_STANDALONE
+    public bool IsVisible { get; private set; } = false;   // PC: pins OFF by default
+#else
     public bool IsVisible { get; private set; } = true;
+#endif
 
     /// <summary>
     /// Show or hide all hotspots without destroying them.

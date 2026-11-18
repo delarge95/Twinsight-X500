@@ -494,6 +494,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-hero-gate", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var hg = gameObject.AddComponent<DesktopCaptureHeroGate>(); // post-build gate aid: hero, Modelo menu, viewer, pins default
+                    hg.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-mvp-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var mvp = gameObject.AddComponent<DesktopCaptureMvp>(); // MVP priorities: camera while piloting, active-effect chips, thermal field, battery

@@ -552,7 +552,11 @@ namespace WebGL.UI
                 _hotspotsInitialized = true;
                 HotspotManager.Instance.Initialize(root);
             }
+#if UNITY_STANDALONE
+            HotspotManager.Instance?.SetVisible(false);   // PC: the pins start OFF (the Pins button / H turns them on)
+#else
             HotspotManager.Instance?.SetVisible(true);
+#endif
 
             // Show onboarding overlay the first time the user enters the 3D view
             _onboardingController?.ShowIfFirstTime();
@@ -1674,8 +1678,12 @@ namespace WebGL.UI
             {
                 _hotspotsInitialized = true;
                 HotspotManager.Instance?.Initialize(root);
+#if UNITY_STANDALONE
+                HotspotManager.Instance?.SetVisible(false);   // PC: pins OFF by default
+#else
                 // Show hotspots on first init (default state)
                 HotspotManager.Instance?.SetVisible(true);
+#endif
             }
 
             // Slider visibility now controlled by Explode button toggle, not by state changes

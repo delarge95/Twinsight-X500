@@ -2528,3 +2528,15 @@
 /* MVP P1 - tool chips of the active-effect registry: the same chip, a little tighter when the bar gives up room (1280 px windows) */
 .dk-chip--tool { margin-left: 0; margin-right: 0; }
 .dk-bar-l3 .dk-chip--tool, .dk-narrowbar .dk-chip--tool { width: 28px; height: 28px; border-radius: 14px; }
+
+
+/* Modelo del dron: las etiquetas largas se recortan con puntos suspensivos en vez de desbordar el boton */
+.desktop-ui .device-option {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 16px;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 16px;
+}

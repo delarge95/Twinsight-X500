@@ -57,10 +57,10 @@ namespace WebGL.UI.Desktop
 
             // ── pins ──
             yield return new WaitForSecondsRealtime(0.5f);
-            Check("pins: visible at start => button on", HotspotManager.Instance.IsVisible && PinsOn(root));
+            Check("pins: hidden at start (default OFF) => button off", !HotspotManager.Instance.IsVisible && !PinsOn(root));
             ui.ShortcutTogglePins();
             yield return new WaitForSecondsRealtime(0.5f);
-            Check("pins: hidden after toggle => button off", !HotspotManager.Instance.IsVisible && !PinsOn(root));
+            Check("pins: shown after toggle => button on", HotspotManager.Instance.IsVisible && PinsOn(root));
             Click(root.Q<Button>("HomeBtn"));
             yield return new WaitForSecondsRealtime(1.5f);
             Click(root.Q<Button>("HeroExploreBtn"));

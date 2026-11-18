@@ -452,6 +452,15 @@ namespace WebGL.UI.Panels
             Label devicesTitle = _submenuDevices?.Q<Label>(className: "hero-title");
             if (devicesTitle != null) devicesTitle.text = spanish ? "Modelo del dron" : "Drone model";
 
+            // the extra slots: short label that fits the button, full wording in the tooltip
+            foreach (string slot in new[] { "DeviceBtn_Robot", "DeviceBtn_Satellite" })
+            {
+                var sb = _root.Q<Button>(slot);
+                if (sb == null) continue;
+                sb.text = spanish ? "Próximamente" : "Coming soon";
+                sb.tooltip = spanish ? "Ranura adicional de dispositivo (próximamente)" : "Additional device slot (coming soon)";
+            }
+
             Label exitTitle = _submenuExit?.Q<Label>(className: "hero-title");
             if (exitTitle != null) exitTitle.text = spanish ? "Salir de TwinSight X500" : "Quit TwinSight X500";
 

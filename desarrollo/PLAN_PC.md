@@ -1165,3 +1165,17 @@ Ningún mando ni ratón/teclado reales (todo con estado XInput falso, el seam `D
 
 ### 32.4 Textos de interfaz nuevos que necesitan aprobación (neutros)
 P0: «Seguir», «Libre», «Modo juego», «Cámara: Seguir» / «Cámara: Libre», «Modo juego · Esc o X para salir», «El modo juego necesita el pilotaje activado.», «El modo juego solo está disponible mientras pilotas.», los tooltips de cámara y modo juego, «Cámara», «Seguir / Libre», «Modo juego (el ratón orbita)», «Orbitar», «LB + stick der.: cámara» y las filas de ayuda del mando y de la columna Pilotaje (EN/ES, tabla `ExtraStrings.Mvp.cs` y `DesktopHelpOverlay.cs`). P1: «Quitar viento», «Quitar geocerca personalizada», «Quitar circuito», «Quitar mapa», «Detener misión», «Salir del entrenamiento», «Dejar de pilotar», «Mostrar suelo», «Volver a la vista realista» (y sus EN, en `DesktopChrome.RegisterActiveEffects`).
+
+
+## 33. Build rota `20261117b` (pantalla emborronada) y puerta automatica de build (2026-11-17, rama `pc-desktop`, solo PC)
+
+**Sintoma:** el `.exe` de `TwinSightX500_PC_20261117b.zip` pintaba copias arrastradas del heroe y de la interfaz. **Causa:** faltaban en el player los shaders Blit de URP (`Blitter.Initialize` <- `UniversalRenderPipeline..ctor`: «shader is null» x3, `NullReferenceException` repetida miles de veces); es el mismo fallo de 12.3 (cache de shaders vacia tras relanzar el Editor) y el zip se entrego sin aplicar ni verificar la receta.
+
+**Arreglo:** con Standalone activo, reimportar (ForceUpdate) `Assets/Shaders` y `Packages/com.unity.render-pipelines.universal/Shaders`, esperar la compilacion y construir (`TwinSightX500_PC_20261117c`; 236,8 MB, como una build sana).
+
+**Para que no vuelva a salir rota (solo PC; WebGL no cambia):**
+- `Assets/Editor/PC/PCBuildHardening.cs`: antes de una build Standalone Windows **aborta** con `BuildFailedException` si `coreBlitPS` / `coreBlitColorAndDepthPS` de `UniversalRenderPipelineRuntimeShaders` son null (y dice la receta de 12.3); durante la build anade los shaders `Hidden/Universal.../Blit*`, `CoreBlit*`, `CopyDepth` y `Sampling` a Always Included Shaders y los **quita al terminar** (`ProjectSettings/GraphicsSettings.asset` queda igual, asi WebGL no cambia).
+- `tools/pc_postbuild_gate.ps1 -BuildDir <carpeta>`: ejecuta el `.exe` 25 s con su `-logFile` y sale con codigo 1 si el Player.log contiene `Blitter`, «shader is null», «Cannot create required material», «LocalKeyword with a null Shader» o `NullReferenceException`. Tambien en el menu `TwinSight/PC/Verificar build (Player.log)`. Comprobado: **falla** con la build `b` y **pasa** con la `c`. Es un paso obligatorio antes de comprimir.
+- Sonda `-hero-gate <carpeta>` (`DesktopCaptureHeroGate.cs`): capturas del heroe, del menu Modelo y del visor, y PASS/FAIL de etiquetas del menu Modelo y de los puntos apagados.
+
+**Arreglos de interfaz de escritorio en la misma build:** los puntos (pins) **empiezan apagados** (`HotspotManager.IsVisible` y `UIManager` bajo `UNITY_STANDALONE`; el boton queda apagado y `-desk-check` pasa con la comprobacion adaptada); en el menu **Modelo** las ranuras extra pasan a «Proximamente» / «Coming soon» con el texto completo en el tooltip y `DesktopUI.uss` recorta con puntos suspensivos (verificado a 1280x720 y 1904x984, ES y EN).
