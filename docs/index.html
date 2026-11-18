@@ -194,7 +194,7 @@
           <p class="body" data-reveal data-i18n="c5p">Telemetría de PX4 por WebSocket. Cada lectura dice si es medida, estimada o simulada.</p>
           <ul class="modes" data-reveal>
             <li><i class="dot dot--ok"></i><b data-i18n="c5m1t">Sombra digital</b><span data-i18n="c5m1p">Un vuelo real, repetido 24/7.</span></li>
-            <li><i class="dot dot--sim"></i><b data-i18n="c5m2t">Gemelo SITL</b><span data-i18n="c5m2p">PX4 y Gazebo, al mando desde el navegador.</span></li>
+            <li><i class="dot dot--sim"></i><b data-i18n="c5m2t">Gemelo digital SITL</b><span data-i18n="c5m2p">PX4 y Gazebo, al mando desde el navegador.</span></li>
           </ul>
         </div>
 
@@ -244,7 +244,7 @@
               <ol><li><b>ULog</b></li><li><b>.twf · 20 Hz</b></li><li><b>Worker + Durable Object</b></li></ol>
             </div>
             <div class="lane">
-              <span class="lane__tag"><i class="dot dot--sim"></i><span data-i18n="lane2">Gemelo SITL</span></span>
+              <span class="lane__tag"><i class="dot dot--sim"></i><span data-i18n="lane2">Gemelo digital SITL</span></span>
               <ol><li><b>PX4 SITL</b></li><li><b>Gazebo Harmonic</b></li><li><b data-i18n="l2c">Puente MAVLink</b></li></ol>
             </div>
             <div class="sink">
@@ -297,31 +297,17 @@
           </svg>
         </figure>
 
-        <div class="sitl__steps">
-          <article class="cell" data-reveal>
-            <p class="cell__tag" data-i18n="cx1k">Simulador</p>
-            <h3>Gazebo</h3>
-            <p data-i18n="cx1p">Simulador físico de robótica. En él vuela un X500 simulado: un modelo en software, no un dron físico.</p>
-          </article>
-          <article class="cell" data-reveal>
-            <p class="cell__tag" data-i18n="cx2k">Piloto automático real</p>
-            <h3 data-i18n="cx2t">PX4 en modo SITL</h3>
-            <p data-i18n="cx2p">PX4 es el piloto automático real del X500. En modo SITL (software in the loop) corre en un computador y pilota el dron simulado de Gazebo.</p>
-          </article>
-          <article class="cell" data-reveal>
-            <p class="cell__tag" data-i18n="cxD4k">App web</p>
-            <h3 data-i18n="cx3t">La app muestra y controla</h3>
-            <p data-i18n="cx3p">Un puente MAVLink lleva los datos de PX4 a la app. La app muestra el vuelo y envía órdenes: ese es el Gemelo digital SITL.</p>
-          </article>
-        </div>
+        <p class="sitl__flow" data-reveal data-i18n="cxFlow">Gazebo simula el dron, PX4 SITL es el piloto automático real corriendo en un computador y un puente MAVLink alimenta la app.</p>
         <p class="fine" data-reveal data-i18n="cxNote">Gemelo digital SITL: un dron simulado que usa el piloto automático real PX4. Ningún dron físico está conectado.</p>
+
+        <!-- MULTIMEDIA PENDIENTE: video de la simulación de Gazebo en una ventana superpuesta y modelo 3D animado del dron como gemelo digital (o video de Unity), sin tapar la vista 3D -->
 
         <div class="sitl__cta" data-reveal>
           <div>
-            <h3 data-i18n="cxCtaT">¿Quieres verlo funcionando?</h3>
-            <p data-i18n="cxCtaP">Escribe al autor para coordinar una demo conectada a Gazebo. No es una demo pública: se muestra en una sesión acordada.</p>
+            <h3 data-i18n="cxCtaT">La conexión en vivo no es una demo pública</h3>
+            <p data-i18n="cxCtaP">La conexión en vivo con PX4 y Gazebo se muestra en tiempo real en una sesión que se agenda con el autor. Agenda tu cita.</p>
           </div>
-          <a class="btn btn--primary" id="cxCta" href="mailto:3d@alexwoodcock.me?subject=Demo%20de%20TwinSight%20conectada%20a%20Gazebo"><span data-i18n="cxCtaB">Pedir una demo</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+          <a class="btn btn--primary" id="cxCta" href="mailto:3d@alexwoodcock.me?subject=Demo%20de%20TwinSight%20conectada%20a%20Gazebo"><span data-i18n="cxCtaB">Agendar una demo</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
         </div>
       </div>
     </section>

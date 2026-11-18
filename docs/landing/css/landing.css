@@ -481,6 +481,7 @@ main, .foot, .rail, .labels { transition: opacity 0.55s var(--ease); }
 .labels line, .labels circle { transition: opacity 0.3s; }
 
 /* conexión con el gemelo digital */
+.sitl__flow { max-width: 62ch; margin-top: 8px; font-size: 15px; line-height: 1.6; color: var(--text-2); }
 .sitl__lead { max-width: 58ch; margin-top: -24px; font-size: clamp(16px, 1.3vw, 19px); line-height: 1.6; color: var(--text-2); }
 .flowdia { margin: clamp(32px, 6vh, 56px) 0 0; padding: clamp(18px, 2.4vw, 32px); border: 1px solid var(--line); border-radius: 20px; background: rgba(11, 13, 17, 0.82); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
 .flowdia svg { width: 100%; height: auto; overflow: visible; }
@@ -492,8 +493,6 @@ main, .foot, .rail, .labels { transition: opacity 0.55s var(--ease); }
 .fd-t { font: 500 20px/1 var(--display); letter-spacing: -0.01em; fill: #fff; }
 .fd-s { font: 400 13px/1 var(--body); fill: var(--muted); }
 .fd-link path { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.sitl__steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
-.sitl__steps .cell h3 { margin-top: 12px; }
 .cell p.cell__tag { margin: 0; font: 500 10.5px/1 var(--display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
 .sitl__cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 40px; margin-top: 40px; padding: clamp(22px, 3vw, 36px); border: 1px solid rgba(70, 175, 255, 0.32); border-radius: 20px; background: radial-gradient(110% 140% at 0% 0%, rgba(70, 175, 255, 0.14), transparent 60%), rgba(14, 17, 22, 0.92); }
 .sitl__cta h3 { font: 500 clamp(20px, 2vw, 28px)/1.15 var(--display); letter-spacing: -0.02em; color: #fff; }
@@ -519,8 +518,7 @@ main, .foot, .rail, .labels { transition: opacity 0.55s var(--ease); }
   .sitl__lead { margin-top: -12px; }
   .flowdia__h { display: none; }
   .flowdia__v { display: block; }
-  .sitl__steps { grid-template-columns: 1fr; }
-  .sitl__cta .btn { width: 100%; }
+    .sitl__cta .btn { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tag, .labels line, .labels circle, .pchip { transition: none; }
