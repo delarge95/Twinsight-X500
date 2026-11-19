@@ -1,0 +1,141 @@
+TwinSight X500 para PC - version 0.0.1 (primera version publica, 2026-11-18)
+==================================================================
+Archivo: TwinSightX500_PC_v0.0.1.zip. Comprueba su SHA-256 con el valor que te dio quien te lo envio (ver "VERIFICAR LA DESCARGA").
+
+QUE ES
+Un visor 3D interactivo del dron Holybro X500 V2 para Windows: orbitas, seleccionas piezas, ves su ficha, cortas, explosionas y filtras el
+modelo, cambias el render y el entorno y, en el modo Telemetria, ves datos de vuelo sobre el modelo, siempre con su origen.
+No es un gemelo de un dron fisico. El modelo 3D esta basado en el CAD de Holybro; sin afiliacion con Holybro.
+
+REQUISITOS
+- Windows 10 u 11, 64 bits.
+- Una GPU compatible con DirectX 11 (cualquier tarjeta de los ultimos ~8 anos). Para la calidad Ultra conviene una GPU dedicada.
+- 1 GB libre en disco y 4 GB de RAM. No necesita instalacion ni conexion a Internet: descomprime la carpeta y abre TwinSightX500.exe.
+- Estos requisitos son orientativos: la aplicacion solo se ha probado en un equipo de desarrollo (Windows 11, GPU dedicada). No se ha medido en equipos
+  modestos ni con GPU integrada; en esos casos usa -quality low (ver opciones) y avisanos de lo que veas.
+
+AVISO DE WINDOWS (SmartScreen): EL PROGRAMA NO ESTA FIRMADO
+TwinSightX500.exe no lleva firma de codigo. Al abrirlo, Windows puede mostrar "Windows protegio su PC" con "Editor desconocido", y algunos
+antivirus pueden avisar de un ejecutable sin firmar. Es normal en esta version. Si el archivo te llego de quien lo publica y su SHA-256 coincide,
+pulsa "Mas informacion" y luego "Ejecutar de todas formas". Si prefieres no hacerlo, no lo ejecutes: no hay otra forma de abrirlo.
+Si descomprimes con el Explorador de Windows, puede que haga falta antes clic derecho sobre el .zip > Propiedades > "Desbloquear".
+
+VERIFICAR LA DESCARGA
+En PowerShell:  Get-FileHash .\TwinSightX500_PC_v0.0.1.zip -Algorithm SHA256
+y compara con el SHA-256 que te dio quien te envio el archivo (de preferencia por un canal distinto del propio archivo). Si no coincide, no lo uses.
+
+CONTROLES
+Raton
+  Clic                       Seleccionar una pieza
+  Doble clic                 Seleccionar y enfocar
+  Arrastrar el fondo / boton derecho   Orbitar
+  Boton central, o Mayus + boton derecho   Desplazar
+  Rueda                      Zoom hacia el cursor
+Teclado
+  1 / 2 / 3 / 4              Inspeccionar / Analizar / Estudio / Telemetria
+  H  I  E  C  G  V           Puntos, aislar, explosionar, corte, filtrar, ciclar el render
+  F                          Enfocar la pieza seleccionada
+  Inicio o R                 Restablecer la vista
+  Esc                        Atras (ayuda, tutorial, ficha, modo, deseleccionar, menu)
+  T o P  /  [ ]              Plegar el arbol de piezas / el inspector
+  Ctrl+F o /                 Buscar una pieza
+  L                          Fuente de datos (modo Telemetria)
+  Mayus+A                    Alertas (modo Telemetria)
+  M                          Mapa cenital (modo Telemetria)
+  Mayus+C / Mayus+M          Comprobaciones previas / Planificador de mision
+  Mayus+R / Mayus+T          Grabar o parar una sesion propia / Entrenamiento guiado
+  Mayus+G                    Geocerca del simulador
+  F11 o Alt+Enter            Ventana / pantalla completa
+  ? o F1                     Ayuda con todos los atajos
+Pilotaje (solo con el simulador de vuelo; boton Pilotar del modo Telemetria)
+  W A S D o flechas          Avanzar, izquierda, atras, derecha
+  Q E                        Girar a izquierda / derecha
+  Espacio / Mayus            Subir / bajar
+  T  L  H  R                 Despegar, aterrizar, mantener, volver (mientras se pilota estas letras ya no son atajos de la app)
+  Esc                        Soltar el pilotaje (el dron queda en mantener posicion)
+  Clic en la rejilla del suelo   Volar hasta ese punto (limite: 120 m de radio y 60 m de altura)
+  B                          Camara: Seguir (detras del dron, por defecto al pilotar) / Libre (la orbita de siempre)
+  X                          Modo juego: el cursor queda capturado y el raton orbita la camara; Esc o X lo sueltan (un segundo Esc suelta el pilotaje)
+  Camara (mando XInput)      Mantener LB + stick derecho orbita (el dron no recibe cabeceo/alabeo mientras LB esta pulsado); la cruceta orbita por pasos;
+                             R3 alterna Seguir/Libre; a los 1,5 s sin tocar la camara vuelve detras del dron (en Libre no vuelve). Sin probar con un mando real.
+  Chips de la barra superior Cada herramienta activa (viento, geocerca personalizada, circuito, mapa, mision, entrenamiento, pilotaje, suelo apagado,
+                             render distinto del realista, ademas de filtro, explosion, corte y energia) muestra un icono; un clic la quita o la detiene.
+  Mando XInput (Xbox)        Modo 2; A despegar, B aterrizar, X mantener, Y volver (no probado con un mando real)
+
+FUENTES DE DATOS (modo Telemetria, tecla 4, y L para elegir)
+  Repeticion local     Un vuelo REAL de PX4 repetido en esta aplicacion, sin servidor. Es una "sombra digital": los datos van en un solo
+                       sentido y no reaccionan a nada. Las fallas que inyectes son SINTETICAS (se superponen a lo grabado).
+  Simulador de vuelo   Rotulo en la app: "Simulador de vuelo · no es PX4 ni un dron real". Un modelo cinematico sencillo que corre en esta aplicacion para probar el pilotaje. No es PX4 ni un dron real, no
+                       esta calibrado con el X500 y todos sus datos son simulados.
+  PX4 SITL             El rotulo "Gemelo digital SITL" solo se usa con esta fuente: un PX4 simulado, no un dron fisico. Necesita PX4 SITL y el puente bridge/px4_bridge.py funcionando en tu equipo (URL por defecto ws://localhost:8765).
+                       Si el puente anuncia la orden battery_off (contrato 1.1), la ventana Fallas ofrece "Agotar bateria" (dos toques) y
+                       "Restaurar motores"; es la orden de PX4 y lo que pasa despues es su propio simulador de bateria.
+                       NO se ha probado de extremo a extremo con un PX4 real: sin ellos no habra datos y la fuente quedara "sin conexion".
+  Mis sesiones         Un vuelo que grabaste tu (simulador o PX4 SITL), repetido aqui. Rotulo: "Repeticion · sesion propia (simulada / PX4 SITL)".
+  Cada lectura lleva su origen: medido, estimado o simulado. Nada convierte una lectura estimada en medida.
+
+HERRAMIENTAS DEL MODO TELEMETRIA (tira de tres filas; todo lo que calculan lleva su origen)
+  Mapa cenital (M)           Rastro del vuelo, origen, geocerca (solo simulador), escenario de pruebas, ruta y viento. No hay mapa de fondo ni
+                             coordenadas geograficas: el enlace no las trae. Tocar el mapa no envia ordenes. La posicion es "medido" solo en la
+                             repeticion del vuelo real; en lo demas es "simulado".
+  Comprobar (Mayus+C)        Lista previa al vuelo con el estado, el valor y el origen de cada punto. Es informativa: no bloquea el despegue, pero
+                             avisa si hay un fallo. El GPS siempre sale "Sin dato": el cable no lo trae.
+  Mision (Mayus+M)           Ruta de puntos que el simulador (o PX4 SITL) vuela con ordenes que ya existen. Es una mision de la app, NO una mision de PX4;
+                             la velocidad por tramo es aproximada.
+  Grabar (Mayus+R)           Guarda un vuelo del simulador o de PX4 SITL como archivo .twf (carpeta de datos de la app) y lo repite despues desde "Mis
+                             sesiones" como "Repeticion · sesion propia". Nunca es una "sombra digital": no hay un dron fisico detras; todas sus
+                             lecturas son simuladas y no acepta ordenes.
+  Aprender (Mayus+T)         Lecciones guiadas en el simulador (despegar y mantener, cuadrado, balizas, orbita, volver, circuito). Entrenamiento
+                             simulado: no sustituye la formacion oficial de piloto.
+  Bateria (simulador)        Con la bateria baja el dron avisa (15 %), vuelve solo (7 %) y, al agotarse (0 %), espera 5 s, aterriza y se desarma. Es un
+                             modelo simplificado y simulado: no es PX4 ni un dron real. El interruptor "Ignorar bateria" lo apaga (la bateria solo se gasta)
+                             y deja un icono en la barra superior para volver a activarla. Los umbrales se ven en la ventana.
+  Escenario / Geocerca / Viento / Fallas (simulador)   Circuito de pruebas con cronometro, choques (prueba de volumen simple, no fisica), tiempo con
+                             penalizacion (+2 s por choque) y records; radio y techo de la geocerca; viento y rafagas; motor cortado con un modelo
+                             sencillo. Todo es del simulador: no es PX4 ni un dron real y no esta calibrado con el X500 (solo el empuje en estacionario).
+  Campo termico (render Termico, tecla V)   Con una fuente de telemetria en marcha, el render Termico pinta sobre el dron un campo de
+                             temperatura a partir de las 6 temperaturas del enlace (motores 1-4, bateria, controladora): escala automatica, isotermas
+                             cada 5 C y una fila por fuente con su origen (simulado, estimado o medido; la controladora sale "no disponible" si el
+                             enlace no la trae). "Fuente termica" cambia a "Simulacion didactica" (un color por pieza, ilustrativa, no FEA). Sin
+                             sesion solo hay la simulacion didactica; sin datos el modelo sale en gris. No es una camara termica ni una medicion.
+  Salud de la bateria        En la pestana Vuelo: resistencia interna, caida bajo carga y tiempo restante, siempre "estimado".
+
+OPCIONES DE LINEA DE COMANDOS (todas opcionales)
+  TwinSightX500.exe -part <id>        Abre el visor con esa pieza seleccionada (tambien acepta una URL twinsight://part/<id> como argumento)
+  TwinSightX500.exe -lang es|en       Idioma de la interfaz (por defecto el del sistema: espanol si Windows esta en espanol, ingles en otro caso)
+  TwinSightX500.exe -quality low|medium|high|ultra|auto   Nivel de calidad (por defecto el automatico segun la GPU)
+  TwinSightX500.exe -sitl-url ws://host:puerto            URL del puente de PX4 SITL
+  TwinSightX500.exe -desk-reduce      Arranca con "Reducir animaciones" (tambien en Ajustes > Pantalla)
+  Opciones estandar de Unity: -screen-width, -screen-height, -screen-fullscreen 0|1, -vsync 0
+
+TUTORIAL
+Se abre solo la primera vez que abres el visor; se repite desde Inicio > Acerca de > Ver tutorial. Siete pasos, teclas <- -> y Esc.
+
+LIMITES CONOCIDOS
+- PX4 SITL no esta probado con un PX4 real; el simulador no esta calibrado; el mando solo se probo sin mando conectado.
+- El protocolo twinsight:// no se registra solo: hay que pasar la URL como argumento.
+- Los numeros de motor de la telemetria (Motor 1-4, numeracion de PX4) no coinciden con las etiquetas de la ficha de la pieza (por ejemplo
+  la ficha dice "frontal derecho" para lo que la telemetria llama "Motor 3, delantero izquierdo").
+- Los textos de contrato de la telemetria vienen del navegador y aqui se adaptan a "esta aplicacion"; el rotulo de la fuente que envia
+  el simulador esta siempre en espanol.
+- A 150 % de tamano de interfaz y 1080p la barra superior se queda justa.
+- "Agotar bateria" no se ha probado con un PX4 SITL real (solo contra un puente simulado); el campo termico no se ha probado en otra GPU.
+- Pendiente del Lote 1: el "fantasma" 3D del mejor intento del circuito, arrastrar marcadores de la mision, el arrastre real del raton sobre el mapa (solo se verifico por rutas de codigo) y el mando en el Lote 1.
+- Sin firma de codigo (ver el aviso de SmartScreen arriba). No hay instalador: la app es portatil y no escribe en el registro de Windows para instalarse.
+- Esta version no se ha probado en otro equipo distinto del de desarrollo (ni en Windows 10); el shader termico no se ha probado en otra GPU.
+- La app guarda tus ajustes (en el registro de Windows, bajo HKCU\Software\TwinSight) y tus sesiones grabadas (.twf, en la carpeta de datos de la
+  aplicacion, normalmente %USERPROFILE%\AppData\LocalLow\TwinSight\TwinSight X500). Las versiones internas de pruebas anteriores guardaban en
+  otra ubicacion (compania "UNAD") y esos datos no se heredan.
+- El instalable, el registro de twinsight:// y el despliegue 24/7 estan fuera de esta version.
+
+Sin garantia. Hecho con Unity 6 (6000.6.5f1). Modelo basado en el CAD de Holybro; sin afiliacion con Holybro.
+Avisos de licencia de terceros (fuentes, paquetes de Unity, HDRI, etc.): ver THIRD_PARTY_NOTICES.txt, en esta misma carpeta.
+
+CAMBIOS DE 0.0.1
+Primera version publica. Reune todo lo descrito arriba. Las versiones internas de prueba anteriores (numeradas 1.x y fechadas) no se publicaron y no
+deben circular; no hay una version anterior publica que esta sustituya.
+- Los puntos (pins) empiezan apagados; se encienden con el boton de puntos o la tecla H.
+- Bateria del simulador: aviso, retorno automatico, aterrizaje de emergencia y desarme; "Ignorar bateria"; icono para quitarlo.
+- PX4 SITL: boton "Agotar bateria" (solo si el puente lo anuncia) y la tarjeta de explicacion de bateria con el texto aprobado.
+- Render Termico: campo de temperatura de la telemetria con leyenda, origen por fuente y selector de fuente termica.
+- Propiedades del ejecutable con empresa (TwinSight), producto (TwinSight X500) y version (0.0.1); paquete con avisos de terceros.

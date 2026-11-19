@@ -1,0 +1,382 @@
+﻿TwinSight X500 para PC - version 0.0.1
+AVISOS DE LICENCIA DE TERCEROS (THIRD PARTY NOTICES)
+======================================================================
+
+TwinSight X500 incluye o usa los componentes de terceros que se listan
+aqui. Este archivo viaja con la aplicacion. Donde no he podido confirmar
+la licencia desde el proyecto, lo digo como "licencia por confirmar" en
+lugar de afirmar una. Lo propio (codigo de la aplicacion, interfaz,
+iconos vectoriales dibujados por codigo, texturas de relieve generadas
+para el proyecto, datos de las fichas) es de los autores de TwinSight.
+
+El modelo 3D esta basado en el CAD que publica Holybro para el X500 V2;
+sin afiliacion con Holybro. Holybro y sus marcas son de Holybro.
+PX4 es una marca de sus propietarios; esta aplicacion no es PX4.
+
+
+RESUMEN
+----------------------------------------------------------------------
+ 1. Motor Unity 6 (6000.6.5f1) y Mono ............ licencia de Unity: por confirmar
+ 2. Paquetes de Unity (URP, Core RP, Collections, Burst, UGUI,
+    Shader Graph library) ......................... Unity Companion License
+ 3. Space Grotesk (tipografia) ..................... SIL OFL 1.1
+ 4. Inter (tipografia) ............................. SIL OFL 1.1
+ 5. HDRI "Studio Small 09" (Poly Haven) ............ CC0 1.0
+ 6. DOTween (Demigiant) ............................ licencia de Demigiant: por confirmar
+ 7. Wireframe Shader (Lilytech Lab) ................ MIT
+ 8. Componentes Microsoft (D3D12, DirectStorage) ... terminos de Microsoft: por confirmar
+ 9. Datos del vuelo de ejemplo (PX4 Flight Review) . licencia por confirmar
+10. Modelo 3D basado en el CAD de Holybro .......... propiedad de Holybro; sin afiliacion
+11. Iconos PNG heredados de la interfaz ............ origen y licencia por confirmar
+
+
+1. UNITY 6 (6000.6.5f1) Y MONO
+----------------------------------------------------------------------
+La aplicacion se ejecuta sobre el motor Unity (UnityPlayer.dll, carpeta
+MonoBleedingEdge con el runtime Mono y las librerias de sistema de
+TwinSightX500_Data\Managed). Copyright Unity Technologies ApS y sus
+licenciantes; el motor incluye componentes de terceros (Mono, entre
+otros) bajo sus propias licencias.
+Licencia de uso con la que se compilo y terminos de redistribucion
+exactos: por confirmar (no consta en el proyecto cual es el plan de
+licencia de Unity del equipo que compilo). Terminos de Unity:
+https://unity.com/legal
+
+
+2. PAQUETES DE UNITY INCLUIDOS EN LA COMPILACION
+----------------------------------------------------------------------
+Paquetes de Unity Technologies, bajo la Unity Companion License for
+Unity-dependent projects
+(https://unity.com/legal/licenses/unity-companion-license):
+  - Universal Render Pipeline (com.unity.render-pipelines.universal) 17.6.0
+  - Core RP Library (com.unity.render-pipelines.core)
+  - Collections (com.unity.collections) 6.6.0
+  - Burst (com.unity.burst) 2.0.0
+  - Unity UI / uGUI (com.unity.ugui) 2.6.0 (incluye TextMeshPro)
+  - Shader Graph (biblioteca de shaders en tiempo de ejecucion)
+  - Universal RP Config
+Cada uno: copyright (c) Unity Technologies, "AS IS", sin garantia de
+ningun tipo. Para el texto completo de la licencia, ver la direccion de
+arriba (el texto no viaja en el paquete; el archivo LICENSE.md de cada
+paquete solo remite a ella).
+
+Avisos de terceros que esos paquetes declaran (copiados tal cual al
+final de este archivo, secciones A y B).
+
+
+3. SPACE GROTESK
+----------------------------------------------------------------------
+Copyright 2020 The Space Grotesk Project Authors
+(https://github.com/floriankarsten/space-grotesk)
+Licencia: SIL Open Font License 1.1 (texto completo en la seccion C).
+Se usa para titulos y botones.
+
+
+4. INTER
+----------------------------------------------------------------------
+Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter)
+(segun los metadatos del archivo Inter-Regular.otf del proyecto).
+Licencia: SIL Open Font License 1.1 (texto completo en la seccion C).
+Se usa para el texto base de la interfaz.
+
+
+5. HDRI "STUDIO SMALL 09"
+----------------------------------------------------------------------
+Autor: Sergej Majboroda. Fuente: https://polyhaven.com/a/studio_small_09
+Licencia: CC0 1.0 (dominio publico); no exige atribucion, se cita por
+cortesia. Se usa en la build de PC como entorno de reflejos y de luz
+ambiental (no se muestra de fondo). Poly Haven: https://polyhaven.com
+
+
+6. DOTWEEN
+----------------------------------------------------------------------
+DOTween is copyright (c) 2014-2018 Daniele Giardini - Demigiant
+(DOTween.dll, version gratuita, usada para animaciones de interfaz).
+Licencia: la publica Demigiant en http://dotween.demigiant.com/license.php
+y no la he podido verificar desde aqui: licencia por confirmar.
+
+
+7. WIREFRAME SHADER (Lilytech Lab)
+----------------------------------------------------------------------
+Paquete com.lilytech-lab.wireframe-shader
+(https://github.com/lilytech-lab/WireframeShader). Su shader
+"Custom/Wireframe" se usa en el material de alambre del visor de PC.
+Licencia MIT (texto completo en la seccion D).
+
+
+8. COMPONENTES DE MICROSOFT
+----------------------------------------------------------------------
+Las carpetas y archivos D3D12\ (D3D12Core.dll), dstorage.dll y
+dstoragecore.dll los copia el reproductor de Unity (DirectX 12 /
+DirectStorage). Son componentes de Microsoft Corporation, que mantiene
+sus derechos; sus terminos de redistribucion no estan en el proyecto:
+licencia por confirmar.
+
+
+9. DATOS DE VUELO DE EJEMPLO
+----------------------------------------------------------------------
+TwinSightX500_Data\StreamingAssets\Telemetry\x500v2_flight.twf se
+deriva del registro publico de PX4 Flight Review
+0f3c4a74-4648-4b99-8992-c7fdc8681f6e (https://review.px4.io, fuselaje 4019
+Holybro X500 V2, PX4 v1.15.4), remuestreado a 20 Hz; no incluye
+coordenadas GPS absolutas, origen del EKF ni identificador de hardware.
+Gracias al piloto que lo hizo publico. Licencia del registro: por
+confirmar (Flight Review no declara aqui una licencia concreta).
+
+
+10. MODELO 3D
+----------------------------------------------------------------------
+Derivado del CAD publicado por Holybro para el kit de marco X500 V2,
+reorganizado y optimizado para visualizacion (solo muestra; no es un
+archivo de ingenieria). Holybro (Shenzhen Holybro Technology Co., Ltd.)
+es la duena del diseno y de sus marcas. Sin afiliacion con Holybro.
+Licencia de redistribucion del CAD: por confirmar.
+
+
+11. ICONOS PNG HEREDADOS
+----------------------------------------------------------------------
+Algunos iconos PNG de Assets\UI\Icons (heredados de la primera version
+de la interfaz) tienen origen y licencia sin documentar en el proyecto:
+licencia por confirmar. Los iconos de la interfaz de escritorio son
+vectoriales y se dibujan por codigo.
+
+
+======================================================================
+TEXTOS DE LICENCIA
+======================================================================
+
+A. AVISOS DE TERCEROS DEL PAQUETE Universal Render Pipeline
+----------------------------------------------------------------------
+This package contains third-party software components governed by the license(s) indicated below:
+---------
+
+Component Name: FXAA3_11.h (renamed to FXAA3_11.hlsl)
+
+License Type: FXAA3_11.h License
+
+Copyright (c) 2014-2015, NVIDIA CORPORATION. All rights reserved.
+
+https://github.com/hghdev/NVIDIAGameWorks-GraphicsSamples/blob/master/samples/es3-kepler/FXAA/FXAA3_11.h
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+ * Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+ * Neither the name of NVIDIA CORPORATION nor the names of its
+   contributors may be used to endorse or promote products derived
+   from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+B. AVISOS DE TERCEROS DEL PAQUETE Core RP Library
+----------------------------------------------------------------------
+This package contains third-party software components governed by the license(s) indicated below:
+---------
+
+Component Name: RadeonRays 4.1
+
+License Type: MIT License
+
+https://github.com/GPUOpen-LibrariesAndSDKs/RadeonRays_SDK
+
+Copyright (c) 2021 Advanced Micro Devices, Inc. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+---------
+
+Component Name: Bullet Physics SDK
+
+License Type: zlib License
+
+The files in this repository are licensed under the zlib license, except for the files under 'Extras' and examples/ThirdPartyLibs.
+
+Bullet Continuous Collision Detection and Physics Library
+http://bulletphysics.org
+
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the use of this software.
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
+subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+---------
+
+Component Name: Sobol sampler
+
+License Type: MIT License
+
+https://github.com/lgruen/sobol
+
+Copyright (c) 2023 Leonhard Gruenschloss
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+C. SIL OPEN FONT LICENSE 1.1 (Space Grotesk e Inter)
+----------------------------------------------------------------------
+Copyright 2020 The Space Grotesk Project Authors (https://github.com/floriankarsten/space-grotesk)
+Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter)
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded, 
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+
+
+D. MIT - Wireframe Shader (Lilytech Lab)
+----------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2025 有限会社リリテックラボ
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
