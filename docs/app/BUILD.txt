@@ -1,2 +1,2 @@
-twinsight-web-twin 89e9b34
-compilado 2026-11-19T00:06:46.924Z
+twinsight-web-twin 46f771e
+compilado 2026-11-19T22:04:04.856Z
