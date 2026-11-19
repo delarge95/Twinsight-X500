@@ -60,3 +60,10 @@ filtro `WebGL.Telemetry`).
 - Origen: repo web `E:	winsight-web-twin`, rama `web/telemetria-control`; ultimo commit que toca `contracts/golden/batteryreact.json`: `b1ec5c95be8cf4614b82bad0259b6037a69b6f8c` (HEAD de la web al copiar: `cbd57e9`).
 - Copiado `golden/batteryreact.json` (nuevo; 10 escenarios + defaults, limites, textos, validacion y almacenamiento). Los demas goldens no cambian. Ignorado por `*~`: se anade con `git add -f`.
 - Contrato 1.1: el codigo de `battery_off` ya esta en `ClientMessages`/`TelemetryProtocol`; no hizo falta tocar `fixtures/`.
+
+## Contrato 1.2 (2026-11-19)
+- Origen: repo web `E:\twinsight-web-twin`, rama `web/telemetria-control` (HEAD `8416eb83fd8c3e34dc193731beae6fe989964521`); ultimo commit que toca `contracts/`: `61e11a53` («contrato 1.2.0 aditivo»). Documento: `docs/CONTRATO_1_2.md` (§12 «Qué debe portar Unity», U-1..U-10).
+- Copiados: `telemetry.schema.json` (1.2.0), `fixtures/**` (nuevos: `hello.world`, `frames.sitl.gps`, `frames.esc`, `params.list/set`, `mission.status.ready/active`, `ack.legacy.no_code`, `ack.relay.no_lease`, `ack.sitl.mission_uploaded/param_armed/param_not_allowed/param_set`, `client.command.param_*` y `mission_*`, invalidos `ack.bad_code`, `client.param_get_bad_id`, `client.param_set_without_value`, `client.mission_set_empty`, `frames.esc_short`, `frames.gps_bad_fix`, `hello.world_bad_frame`, `mission.unknown_state`, `params.bad_type`; cambian `hello.*`, los `ack.*` (con `code`), `invalid/frames.extra_field` (ahora `airspeed`) y `manifest.json`), `golden/params.json` (nuevo), `golden/thermal.json` (solo cambia la entrada `telemetry_origins`) y `px4_params.json` (nuevo, la lista blanca; un test la compara con `Px4Params.cs`).
+- `labels.json` (aqui y en `Resources/TelemetryLabels.json`): solo cambia `protocolVersion` a 1.2.0 (los demas textos de la web NO se toman).
+- NO copiados: `golden/alerts.json` y `fixtures/alerts.example.json` (la web les anadio `code`/`params`/`origin` de las alertas traducibles, commit `e55a975`: no es del contrato 1.2 ni del cable; se quedan los de antes) y `golden/stamp.json` (relay).
+- Los nuevos estan ignorados por `*~`: se anaden con `git add -f`.

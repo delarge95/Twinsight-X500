@@ -562,7 +562,7 @@ namespace WebGL.UI.Desktop
 
         private string AckText(AckMessage ack)
         {
-            string d = ack.HasDetail ? TelemetryStrings.AckDetail(ack.detail, Lang) : T("faults.ack.rejected");
+            string d = WireText.AckForUi(ack, Lang) ?? T("faults.ack.rejected"); // contract 1.2: by `code` when the dictionary has it, else the detail as before
             return ack.command + ": " + d;
         }
 

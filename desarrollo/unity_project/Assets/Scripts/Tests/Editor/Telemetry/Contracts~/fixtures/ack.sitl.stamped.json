@@ -3,6 +3,8 @@
   "command": "set_altitude",
   "ok": true,
   "detail": "MAV_RESULT 0 (ACCEPTED)",
+  "code": "mavResult",
+  "params": { "result": 0, "name": "ACCEPTED" },
   "seq": 41,
   "ts": 1792195330180
 }

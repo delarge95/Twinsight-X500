@@ -1,0 +1,8 @@
+{
+  "type": "ack",
+  "command": "mission_set",
+  "ok": true,
+  "detail": "misión subida: 3 waypoints, 8 elementos",
+  "code": "mission.uploaded",
+  "params": { "items": 8, "legs": 3 }
+}

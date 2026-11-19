@@ -13,12 +13,19 @@
     "motorTemp": "estimated",
     "batteryTemp": "estimated",
     "fcTemp": "measured",
-    "batteryCurrent": "estimated"
+    "batteryCurrent": "estimated",
+    "pose": "estimated",
+    "velocity": "estimated",
+    "gps": "measured"
   },
   "batteryCells": 4,
   "ambientC": 20,
-  "source": { "label": "PX4 SITL local (gz_x500) vía pymavlink", "vehicle": "gz_x500 · Gazebo Harmonic" },
+  "source": {
+    "label": "PX4 SITL local (gz_x500) vía pymavlink",
+    "vehicle": "gz_x500 · Gazebo Harmonic",
+    "code": "sitl.gz"
+  },
   "commands": ["takeoff", "reboot"],
   "serverTime": 1792195320000,
-  "protocolVersion": "1.1.0"
+  "protocolVersion": "1.2.0"
 }

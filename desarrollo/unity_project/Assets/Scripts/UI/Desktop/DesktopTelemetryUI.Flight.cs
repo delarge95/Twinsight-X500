@@ -365,12 +365,15 @@ namespace WebGL.UI.Desktop
             Set(_rTime, time);
 
             // pose and speed
-            Set(_rAlt, F1(-f.p[2]) + " m", baseOrigin, baseTag);
-            Set(_rHSpeed, F1(Math.Sqrt(f.v[0] * f.v[0] + f.v[1] * f.v[1])) + " m/s", baseOrigin, baseTag);
-            Set(_rVSpeed, F1(-f.v[2]) + " m/s", baseOrigin, baseTag);
+            // contract 1.2 (D-10): the hello says attitude, position and velocity are an EKF2 estimate ("estimado"); without that field the old origin stays
+            ReadingOrigin poseOrigin = FlightOrigins.ForSession(FlightOrigins.Pose(h, cls), sim), velOrigin = FlightOrigins.ForSession(FlightOrigins.Velocity(h, cls), sim);
+            string poseTag = FlightOrigins.Text(poseOrigin, lang, labels), velTag = FlightOrigins.Text(velOrigin, lang, labels);
+            Set(_rAlt, F1(-f.p[2]) + " m", poseOrigin, poseTag);
+            Set(_rHSpeed, F1(Math.Sqrt(f.v[0] * f.v[0] + f.v[1] * f.v[1])) + " m/s", velOrigin, velTag);
+            Set(_rVSpeed, F1(-f.v[2]) + " m/s", velOrigin, velTag);
             NedFrames.Px4Euler(f.q, out double roll, out double pitch, out double yaw);
-            Set(_rHeading, yaw.ToString("0", CultureInfo.InvariantCulture) + " °", baseOrigin, baseTag);
-            Set(_rRollPitch, F1(roll) + " ° / " + F1(pitch) + " °", baseOrigin, baseTag);
+            Set(_rHeading, yaw.ToString("0", CultureInfo.InvariantCulture) + " °", poseOrigin, poseTag);
+            Set(_rRollPitch, F1(roll) + " ° / " + F1(pitch) + " °", poseOrigin, poseTag);
 
             // battery
             int cells = h != null && h.batteryCells > 0 ? h.batteryCells : 4;
@@ -412,7 +415,7 @@ namespace WebGL.UI.Desktop
             Set(_rFcTemp, ofc == ReadingOrigin.Unavailable ? "—" : F1(f.temp[5]) + " °C", ofc, FlightOrigins.Text(ofc, lang, labels));
             Set(_rVib, F1(f.vib) + " m/s²", baseOrigin, baseTag);
 
-            string src = h != null ? h.source.label : null;
+            string src = h != null ? WireText.SourceForUi(h, lang) : null; // contract 1.2: by source.code when the dictionary has it, else the server label
             string srcLine = T("fl.source") + " " + (src ?? string.Empty) + (h != null && h.source.HasVehicle ? " · " + h.source.vehicle : string.Empty) + (h != null && h.source.HasPx4 ? " · PX4 " + h.source.px4 : string.Empty);
             SetText(_flSource, srcLine);
             _hello = h;

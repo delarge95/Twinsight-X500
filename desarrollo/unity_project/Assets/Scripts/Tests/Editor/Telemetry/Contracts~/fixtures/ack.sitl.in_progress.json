@@ -1,1 +1,8 @@
-{ "type": "ack", "command": "land", "ok": true, "detail": "MAV_RESULT 5 (IN_PROGRESS)" }
+{
+  "type": "ack",
+  "command": "land",
+  "ok": true,
+  "detail": "MAV_RESULT 5 (IN_PROGRESS)",
+  "code": "mavResult",
+  "params": { "result": 5, "name": "IN_PROGRESS" }
+}

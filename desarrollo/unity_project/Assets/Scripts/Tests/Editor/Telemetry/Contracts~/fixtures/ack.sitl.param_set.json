@@ -1,0 +1,8 @@
+{
+  "type": "ack",
+  "command": "param_set",
+  "ok": true,
+  "detail": "MPC_XY_VEL_MAX = 8",
+  "code": "param.set",
+  "params": { "id": "MPC_XY_VEL_MAX", "value": 8 }
+}

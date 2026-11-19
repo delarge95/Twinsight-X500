@@ -1,0 +1,1 @@
+{ "type": "command", "name": "param_set", "id": "MPC_XY_VEL_MAX", "value": 8 }

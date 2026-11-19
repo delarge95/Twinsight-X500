@@ -51,6 +51,11 @@ namespace WebGL.Telemetry.Tests
             {
                 rpm = o["rpm"] as string, motorTemp = o["motorTemp"] as string, batteryTemp = o["batteryTemp"] as string, fcTemp = o["fcTemp"] as string,
                 batteryCurrent = o.TryGetValue("batteryCurrent", out var bc) ? bc as string : null, HasBatteryCurrent = o.ContainsKey("batteryCurrent"),
+                // contract 1.2 (golden/thermal.json telemetry_origins now carries them)
+                pose = o.TryGetValue("pose", out var po) ? po as string : null, HasPose = o.ContainsKey("pose"),
+                velocity = o.TryGetValue("velocity", out var ve) ? ve as string : null, HasVelocity = o.ContainsKey("velocity"),
+                gps = o.TryGetValue("gps", out var gp) ? gp as string : null, HasGps = o.ContainsKey("gps"),
+                esc = o.TryGetValue("esc", out var es) ? es as string : null, HasEsc = o.ContainsKey("esc"),
             };
         }
 

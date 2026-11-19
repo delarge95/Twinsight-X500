@@ -1,0 +1,5 @@
+{
+  "type": "command",
+  "name": "mission_set",
+  "mission": { "version": 1, "id": "mision-demo", "name": "Vuelta corta", "finish": "land", "waypoints": [] }
+}

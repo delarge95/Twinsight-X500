@@ -1,6 +1,6 @@
 {
   "_doc": "Index of the fixtures. `def` is the name in telemetry.schema.json \"$defs\" the file validates against (each: true = array of def). valid=false files MUST be rejected by the schema. kind: wire-server / wire-client = a WebSocket JSON message (also valid against the schema root); derived = computed by the client; http / file = other.",
-  "protocolVersion": "1.1.0",
+  "protocolVersion": "1.2.0",
   "entries": [
     {
       "file": "fixtures/hello.replay.json",
@@ -17,6 +17,14 @@
       "producer": "bridge",
       "valid": true,
       "note": "hello of the SITL bridge (Gemelo digital SITL) once pressure and battery data arrived; tests/python/test_contract.py checks the real bridge produces exactly this (except serverTime)"
+    },
+    {
+      "file": "fixtures/hello.world.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": true,
+      "note": "contract 1.2, SCHEMA EXAMPLE ONLY (nobody emits it): a hello with world and streams (decision D8 pending; texts not approved)"
     },
     {
       "file": "fixtures/hello.inspector.json",
@@ -57,6 +65,22 @@
       "producer": "bridge",
       "valid": true,
       "note": "one SITL frame per message (30 Hz); rpm is the rotor speed command, battery current is estimated"
+    },
+    {
+      "file": "fixtures/frames.sitl.gps.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: SITL frame once GPS_RAW_INT arrived (Gazebo simulated GPS: 3D fix, 10 satellites, HDOP 0.8)"
+    },
+    {
+      "file": "fixtures/frames.esc.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: frame with MEASURED ESC telemetry (bridge --esc-telemetry, HITL or physical vehicle; NOT verified, and never in gz SITL); rpm equals esc.rpm and provenance.rpm is measured"
     },
     {
       "file": "fixtures/frames.sitl.landed.json",
@@ -112,7 +136,7 @@
       "kind": "wire-server",
       "producer": "bridge",
       "valid": true,
-      "note": "command accepted by PX4 (detail = MAV_RESULT)"
+      "note": "command accepted by PX4 (detail = MAV_RESULT; code mavResult)"
     },
     {
       "file": "fixtures/ack.sitl.in_progress.json",
@@ -128,7 +152,7 @@
       "kind": "wire-server",
       "producer": "bridge",
       "valid": true,
-      "note": "PX4 refused; the newest STATUSTEXT is appended as the reason (illustrative text)"
+      "note": "PX4 refused; the newest STATUSTEXT is appended as the reason (illustrative text) and travels untranslated in params.px4"
     },
     {
       "file": "fixtures/ack.sitl.no_px4.json",
@@ -168,7 +192,7 @@
       "kind": "wire-server",
       "producer": "worker",
       "valid": true,
-      "note": "inject / clear accepted: ok=true WITHOUT detail"
+      "note": "inject / clear accepted: ok=true WITHOUT detail (and without code)"
     },
     {
       "file": "fixtures/ack.replay.cooldown.json",
@@ -176,7 +200,7 @@
       "kind": "wire-server",
       "producer": "worker",
       "valid": true,
-      "note": "second message within 1.5 s on the same socket (applies to every message type)"
+      "note": "second message within 1.5 s on the same socket (applies to every message type); params.ms is the real cooldown (H-25: the text says \"un segundo\")"
     },
     {
       "file": "fixtures/ack.replay.bad_fault.json",
@@ -193,6 +217,86 @@
       "producer": "worker",
       "valid": true,
       "note": "flight command sent to the replay: command carries the MESSAGE TYPE (\"command\"), not the command name"
+    },
+    {
+      "file": "fixtures/ack.legacy.no_code.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": true,
+      "note": "an ack of a 1.0 / 1.1 server: no code, no params. Still valid; a 1.2 client shows detail as it is"
+    },
+    {
+      "file": "fixtures/ack.sitl.param_set.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: param_set written AND read back equal (a params message with the read-back value goes before it)"
+    },
+    {
+      "file": "fixtures/ack.sitl.param_armed.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: parameters are written only on the ground, disarmed"
+    },
+    {
+      "file": "fixtures/ack.sitl.param_not_allowed.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: an id outside the whitelist (or one that is never written, e.g. calibrations)"
+    },
+    {
+      "file": "fixtures/ack.sitl.mission_uploaded.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: mission_set accepted by PX4 (MISSION_ACK ACCEPTED); items = MAVLink items (takeoff + speed and waypoint per leg + final action)"
+    },
+    {
+      "file": "fixtures/ack.relay.no_lease.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "relay",
+      "valid": true,
+      "note": "contract 1.2: refusal of the remote-control relay (src/worker/relay/core.ts), code relay.<reason>"
+    },
+    {
+      "file": "fixtures/params.list.json",
+      "def": "ParamsMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: answer to param_list: only whitelisted parameters PX4 reported (int32 decoded from the bytewise encoding)"
+    },
+    {
+      "file": "fixtures/params.set.json",
+      "def": "ParamsMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: the read-back value after a param_set"
+    },
+    {
+      "file": "fixtures/mission.status.ready.json",
+      "def": "MissionStatusMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: mission uploaded, not started"
+    },
+    {
+      "file": "fixtures/mission.status.active.json",
+      "def": "MissionStatusMessage",
+      "kind": "wire-server",
+      "producer": "bridge",
+      "valid": true,
+      "note": "contract 1.2: flying to waypoint 2 (MISSION_CURRENT seq 4 = the NAV_WAYPOINT of leg 2)"
     },
     {
       "file": "fixtures/client.inject.motor_failure.json",
@@ -347,6 +451,54 @@
       "note": "client -> server: manual"
     },
     {
+      "file": "fixtures/client.command.param_list.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command param_list"
+    },
+    {
+      "file": "fixtures/client.command.param_get.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command param_get"
+    },
+    {
+      "file": "fixtures/client.command.param_set.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command param_set"
+    },
+    {
+      "file": "fixtures/client.command.mission_set.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command mission_set"
+    },
+    {
+      "file": "fixtures/client.command.mission_start.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command mission_start"
+    },
+    {
+      "file": "fixtures/client.command.mission_clear.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "client",
+      "valid": true,
+      "note": "client -> server: command mission_clear"
+    },
+    {
       "file": "fixtures/alerts.example.json",
       "def": "Alert",
       "kind": "derived",
@@ -410,6 +562,78 @@
       "producer": "local",
       "valid": false,
       "note": "undeclared field (a server must declare it in the schema first)"
+    },
+    {
+      "file": "fixtures/invalid/frames.gps_bad_fix.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: gps.fix is GPS_FIX_TYPE 0..8"
+    },
+    {
+      "file": "fixtures/invalid/frames.esc_short.json",
+      "def": "FramesMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: esc.rpm has one value per motor (4)"
+    },
+    {
+      "file": "fixtures/invalid/client.param_set_without_value.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: param_set needs value"
+    },
+    {
+      "file": "fixtures/invalid/client.param_get_bad_id.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: PX4 parameter names are upper case, at most 16 characters"
+    },
+    {
+      "file": "fixtures/invalid/client.mission_set_empty.json",
+      "def": "ClientMessage",
+      "kind": "wire-client",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: a mission has 1..50 waypoints"
+    },
+    {
+      "file": "fixtures/invalid/ack.bad_code.json",
+      "def": "AckMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: code is a dotted camelCase identifier, not text"
+    },
+    {
+      "file": "fixtures/invalid/hello.world_bad_frame.json",
+      "def": "HelloMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: world.frame is NED"
+    },
+    {
+      "file": "fixtures/invalid/mission.unknown_state.json",
+      "def": "MissionStatusMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: unknown mission state"
+    },
+    {
+      "file": "fixtures/invalid/params.bad_type.json",
+      "def": "ParamsMessage",
+      "kind": "wire-server",
+      "producer": "local",
+      "valid": false,
+      "note": "contract 1.2: type is int32 or real32"
     },
     {
       "file": "fixtures/invalid/hello.unknown_mode.json",
@@ -556,7 +780,13 @@
     "fixtures/client.manual.json",
     "fixtures/client.command.battery_off.json",
     "fixtures/client.command.stamped.json",
-    "fixtures/client.manual.stamped.json"
+    "fixtures/client.manual.stamped.json",
+    "fixtures/client.command.param_list.json",
+    "fixtures/client.command.param_get.json",
+    "fixtures/client.command.param_set.json",
+    "fixtures/client.command.mission_set.json",
+    "fixtures/client.command.mission_start.json",
+    "fixtures/client.command.mission_clear.json"
   ],
   "motor_needed_fault_kinds": ["motor_failure", "motor_overheat"]
 }

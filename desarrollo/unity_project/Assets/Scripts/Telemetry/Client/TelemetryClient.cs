@@ -76,6 +76,10 @@ namespace WebGL.Telemetry
         public HelloMessage Hello { get; private set; }
         public IReadOnlyList<Fault> Faults => faults;
         public AckMessage LastAck { get; private set; }
+        /// <summary>Contract 1.2: last value of each PX4 parameter the server reported (`params`), by id. Empty until one arrives; cleared by a new hello. Data only: no screen reads it yet.</summary>
+        public IReadOnlyDictionary<string, ParamValue> Params => paramValues;
+        /// <summary>Contract 1.2: last state of the mission stored in PX4 (`mission`). null until one arrives; cleared by a new hello.</summary>
+        public MissionStatusMessage MissionStatus { get; private set; }
         public TransportState Transport { get; private set; } = TransportState.Idle;
         public int Failures { get; private set; }
         public string LastError { get; private set; }
@@ -104,10 +108,15 @@ namespace WebGL.Telemetry
         public event Action<Alert> AlertRaised;
         public event Action<LinkState> StateChanged;
         public event Action<AckMessage> AckReceived;
+        /// <summary>Contract 1.2: raised on the main thread when a `params` message arrived (Params already updated).</summary>
+        public event Action<ParamsMessage> ParamsReceived;
+        /// <summary>Contract 1.2: raised when a `mission` message arrived (MissionStatus already updated).</summary>
+        public event Action<MissionStatusMessage> MissionStatusReceived;
         /// <summary>Log sink (defaults to UnityEngine.Debug). Set to null to silence.</summary>
         public Action<int, string> Log = DefaultLog;
 
         readonly List<Fault> faults = new List<Fault>();
+        readonly Dictionary<string, ParamValue> paramValues = new Dictionary<string, ParamValue>();
         List<Alert> alerts = new List<Alert>();
         readonly HashSet<string> prevAlertIds = new HashSet<string>();
         readonly List<SourceEvent> drained = new List<SourceEvent>();
@@ -125,6 +134,8 @@ namespace WebGL.Telemetry
             ResetSession();
             Hello = null;
             faults.Clear();
+            paramValues.Clear();
+            MissionStatus = null;
             Transport = TransportState.Idle;
             Failures = 0;
             UpdateState(TelemetryTime.NowMs);
@@ -211,6 +222,8 @@ namespace WebGL.Telemetry
                     ResetSession();
                     Hello = h;
                     Events.Clear();
+                    paramValues.Clear();
+                    MissionStatus = null;
                     ProtocolWarning = null;
                     if (h.HasProtocolVersion && MajorOf(h.protocolVersion) != TelemetryProtocol.VersionMajor)
                     {
@@ -257,6 +270,14 @@ namespace WebGL.Telemetry
                     if (!a.ok && a.HasDetail)
                         Events.Add(new EventMessage { severity = EventSeverity.Warning, text = a.command + ": " + a.detail, ts = ReplaySchedule.WallClockMs(), ReceivedAtMs = a.ReceivedAtMs });
                     AckReceived?.Invoke(a);
+                    break;
+                case ParamsMessage pm:
+                    foreach (var pv in pm.values) paramValues[pv.id] = pv;
+                    ParamsReceived?.Invoke(pm);
+                    break;
+                case MissionStatusMessage ms:
+                    MissionStatus = ms;
+                    MissionStatusReceived?.Invoke(ms);
                     break;
             }
         }

@@ -51,6 +51,11 @@ namespace WebGL.Telemetry
         public static ReadingOrigin FcTemp(HelloMessage h, SourceClassification c) => h == null ? ReadingOrigin.Unavailable : Of(h.provenance.fcTemp, c);
         public static ReadingOrigin BatteryCurrent(HelloMessage h, SourceClassification c) => h == null ? Base(c) : Of(h.provenance.BatteryCurrentOrDefault, c);
 
+        // Contract 1.2 (D-10): attitude, position and velocity are EKF2 output, an estimate. A hello that declares them is believed (same words as the
+        // other channels: "estimado"); a hello without the field (1.0 / 1.1 servers, the flight simulator, own recordings) keeps the old rule of Base().
+        public static ReadingOrigin Pose(HelloMessage h, SourceClassification c) => h != null && h.provenance.HasPose ? Of(h.provenance.pose, c) : Base(c);
+        public static ReadingOrigin Velocity(HelloMessage h, SourceClassification c) => h != null && h.provenance.HasVelocity ? Of(h.provenance.velocity, c) : Base(c);
+
         /// <summary>The origin word (labels.json): "medido" / "estimado" / "simulado" (thermalOrigin), "comando" / "no disponible" (provenance).</summary>
         public static string Text(ReadingOrigin o, string lang, HonestyLabels labels)
         {
@@ -619,6 +624,8 @@ namespace WebGL.Telemetry
             { "map.originTakeoff", new[] { "Punto de despegue", "Takeoff point" } },
             { "map.posMeasured", new[] { "Posición: medido", "Position: measured" } },
             { "map.posSimulated", new[] { "Posición: simulado", "Position: simulated" } },
+            // contract 1.2 (CONTRATO_1_2.md section 9, D-10): neutral text PROPOSED, NOT YET APPROVED by the user; it replaces «Posición: medido» in the replay footer
+            { "map.posEstimated", new[] { "Posición: estimado", "Position: estimated" } },
             { "map.readout", new[] { "A {dist} m del origen · rumbo {hdg}°", "{dist} m from the origin · heading {hdg}°" } },
             { "map.honest", new[] { "Sin mapa de fondo ni coordenadas geográficas: el enlace no las trae.", "No base map and no geographic coordinates: the link does not carry them." } },
             { "map.noOrders", new[] { "Tocar el mapa no envía órdenes.", "Touching the map sends no commands." } },
@@ -765,6 +772,14 @@ namespace WebGL.Telemetry
         {
             if (!Table.TryGetValue(key, out var v) && !ExtraStrings.TryGet(key, out v)) throw new KeyNotFoundException("TelemetryStrings: missing key " + key);
             return lang == "en" ? v[1] : v[0];
+        }
+
+        /// <summary>T without the exception: false when the dictionary does not have the key (used by the translatable wire codes, contract 1.2).</summary>
+        public static bool TryT(string key, string lang, out string text)
+        {
+            if (!Table.TryGetValue(key, out var v) && !ExtraStrings.TryGet(key, out v)) { text = null; return false; }
+            text = lang == "en" ? v[1] : v[0];
+            return true;
         }
 
         /// <summary>T with {name} placeholders replaced (name, value pairs).</summary>

@@ -1,1 +1,8 @@
-{ "type": "ack", "command": "takeoff", "ok": true, "detail": "MAV_RESULT 0 (ACCEPTED)" }
+{
+  "type": "ack",
+  "command": "takeoff",
+  "ok": true,
+  "detail": "MAV_RESULT 0 (ACCEPTED)",
+  "code": "mavResult",
+  "params": { "result": 0, "name": "ACCEPTED" }
+}

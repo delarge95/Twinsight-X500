@@ -1,0 +1,10 @@
+{
+  "type": "params",
+  "ts": 1792195330400,
+  "params": [
+    { "id": "GF_ACTION", "value": 1, "type": "int32" },
+    { "id": "GF_MAX_HOR_DIST", "value": 0, "type": "real32" },
+    { "id": "NAV_RCL_ACT", "value": 1, "type": "int32" },
+    { "id": "MIS_TAKEOFF_ALT", "value": 2.5, "type": "real32" }
+  ]
+}

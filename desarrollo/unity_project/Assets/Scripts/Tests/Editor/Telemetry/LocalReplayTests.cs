@@ -82,6 +82,14 @@ namespace WebGL.Telemetry.Tests
             Assert.AreEqual(want.provenance.batteryTemp, got.provenance.batteryTemp);
             Assert.AreEqual(want.provenance.fcTemp, got.provenance.fcTemp);
             Assert.AreEqual(want.provenance.BatteryCurrentOrDefault, got.provenance.BatteryCurrentOrDefault);
+            // contract 1.2 (D-10): attitude, position and velocity are an EKF2 estimate, no GPS in the file; the local replay has its own source code
+            Assert.IsTrue(got.provenance.HasPose && got.provenance.HasVelocity && got.provenance.HasGps);
+            Assert.AreEqual(want.provenance.pose, got.provenance.pose);
+            Assert.AreEqual(want.provenance.velocity, got.provenance.velocity);
+            Assert.AreEqual(want.provenance.gps, got.provenance.gps);
+            Assert.IsTrue(want.source.HasCode && got.source.HasCode);
+            Assert.AreEqual("replay.flightReview", want.source.code);
+            Assert.AreEqual("replay.local", got.source.code, "contract 1.2: the local replay says replay.local (the worker says replay.flightReview)");
             Assert.AreEqual(want.source.label, got.source.label);
             Assert.AreEqual(want.source.url, got.source.url);
             Assert.AreEqual(want.source.vehicle, got.source.vehicle);

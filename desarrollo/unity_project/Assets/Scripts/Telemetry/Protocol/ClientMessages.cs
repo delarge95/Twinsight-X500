@@ -20,6 +20,9 @@ namespace WebGL.Telemetry
         /// <summary>Schema rules; null when valid, else the reason.</summary>
         public abstract string Validate();
 
+        /// <summary>Longest JSON the servers accept for this message (512; contract 1.2: 4096 for mission_set).</summary>
+        public virtual int MaxChars => TelemetryProtocol.MaxClientMessageChars;
+
         // Factories ------------------------------------------------------------------------------------------------
         public static InjectMessage Inject(FaultKind kind, int? motor = null) => new InjectMessage { kind = kind, motor = motor };
         public static ClearMessage Clear() => new ClearMessage();
@@ -35,6 +38,13 @@ namespace WebGL.Telemetry
         public static CommandMessage MotorOff(int motor) => new CommandMessage { name = "motor_off", motor = motor };
         public static CommandMessage Restore(int? motor = null) => new CommandMessage { name = "restore", motor = motor };
         public static CommandMessage Pilot() => new CommandMessage { name = "pilot" };
+        // Contract 1.2 (data support only: no screen offers these yet). Offer them only when `hello.commands` lists them (TelemetryClient.Send checks it).
+        public static CommandMessage ParamList() => new CommandMessage { name = "param_list" };
+        public static CommandMessage ParamGet(string id) => new CommandMessage { name = "param_get", id = id };
+        public static CommandMessage ParamSet(string id, double value) => new CommandMessage { name = "param_set", id = id, value = value };
+        public static CommandMessage MissionSet(MissionDoc mission) => new CommandMessage { name = "mission_set", mission = mission };
+        public static CommandMessage MissionStart() => new CommandMessage { name = "mission_start" };
+        public static CommandMessage MissionClear() => new CommandMessage { name = "mission_clear" };
         public static ManualMessage Manual(double x, double y, double z, double r) => new ManualMessage { x = x, y = y, z = z, r = r };
 
         protected static string N(double v) => TelemetryJson.Num(v);
@@ -75,12 +85,23 @@ namespace WebGL.Telemetry
         public string name;
         public double? altitude, north, east, degrees, radius;
         public int? motor;
+        /// <summary>Contract 1.2: PX4 parameter name (param_get, param_set), its new value (param_set) and the mission document (mission_set).</summary>
+        public string id;
+        public double? value;
+        public MissionDoc mission;
         /// <summary>Contract 1.1, optional: sender sequence number (non-negative integer, increasing per connection; one counter shared with manual) and sender clock (epoch ms).</summary>
         public long? seq; public double? ts;
+
+        public override int MaxChars => name == "mission_set" ? TelemetryProtocol.MaxMissionSetChars : TelemetryProtocol.MaxClientMessageChars;
+
+        static readonly System.Text.RegularExpressions.Regex ParamId = new System.Text.RegularExpressions.Regex("^[A-Z][A-Z0-9_]{0,15}$", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
 
         public override string ToJson()
         {
             var sb = new StringBuilder("{\"type\":\"command\",\"name\":").Append(TelemetryJson.Str(name));
+            if (id != null) sb.Append(",\"id\":").Append(TelemetryJson.Str(id));
+            if (value.HasValue) sb.Append(",\"value\":").Append(N(value.Value));
+            if (mission != null) sb.Append(",\"mission\":").Append(Mission.ToJson(mission));
             if (north.HasValue) sb.Append(",\"north\":").Append(N(north.Value));
             if (east.HasValue) sb.Append(",\"east\":").Append(N(east.Value));
             if (altitude.HasValue) sb.Append(",\"altitude\":").Append(N(altitude.Value));
@@ -104,7 +125,11 @@ namespace WebGL.Telemetry
                 case "orbit": return new[] { "radius" };
                 case "motor_off": return new[] { "motor" };
                 case "restore": return new[] { "motor?" };
-                case "land": case "rtl": case "hold": case "pilot": case "battery_off": return Array.Empty<string>();
+                case "param_get": return new[] { "id" };
+                case "param_set": return new[] { "id", "value" };
+                case "mission_set": return new[] { "mission" };
+                case "land": case "rtl": case "hold": case "pilot": case "battery_off":
+                case "param_list": case "mission_start": case "mission_clear": return Array.Empty<string>();
                 default: return null;
             }
         }
@@ -117,6 +142,7 @@ namespace WebGL.Telemetry
             {
                 { "altitude", altitude.HasValue }, { "north", north.HasValue }, { "east", east.HasValue },
                 { "degrees", degrees.HasValue }, { "radius", radius.HasValue }, { "motor", motor.HasValue },
+                { "id", id != null }, { "value", value.HasValue }, { "mission", mission != null },
             };
             var allowed = new HashSet<string>();
             foreach (var f in fields)
@@ -132,6 +158,19 @@ namespace WebGL.Telemetry
             if (ts.HasValue && ts.Value < 0) return name + ": ts must be non-negative";
             if (name == "motor_off" && (motor < 1 || motor > 4)) return "motor_off: motor out of 1..4";
             if (name == "restore" && motor.HasValue && (motor < 0 || motor > 4)) return "restore: motor out of 0..4";
+            if (id != null && !ParamId.IsMatch(id)) return name + ": id is not a PX4 parameter name";
+            if (value.HasValue && (double.IsNaN(value.Value) || double.IsInfinity(value.Value))) return name + ": value must be finite";
+            if (mission != null)
+            {
+                if (mission.waypoints == null || mission.waypoints.Count < 1 || mission.waypoints.Count > Mission.MaxWaypoints) return "mission_set: a mission has 1.." + Mission.MaxWaypoints + " waypoints";
+                if (Array.IndexOf(TelemetryProtocol.MissionFinishes, mission.finish) < 0) return "mission_set: finish must be hold, land or rtl";
+                foreach (Waypoint w in mission.waypoints)
+                {
+                    if (!(w.speed > 0) || double.IsInfinity(w.speed) || double.IsNaN(w.n) || double.IsNaN(w.e) || double.IsNaN(w.alt) || double.IsInfinity(w.n) || double.IsInfinity(w.e) || double.IsInfinity(w.alt))
+                        return "mission_set: a waypoint has invalid values";
+                    if (w.holdS.HasValue && (w.holdS.Value < 0 || double.IsNaN(w.holdS.Value) || double.IsInfinity(w.holdS.Value))) return "mission_set: holdS must be >= 0";
+                }
+            }
             return null;
         }
     }

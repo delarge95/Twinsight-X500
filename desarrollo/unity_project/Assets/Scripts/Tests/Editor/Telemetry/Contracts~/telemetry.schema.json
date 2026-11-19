@@ -3,7 +3,7 @@
   "$id": "urn:twinsight:contracts:telemetry",
   "title": "TwinSight telemetry contract",
   "description": "JSON over WebSocket shared by the Cloudflare worker (24/7 replay, 'Sombra digital'), the local PX4 SITL bridge ('Gemelo digital SITL') and every client (web, Unity desktop). Source of truth in code: src/shared/protocol.ts. The root validates any single wire message (server -> client or client -> server); use '#/$defs/<Name>' to validate a specific type. Units: NED metres, m/s; quaternion Hamilton scalar first rotating body FRD into world NED; u 0..1; rpm; degrees Celsius; ts in ms. Readers must ignore unknown fields (forward compatibility); this schema is strict (additionalProperties false) so that any new field in a server must be declared here first.",
-  "protocolVersion": "1.1.0",
+  "protocolVersion": "1.2.0",
   "oneOf": [
     { "$ref": "#/$defs/ServerMessage" },
     { "$ref": "#/$defs/ClientMessage" }
@@ -63,6 +63,38 @@
       "required": ["motor", "px", "py", "km"],
       "additionalProperties": false
     },
+    "WireCode": {
+      "description": "Contract 1.2: translatable code of an ack or of hello.source (docs/CONTRATO_1_2.md section 8). The client translates 'wire.ack.<code>' / 'wire.source.<code>' with its own dictionary and falls back to the server text (detail / label) when it does not know the code.",
+      "type": "string",
+      "pattern": "^[a-z][a-zA-Z0-9]*([.][a-zA-Z0-9]+)*$"
+    },
+    "WireParams": {
+      "description": "Contract 1.2: values for the translation of a code (text or number). 'px4' carries PX4's own STATUSTEXT, never translated.",
+      "type": "object",
+      "additionalProperties": { "type": ["string", "number"] }
+    },
+    "GpsState": {
+      "description": "Contract 1.2, optional in the frame: GPS state from MAVLink GPS_RAW_INT (bridge). Absent in the replay (the file has no GPS) and in the browser simulator. Origin: Provenance.gps (in SITL it is Gazebo's simulated GPS).",
+      "type": "object",
+      "properties": {
+        "fix": { "description": "MAVLink GPS_FIX_TYPE: 0 no GPS, 1 no fix, 2 2D, 3 3D, 4 DGPS, 5 RTK float, 6 RTK fixed, 7 static, 8 PPP.", "type": "integer", "minimum": 0, "maximum": 8 },
+        "sats": { "description": "Satellites visible; absent = unknown (MAVLink 255).", "type": "integer", "minimum": 0, "maximum": 254 },
+        "hdop": { "description": "Horizontal dilution of precision, unitless (GPS_RAW_INT.eph / 100); absent = unknown (65535).", "type": "number", "minimum": 0 }
+      },
+      "required": ["fix"],
+      "additionalProperties": false
+    },
+    "EscState": {
+      "description": "Contract 1.2, optional in the frame: MEASURED ESC telemetry (MAVLink ESC_STATUS), only with real ESC telemetry (HITL or a physical vehicle; bridge option --esc-telemetry). gz SITL never sends it (its ESC_STATUS echoes the command). When present, TelemetryFrame.rpm is the same measured speed and Provenance.rpm is 'measured'.",
+      "type": "object",
+      "properties": {
+        "rpm": { "description": "Measured rotor speed per ESC, RPM, PX4 motor order 1..4.", "type": "array", "items": { "type": "number", "minimum": 0 }, "minItems": 4, "maxItems": 4 },
+        "v": { "description": "ESC voltage, V.", "$ref": "#/$defs/Quad" },
+        "i": { "description": "ESC current, A.", "$ref": "#/$defs/Quad" }
+      },
+      "required": ["rpm"],
+      "additionalProperties": false
+    },
     "TelemetryFrame": {
       "type": "object",
       "properties": {
@@ -88,7 +120,9 @@
         "vib": { "description": "Accelerometer vibration metric, m/s^2.", "type": "number" },
         "armed": { "type": "boolean" },
         "landed": { "type": "boolean" },
-        "nav": { "description": "PX4 vehicle_status.nav_state (labels in contracts/labels.json navState).", "type": "integer" }
+        "nav": { "description": "PX4 vehicle_status.nav_state (labels in contracts/labels.json navState).", "type": "integer" },
+        "gps": { "$ref": "#/$defs/GpsState" },
+        "esc": { "$ref": "#/$defs/EscState" }
       },
       "required": ["ts", "lt", "seg", "q", "p", "v", "u", "rpm", "bat", "temp", "vib", "armed", "landed", "nav"],
       "additionalProperties": false
@@ -106,6 +140,14 @@
     "ProvenanceCurrent": {
       "enum": ["measured", "estimated"]
     },
+    "ProvenanceState": {
+      "description": "Contract 1.2: origin of the pose and velocity channels.",
+      "enum": ["measured", "estimated", "unavailable"]
+    },
+    "ProvenanceSensor": {
+      "description": "Contract 1.2: origin of GPS and ESC telemetry. In SITL 'measured' is a simulated sensor (shown as simulated).",
+      "enum": ["measured", "unavailable"]
+    },
     "Provenance": {
       "description": "Which telemetry channels are measured and which are model estimates. Shown in the UI; no reading may reach the screen without its origin.",
       "type": "object",
@@ -114,7 +156,11 @@
         "motorTemp": { "$ref": "#/$defs/ProvenanceTemp" },
         "batteryTemp": { "$ref": "#/$defs/ProvenanceTemp" },
         "fcTemp": { "$ref": "#/$defs/ProvenanceFcTemp" },
-        "batteryCurrent": { "description": "Optional: absent for older servers (treat as measured). SITL reports 0 A, so the bridge estimates it from rotor speed.", "$ref": "#/$defs/ProvenanceCurrent" }
+        "batteryCurrent": { "description": "Optional: absent for older servers (treat as measured). SITL reports 0 A, so the bridge estimates it from rotor speed.", "$ref": "#/$defs/ProvenanceCurrent" },
+        "pose": { "description": "Contract 1.2, optional (decision D-10, default and reversible): attitude and position. 'estimated' in the replay and in PX4 SITL (EKF2 output, not a direct sensor). Absent = what the client assumed before 1.2.", "$ref": "#/$defs/ProvenanceState" },
+        "velocity": { "description": "Contract 1.2, optional (D-10): velocity, 'estimated' (EKF2) in the replay and in PX4 SITL.", "$ref": "#/$defs/ProvenanceState" },
+        "gps": { "description": "Contract 1.2, optional: TelemetryFrame.gps. 'unavailable' in the replay.", "$ref": "#/$defs/ProvenanceSensor" },
+        "esc": { "description": "Contract 1.2, optional: TelemetryFrame.esc. Never 'measured' in gz SITL.", "$ref": "#/$defs/ProvenanceSensor" }
       },
       "required": ["rpm", "motorTemp", "batteryTemp", "fcTemp"],
       "additionalProperties": false
@@ -129,7 +175,42 @@
     },
     "CommandCapability": {
       "description": "Entries of HelloMessage.commands. Mixed vocabulary, as the servers emit it: message types the server accepts ('inject', 'clear', 'manual') and names of 'command' messages.",
-      "enum": ["inject", "clear", "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "battery_off", "pilot", "manual"]
+      "enum": ["inject", "clear", "takeoff", "set_altitude", "land", "fly_to", "yaw", "orbit", "rtl", "hold", "motor_off", "restore", "battery_off", "pilot", "manual", "param_list", "param_get", "param_set", "mission_set", "mission_start", "mission_clear"]
+    },
+    "WorldInfo": {
+      "description": "Contract 1.2, optional, SCHEMA ONLY (nobody emits it yet; decision D8 pending): the world the vehicle flies in. A decorative scene is 'illustrative' and labelled as such.",
+      "type": "object",
+      "properties": {
+        "id": { "description": "PX4_GZ_WORLD name or own world id.", "type": "string", "pattern": "^[a-z0-9_-]{1,64}$" },
+        "kind": { "enum": ["gazebo", "illustrative"] },
+        "frame": { "const": "NED" },
+        "origin": {
+          "description": "Geographic origin of the EKF frame.",
+          "type": "object",
+          "properties": { "lat": { "description": "Degrees.", "type": "number", "minimum": -90, "maximum": 90 }, "lon": { "description": "Degrees.", "type": "number", "minimum": -180, "maximum": 180 }, "alt": { "description": "Metres AMSL.", "type": "number" } },
+          "required": ["lat", "lon", "alt"],
+          "additionalProperties": false
+        },
+        "yawDeg": { "type": "number" },
+        "url": { "type": "string" },
+        "version": { "type": "string" },
+        "label": { "description": "Free fallback text.", "type": "string" }
+      },
+      "required": ["id", "kind", "frame"],
+      "additionalProperties": false
+    },
+    "StreamInfo": {
+      "description": "Contract 1.2, optional, SCHEMA ONLY: a video stream. Video travels OUTSIDE this WebSocket.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]{1,64}$" },
+        "kind": { "enum": ["webrtc-whep", "ll-hls"] },
+        "url": { "type": "string" },
+        "provenance": { "enum": ["simulated", "live"] },
+        "label": { "type": "string" }
+      },
+      "required": ["id", "kind", "url", "provenance"],
+      "additionalProperties": false
     },
     "HelloMessage": {
       "description": "First message after connecting. A new hello means a new session: clear buffers, clock and ground reference.",
@@ -145,18 +226,21 @@
         "source": {
           "type": "object",
           "properties": {
-            "label": { "description": "Free text, Spanish only today (see README, discrepancias).", "type": "string" },
+            "label": { "description": "Free text, Spanish only (see README, discrepancias). Since 1.2 the fallback of source.code.", "type": "string" },
             "url": { "type": "string" },
             "vehicle": { "type": "string" },
             "px4": { "type": "string" },
-            "durationS": { "type": "number" }
+            "durationS": { "type": "number" },
+            "code": { "description": "Contract 1.2, optional: translatable code of label (replay.flightReview, replay.local, inspector, sim.browser, sitl.gz); label stays as the fallback.", "$ref": "#/$defs/WireCode" }
           },
           "required": ["label"],
           "additionalProperties": false
         },
         "commands": { "description": "Commands the server accepts from the client.", "type": "array", "items": { "$ref": "#/$defs/CommandCapability" } },
         "serverTime": { "description": "Server wall clock, epoch ms (0 for the local Inspector).", "type": "number" },
-        "protocolVersion": { "description": "Contract 1.1, optional: version of this contract the server speaks. Absent = 1.0.0.", "type": "string", "pattern": "^[0-9]+[.][0-9]+[.][0-9]+$" }
+        "protocolVersion": { "description": "Contract 1.1, optional: version of this contract the server speaks. Absent = 1.0.0.", "type": "string", "pattern": "^[0-9]+[.][0-9]+[.][0-9]+$" },
+        "world": { "$ref": "#/$defs/WorldInfo" },
+        "streams": { "type": "array", "items": { "$ref": "#/$defs/StreamInfo" } }
       },
       "required": ["type", "mode", "rotors", "rateHz", "provenance", "batteryCells", "ambientC", "source", "commands", "serverTime"],
       "additionalProperties": false
@@ -210,7 +294,7 @@
       "additionalProperties": false
     },
     "AckMessage": {
-      "description": "Answer to a client message. 'command' is the command name (bridge), or the message type (worker: 'inject', 'clear', 'command', 'manual'), or '?' (bridge: message not understood). 'detail' is free text, Spanish only today.",
+      "description": "Answer to a client message. 'command' is the command name (bridge), or the message type (worker: 'inject', 'clear', 'command', 'manual'), or '?' (bridge: message not understood). 'detail' is free text, Spanish only; since 1.2 it is the fallback of 'code' (+ 'params').",
       "type": "object",
       "properties": {
         "type": { "const": "ack" },
@@ -218,9 +302,53 @@
         "ok": { "type": "boolean" },
         "detail": { "type": "string" },
         "seq": { "description": "1.1, optional: echo of the seq of the command being answered (absent when that command carried none).", "$ref": "#/$defs/Seq" },
-        "ts": { "description": "1.1, optional: clock of the server that answers, epoch ms.", "$ref": "#/$defs/SenderTs" }
+        "ts": { "description": "1.1, optional: clock of the server that answers, epoch ms.", "$ref": "#/$defs/SenderTs" },
+        "code": { "description": "1.2, optional: translatable code of the answer; detail stays as the Spanish fallback.", "$ref": "#/$defs/WireCode" },
+        "params": { "description": "1.2, optional: values for the translation of code.", "$ref": "#/$defs/WireParams" }
       },
       "required": ["type", "command", "ok"],
+      "additionalProperties": false
+    },
+    "ParamId": {
+      "description": "Contract 1.2: PX4 parameter name (at most 16 characters). Which ones may be read or written is policy, not schema: contracts/px4_params.json.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]{0,15}$"
+    },
+    "ParamValue": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "#/$defs/ParamId" },
+        "value": { "description": "Value as PX4 reported it (PARAM_VALUE; int32 decoded from PX4's bytewise encoding).", "type": "number" },
+        "type": { "enum": ["int32", "real32"] }
+      },
+      "required": ["id", "value", "type"],
+      "additionalProperties": false
+    },
+    "ParamsMessage": {
+      "description": "Contract 1.2: whitelisted PX4 parameters (answer to param_list / param_get / param_set, after the bridge read them from PX4). The relay delivers it to pilot and admin only.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "params" },
+        "params": { "type": "array", "items": { "$ref": "#/$defs/ParamValue" } },
+        "ts": { "description": "Bridge clock, epoch ms.", "type": "number" }
+      },
+      "required": ["type", "params", "ts"],
+      "additionalProperties": false
+    },
+    "MissionStatusMessage": {
+      "description": "Contract 1.2: state of the mission stored in PX4 (MISSION_CURRENT, MISSION_ITEM_REACHED). Sent when it changes.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "mission" },
+        "state": { "enum": ["none", "ready", "active", "paused", "done"] },
+        "id": { "description": "Mission.id of the uploaded mission (absent when this bridge did not upload it).", "type": "string" },
+        "legs": { "description": "Number of waypoints.", "type": "integer", "minimum": 0 },
+        "leg": { "description": "1-based waypoint being flown to; absent during the takeoff and the final action.", "type": "integer", "minimum": 1 },
+        "item": { "description": "Current MAVLink mission item (debugging).", "type": "integer", "minimum": 0 },
+        "items": { "description": "MAVLink mission item count (debugging).", "type": "integer", "minimum": 0 },
+        "ts": { "description": "Epoch ms.", "type": "number" }
+      },
+      "required": ["type", "state", "legs", "ts"],
       "additionalProperties": false
     },
     "ServerMessage": {
@@ -229,7 +357,9 @@
         { "$ref": "#/$defs/FramesMessage" },
         { "$ref": "#/$defs/FaultsMessage" },
         { "$ref": "#/$defs/EventMessage" },
-        { "$ref": "#/$defs/AckMessage" }
+        { "$ref": "#/$defs/AckMessage" },
+        { "$ref": "#/$defs/ParamsMessage" },
+        { "$ref": "#/$defs/MissionStatusMessage" }
       ]
     },
     "InjectMessage": {
@@ -339,6 +469,74 @@
       "required": ["type", "name"],
       "additionalProperties": false
     },
+    "CommandParamList": {
+      "description": "Contract 1.2: read the whitelisted PX4 parameters. Answer: a params message and an ack (code param.list).",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "param_list" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
+    "CommandParamGet": {
+      "description": "Contract 1.2: read one whitelisted PX4 parameter (anything else: ack ok=false, code param.notAllowed).",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "param_get" }, "id": { "$ref": "#/$defs/ParamId" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
+      "required": ["type", "name", "id"],
+      "additionalProperties": false
+    },
+    "CommandParamSet": {
+      "description": "Contract 1.2: write one PX4 parameter of the whitelist (contracts/px4_params.json: write role, range or allowed values, never_write). Disarmed only. The bridge reads the value back and answers params + ack (code param.set, or param.mismatch / param.noResponse). Unlike altitudes, nothing is clamped: out of range is refused.",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "param_set" }, "id": { "$ref": "#/$defs/ParamId" }, "value": { "type": "number" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
+      "required": ["type", "name", "id", "value"],
+      "additionalProperties": false
+    },
+    "MissionWaypoint": {
+      "description": "Waypoint of the Mission document (src/shared/mission.ts): local NED of the EKF origin, m; alt positive up; speed of the leg that ENDS here, m/s; optional wait, s.",
+      "type": "object",
+      "properties": {
+        "n": { "type": "number" },
+        "e": { "type": "number" },
+        "alt": { "type": "number" },
+        "speed": { "type": "number", "exclusiveMinimum": 0 },
+        "holdS": { "type": "number", "minimum": 0 }
+      },
+      "required": ["n", "e", "alt", "speed"],
+      "additionalProperties": false
+    },
+    "Mission": {
+      "description": "The mission document of src/shared/mission.ts (version 1), the same JSON both clients export and import. Servers check it with validateMission and SITL_MISSION_LIMITS (200 m, 1..50 m, 0.5..6 m/s, wait 0..120 s).",
+      "type": "object",
+      "properties": {
+        "version": { "const": 1 },
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "waypoints": { "type": "array", "items": { "$ref": "#/$defs/MissionWaypoint" }, "minItems": 1, "maxItems": 50 },
+        "finish": { "enum": ["hold", "land", "rtl"] }
+      },
+      "required": ["version", "id", "name", "waypoints", "finish"],
+      "additionalProperties": false
+    },
+    "CommandMissionSet": {
+      "description": "Contract 1.2: upload a mission to PX4 (MISSION_COUNT / MISSION_REQUEST_INT / MISSION_ITEM_INT / MISSION_ACK). The only client message allowed up to 4096 characters (every other one: 512).",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "mission_set" }, "mission": { "$ref": "#/$defs/Mission" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
+      "required": ["type", "name", "mission"],
+      "additionalProperties": false
+    },
+    "CommandMissionStart": {
+      "description": "Contract 1.2: start or resume the mission stored in PX4 (arms when needed, MAV_CMD_MISSION_START). Pause = hold.",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "mission_start" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
+    "CommandMissionClear": {
+      "description": "Contract 1.2: remove the mission stored in PX4 (MISSION_CLEAR_ALL).",
+      "type": "object",
+      "properties": { "type": { "const": "command" }, "name": { "const": "mission_clear" }, "seq": { "$ref": "#/$defs/Seq" }, "ts": { "$ref": "#/$defs/SenderTs" } },
+      "required": ["type", "name"],
+      "additionalProperties": false
+    },
     "CommandMessage": {
       "oneOf": [
         { "$ref": "#/$defs/CommandTakeoff" },
@@ -352,7 +550,13 @@
         { "$ref": "#/$defs/CommandMotorOff" },
         { "$ref": "#/$defs/CommandRestore" },
         { "$ref": "#/$defs/CommandBatteryOff" },
-        { "$ref": "#/$defs/CommandPilot" }
+        { "$ref": "#/$defs/CommandPilot" },
+        { "$ref": "#/$defs/CommandParamList" },
+        { "$ref": "#/$defs/CommandParamGet" },
+        { "$ref": "#/$defs/CommandParamSet" },
+        { "$ref": "#/$defs/CommandMissionSet" },
+        { "$ref": "#/$defs/CommandMissionStart" },
+        { "$ref": "#/$defs/CommandMissionClear" }
       ]
     },
     "ManualMessage": {
@@ -371,7 +575,7 @@
       "additionalProperties": false
     },
     "ClientMessage": {
-      "description": "Messages a client may send. The servers drop messages longer than 512 characters or not valid JSON without any answer.",
+      "description": "Messages a client may send. The servers drop messages longer than 512 characters (4096 for mission_set, contract 1.2) or not valid JSON without any answer.",
       "oneOf": [
         { "$ref": "#/$defs/InjectMessage" },
         { "$ref": "#/$defs/ClearMessage" },
@@ -381,15 +585,19 @@
     },
 
     "Alert": {
-      "description": "NOT on the wire: derived client-side by deriveAlerts() (src/shared/alerts.ts) from each displayed frame. 'id' and 'component'/'severity' are normative; 'message' is Spanish free text today and will become a translatable code (WP-03).",
+      "description": "NOT on the wire: derived client-side by deriveAlerts() (src/shared/alerts.ts) from each displayed frame. 'id' and 'component'/'severity' are normative; 'message' is informational Spanish text; a client translates from 'code' + 'params' (+ 'origin', 'synthetic') with its own dictionary.",
       "type": "object",
       "properties": {
         "id": { "type": "string", "pattern": "^(motor[1-4]:(out|temp)|battery:(rem|temp)|fc:(temp|vib))$" },
         "component": { "enum": ["motor1", "motor2", "motor3", "motor4", "battery", "fc"] },
         "severity": { "enum": ["warning", "critical"] },
-        "message": { "type": "string" }
+        "message": { "type": "string" },
+        "code": { "enum": ["motorOut", "motorTemp", "batteryRem", "batteryTemp", "fcTemp", "vibration"] },
+        "params": { "description": "Figures of the message as shown: n (motor), rpm, mean, c (degC), pct, v.", "type": "object", "additionalProperties": { "type": "string" } },
+        "origin": { "description": "Where the figure comes from, when the alert states it.", "enum": ["measured", "estimated", "simulated"] },
+        "synthetic": { "description": "A synthetic fault of the replay is active on this alert's component.", "type": "boolean" }
       },
-      "required": ["id", "component", "severity", "message"],
+      "required": ["id", "component", "severity", "message", "code", "params"],
       "additionalProperties": false
     },
     "AlertSummary": {

@@ -1,0 +1,471 @@
+{
+  "_doc": "src/shared/px4params.ts (contract 1.2): checkParamRead(id, role) and checkParamSet(id, value, {role, profile, armed}). armed null = no telemetry (treated as armed). A client that offers parameters must not offer what these refuse; the bridge (Python) runs the role-free cases (role admin) through its own check and must agree. never_write: true for ids no client may ever write. The whitelist itself is contracts/px4_params.json.",
+  "rules": [
+    "GF_ACTION",
+    "GF_MAX_HOR_DIST",
+    "GF_MAX_VER_DIST",
+    "COM_LOW_BAT_ACT",
+    "COM_DL_LOSS_T",
+    "NAV_DLL_ACT",
+    "COM_RC_LOSS_T",
+    "NAV_RCL_ACT",
+    "COM_ACT_FAIL_ACT",
+    "CA_FAILURE_MODE",
+    "RTL_RETURN_ALT",
+    "MIS_TAKEOFF_ALT",
+    "MPC_XY_VEL_MAX",
+    "SYS_FAILURE_EN",
+    "COM_RC_IN_MODE",
+    "COM_RCL_EXCEPT",
+    "BAT_LOW_THR",
+    "BAT_CRIT_THR",
+    "BAT_EMERGEN_THR",
+    "SYS_AUTOSTART"
+  ],
+  "read": [
+    {
+      "id": "GF_ACTION",
+      "role": "viewer",
+      "out": { "ok": false, "code": "relay.role", "params": { "id": "GF_ACTION" } }
+    },
+    {
+      "id": "GF_ACTION",
+      "role": "pilot",
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "GF_ACTION",
+          "type": "int32",
+          "read": "pilot",
+          "write": "admin",
+          "values": [1, 2, 3, 5],
+          "note": "Geofence breach action: 1 warning, 2 hold, 3 return, 5 land. 0 (none) and 4 (terminate) are excluded."
+        }
+      }
+    },
+    {
+      "id": "GF_ACTION",
+      "role": "admin",
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "GF_ACTION",
+          "type": "int32",
+          "read": "pilot",
+          "write": "admin",
+          "values": [1, 2, 3, 5],
+          "note": "Geofence breach action: 1 warning, 2 hold, 3 return, 5 land. 0 (none) and 4 (terminate) are excluded."
+        }
+      }
+    },
+    {
+      "id": "SYS_FAILURE_EN",
+      "role": "viewer",
+      "out": { "ok": false, "code": "relay.role", "params": { "id": "SYS_FAILURE_EN" } }
+    },
+    {
+      "id": "SYS_FAILURE_EN",
+      "role": "pilot",
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "SYS_FAILURE_EN",
+          "type": "int32",
+          "read": "pilot",
+          "write": null,
+          "note": "Failure injection enabled (read at boot). Written by the bridge only, never by a client."
+        }
+      }
+    },
+    {
+      "id": "SYS_FAILURE_EN",
+      "role": "admin",
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "SYS_FAILURE_EN",
+          "type": "int32",
+          "read": "pilot",
+          "write": null,
+          "note": "Failure injection enabled (read at boot). Written by the bridge only, never by a client."
+        }
+      }
+    },
+    {
+      "id": "CAL_ACC0_ID",
+      "role": "viewer",
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "CAL_ACC0_ID" } }
+    },
+    {
+      "id": "CAL_ACC0_ID",
+      "role": "pilot",
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "CAL_ACC0_ID" } }
+    },
+    {
+      "id": "CAL_ACC0_ID",
+      "role": "admin",
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "CAL_ACC0_ID" } }
+    },
+    {
+      "id": "EKF2_GPS_CTRL",
+      "role": "viewer",
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "EKF2_GPS_CTRL" } }
+    },
+    {
+      "id": "EKF2_GPS_CTRL",
+      "role": "pilot",
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "EKF2_GPS_CTRL" } }
+    },
+    {
+      "id": "EKF2_GPS_CTRL",
+      "role": "admin",
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "EKF2_GPS_CTRL" } }
+    }
+  ],
+  "set": [
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 150,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "GF_MAX_HOR_DIST",
+          "type": "real32",
+          "read": "pilot",
+          "write": "admin",
+          "min": 10,
+          "max": 500,
+          "unit": "m",
+          "note": "Geofence horizontal radius from home. 0 (disabled) is excluded."
+        }
+      }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 150,
+      "role": "pilot",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "relay.role", "params": { "id": "GF_MAX_HOR_DIST" } }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 150,
+      "role": "viewer",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "relay.role", "params": { "id": "GF_MAX_HOR_DIST" } }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 9.99,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": false,
+        "code": "param.outOfRange",
+        "params": { "id": "GF_MAX_HOR_DIST", "min": 10, "max": 500 }
+      }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 10,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "GF_MAX_HOR_DIST",
+          "type": "real32",
+          "read": "pilot",
+          "write": "admin",
+          "min": 10,
+          "max": 500,
+          "unit": "m",
+          "note": "Geofence horizontal radius from home. 0 (disabled) is excluded."
+        }
+      }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 500,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "GF_MAX_HOR_DIST",
+          "type": "real32",
+          "read": "pilot",
+          "write": "admin",
+          "min": 10,
+          "max": 500,
+          "unit": "m",
+          "note": "Geofence horizontal radius from home. 0 (disabled) is excluded."
+        }
+      }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 500.5,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": false,
+        "code": "param.outOfRange",
+        "params": { "id": "GF_MAX_HOR_DIST", "min": 10, "max": 500 }
+      }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 0,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": false,
+        "code": "param.outOfRange",
+        "params": { "id": "GF_MAX_HOR_DIST", "min": 10, "max": 500 }
+      }
+    },
+    {
+      "id": "GF_ACTION",
+      "value": 3,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "GF_ACTION",
+          "type": "int32",
+          "read": "pilot",
+          "write": "admin",
+          "values": [1, 2, 3, 5],
+          "note": "Geofence breach action: 1 warning, 2 hold, 3 return, 5 land. 0 (none) and 4 (terminate) are excluded."
+        }
+      }
+    },
+    {
+      "id": "GF_ACTION",
+      "value": 4,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.badValue", "params": { "id": "GF_ACTION", "values": "1,2,3,5" } }
+    },
+    {
+      "id": "GF_ACTION",
+      "value": 0,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.badValue", "params": { "id": "GF_ACTION", "values": "1,2,3,5" } }
+    },
+    {
+      "id": "GF_ACTION",
+      "value": 2.5,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.badValue", "params": { "id": "GF_ACTION" } }
+    },
+    {
+      "id": "NAV_DLL_ACT",
+      "value": 5,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.badValue", "params": { "id": "NAV_DLL_ACT", "values": "1,2,3" } }
+    },
+    {
+      "id": "NAV_RCL_ACT",
+      "value": 1,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "NAV_RCL_ACT",
+          "type": "int32",
+          "read": "pilot",
+          "write": "admin",
+          "values": [1, 2, 3],
+          "note": "Manual control loss action: 1 hold, 2 return, 3 land. The bridge sets 1 when piloting starts."
+        }
+      }
+    },
+    {
+      "id": "COM_ACT_FAIL_ACT",
+      "value": 4,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": false,
+        "code": "param.badValue",
+        "params": { "id": "COM_ACT_FAIL_ACT", "values": "0,1,2,3" }
+      }
+    },
+    {
+      "id": "CA_FAILURE_MODE",
+      "value": 1,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "CA_FAILURE_MODE",
+          "type": "int32",
+          "read": "pilot",
+          "write": "admin",
+          "values": [0, 1],
+          "sitlOnly": true,
+          "note": "Control allocator obeys the failure injector (1). The bridge sets 1 on motor_off (docs/INVESTIGACION_FALLAS_PX4.md)."
+        }
+      }
+    },
+    {
+      "id": "CA_FAILURE_MODE",
+      "value": 1,
+      "role": "admin",
+      "profile": "hitl",
+      "armed": false,
+      "out": { "ok": false, "code": "relay.profile", "params": { "id": "CA_FAILURE_MODE" } }
+    },
+    {
+      "id": "MIS_TAKEOFF_ALT",
+      "value": 12,
+      "role": "pilot",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": true,
+        "rule": {
+          "id": "MIS_TAKEOFF_ALT",
+          "type": "real32",
+          "read": "pilot",
+          "write": "pilot",
+          "min": 1,
+          "max": 50,
+          "unit": "m",
+          "note": "Takeoff altitude; the bridge also writes it on every takeoff (1..50 m clamp)."
+        }
+      }
+    },
+    {
+      "id": "MPC_XY_VEL_MAX",
+      "value": 13,
+      "role": "pilot",
+      "profile": "sitl",
+      "armed": false,
+      "out": {
+        "ok": false,
+        "code": "param.outOfRange",
+        "params": { "id": "MPC_XY_VEL_MAX", "min": 1, "max": 12 }
+      }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 150,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": true,
+      "out": { "ok": false, "code": "param.armed", "params": { "id": "GF_MAX_HOR_DIST" } }
+    },
+    {
+      "id": "GF_MAX_HOR_DIST",
+      "value": 150,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": null,
+      "out": { "ok": false, "code": "param.armed", "params": { "id": "GF_MAX_HOR_DIST" } }
+    },
+    {
+      "id": "SYS_FAILURE_EN",
+      "value": 1,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "SYS_FAILURE_EN" } }
+    },
+    {
+      "id": "COM_RC_IN_MODE",
+      "value": 1,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "COM_RC_IN_MODE" } }
+    },
+    {
+      "id": "CAL_ACC0_ID",
+      "value": 1,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "CAL_ACC0_ID" } }
+    },
+    {
+      "id": "SYS_AUTOCONFIG",
+      "value": 1,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "SYS_AUTOCONFIG" } }
+    },
+    {
+      "id": "PWM_MAIN_FUNC1",
+      "value": 101,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "PWM_MAIN_FUNC1" } }
+    },
+    {
+      "id": "CBRK_SUPPLY_CHK",
+      "value": 894281,
+      "role": "admin",
+      "profile": "sitl",
+      "armed": false,
+      "out": { "ok": false, "code": "param.notAllowed", "params": { "id": "CBRK_SUPPLY_CHK" } }
+    }
+  ],
+  "never_write": [
+    { "id": "CAL_GYRO0_ID", "out": true },
+    { "id": "SENS_BOARD_ROT", "out": true },
+    { "id": "CBRK_IO_SAFETY", "out": true },
+    { "id": "PWM_MAIN_MIN1", "out": true },
+    { "id": "DSHOT_CONFIG", "out": true },
+    { "id": "MOT_ORDERING", "out": true },
+    { "id": "CA_ROTOR0_PX", "out": true },
+    { "id": "CA_SV_CS0_TYPE", "out": true },
+    { "id": "CA_AIRFRAME", "out": true },
+    { "id": "COM_ARM_WO_GPS", "out": true },
+    { "id": "COM_PREARM_MODE", "out": true },
+    { "id": "SYS_AUTOSTART", "out": true },
+    { "id": "SYS_AUTOCONFIG", "out": true },
+    { "id": "SYS_HAS_MAG", "out": true },
+    { "id": "SYS_FAILURE_EN", "out": true },
+    { "id": "EKF2_HGT_REF", "out": true },
+    { "id": "MAV_0_CONFIG", "out": true },
+    { "id": "BAT1_N_CELLS", "out": true },
+    { "id": "BAT_LOW_THR", "out": true },
+    { "id": "SIM_BAT_MIN_PCT", "out": true },
+    { "id": "RC_MAP_THROTTLE", "out": true },
+    { "id": "RC1_MIN", "out": true },
+    { "id": "COM_RC_IN_MODE", "out": true },
+    { "id": "GF_ACTION", "out": false },
+    { "id": "NAV_RCL_ACT", "out": false },
+    { "id": "CA_FAILURE_MODE", "out": false },
+    { "id": "MPC_XY_VEL_MAX", "out": false }
+  ]
+}

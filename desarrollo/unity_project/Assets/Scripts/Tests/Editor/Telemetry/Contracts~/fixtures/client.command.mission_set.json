@@ -1,0 +1,15 @@
+{
+  "type": "command",
+  "name": "mission_set",
+  "mission": {
+    "version": 1,
+    "id": "mision-demo",
+    "name": "Vuelta corta",
+    "finish": "land",
+    "waypoints": [
+      { "n": 10, "e": 0, "alt": 8, "speed": 3 },
+      { "n": 10, "e": 15, "alt": 8, "speed": 3, "holdS": 5 },
+      { "n": 0, "e": 15, "alt": 10, "speed": 2 }
+    ]
+  }
+}

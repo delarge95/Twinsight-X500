@@ -60,6 +60,7 @@ namespace WebGL.Telemetry
                 label = SourceLabel,
                 vehicle = (h.vehicleHardware ?? "") + " · airframe " + h.vehicleSysAutostart, HasVehicle = true,
                 durationS = h.duration_s, HasDurationS = h.HasDuration,
+                code = "replay.local", HasCode = true, // contract 1.2: the label stays the fallback
             };
             if (!string.IsNullOrEmpty(h.sourceUrl)) { src.url = h.sourceUrl; src.HasUrl = true; }
             if (!string.IsNullOrEmpty(h.vehiclePx4Version)) { src.px4 = h.vehiclePx4Version; src.HasPx4 = true; }
@@ -72,6 +73,8 @@ namespace WebGL.Telemetry
                 {
                     rpm = "estimated", motorTemp = "estimated", batteryTemp = "estimated", fcTemp = "measured",
                     batteryCurrent = "measured", HasBatteryCurrent = true,
+                    // contract 1.2 (D-10): attitude, position and velocity of a real log are EKF2 output (an estimate); the file has no GPS
+                    pose = "estimated", HasPose = true, velocity = "estimated", HasVelocity = true, gps = "unavailable", HasGps = true,
                 },
                 batteryCells = h.vehicleBatCells > 0 ? h.vehicleBatCells : 4,
                 ambientC = ambient,
@@ -129,7 +132,7 @@ namespace WebGL.Telemetry
         {
             reason = msg.Validate();
             if (reason != null) return false;
-            if (msg.ToJson().Length > TelemetryProtocol.MaxClientMessageChars) { reason = "message longer than 512 characters"; return false; }
+            if (msg.ToJson().Length > msg.MaxChars) { reason = "message longer than " + msg.MaxChars + " characters"; return false; }
             if (!running) { reason = "link not open"; return false; }
             double wall = WallNowMs(), local = LocalNowMs();
             string name = msg is CommandMessage c ? c.name : msg.Type.ToString().ToLowerInvariant();

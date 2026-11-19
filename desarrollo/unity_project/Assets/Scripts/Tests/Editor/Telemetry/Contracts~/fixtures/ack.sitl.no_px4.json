@@ -1,1 +1,7 @@
-{ "type": "ack", "command": "land", "ok": false, "detail": "PX4 no conectado" }
+{
+  "type": "ack",
+  "command": "land",
+  "ok": false,
+  "detail": "PX4 no conectado",
+  "code": "px4NotConnected"
+}

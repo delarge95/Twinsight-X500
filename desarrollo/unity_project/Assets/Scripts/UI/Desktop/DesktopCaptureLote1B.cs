@@ -309,7 +309,7 @@ namespace WebGL.UI.Desktop
             var tel = Tel;
             tel.StartLocalReplay();
             yield return new WaitForSecondsRealtime(3.0f);
-            Check("replay: the map stays on, a new trail, origin «Origen local (EKF)», «Posición: medido», no geofence ring", tel.MapVisible && tel.MapOriginLabel == T("map.originLocal") && tel.MapCaption.Contains(T("map.posMeasured")) && tel.MapCanvas.Fence == null);
+            Check("replay: the map stays on, a new trail, origin «Origen local (EKF)», «Posición: estimado» (D-10, contrato 1.2), no geofence ring", tel.MapVisible && tel.MapOriginLabel == T("map.originLocal") && tel.MapCaption.Contains(T("map.posEstimated")) && tel.MapCanvas.Fence == null);
             Click(B("DkTelPreflight"));
             yield return new WaitForSecondsRealtime(0.6f);
             PreflightResult r = tel.PreflightNow;

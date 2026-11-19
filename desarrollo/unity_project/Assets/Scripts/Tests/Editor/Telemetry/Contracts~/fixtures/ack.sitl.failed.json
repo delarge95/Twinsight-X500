@@ -2,5 +2,7 @@
   "type": "ack",
   "command": "takeoff",
   "ok": false,
-  "detail": "MAV_RESULT 4 (FAILED); PX4: Arming denied: vehicle not ready"
+  "detail": "MAV_RESULT 4 (FAILED); PX4: Arming denied: vehicle not ready",
+  "code": "mavResult",
+  "params": { "result": 4, "name": "FAILED", "px4": "Arming denied: vehicle not ready" }
 }

@@ -437,14 +437,16 @@ namespace WebGL.UI.Desktop
             _mapFit.EnableInClassList("dk-b--on", _mapMode == MapMode.Fit);
             _mapFollow.EnableInClassList("dk-b--on", _mapMode == MapMode.Follow);
             TelSource src = ActiveSource;
-            string key = lang + "|" + src + "|" + _mapHeadingUp;
+            // contract 1.2 (D-10): the replay hello says the position is an EKF2 estimate; without that field the replay keeps «medido» as before
+            bool posEstimated = src == TelSource.LocalReplay && FlightOrigins.Pose(DesktopTelemetry.Client?.Hello, SourceClassification.Replay) == ReadingOrigin.Estimated;
+            string key = lang + "|" + src + "|" + _mapHeadingUp + "|" + posEstimated;
             if (key != _mapLangShown)
             {
                 _mapLangShown = key;
                 _mapOrient.text = T(_mapHeadingUp ? "map.headingUp" : "map.northUp");
-                // the origin is the take-off point only in the simulator; the position is measured only in the replay of the real flight
+                // the origin is the take-off point only in the simulator; the position of the replay of the real flight is an EKF2 estimate (hello) or, with an old hello, measured
                 string origin = T(src == TelSource.Simulator ? "map.originTakeoff" : "map.originLocal");
-                string pos = T(src == TelSource.LocalReplay ? "map.posMeasured" : "map.posSimulated");
+                string pos = T(src == TelSource.LocalReplay ? (posEstimated ? "map.posEstimated" : "map.posMeasured") : "map.posSimulated");
                 _mapH.tooltip = origin;
                 _mapCaption.text = "H · " + origin + " · " + pos;
                 _mapCaption.tooltip = T("map.noOrders");

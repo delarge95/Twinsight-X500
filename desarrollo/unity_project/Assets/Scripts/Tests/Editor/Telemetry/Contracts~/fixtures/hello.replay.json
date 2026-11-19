@@ -13,12 +13,16 @@
     "motorTemp": "estimated",
     "batteryTemp": "estimated",
     "fcTemp": "measured",
-    "batteryCurrent": "measured"
+    "batteryCurrent": "measured",
+    "pose": "estimated",
+    "velocity": "estimated",
+    "gps": "unavailable"
   },
   "batteryCells": 4,
   "ambientC": 22.87,
   "source": {
     "label": "Log real de PX4 Flight Review · Holybro X500 V2",
+    "code": "replay.flightReview",
     "url": "https://review.px4.io/plot_app?log=0f3c4a74-4648-4b99-8992-c7fdc8681f6e",
     "vehicle": "PX4_FMU_V5 · airframe 4019",
     "px4": "v1.15.4",

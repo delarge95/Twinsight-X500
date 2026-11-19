@@ -29,6 +29,18 @@ namespace WebGL.Telemetry.Tests
                     if (m.Type.ToString() != want) throw new ProtocolException("parsed as " + m.Type + ", manifest says " + def);
                     return m;
                 }
+                case "ParamsMessage":
+                {
+                    var m = ProtocolParser.ParseServer(raw, opt);
+                    if (!(m is ParamsMessage)) throw new ProtocolException("parsed as " + m.Type + ", manifest says " + def);
+                    return m;
+                }
+                case "MissionStatusMessage":
+                {
+                    var m = ProtocolParser.ParseServer(raw, opt);
+                    if (!(m is MissionStatusMessage)) throw new ProtocolException("parsed as " + m.Type + ", manifest says " + def);
+                    return m;
+                }
                 case "ServerMessage": return ProtocolParser.ParseServer(raw, opt);
                 case "ClientMessage": return ProtocolParser.ParseClient(raw, opt);
                 case "Alert": return ProtocolParser.ParseAlert(raw, opt);
@@ -82,7 +94,12 @@ namespace WebGL.Telemetry.Tests
                 bool accepted = server || client;
                 if (name == "frames.extra_field.json")
                 {
-                    cs.True(server && sm is FramesMessage fm && fm.frames.Length == 1 && fm.frames[0].nav == 4, name + ": tolerant reader keeps the frame and ignores 'gps'");
+                    cs.True(server && sm is FramesMessage fm && fm.frames.Length == 1 && fm.frames[0].nav == 4 && fm.frames[0].gps == null, name + ": tolerant reader keeps the frame and ignores the unknown 'airspeed'");
+                }
+                else if (name == "hello.world_bad_frame.json")
+                {
+                    // contract 1.2: `world` is schema only; the live reader ignores it (it is not even validated), so a bad world never costs the hello
+                    cs.True(server && sm is HelloMessage hw && hw.HasWorld, name + ": tolerant reader accepts the hello and ignores `world`");
                 }
                 else cs.True(!accepted, name + " must be rejected even by the tolerant reader");
             }
@@ -141,7 +158,7 @@ namespace WebGL.Telemetry.Tests
                 var raw = TelemetryJson.Parse(File.ReadAllText(path));
                 var m = ProtocolParser.ParseClient(raw, ParseOptions.StrictSchema);
                 string json = m.ToJson();
-                cs.True(json.Length <= TelemetryProtocol.MaxClientMessageChars, "<= 512 chars");
+                cs.True(json.Length <= m.MaxChars, "<= 512 chars (4096 for mission_set)");
                 cs.Eq(TelemetryJson.Write(Canon(raw)), TelemetryJson.Write(Canon(TelemetryJson.Parse(json))), Path.GetFileName(path));
                 cs.True(m.Validate() == null, "validates");
             }
@@ -190,7 +207,19 @@ namespace WebGL.Telemetry.Tests
                 .Select(n => C.S(C.O(C.O(C.O(defs, n), "properties"), "name"), "const")).ToArray();
             CollectionAssert.AreEqual(cmdNames, TelemetryProtocol.CommandNames);
             var frameReq = C.A(C.O(defs, "TelemetryFrame"), "required").Cast<string>().ToArray();
-            CollectionAssert.AreEquivalent(frameReq, typeof(TelemetryFrame).GetFields().Select(f => f.Name).ToArray(), "TelemetryFrame fields = schema required");
+            // 1.2 adds two optional properties (gps, esc): the C# fields are the schema properties
+            var frameProps = C.O(C.O(defs, "TelemetryFrame"), "properties").Keys.ToArray();
+            CollectionAssert.AreEquivalent(frameProps, typeof(TelemetryFrame).GetFields().Select(f => f.Name).ToArray(), "TelemetryFrame fields = schema properties");
+            CollectionAssert.IsSubsetOf(frameReq, frameProps);
+            CollectionAssert.AreEquivalent(new[] { "gps", "esc" }, frameProps.Except(frameReq).ToArray(), "the only optional frame properties are the 1.2 ones");
+            CollectionAssert.AreEqual(Enum("ProvenanceState"), TelemetryProtocol.ProvenanceState);
+            CollectionAssert.AreEqual(Enum("ProvenanceSensor"), TelemetryProtocol.ProvenanceSensor);
+            CollectionAssert.AreEqual(C.A(C.O(C.O(C.O(defs, "ParamValue"), "properties"), "type"), "enum").Cast<string>().ToArray(), TelemetryProtocol.ParamTypes);
+            CollectionAssert.AreEqual(C.A(C.O(C.O(C.O(defs, "MissionStatusMessage"), "properties"), "state"), "enum").Cast<string>().ToArray(), TelemetryProtocol.MissionStates);
+            CollectionAssert.AreEqual(C.A(C.O(C.O(C.O(defs, "Mission"), "properties"), "finish"), "enum").Cast<string>().ToArray(), TelemetryProtocol.MissionFinishes);
+            CollectionAssert.AreEqual(C.A(C.O(C.O(C.O(defs, "WorldInfo"), "properties"), "kind"), "enum").Cast<string>().ToArray(), TelemetryProtocol.WorldKinds);
+            CollectionAssert.AreEqual(C.A(C.O(C.O(C.O(defs, "StreamInfo"), "properties"), "kind"), "enum").Cast<string>().ToArray(), TelemetryProtocol.StreamKinds);
+            CollectionAssert.AreEqual(C.A(C.O(C.O(C.O(defs, "StreamInfo"), "properties"), "provenance"), "enum").Cast<string>().ToArray(), TelemetryProtocol.StreamProvenances);
             var alertProps = C.O(C.O(defs, "Alert"), "properties");
             CollectionAssert.AreEqual(C.A(C.O(alertProps, "component"), "enum").Cast<string>().ToArray(), TelemetryProtocol.AlertComponents);
         }

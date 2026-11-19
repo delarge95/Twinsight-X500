@@ -1,0 +1,10 @@
+{
+  "type": "mission",
+  "state": "active",
+  "id": "mision-demo",
+  "legs": 3,
+  "leg": 2,
+  "item": 4,
+  "items": 8,
+  "ts": 1792195339000
+}

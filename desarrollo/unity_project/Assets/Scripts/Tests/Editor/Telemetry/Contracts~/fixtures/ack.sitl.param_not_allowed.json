@@ -1,0 +1,8 @@
+{
+  "type": "ack",
+  "command": "param_get",
+  "ok": false,
+  "detail": "parámetro no permitido: CAL_ACC0_ID",
+  "code": "param.notAllowed",
+  "params": { "id": "CAL_ACC0_ID" }
+}

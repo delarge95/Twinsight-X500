@@ -1,0 +1,1 @@
+{ "type": "ack", "command": "takeoff", "ok": false, "detail": "MAV_RESULT 4 (FAILED)" }

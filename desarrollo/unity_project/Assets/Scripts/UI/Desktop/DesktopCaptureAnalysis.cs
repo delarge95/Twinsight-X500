@@ -218,7 +218,7 @@ namespace WebGL.UI.Desktop
             {
                 VisualElement cell = Root.Q<VisualElement>("DkAn_" + spec.Id);
                 Label tag = cell.Q<Label>(className: "dk-tag");
-                ReadingOrigin o = spec.RpmOrigin ? FlightOrigins.Rpm(h, client.Classification) : FlightOrigins.Base(client.Classification);
+                ReadingOrigin o = spec.Origin(h, client.Classification);
                 string want = FlightOrigins.Text(o, lang, labels);
                 if (tag == null || tag.text != want) { allLabeled = false; Log("  tag mismatch on " + spec.Id + ": '" + (tag != null ? tag.text : "null") + "' vs '" + want + "'"); }
                 VisualElement plot = cell.Q<VisualElement>("DkAnPlot_" + spec.Id);
@@ -228,7 +228,7 @@ namespace WebGL.UI.Desktop
             Check("every chart carries the origin tag the Vuelo tab uses for that channel (medido / estimado)", allLabeled);
             Check("all charts share one time axis (same x and width)", sameAxis);
             VisualElement altCell = Root.Q<VisualElement>("DkAn_altitude");
-            Check("altitude tag is 'medido' green on a replay of a real flight", altCell.Q<Label>(className: "dk-tag").ClassListContains("dk-tag--measured"));
+            Check("altitude tag is 'estimado' amber on a replay of a real flight (contract 1.2, D-10: the hello says pose = estimated)", altCell.Q<Label>(className: "dk-tag").ClassListContains("dk-tag--estimated") == (FlightOrigins.Pose(h, client.Classification) == ReadingOrigin.Estimated));
             Check("rpm tag is the 'estimado' amber of hello.provenance.rpm", Root.Q<VisualElement>("DkAn_rpm").Q<Label>(className: "dk-tag").ClassListContains("dk-tag--estimated") == (FlightOrigins.Rpm(h, client.Classification) == ReadingOrigin.Estimated));
             string altShown = altCell.Q<Label>(className: "dk-an-value").text;
             string altWant = Sparkline.Format(hist[Channel.Altitude].Last, 1) + " m";

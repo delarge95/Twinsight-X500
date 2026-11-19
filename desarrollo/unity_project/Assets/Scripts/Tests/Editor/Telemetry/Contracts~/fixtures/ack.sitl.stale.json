@@ -3,6 +3,7 @@
   "command": "set_altitude",
   "ok": false,
   "detail": "orden repetida, fuera de orden o caducada",
+  "code": "stale",
   "seq": 41,
   "ts": 1792195330180
 }

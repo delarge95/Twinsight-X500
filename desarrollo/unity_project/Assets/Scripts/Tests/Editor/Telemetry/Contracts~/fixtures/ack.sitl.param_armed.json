@@ -1,0 +1,8 @@
+{
+  "type": "ack",
+  "command": "param_set",
+  "ok": false,
+  "detail": "los parámetros solo se cambian desarmado",
+  "code": "param.armed",
+  "params": { "id": "MPC_XY_VEL_MAX" }
+}

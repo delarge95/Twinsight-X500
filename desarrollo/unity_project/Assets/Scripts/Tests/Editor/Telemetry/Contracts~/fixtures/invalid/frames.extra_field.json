@@ -16,7 +16,7 @@
       "armed": true,
       "landed": false,
       "nav": 4,
-      "gps": [0, 0]
+      "airspeed": 12
     }
   ]
 }

@@ -73,7 +73,7 @@ namespace WebGL.Telemetry
             reason = msg.Validate();
             if (reason != null) return false;
             string json = msg.ToJson();
-            if (json.Length > TelemetryProtocol.MaxClientMessageChars) { reason = "message longer than 512 characters"; return false; }
+            if (json.Length > msg.MaxChars) { reason = "message longer than " + msg.MaxChars + " characters"; return false; }
             var ws = current;
             if (ws == null || ws.State != WebSocketState.Open) { reason = "link not open"; return false; }
             outbox.Enqueue(json);

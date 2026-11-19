@@ -1,0 +1,7 @@
+{
+  "type": "ack",
+  "command": "takeoff",
+  "ok": false,
+  "detail": "no tienes el mando; pídelo primero",
+  "code": "relay.noLease"
+}

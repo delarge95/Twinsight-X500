@@ -138,7 +138,7 @@ namespace WebGL.Telemetry
         {
             reason = msg.Validate();
             if (reason != null) return false;
-            if (msg.ToJson().Length > TelemetryProtocol.MaxClientMessageChars) { reason = "message longer than 512 characters"; return false; }
+            if (msg.ToJson().Length > msg.MaxChars) { reason = "message longer than " + msg.MaxChars + " characters"; return false; }
             if (!running) { reason = "link not open"; return false; }
             double local = LocalNowMs();
             if (msg is ManualMessage m)

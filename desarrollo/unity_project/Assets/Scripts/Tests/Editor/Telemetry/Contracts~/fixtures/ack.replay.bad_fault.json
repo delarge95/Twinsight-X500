@@ -1,1 +1,7 @@
-{ "type": "ack", "command": "inject", "ok": false, "detail": "falla no válida" }
+{
+  "type": "ack",
+  "command": "inject",
+  "ok": false,
+  "detail": "falla no válida",
+  "code": "invalidFault"
+}

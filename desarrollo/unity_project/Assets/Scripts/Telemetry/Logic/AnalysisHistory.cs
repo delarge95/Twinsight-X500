@@ -259,6 +259,13 @@ namespace WebGL.Telemetry
         }
 
         /// <summary>
+        /// The origin tag of this chart: the same the Vuelo tab uses for that channel. Rotor speeds: hello.provenance.rpm; altitude: the pose and speeds: the
+        /// velocity of contract 1.2 (D-10, absent = the base origin as before); the rest: the base origin of the channels without a field.
+        /// </summary>
+        public ReadingOrigin Origin(HelloMessage h, SourceClassification c) =>
+            RpmOrigin ? FlightOrigins.Rpm(h, c) : Id == "altitude" ? FlightOrigins.Pose(h, c) : Id == "speed" ? FlightOrigins.Velocity(h, c) : FlightOrigins.Base(c);
+
+        /// <summary>
         /// Order and settings of the web (FlightUI.tsx CHARTS: altitude 2, speed 2, voltage 0.6, throttle 20, vibration 2) with the desktop
         /// additions: horizontal / vertical speed on one chart, the battery level, and the 4 rotor speeds.
         /// </summary>

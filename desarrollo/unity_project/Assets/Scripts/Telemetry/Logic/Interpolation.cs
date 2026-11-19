@@ -68,6 +68,9 @@ namespace WebGL.Telemetry
                 armed = a.armed,
                 landed = a.landed,
                 nav = a.nav,
+                // Contract 1.2 optional state (GPS fix, ESC readings): also held from the older sample, never blended.
+                gps = a.gps,
+                esc = a.esc,
             };
         }
 
@@ -82,6 +85,8 @@ namespace WebGL.Telemetry
             f.armed = target.armed;
             f.landed = target.landed;
             f.nav = target.nav;
+            f.gps = target.gps;
+            f.esc = target.esc;
             f.ts = target.ts;
             return f;
         }

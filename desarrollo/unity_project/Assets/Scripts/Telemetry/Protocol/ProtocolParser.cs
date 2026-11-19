@@ -56,6 +56,8 @@ namespace WebGL.Telemetry
                 case "faults": return Faults(o);
                 case "event": return Event(o);
                 case "ack": return Ack(o);
+                case "params": return Params(o);
+                case "mission": return MissionStatus(o);
                 default: throw new ProtocolException("unknown server message type '" + type + "'");
             }
         }
@@ -88,6 +90,10 @@ namespace WebGL.Telemetry
                     foreach (var f in fields) allowed.Add(f.TrimEnd('?'));
                     o.Allow(allowed.ToArray());
                     var m = new CommandMessage { name = name };
+                    // contract 1.2
+                    if (o.Has("id")) m.id = o.Pat("id", ParamIdPattern);
+                    if (o.Has("value")) m.value = o.Num("value");
+                    if (o.Has("mission")) m.mission = MissionOf(o.Sub("mission"));
                     if (o.Has("altitude")) m.altitude = o.Num("altitude");
                     if (o.Has("north")) m.north = o.Num("north");
                     if (o.Has("east")) m.east = o.Num("east");
@@ -121,7 +127,7 @@ namespace WebGL.Telemetry
 
         static HelloMessage Hello(Obj o)
         {
-            o.Allow("type", "mode", "rotors", "rateHz", "provenance", "batteryCells", "ambientC", "source", "commands", "serverTime", "protocolVersion");
+            o.Allow("type", "mode", "rotors", "rateHz", "provenance", "batteryCells", "ambientC", "source", "commands", "serverTime", "protocolVersion", "world", "streams");
             var h = new HelloMessage();
             if (!WireNames.TryMode(o.Str("mode"), out h.mode)) throw new ProtocolException(o.Path + ".mode: unknown mode '" + o.Str("mode") + "'");
             var rotors = o.Arr("rotors");
@@ -132,8 +138,9 @@ namespace WebGL.Telemetry
             h.batteryCells = o.Int("batteryCells", 1, int.MaxValue);
             h.ambientC = o.Num("ambientC");
             var s = o.Sub("source");
-            s.Allow("label", "url", "vehicle", "px4", "durationS");
+            s.Allow("label", "url", "vehicle", "px4", "durationS", "code");
             h.source = new SourceInfo { label = s.Str("label") };
+            if (s.Has("code")) { h.source.code = s.Pat("code", WireCodePattern); h.source.HasCode = true; }
             if (s.Has("url")) { h.source.url = s.Str("url"); h.source.HasUrl = true; }
             if (s.Has("vehicle")) { h.source.vehicle = s.Str("vehicle"); h.source.HasVehicle = true; }
             if (s.Has("px4")) { h.source.px4 = s.Str("px4"); h.source.HasPx4 = true; }
@@ -154,7 +161,51 @@ namespace WebGL.Telemetry
                 if (!System.Text.RegularExpressions.Regex.IsMatch(pv, "^[0-9]+[.][0-9]+[.][0-9]+$")) throw new ProtocolException(o.Path + ".protocolVersion: not x.y.z");
                 else { h.protocolVersion = pv; h.HasProtocolVersion = true; }
             }
+            // Contract 1.2 (schema only): `world` and `streams` are tolerated and IGNORED. Strict mode (tests) validates their shape; the live reader never rejects a hello for them.
+            if (o.Has("world")) { h.HasWorld = true; if (o.IsStrict) ValidateWorld(o.Sub("world")); }
+            if (o.Has("streams"))
+            {
+                h.HasStreams = true;
+                if (o.IsStrict)
+                {
+                    var st = o.Arr("streams");
+                    for (int i = 0; i < st.Count; i++) ValidateStream(o.Child(st[i], ".streams[" + i + "]"));
+                }
+            }
             return h;
+        }
+
+        static readonly Regex ParamIdPattern = new Regex("^[A-Z][A-Z0-9_]{0,15}$", RegexOptions.CultureInvariant);
+        static readonly Regex WireCodePattern = new Regex("^[a-z][a-zA-Z0-9]*([.][a-zA-Z0-9]+)*$", RegexOptions.CultureInvariant);
+        static readonly Regex WorldIdPattern = new Regex("^[a-z0-9_-]{1,64}$", RegexOptions.CultureInvariant);
+        static readonly Regex StreamIdPattern = new Regex("^[a-zA-Z0-9_-]{1,64}$", RegexOptions.CultureInvariant);
+
+        static void ValidateWorld(Obj w)
+        {
+            w.Allow("id", "kind", "frame", "origin", "yawDeg", "url", "version", "label");
+            w.Pat("id", WorldIdPattern);
+            w.Enum("kind", TelemetryProtocol.WorldKinds);
+            if (w.Str("frame") != "NED") throw new ProtocolException(w.Path + ".frame: must be NED");
+            if (w.Has("origin"))
+            {
+                var g = w.Sub("origin");
+                g.Allow("lat", "lon", "alt");
+                g.Num("lat", -90, 90); g.Num("lon", -180, 180); g.Num("alt");
+            }
+            if (w.Has("yawDeg")) w.Num("yawDeg");
+            if (w.Has("url")) w.Str("url");
+            if (w.Has("version")) w.Str("version");
+            if (w.Has("label")) w.Str("label");
+        }
+
+        static void ValidateStream(Obj s)
+        {
+            s.Allow("id", "kind", "url", "provenance", "label");
+            s.Pat("id", StreamIdPattern);
+            s.Enum("kind", TelemetryProtocol.StreamKinds);
+            s.Str("url");
+            s.Enum("provenance", TelemetryProtocol.StreamProvenances);
+            if (s.Has("label")) s.Str("label");
         }
 
         static FramesMessage Frames(Obj o)
@@ -170,7 +221,7 @@ namespace WebGL.Telemetry
 
         static TelemetryFrame Frame(Obj o)
         {
-            o.Allow("ts", "lt", "seg", "q", "p", "v", "u", "rpm", "bat", "temp", "vib", "armed", "landed", "nav");
+            o.Allow("ts", "lt", "seg", "q", "p", "v", "u", "rpm", "bat", "temp", "vib", "armed", "landed", "nav", "gps", "esc");
             var f = new TelemetryFrame
             {
                 ts = o.Num("ts"),
@@ -190,6 +241,22 @@ namespace WebGL.Telemetry
             var b = o.Sub("bat");
             b.Allow("v", "i", "rem");
             f.bat = new BatteryState { v = b.Num("v"), i = b.Num("i"), rem = b.Num("rem", 0, 1) };
+            if (o.Has("gps"))
+            {
+                var g = o.Sub("gps");
+                g.Allow("fix", "sats", "hdop");
+                f.gps = new GpsState { fix = g.Int("fix", 0, 8) };
+                if (g.Has("sats")) { f.gps.sats = g.Int("sats", 0, 254); f.gps.HasSats = true; }
+                if (g.Has("hdop")) { f.gps.hdop = g.Num("hdop", 0, double.MaxValue); f.gps.HasHdop = true; }
+            }
+            if (o.Has("esc"))
+            {
+                var e = o.Sub("esc");
+                e.Allow("rpm", "v", "i");
+                f.esc = new EscState { rpm = e.Tuple("rpm", 4, 0) };
+                if (e.Has("v")) f.esc.v = e.Tuple("v", 4);
+                if (e.Has("i")) f.esc.i = e.Tuple("i", 4);
+            }
             return f;
         }
 
@@ -221,11 +288,68 @@ namespace WebGL.Telemetry
 
         static AckMessage Ack(Obj o)
         {
-            o.Allow("type", "command", "ok", "detail", "seq", "ts");
+            o.Allow("type", "command", "ok", "detail", "seq", "ts", "code", "params");
             var a = new AckMessage { command = o.Str("command"), ok = o.Bool("ok") };
             Stamp(o, out a.seq, out a.ts);
             if (o.Has("detail")) { a.detail = o.Str("detail"); a.HasDetail = true; }
+            // contract 1.2: translatable code (+ values). A code that breaks the pattern, or a value that is neither text nor number, rejects the ack.
+            if (o.Has("code")) { a.code = o.Pat("code", WireCodePattern); a.HasCode = true; }
+            if (o.Has("params"))
+            {
+                var p = o.Sub("params");
+                a.codeParams = new Dictionary<string, object>();
+                foreach (var kv in p.Dict)
+                {
+                    if (!(kv.Value is string) && !(kv.Value is double)) throw new ProtocolException(p.Path + "." + kv.Key + ": must be text or a number");
+                    a.codeParams[kv.Key] = kv.Value;
+                }
+            }
             return a;
+        }
+
+        static ParamsMessage Params(Obj o)
+        {
+            o.Allow("type", "params", "ts");
+            var arr = o.Arr("params");
+            var m = new ParamsMessage { values = new ParamValue[arr.Count], ts = o.Num("ts") };
+            for (int i = 0; i < arr.Count; i++)
+            {
+                var p = o.Child(arr[i], ".params[" + i + "]");
+                p.Allow("id", "value", "type");
+                m.values[i] = new ParamValue { id = p.Pat("id", ParamIdPattern), value = p.Num("value"), type = p.Enum("type", TelemetryProtocol.ParamTypes) };
+            }
+            return m;
+        }
+
+        static MissionStatusMessage MissionStatus(Obj o)
+        {
+            o.Allow("type", "state", "id", "legs", "leg", "item", "items", "ts");
+            var m = new MissionStatusMessage { state = (MissionState)Array.IndexOf(TelemetryProtocol.MissionStates, o.Enum("state", TelemetryProtocol.MissionStates)), legs = o.Int("legs", 0, int.MaxValue), ts = o.Num("ts") };
+            if (o.Has("id")) { m.id = o.Str("id"); m.HasId = true; }
+            if (o.Has("leg")) { m.leg = o.Int("leg", 1, int.MaxValue); m.HasLeg = true; }
+            if (o.Has("item")) { m.item = o.Int("item", 0, int.MaxValue); m.HasItem = true; }
+            if (o.Has("items")) { m.items = o.Int("items", 0, int.MaxValue); m.HasItems = true; }
+            return m;
+        }
+
+        /// <summary>The Mission document of the schema (version 1, the same JSON both clients export): strict about the shape, 1..50 waypoints.</summary>
+        static MissionDoc MissionOf(Obj o)
+        {
+            o.Allow("version", "id", "name", "waypoints", "finish");
+            if (o.Int("version", 1, 1) != 1) throw new ProtocolException(o.Path + ".version: must be 1");
+            var m = new MissionDoc { id = o.Str("id"), name = o.Str("name"), finish = o.Enum("finish", TelemetryProtocol.MissionFinishes) };
+            var arr = o.Arr("waypoints");
+            if (arr.Count < 1 || arr.Count > Mission.MaxWaypoints) throw new ProtocolException(o.Path + ".waypoints: needs 1.." + Mission.MaxWaypoints + " items, got " + arr.Count);
+            for (int i = 0; i < arr.Count; i++)
+            {
+                var w = o.Child(arr[i], ".waypoints[" + i + "]");
+                w.Allow("n", "e", "alt", "speed", "holdS");
+                var wp = new Waypoint { n = w.Num("n"), e = w.Num("e"), alt = w.Num("alt"), speed = w.Num("speed") };
+                if (!(wp.speed > 0)) throw new ProtocolException(w.Path + ".speed: must be > 0");
+                if (w.Has("holdS")) wp.holdS = w.Num("holdS", 0, double.MaxValue);
+                m.waypoints.Add(wp);
+            }
+            return m;
         }
 
         // --------------------------------------------------------------------------------------------- shared defs
@@ -238,7 +362,7 @@ namespace WebGL.Telemetry
 
         static Provenance ProvenanceOf(Obj o)
         {
-            o.Allow("rpm", "motorTemp", "batteryTemp", "fcTemp", "batteryCurrent");
+            o.Allow("rpm", "motorTemp", "batteryTemp", "fcTemp", "batteryCurrent", "pose", "velocity", "gps", "esc");
             var p = new Provenance
             {
                 rpm = o.Enum("rpm", TelemetryProtocol.ProvenanceRpm),
@@ -247,6 +371,11 @@ namespace WebGL.Telemetry
                 fcTemp = o.Enum("fcTemp", TelemetryProtocol.ProvenanceFcTemp),
             };
             if (o.Has("batteryCurrent")) { p.batteryCurrent = o.Enum("batteryCurrent", TelemetryProtocol.ProvenanceCurrent); p.HasBatteryCurrent = true; }
+            // contract 1.2
+            if (o.Has("pose")) { p.pose = o.Enum("pose", TelemetryProtocol.ProvenanceState); p.HasPose = true; }
+            if (o.Has("velocity")) { p.velocity = o.Enum("velocity", TelemetryProtocol.ProvenanceState); p.HasVelocity = true; }
+            if (o.Has("gps")) { p.gps = o.Enum("gps", TelemetryProtocol.ProvenanceSensor); p.HasGps = true; }
+            if (o.Has("esc")) { p.esc = o.Enum("esc", TelemetryProtocol.ProvenanceSensor); p.HasEsc = true; }
             return p;
         }
 
@@ -392,6 +521,13 @@ namespace WebGL.Telemetry
                 if (d != Math.Floor(d)) throw new ProtocolException(Path + "." + key + ": not an integer");
                 if (d < min || d > max) throw new ProtocolException(Path + "." + key + ": " + d.ToString(CultureInfo.InvariantCulture) + " out of range");
                 return (int)d;
+            }
+
+            public string Pat(string key, Regex pattern)
+            {
+                string s = Str(key);
+                if (!pattern.IsMatch(s)) throw new ProtocolException(Path + "." + key + ": '" + s + "' does not match " + pattern);
+                return s;
             }
 
             public string Enum(string key, string[] values)

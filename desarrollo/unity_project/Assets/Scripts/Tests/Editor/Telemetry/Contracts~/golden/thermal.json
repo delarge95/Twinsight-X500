@@ -45,7 +45,10 @@
         "motorTemp": "estimated",
         "batteryTemp": "estimated",
         "fcTemp": "measured",
-        "batteryCurrent": "measured"
+        "batteryCurrent": "measured",
+        "pose": "estimated",
+        "velocity": "estimated",
+        "gps": "unavailable"
       },
       "out": ["measured", "estimated"]
     },
@@ -56,7 +59,10 @@
         "motorTemp": "estimated",
         "batteryTemp": "estimated",
         "fcTemp": "measured",
-        "batteryCurrent": "estimated"
+        "batteryCurrent": "estimated",
+        "pose": "estimated",
+        "velocity": "estimated",
+        "gps": "measured"
       },
       "out": ["measured", "estimated"]
     },

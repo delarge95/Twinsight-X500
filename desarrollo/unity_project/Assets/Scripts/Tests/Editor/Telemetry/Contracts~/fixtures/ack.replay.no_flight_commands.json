@@ -2,5 +2,6 @@
   "type": "ack",
   "command": "command",
   "ok": false,
-  "detail": "la repetición 24/7 no acepta comandos de vuelo; usa el modo SITL"
+  "detail": "la repetición 24/7 no acepta comandos de vuelo; usa el modo SITL",
+  "code": "replayReadOnly"
 }

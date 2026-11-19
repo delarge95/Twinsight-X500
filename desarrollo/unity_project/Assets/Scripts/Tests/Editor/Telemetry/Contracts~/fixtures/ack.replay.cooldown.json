@@ -1,1 +1,8 @@
-{ "type": "ack", "command": "inject", "ok": false, "detail": "demasiado rápido, espera un segundo" }
+{
+  "type": "ack",
+  "command": "inject",
+  "ok": false,
+  "detail": "demasiado rápido, espera un segundo",
+  "code": "cooldown",
+  "params": { "ms": 1500 }
+}

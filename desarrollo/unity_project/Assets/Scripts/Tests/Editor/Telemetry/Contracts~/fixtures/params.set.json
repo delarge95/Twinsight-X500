@@ -1,0 +1,5 @@
+{
+  "type": "params",
+  "ts": 1792195330180,
+  "params": [{ "id": "MPC_XY_VEL_MAX", "value": 8, "type": "real32" }]
+}

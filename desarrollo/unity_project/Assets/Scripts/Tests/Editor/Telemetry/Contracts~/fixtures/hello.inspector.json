@@ -16,7 +16,7 @@
   },
   "batteryCells": 4,
   "ambientC": 20,
-  "source": { "label": "Inspector (sin telemetría)" },
+  "source": { "label": "Inspector (sin telemetría)", "code": "inspector" },
   "commands": [],
   "serverTime": 0
 }
