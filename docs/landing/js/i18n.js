@@ -83,7 +83,7 @@ export const EN = {
   oa: 'Your turn.',
   byRole: 'Multimedia Engineer · real-time 3D. Open to remote roles.', byFolio: 'Portfolio',
   fLegal: 'Model derived from Holybro’s public CAD; not affiliated. Telemetry from a public PX4 Flight Review log.',
-  fOld: 'Previous landing',
+  fOld: 'Previous landing', fVers: 'Versions',
   rail_hero: 'Start', rail_pipeline: 'Pipeline', rail_explode: 'Taxonomy', rail_xray: 'X-ray', rail_thermal: 'Thermal',
   rail_flight: 'Telemetry', rail_connect: 'Connection', rail_apps: 'Apps', rail_evidence: 'Evidence', rail_engineering: 'Engineering', rail_docs: 'Docs', rail_outro: 'Contact',
   pzList: 'Drone parts', pzCard: 'Part information', pzHint: 'Pick a part from the list or tap it on the 3D model.', pzClear: 'Clear selection',
