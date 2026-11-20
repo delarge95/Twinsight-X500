@@ -406,7 +406,7 @@ namespace WebGL.Core.Managers
                 case QualityTier.Low: return 64;
                 case QualityTier.Medium: return 128;
                 case QualityTier.High: return 256;
-                default: return 512;
+                default: return 2048; // PLAN_PC 41: Ultra = the maximum cubemap of a reflection probe (was 512)
             }
         }
     }

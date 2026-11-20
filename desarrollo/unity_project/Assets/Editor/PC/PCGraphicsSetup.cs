@@ -51,14 +51,22 @@ namespace WebGL.Editor.PC
             public int aniso;
             public float lodBias;
             public int pixelLights;
+            // PLAN_PC 41: the rest of the quality switches (Ultra takes the engine maximum; the other levels keep what they had)
+            public int shMode;            // 1 per vertex, 3 per pixel
+            public bool probeBlend;       // reflection probe blending + box projection
+            public bool lodCrossFade;     // LOD cross-fade (URP asset and quality level)
+            public bool softParticles;
+            public int addShadowTierHigh; // additional lights: resolution of the "High" shadow tier
         }
 
+        // PLAN_PC 41: PC_Ultra = every value at the maximum the engine / URP of this project accepts (MSAA 8x, render scale 2.0, shadow map 8192 over 100 m, SH per pixel...).
+        // Low / Medium / High are exactly what they were.
         private static readonly Level[] Levels =
         {
-            new Level { name = "PC_Low",    hdr64 = false, msaa = 2, renderScale = 1.0f,  shadowRes = 1024, cascades = 1, shadowDistance = 20f, cascade4Split = new Vector3(0.067f, 0.2f, 0.467f), softShadows = false, softQuality = 1, addShadows = false, addShadowRes = 512,  lutSize = 32, mipLimit = 1, aniso = 1, lodBias = 1.0f, pixelLights = 2 },
-            new Level { name = "PC_Medium", hdr64 = false, msaa = 2, renderScale = 1.0f,  shadowRes = 2048, cascades = 2, shadowDistance = 30f, cascade4Split = new Vector3(0.067f, 0.2f, 0.467f), softShadows = true,  softQuality = 2, addShadows = false, addShadowRes = 1024, lutSize = 32, mipLimit = 0, aniso = 2, lodBias = 1.0f, pixelLights = 4 },
-            new Level { name = "PC_High",   hdr64 = false, msaa = 4, renderScale = 1.0f,  shadowRes = 2048, cascades = 4, shadowDistance = 35f, cascade4Split = new Vector3(0.08f, 0.22f, 0.5f),   softShadows = true,  softQuality = 3, addShadows = true,  addShadowRes = 1024, lutSize = 32, mipLimit = 0, aniso = 2, lodBias = 1.5f, pixelLights = 4 },
-            new Level { name = "PC_Ultra",  hdr64 = true,  msaa = 4, renderScale = 1.25f, shadowRes = 4096, cascades = 4, shadowDistance = 40f, cascade4Split = new Vector3(0.08f, 0.22f, 0.5f),   softShadows = true,  softQuality = 3, addShadows = true,  addShadowRes = 2048, lutSize = 64, mipLimit = 0, aniso = 2, lodBias = 2.0f, pixelLights = 6 },
+            new Level { name = "PC_Low",    hdr64 = false, msaa = 2, renderScale = 1.0f,  shadowRes = 1024, cascades = 1, shadowDistance = 20f, cascade4Split = new Vector3(0.067f, 0.2f, 0.467f), softShadows = false, softQuality = 1, addShadows = false, addShadowRes = 512,  lutSize = 32, mipLimit = 1, aniso = 1, lodBias = 1.0f, pixelLights = 2, shMode = 1, probeBlend = false, lodCrossFade = false, softParticles = false, addShadowTierHigh = 512 },
+            new Level { name = "PC_Medium", hdr64 = false, msaa = 2, renderScale = 1.0f,  shadowRes = 2048, cascades = 2, shadowDistance = 30f, cascade4Split = new Vector3(0.067f, 0.2f, 0.467f), softShadows = true,  softQuality = 2, addShadows = false, addShadowRes = 1024, lutSize = 32, mipLimit = 0, aniso = 2, lodBias = 1.0f, pixelLights = 4, shMode = 1, probeBlend = false, lodCrossFade = false, softParticles = false, addShadowTierHigh = 1024 },
+            new Level { name = "PC_High",   hdr64 = false, msaa = 4, renderScale = 1.0f,  shadowRes = 2048, cascades = 4, shadowDistance = 35f, cascade4Split = new Vector3(0.08f, 0.22f, 0.5f),   softShadows = true,  softQuality = 3, addShadows = true,  addShadowRes = 1024, lutSize = 32, mipLimit = 0, aniso = 2, lodBias = 1.5f, pixelLights = 4, shMode = 1, probeBlend = false, lodCrossFade = false, softParticles = false, addShadowTierHigh = 1024 },
+            new Level { name = "PC_Ultra",  hdr64 = true,  msaa = 8, renderScale = 2.0f,  shadowRes = 8192, cascades = 4, shadowDistance = 100f, cascade4Split = new Vector3(0.08f, 0.22f, 0.5f),   softShadows = true,  softQuality = 3, addShadows = true,  addShadowRes = 8192, lutSize = 65, mipLimit = 0, aniso = 2, lodBias = 4.0f, pixelLights = 8, shMode = 3, probeBlend = true,  lodCrossFade = true,  softParticles = true,  addShadowTierHigh = 4096 },
         };
 
         [MenuItem("TwinSight/PC/Build PC Graphics (fase 1)")]
@@ -216,10 +224,12 @@ namespace WebGL.Editor.PC
             so.FindProperty("m_AdditionalLightsShadowmapResolution").intValue = lv.addShadowRes;
             so.FindProperty("m_AdditionalLightsShadowResolutionTierLow").intValue = 512;
             so.FindProperty("m_AdditionalLightsShadowResolutionTierMedium").intValue = 1024;
-            so.FindProperty("m_AdditionalLightsShadowResolutionTierHigh").intValue = lv.addShadowRes;
+            so.FindProperty("m_AdditionalLightsShadowResolutionTierHigh").intValue = lv.addShadowTierHigh;
 
-            so.FindProperty("m_ReflectionProbeBlending").boolValue = false;
-            so.FindProperty("m_ReflectionProbeBoxProjection").boolValue = false;
+            so.FindProperty("m_ReflectionProbeBlending").boolValue = lv.probeBlend;
+            so.FindProperty("m_ReflectionProbeBoxProjection").boolValue = lv.probeBlend;
+            so.FindProperty("m_ShEvalMode").intValue = lv.shMode;
+            so.FindProperty("m_EnableLODCrossFade").boolValue = lv.lodCrossFade;
 
             so.FindProperty("m_ColorGradingMode").intValue = 1; // HDR
             so.FindProperty("m_ColorGradingLutSize").intValue = lv.lutSize;
@@ -270,6 +280,9 @@ namespace WebGL.Editor.PC
                 e.FindPropertyRelative("realtimeReflectionProbes").boolValue = true;
                 e.FindPropertyRelative("vSyncCount").intValue = 1;
                 e.FindPropertyRelative("lodBias").floatValue = lv.lodBias;
+                e.FindPropertyRelative("pixelLightCount").intValue = lv.pixelLights;
+                e.FindPropertyRelative("softParticles").boolValue = lv.softParticles;
+                e.FindPropertyRelative("enableLODCrossFade").boolValue = lv.lodCrossFade;
                 e.FindPropertyRelative("customRenderPipeline").objectReferenceValue = assets[i];
                 SetExcluded(e, AllPlatforms);
             }

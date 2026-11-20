@@ -70,7 +70,7 @@ namespace WebGL.UI.Panels
 #if UNITY_STANDALONE
             // PC (G12): rangos ampliados de los deslizadores (el UXML compartido con WebGL no cambia).
             if (_renderScaleSlider != null) _renderScaleSlider.highValue = RenderQualityController.PcMaxRenderScale;
-            if (_shadowDistanceSlider != null) _shadowDistanceSlider.highValue = 80f;
+            if (_shadowDistanceSlider != null) _shadowDistanceSlider.highValue = RenderQualityController.PcMaxShadowDistance; // PLAN_PC 41: Ultra reaches the PC maximum (100 m), the slider must too
 #endif
 
             _expanded = RenderQualityController.SavedTier != QualityTier.Auto;

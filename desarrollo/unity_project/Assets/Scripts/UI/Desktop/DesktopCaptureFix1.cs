@@ -87,6 +87,7 @@ namespace WebGL.UI.Desktop
             if (ui.IsOnboardingOpen) { UIManager.Instance.ShortcutBack(); yield return new WaitForSecondsRealtime(1f); }
             Log("window " + Screen.width + "x" + Screen.height + " lang " + Lang + " scale " + F2(UiScale()));
 
+            yield return Perf();
             yield return CutPart();
             yield return TogglePart();
             yield return EnvPart();
@@ -96,6 +97,25 @@ namespace WebGL.UI.Desktop
             Log("RESULT " + _pass + " pass, " + _fail + " fail");
             File.WriteAllText(Path.Combine(OutputDirectory, "fix1_" + _tag + ".log"), _log.ToString());
             Application.Quit();
+        }
+
+        /// <summary>Frame time of the drone seen three-quarters (PLAN_PC 41, Ultra at the maximum): average and worst over 4 s after 2 s of settling. Run with -vsync 0 -quality &lt;tier&gt;.</summary>
+        private IEnumerator Perf()
+        {
+            OrbitCameraController cam = OrbitCameraController.Instance;
+            cam.SetAngles(35f, 22f, true);
+            cam.SetDistance(3.2f, true);
+            yield return new WaitForSecondsRealtime(2f);
+            float acc = 0f, worst = 0f;
+            int n = 0;
+            float until = Time.realtimeSinceStartup + 4f;
+            while (Time.realtimeSinceStartup < until)
+            {
+                float dt = Time.unscaledDeltaTime;
+                acc += dt; n++; worst = Mathf.Max(worst, dt);
+                yield return null;
+            }
+            Log("perf: tier " + RenderQualityController.ResolvedTier + " " + Screen.width + "x" + Screen.height + " " + F2(1000f * acc / Mathf.Max(1, n)) + " ms avg, " + F2(n / acc) + " fps, " + F2(1000f * worst) + " ms worst, vsync " + QualitySettings.vSyncCount);
         }
 
         // ───────────────────────── 1. CUT ─────────────────────────
