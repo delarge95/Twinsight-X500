@@ -158,6 +158,7 @@ namespace WebGL.UI.Desktop
 
             // UX step 5: the long detail of each source moves behind an ⓘ next to its short badge (the badge, with the honesty label of the origin, stays visible);
             // the SITL note goes behind an ⓘ next to the URL label. The texts stay in the tree (hidden labels + the tooltip of the ⓘ).
+            DesktopInfo.Beside(_inspTitle, true, "DkInfoSrcInspector", _inspDetail);
             DesktopInfo.Beside(_repBadge, true, "DkInfoSrcReplay", _repDetail);
             DesktopInfo.Beside(_simSub, true, "DkInfoSrcSim", _simDetail);
             DesktopInfo.Beside(_sitlBadge, true, "DkInfoSrcSitl", _sitlDetail);

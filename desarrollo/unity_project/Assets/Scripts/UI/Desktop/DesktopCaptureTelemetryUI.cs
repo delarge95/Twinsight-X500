@@ -183,7 +183,7 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(0.8f);
             Check("source popover open with four rows", Tel.OpenPopover == "source" && Root.Q<VisualElement>("DkPopSource") != null);
             Button sim = B("DkSrcSim");
-            Check("flight simulator row is enabled (E-5) and its tooltip is the honest detail, never SITL", sim != null && !sim.ClassListContains("dk-src-row--disabled") && labels.TrySimText("detail", lang, out string simHonest) && sim.tooltip.StartsWith(TelemetryStrings.ForDesktop(simHonest, lang)) && !sim.tooltip.ToUpperInvariant().Contains("SITL"));
+            Check("flight simulator row is enabled (E-5) and its tooltip is the honest detail, never SITL", sim != null && !sim.ClassListContains("dk-src-row--disabled") && labels.TrySimText("detail", lang, out string simHonest) && Root.Q<Button>("DkInfoSrcSim").tooltip.StartsWith(TelemetryStrings.ForDesktop(simHonest, lang)) && !Root.Q<Button>("DkInfoSrcSim").tooltip.ToUpperInvariant().Contains("SITL"));
             Check("replay row is the active one", B("DkSrcReplay").ClassListContains("dk-src-row--on"));
             string badge = Root.Q<VisualElement>("DkSrcReplay").Q<Label>(className: "dk-src-badge").text;
             Check("replay row badge is the approved text", labels.TryLocalReplayText(lang, out string ap2) && badge == ap2);

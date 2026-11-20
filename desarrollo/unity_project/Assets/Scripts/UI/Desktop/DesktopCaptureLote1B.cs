@@ -281,6 +281,8 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(0.5f);
 
             Log("── battery (tool 8) ──");
+            tel.OpenFlightAdvanced(true); // the battery health and its chart live in the «Avanzado» fold of the Flight tab
+            yield return new WaitForSecondsRealtime(0.8f);
             BatteryReport b = tel.BatteryReportNow;
             Log("battery: accepted pairs " + b.quality + ", R " + (b.rHat.HasValue ? F1(b.rHat.Value * 1000) + " mOhm" : "calculating") + ", sag " + (b.dropV.HasValue ? F2(b.dropV.Value) : "-") + " V, rest " + (b.restV.HasValue ? F2(b.restV.Value) : "-") + " V, slope time " + (b.bySlopeS.HasValue ? F1(b.bySlopeS.Value) : "-") + " s, current time " + (b.byCurrentS.HasValue ? F1(b.byCurrentS.Value) : "-") + " s, samples " + tel.BatteryState.samples.Count);
             foreach (string id in new[] { "r", "drop", "rest", "time", "timeI" }) Log("row " + id + ": " + tel.BatteryRowText(id));
@@ -325,6 +327,7 @@ namespace WebGL.UI.Desktop
 
             // the real flight: 20 s of it for the estimator
             tel.ShowFlightTab(true);
+            tel.OpenFlightAdvanced(true);
             yield return new WaitForSecondsRealtime(20f);
             BatteryReport b = tel.BatteryReportNow;
             Log("replay battery: accepted pairs " + b.quality + ", R " + (b.rHat.HasValue ? F1(b.rHat.Value * 1000) + " mOhm (the whole TWF gives 82 mOhm in the web golden)" : "calculating") + ", samples " + tel.BatteryState.samples.Count);

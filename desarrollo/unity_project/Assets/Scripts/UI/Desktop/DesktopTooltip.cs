@@ -238,18 +238,35 @@ namespace WebGL.UI.Desktop
             _tip.style.visibility = Visibility.Hidden;
 
             // Position after layout so the tooltip's own size is known.
-            _tip.schedule.Execute(() => Place(host)).StartingIn(0);
+            _tip.schedule.Execute(() => Place(host, 0)).StartingIn(0);
         }
 
-        private void Place(VisualElement host)
+        /// <summary>The window in panel units: the logical size the UI scaler computed (the root element reports no layout of its own).</summary>
+        internal static Rect WindowRect(VisualElement root)
+        {
+            Vector2 s = DesktopUIController.Instance != null ? DesktopUIController.Instance.LogicalSize : Vector2.zero;
+            if (s.x > 1f && s.y > 1f) return new Rect(0f, 0f, s.x, s.y);
+            Rect r = root.worldBound;
+            return r.width > 1f ? r : new Rect(0f, 0f, Screen.width, Screen.height);
+        }
+
+        private void Place(VisualElement host, int attempt)
         {
             if (host == null || host.panel == null)
             {
                 return;
             }
 
+            // a text that wraps has no size until the layout pass after display:flex: wait for it (up to ~100 ms) instead of placing a 160x40 guess
+            if ((float.IsNaN(_tip.resolvedStyle.width) || _tip.resolvedStyle.width <= 0f) && attempt < 6)
+            {
+                _tip.schedule.Execute(() => Place(host, attempt + 1)).StartingIn(16);
+                return;
+            }
+
             Rect hostRect = host.worldBound;
-            Rect panelRect = _root.worldBound;
+            // the root element may have no layout of its own yet (width 0 pinned every tooltip to the top-left corner): the panel's visual tree is the window
+            Rect panelRect = WindowRect(_root);
             float w = _tip.resolvedStyle.width;
             float h = _tip.resolvedStyle.height;
             if (float.IsNaN(w) || w <= 0f)

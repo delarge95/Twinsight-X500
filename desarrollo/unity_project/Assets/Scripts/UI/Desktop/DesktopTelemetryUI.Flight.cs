@@ -227,6 +227,9 @@ namespace WebGL.UI.Desktop
             _flightPanel.Add(_flBody);
         }
 
+        /// <summary>Verification: opens or closes the «Avanzado» fold of the Flight tab (without remembering the choice).</summary>
+        public void OpenFlightAdvanced(bool open) => _flAdv?.SetOpen(open);
+
         private void DisposeFlightTab()
         {
             DisposeAnalysisTab();

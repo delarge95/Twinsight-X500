@@ -2579,10 +2579,11 @@
 /* ── ⓘ and «Avanzado» fold (PLAN_PC 39, UX step 4) ── */
 .dk-inforow { flex-direction: row; align-items: center; flex-shrink: 0; margin: 0 0 2px 0; }
 .dk-inforow > .dk-field-label, .dk-inforow > .dk-note, .dk-inforow > .dk-src-badge { flex-shrink: 1; margin: 0 4px 0 0; }
-.dk-info { flex-shrink: 0; margin: 0 0 0 2px; }
+.dk-ibtn.dk-info { width: 24px; height: 24px; min-width: 24px; min-height: 24px; padding: 0; flex-shrink: 0; margin: 0 0 0 2px; border-radius: 12px; }
 .dk-info .dk-icon { color: rgb(139, 149, 163); }
 .dk-info:hover .dk-icon, .dk-info:focus .dk-icon { color: rgb(255, 255, 255); }
-.dk-fold { margin: 4px 0 0 0; flex-shrink: 0; }
+.dk-fold { margin: 2px 0 0 0; flex-shrink: 0; }
+.dk-pop .dk-fold-head { height: 22px; }
 .dk-fold-head { flex-direction: row; align-items: center; justify-content: flex-start; height: 24px; margin: 0; padding: 0 6px 0 2px; border-width: 1px; border-color: rgba(0, 0, 0, 0); border-radius: 12px; background-color: rgba(0, 0, 0, 0); }
 .dk-fold-head:hover { background-color: rgb(27, 32, 41); }
 .dk-fold-chev { margin: 0 4px 0 0; color: rgb(139, 149, 163); }

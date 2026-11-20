@@ -61,7 +61,11 @@ namespace WebGL.UI.Desktop
         {
             for (VisualElement p = e; p != null; p = p.parent)
             {
-                if (p.resolvedStyle.display == DisplayStyle.None) return false;
+                if (p.resolvedStyle.display == DisplayStyle.None)
+                {
+                    if (p.parent is DesktopFold fold && fold.Body == p) continue; // closed «Avanzado» fold: shown once the user opens it (checked apart)
+                    return false;
+                }
                 if (p.name == "DkTelemetry") break;
             }
             return true;
@@ -268,6 +272,9 @@ namespace WebGL.UI.Desktop
                 if (should && b != null) Check(label + ": " + Names[id] + " is shown", Visible(b));
             }
             Check(label + ": the Telemetry mode is open", Tel.ModeOpen);
+            var where = TelemetryMenu.AvailableIn(expected);
+            Check(label + ": the «Disponible en» line " + (where.Count == 0 ? "is hidden (nothing missing)" : "shows (" + Tel.AvailText + ") with its ⓘ"),
+                where.Count == 0 ? !Shown(Tel.AvailRow) : Shown(Tel.AvailRow) && !string.IsNullOrEmpty(Tel.AvailText) && !string.IsNullOrEmpty(Tel.AvailInfoText));
 
             // the record switch lives in the popover of «Grabar»
             Tel.TogglePopover("record");

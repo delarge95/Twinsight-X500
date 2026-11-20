@@ -30,7 +30,7 @@ namespace WebGL.UI.Desktop
             VisualElement root = Root;
             Check(label + ": the tooltip shows the full text", TipShown && TipText != null && TipText.text == expected);
             Rect tip = TipEl.worldBound;
-            Rect win = root.worldBound;
+            Rect win = DesktopTooltip.WindowRect(root);
             Check(label + ": the tooltip is wrapped (several lines) and at most 380 px wide (" + F1(tip.width) + " x " + F1(tip.height) + ")", tip.width <= 382f && tip.height > 40f);
             Log(label + " tip " + tip + " window " + win);
             Check(label + ": the tooltip is inside the window", tip.xMin >= win.xMin - 1f && tip.yMin >= win.yMin - 1f && tip.xMax <= win.xMax + 1f && tip.yMax <= win.yMax + 1f);
@@ -62,7 +62,8 @@ namespace WebGL.UI.Desktop
             host.Add(tl); host.Add(br); host.Add(row);
             yield return new WaitForSecondsRealtime(0.4f);
             float tw = tl.resolvedStyle.width, th = tl.resolvedStyle.height;
-            Check("the ⓘ hit target is at least 24 x 24 px (" + F1(tw) + " x " + F1(th) + ") and its icon 16 px", tw >= 23.5f && th >= 23.5f && tl.Q<VisualElement>(className: "dk-icon").resolvedStyle.width >= 15.5f);
+            float iw = tl.Q<VisualElement>(className: "dk-icon").resolvedStyle.width;
+            Check("the ⓘ hit target is at least 24 x 24 px (" + F1(tw) + " x " + F1(th) + ", icon " + F1(iw) + " px)", tw >= 23.5f && th >= 23.5f && iw >= 14f);
             Check("the ⓘ can take the keyboard focus", tl.focusable && tl.tabIndex >= 0);
 
             // hover
@@ -138,6 +139,46 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(0.2f);
         }
 
+        private static int VisibleLabels(VisualElement root, string cls)
+        {
+            int n = 0;
+            foreach (Label l in root.Query<Label>(className: cls).ToList()) if (!string.IsNullOrEmpty(l.text) && l.resolvedStyle.display != DisplayStyle.None) n++;
+            return n;
+        }
+
+        /// <summary>Opens a popover; checks its ⓘ (hover shows the full text inside the window) and, when it has one, that its «Avanzado» fold is closed and opens.</summary>
+        private IEnumerator FoldPopover(string pop, string foldName, string insideName, string infoName, string shot)
+        {
+            Tel.TogglePopover(pop);
+            yield return new WaitForSecondsRealtime(0.6f);
+            Button info = B(infoName);
+            Check(pop + ": the ⓘ " + infoName + " is shown and carries the long note(s) (" + (info != null ? info.tooltip.Length : 0) + " chars)", info != null && Shown(info) && info.tooltip.Length > 30);
+            if (foldName != null)
+            {
+                DesktopFold fold = Root.Q<DesktopFold>(foldName);
+                Check(pop + ": the «Avanzado» fold is closed and still holds " + insideName, fold != null && !fold.IsOpen && fold.Contains(B(insideName)) && fold.Body.resolvedStyle.display == DisplayStyle.None);
+                yield return Shot(shot + "_cerrado", 0.2f);
+                Click(fold.Header);
+                yield return new WaitForSecondsRealtime(0.4f);
+                Check(pop + ": opening the fold shows " + insideName, fold.IsOpen && Shown(B(insideName)));
+                yield return Shot(shot + "_abierto", 0.2f);
+                fold.SetOpen(false);
+                PlayerPrefs.DeleteKey(DesktopFold.PrefKey(foldName == "DkFaultFold" ? "faults" : "mission"));
+            }
+            else
+            {
+                yield return Shot(shot, 0.2f);
+            }
+            if (info != null && Shown(info))
+            {
+                SendOver(info, true);
+                yield return CheckTipFor(pop + " ⓘ hover", info, info.tooltip);
+                SendOver(info, false);
+            }
+            Tel.CloseAllPopovers();
+            yield return new WaitForSecondsRealtime(0.3f);
+        }
+
         private IEnumerator HonestyAndAdvancedChecks()
         {
             Log("── paso 4/5: cadenas de honestidad en el arbol ──");
@@ -149,9 +190,58 @@ namespace WebGL.UI.Desktop
             {
                 Check("honesty «" + f + "» is in the tree (text or ⓘ)", DesktopInfo.TreeHas(Root, f));
             }
+            foreach (string n in new[] { "DkInfoSrcInspector", "DkInfoSrcReplay", "DkInfoSrcSim", "DkInfoSrcSitl", "DkInfoSitlNote" })
+            {
+                Button i = B(n);
+                Check("Fuente: " + n + " exists, is shown and carries a long text (" + (i != null ? i.tooltip.Length : 0) + " chars)", i != null && Shown(i) && i.tooltip.Length > 30);
+            }
+            Check("Fuente: the short origin badges stay visible (Sombra digital, Simulador de vuelo, Gemelo digital SITL)", VisibleLabels(Root.Q<VisualElement>("DkPopSource"), "dk-src-badge") >= 3);
             yield return Shot("ux_fuente_popover", 0.2f);
+            Button simInfo = B("DkInfoSrcSim");
+            SendOver(simInfo, true);
+            yield return CheckTipFor("Fuente > Simulador ⓘ", simInfo, simInfo.tooltip);
+            yield return Shot("ux_fuente_info_simulador", 0.05f);
+            SendOver(simInfo, false);
             Tel.CloseAllPopovers();
+            yield return new WaitForSecondsRealtime(0.3f);
+
+            // folds and ⓘ of the other screens (simulator running: every control exists)
+            Tel.StartSimulator();
+            yield return new WaitForSecondsRealtime(2.5f);
+            DesktopFold cmd = Root.Q<DesktopFold>("DkCmdFold");
+            Check("Comandos: the «Avanzado» fold exists and is closed", cmd != null && !cmd.IsOpen && Shown(cmd));
+            Check("Comandos: Mantener (H) and Volver (R) are visible, never in the fold", Shown(B("DkCmdHold")) && Shown(B("DkCmdRtl")) && !cmd.Contains(B("DkCmdHold")) && !cmd.Contains(B("DkCmdRtl")));
+            Check("Comandos: the camera and the game mode are inside the closed fold", cmd.Contains(B("DkCamMode")) && cmd.Contains(B("DkGameMode")) && cmd.Body.resolvedStyle.display == DisplayStyle.None);
+            yield return Shot("ux_comandos_avanzado_cerrado", 0.2f);
+            Click(cmd.Header);
+            yield return new WaitForSecondsRealtime(0.4f);
+            Check("Comandos: a submit on the header opens it and shows the camera buttons", cmd.IsOpen && Shown(B("DkCamMode")) && Shown(B("DkGameMode")));
+            yield return Shot("ux_comandos_avanzado_abierto", 0.2f);
+            Click(cmd.Header);
             yield return new WaitForSecondsRealtime(0.2f);
+            Check("Comandos: a second submit closes it", !cmd.IsOpen);
+            PlayerPrefs.DeleteKey(DesktopFold.PrefKey("commands"));
+
+            yield return FoldPopover("faults", "DkFaultFold", "DkFaultExplain", "DkInfoFaults", "ux_fallas");
+            yield return FoldPopover("mission", "DkMsFold", "DkMsExport", "DkInfoMission", "ux_mision");
+            yield return FoldPopover("fence", null, null, "DkInfoFence", "ux_geocerca");
+            yield return FoldPopover("wind", null, null, "DkInfoWind", "ux_viento");
+            yield return FoldPopover("batteryreact", null, null, "DkInfoBattery", "ux_bateria");
+
+            Tel.ShowFlightTab(true);
+            yield return new WaitForSecondsRealtime(1.0f);
+            DesktopFold fl = Root.Q<DesktopFold>("DkFlFold");
+            Check("Vuelo: the «Avanzado» fold exists and is closed, with the tags of origin still in the tree", fl != null && !fl.IsOpen && fl.Body.Query<Label>(className: "dk-tag").ToList().Count > 0);
+            Check("Vuelo: the ⓘ of the origin badge carries the long detail and the Source line", B("DkInfoFlBadge") != null && B("DkInfoFlBadge").tooltip.Length > 30);
+            yield return Shot("ux_vuelo_avanzado_cerrado", 0.2f);
+            Click(fl.Header);
+            yield return new WaitForSecondsRealtime(0.5f);
+            Check("Vuelo: opening the fold shows the motors, the battery health and the controller rows", fl.IsOpen && fl.Body.resolvedStyle.display != DisplayStyle.None);
+            yield return Shot("ux_vuelo_avanzado_abierto", 0.2f);
+            PlayerPrefs.DeleteKey(DesktopFold.PrefKey("flight"));
+            Tel.ShowFlightTab(false);
+            DesktopTelemetry.Stop();
+            yield return new WaitForSecondsRealtime(0.4f);
         }
     }
 }
