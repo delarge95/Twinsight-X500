@@ -19,7 +19,7 @@ namespace WebGL.UI.Desktop
     /// that what is hidden cannot be clicked or focused, that every shown button fits in the window and that the pad still has a valid first focus.
     /// One PNG per source (tag = WxH_lang) and PASS / FAIL lines.
     /// </summary>
-    internal sealed class DesktopCaptureUx : MonoBehaviour
+    internal sealed partial class DesktopCaptureUx : MonoBehaviour
     {
         public string OutputDirectory;
         private int _fail, _pass, _blackShots;
@@ -155,6 +155,8 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(0.4f);
 
             yield return InspectAndPowerChecks();
+            yield return InfoAndFoldChecks();
+            yield return HonestyAndAdvancedChecks();
 
             Log("black captures: " + _blackShots);
             Check("no capture came out black", _blackShots == 0);

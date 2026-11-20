@@ -303,6 +303,7 @@ namespace WebGL.UI.Desktop
                     DispatchedNavEvents++;
                     break;
                 case PadAction.Cancel:
+                    if (focused != null && DesktopFold.TryCloseFor(focused)) { DispatchedNavEvents++; break; } // B inside an open «Avanzado» fold closes the fold first
                     UIManager.Instance?.ShortcutBack();
                     DispatchedNavEvents++;
                     break;

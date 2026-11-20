@@ -68,6 +68,10 @@ namespace WebGL.UI.Desktop
             root.RegisterCallback<PointerOutEvent>(OnOut, TrickleDown.TrickleDown);
             root.RegisterCallback<PointerDownEvent>(OnDown, TrickleDown.TrickleDown);
             root.RegisterCallback<WheelEvent>(OnWheel, TrickleDown.TrickleDown);
+            root.RegisterCallback<FocusInEvent>(OnFocusIn, TrickleDown.TrickleDown);
+            root.RegisterCallback<FocusOutEvent>(OnFocusOut, TrickleDown.TrickleDown);
+            root.RegisterCallback<ClickEvent>(OnClick, TrickleDown.TrickleDown);
+            root.RegisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
         }
 
         public void Dispose()
@@ -76,6 +80,10 @@ namespace WebGL.UI.Desktop
             _root.UnregisterCallback<PointerOutEvent>(OnOut, TrickleDown.TrickleDown);
             _root.UnregisterCallback<PointerDownEvent>(OnDown, TrickleDown.TrickleDown);
             _root.UnregisterCallback<WheelEvent>(OnWheel, TrickleDown.TrickleDown);
+            _root.UnregisterCallback<FocusInEvent>(OnFocusIn, TrickleDown.TrickleDown);
+            _root.UnregisterCallback<FocusOutEvent>(OnFocusOut, TrickleDown.TrickleDown);
+            _root.UnregisterCallback<ClickEvent>(OnClick, TrickleDown.TrickleDown);
+            _root.UnregisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
             _pending?.Pause();
             _tip.RemoveFromHierarchy();
         }
@@ -136,6 +144,39 @@ namespace WebGL.UI.Desktop
         private void OnWheel(WheelEvent evt)
         {
             Hide();
+        }
+
+        // Keyboard / pad focus (PLAN_PC 39): an ⓘ shows its text as soon as it gets the focus, whatever moved it there; any other element with a tooltip shows
+        // it only when the focus came from navigation (Tab, arrows, the pad's stick in the Menus mode), never from a mouse press or a programmatic Focus().
+        private void OnFocusIn(FocusInEvent evt)
+        {
+            if (!(evt.target is VisualElement target)) return;
+            VisualElement host = FindTooltipHost(target);
+            if (host == null) { Hide(); return; }
+            if (!DesktopInfo.IsInfo(host) && evt.direction == FocusChangeDirection.unspecified) return;
+            Hide();
+            _hovered = host;
+            ShowFor(host);
+        }
+
+        private void OnFocusOut(FocusOutEvent evt)
+        {
+            if (_hovered != null && evt.target is VisualElement t && (t == _hovered || _hovered.Contains(t)))
+            {
+                Hide();
+                _hovered = null;
+            }
+        }
+
+        // A click or a submit (Enter, Space, the pad's A) on an ⓘ shows its text at once.
+        private void OnClick(ClickEvent evt)
+        {
+            if (evt.target is VisualElement target && FindTooltipHost(target) is VisualElement host && DesktopInfo.IsInfo(host)) ShowFor(host);
+        }
+
+        private void OnKeyDown(KeyDownEvent evt)
+        {
+            if (evt.keyCode == KeyCode.Escape && _tip.resolvedStyle.display != DisplayStyle.None) Hide();
         }
 
         public void Hide()
