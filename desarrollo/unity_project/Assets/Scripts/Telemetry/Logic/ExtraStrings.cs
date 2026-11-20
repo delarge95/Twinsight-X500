@@ -17,6 +17,7 @@ namespace WebGL.Telemetry
             AddCourse(d);
             AddDesktop(d);
             AddMvp(d);
+            AddUx(d);
             return d;
         }
 
@@ -29,6 +30,8 @@ namespace WebGL.Telemetry
         static partial void AddDesktop(Dictionary<string, string[]> d);
         // MVP priorities (camera while piloting, active-effect chips, thermal field, battery): ExtraStrings.Mvp.cs
         static partial void AddMvp(Dictionary<string, string[]> d);
+        // desktop UX cut (the «Avanzado» fold, «Disponible en»): ExtraStrings.Ux.cs
+        static partial void AddUx(Dictionary<string, string[]> d);
 
         public static bool TryGet(string key, out string[] v) => Table.TryGetValue(key, out v);
 

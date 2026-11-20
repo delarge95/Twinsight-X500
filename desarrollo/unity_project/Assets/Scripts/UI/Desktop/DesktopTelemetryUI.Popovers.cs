@@ -37,6 +37,7 @@ namespace WebGL.UI.Desktop
         private readonly Button[] _kindBtns = new Button[4];
         private Button _faultClear, _faultExplain;
         private VisualElement _faultFoot;
+        private DesktopFold _faultFold;
         private VisualElement _faultControls;
         private VisualElement _faultActiveList;
         private readonly List<Label> _faultActiveRows = new List<Label>();
@@ -244,13 +245,21 @@ namespace WebGL.UI.Desktop
             _faultClear.AddToClassList("dk-b");
             _faultClear.AddToClassList("dk-b--ghost");
             _faultClear.AddToClassList("dk-fault-footbtn");
-            _faultFoot.Add(_faultClear);
             _faultExplain = new Button(() => ShowFaultExplanation(_fxTopic, _faultMotor, null)) { name = "DkFaultExplain" };
             _faultExplain.AddToClassList("dk-b");
             _faultExplain.AddToClassList("dk-b--secondary");
             _faultExplain.AddToClassList("dk-fault-footbtn");
-            _faultFoot.Add(_faultExplain);
             _popFaults.Add(_faultFoot);
+            // UX step 5: «Limpiar» and «Explicación» go in the «Avanzado» fold (closed); the long notes of the simulator / SITL controls go behind an ⓘ in the title row.
+            // The ack line stays in the foot (a live reply of the source: it must stay visible).
+            _faultFold = new DesktopFold("faults", "DkFaultFold");
+            var advRow = new VisualElement();
+            advRow.AddToClassList("dk-fault-foot");
+            advRow.Add(_faultClear);
+            advRow.Add(_faultExplain);
+            _faultFold.Body.Add(advRow);
+            _popFaults.Add(_faultFold);
+            DesktopInfo.Beside(_flTitle, false, "DkInfoFaults", _sfNote, _sfCompNote, _sbNote);
             RefreshMotorButtons();
         }
 
@@ -329,6 +338,7 @@ namespace WebGL.UI.Desktop
             RelabelSimFaults();
             RelabelSitlFaults();
             _faultExplain.text = T("fx.open");
+            _faultFold?.SetTitle(T("ux.advanced"));
             _faultMotorLabel.text = T("faults.motor");
             _faultActiveTitle.text = T("faults.active");
             _faultClear.text = T("faults.clear");
