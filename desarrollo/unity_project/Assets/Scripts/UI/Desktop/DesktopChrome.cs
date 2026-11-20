@@ -646,7 +646,66 @@ namespace WebGL.UI.Desktop
                 SetStudioSection("render");
             }
 
+            ReshapeInspectCards(); // PLAN_PC 38 (paso 3): INSPECT = Pins, Isolate, Frame; the simulated power goes to Studio > Render
+
             // Tool strip tags: icons are the existing procedural ones; keep them small via USS.
+        }
+
+        private Label _frameCardLabel;
+        private Button _frameCard;
+
+        /// <summary>
+        /// PLAN_PC 38 (paso 3), PC only (the shared UXML and InspectModeHandler are untouched, so WebGL does not change): the third card of INSPECT, «Energía», becomes
+        /// «Enfocar» (the same action as F and the footer button of the inspector: <see cref="UIManager.ShortcutFocusSelection"/>), and the simulated power (the
+        /// switch card with its load slider panel) moves into Studio > Render, next to the thermal view. The elements are MOVED, not copied: InspectModeHandler
+        /// keeps its references and its logic (switch, load slider, state label), and the power chip of the top bar keeps working.
+        /// </summary>
+        private void ReshapeInspectCards()
+        {
+            Button power = _root.Q<Button>("ToolPowerBtn");
+            VisualElement panel = _root.Q<VisualElement>("ToolPowerLoadPanel");
+            VisualElement grid = power?.parent;
+            if (power == null || grid == null) return;
+
+            // 1) the new third card of INSPECT
+            _frameCard = new Button(() => _ui.ShortcutFocusSelection()) { name = "ToolFrameBtn" };
+            foreach (string c in power.GetClasses()) if (c != "submenu-card--active") _frameCard.AddToClassList(c);
+            var icon = new OutlineIcon { pickingMode = PickingMode.Ignore };
+            icon.AddToClassList("submenu-icon");
+            icon.SetShape("focus");
+            _frameCard.Add(icon);
+            _frameCardLabel = new Label { name = "ToolFrameLabel", pickingMode = PickingMode.Ignore };
+            _frameCardLabel.AddToClassList("submenu-label");
+            _frameCard.Add(_frameCardLabel);
+            grid.Insert(grid.IndexOf(power), _frameCard);
+
+            // 2) the simulated power, next to the render modes (the thermal view lives there)
+            VisualElement shaderMenu = _root.Q<VisualElement>("ShaderMenu");
+            if (_studioPanel == null || shaderMenu == null) { grid.Add(power); return; } // no Studio panel (diagnostics): the card stays in INSPECT
+            var block = new VisualElement { name = "DkPowerBlock" };
+            block.AddToClassList("dk-power-block");
+            var row = new VisualElement { name = "DkPowerRow" };
+            row.AddToClassList("submenu-grid");
+            row.Add(power);
+            block.Add(row);
+            if (panel != null)
+            {
+                panel.RemoveFromClassList("dk-pop"); // it was a popover of INSPECT; here it is a row of the Render popover
+                block.Add(panel);
+            }
+            _studioPanel.Insert(_studioPanel.IndexOf(shaderMenu) + 1, block);
+            // the state and value labels keep the size of the other rows of the popover (the shared UXML sizes them for the old INSPECT panel)
+            Label state = _root.Q<Label>("ToolPowerStateLabel");
+            if (state != null) { state.style.fontSize = 12; state.style.letterSpacing = 0; state.style.unityFontStyleAndWeight = FontStyle.Normal; }
+            Label value = _root.Q<Label>("ToolPowerLoadValue");
+            if (value != null) value.style.fontSize = 12;
+        }
+
+        private void RelabelFrameCard()
+        {
+            if (_frameCard == null) return;
+            _frameCardLabel.text = T("Focus", "Enfocar");
+            _frameCard.tooltip = T("Focus the selected part (no selection: reset the view)", "Enfocar la pieza seleccionada (sin selección: restablecer la vista)");
         }
 
         private static void ClearInlineStyles(VisualElement e)
@@ -1108,6 +1167,7 @@ namespace WebGL.UI.Desktop
             if (fl != null) fl.text = T("Focus", "Enfocar");
             var il = _root.Q<Label>("DkIsolateLabel");
             if (il != null) il.text = T("Isolate", "Aislar");
+            RelabelFrameCard();
             _btnPins.tooltip = T("Pins", "Puntos");
             _fx?.Relabel();
             _btnIso.tooltip = T("Isolate selected part", "Aislar la pieza seleccionada");
@@ -1119,7 +1179,7 @@ namespace WebGL.UI.Desktop
             _railTree.tooltip = T("Parts tree", "Árbol de piezas");
             _railSearch.tooltip = T("Search part", "Buscar pieza");
             _railInspector.tooltip = T("Part inspector", "Inspector de pieza");
-            _modeSeg[0].tooltip = T("Inspect: pins, isolate, simulated power", "Inspeccionar: puntos, aislar, energía simulada");
+            _modeSeg[0].tooltip = T("Inspect: pins, isolate, focus", "Inspeccionar: puntos, aislar, enfocar");
             _modeSeg[3].tooltip = T("Telemetry: power, source, alerts and faults", "Telemetría: encendido, fuente, alertas y fallas");
             _modeSeg[1].tooltip = T("Analyze: cut, explode, filter", "Analizar: corte, explosión, filtro");
             _modeSeg[2].tooltip = T("Studio: render and environment", "Estudio: render y entorno");

@@ -183,8 +183,11 @@ namespace WebGL.UI.Desktop
             CrossSectionManager.Instance.EnableCrossSection(); yield return new WaitForSecondsRealtime(0.6f); yield return Probe("08 cut on");
             Click(B("DkChipCut")); yield return new WaitForSecondsRealtime(0.6f);
 
+            // PLAN_PC 38 (paso 3): the simulated power card lives in Studio > Render now (INSPECT has Pins, Isolate and Focus)
+            Click(B("DkMode3")); yield return new WaitForSecondsRealtime(0.8f);
             Click(B("ToolPowerBtn")); yield return new WaitForSecondsRealtime(3f); yield return Probe("09 manual power on (hover bob)", shot: true);
             Click(B("DkChipPower")); yield return new WaitForSecondsRealtime(2f); yield return Probe("09 manual power off");
+            Click(B("DkMode3")); yield return new WaitForSecondsRealtime(0.6f);
 
             // telemetry: replay
             Tel.OpenMode(); yield return new WaitForSecondsRealtime(0.6f); yield return Probe("10 mode 4 strip, no session");

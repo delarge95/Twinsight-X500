@@ -24,6 +24,7 @@ namespace WebGL.UI.Desktop
             { "ModeStudioBtn", "3" },
             { "ToolHotspotBtn", "H" },
             { "ToolIsolateBtn", "I" },
+            { "ToolFrameBtn", "F" },
             { "AnalyzeExplodeBtn", "E" },
             { "ResetViewBtn", "R|Home" },
             { "SheetCloseBtn", "Esc" },

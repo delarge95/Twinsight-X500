@@ -205,7 +205,7 @@ namespace WebGL.UI.Desktop
             Step("chip filter appears", Chip("DkChipFilter"));
             Click(B("DkChipFilter")); yield return new WaitForSecondsRealtime(0.8f);
             Step("chip filter clears the filter", !ui.FilterActive);
-            Click(B("DkMode1")); yield return new WaitForSecondsRealtime(0.6f);
+            Click(B("DkMode3")); yield return new WaitForSecondsRealtime(0.6f); // PLAN_PC 38: the simulated power card is in Studio > Render now
             Click(B("ToolPowerBtn")); yield return new WaitForSecondsRealtime(2.5f);
             Step("chip power (manual simulated power) appears", Chip("DkChipPower"));
             yield return Shot("06_chip_energia", 0.3f);

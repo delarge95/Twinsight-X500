@@ -733,6 +733,7 @@ namespace WebGL.Core.Managers
                 || IsScreenPositionOverNamedElement("ToolHotspotBtn", screenPos)
                 || IsScreenPositionOverNamedElement("ToolIsolateBtn", screenPos)
                 || IsScreenPositionOverNamedElement("ToolPowerBtn", screenPos)
+                || IsScreenPositionOverNamedElement("ToolFrameBtn", screenPos) // desktop: the third card of INSPECT (DesktopChrome.ReshapeInspectCards)
                 || IsScreenPositionOverNamedElement("AnalyzeCrossSectionBtn", screenPos)
                 || IsScreenPositionOverNamedElement("AnalyzeExplodeBtn", screenPos)
                 || IsScreenPositionOverNamedElement("AnalyzeFilterBtn", screenPos)
@@ -793,6 +794,7 @@ namespace WebGL.Core.Managers
                 "ToolHotspotBtn",
                 "ToolIsolateBtn",
                 "ToolPowerBtn",
+                "ToolFrameBtn",
                 "AnalyzeCrossSectionBtn",
                 "AnalyzeExplodeBtn",
                 "AnalyzeFilterBtn",

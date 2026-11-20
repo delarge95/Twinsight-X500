@@ -146,7 +146,7 @@ namespace WebGL.UI.Desktop
             VisualElement left = NewColumn(columns);
             left.AddToClassList("desktop-help-column--narrow");
             AddSection(left, T("MODES", "MODOS"));
-            AddRow(left, new[] { "1" }, T("Inspect (pins, isolate, simulated power)", "Inspeccionar (puntos, aislar, energía simulada)"));
+            AddRow(left, new[] { "1" }, T("Inspect (pins, isolate, focus)", "Inspeccionar (puntos, aislar, enfocar)"));
             AddRow(left, new[] { "2" }, T("Analyze (cut, explode, filter)", "Analizar (corte, explosión, filtro)"));
             AddRow(left, new[] { "3" }, T("Studio (render modes, light)", "Estudio (modos de render, luz)"));
             AddRow(left, new[] { "4" }, T("Telemetry (power, source, alerts, faults)", "Telemetría (encendido, fuente, alertas, fallas)"));

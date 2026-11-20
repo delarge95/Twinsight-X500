@@ -154,12 +154,89 @@ namespace WebGL.UI.Desktop
             DesktopTelemetry.Stop();
             yield return new WaitForSecondsRealtime(0.4f);
 
+            yield return InspectAndPowerChecks();
+
             Log("black captures: " + _blackShots);
             Check("no capture came out black", _blackShots == 0);
             Log("RESULT " + _pass + " pass, " + _fail + " fail");
             File.WriteAllText(Path.Combine(OutputDirectory, "ux_" + _tag + ".log"), _log.ToString());
             Application.Quit();
         }
+
+        /// <summary>Paso 3 (PLAN_PC 38): INSPECT = Pins, Isolate, Focus; the simulated power (switch + load slider) lives in Studio > Render; the power chip keeps working.</summary>
+        private IEnumerator InspectAndPowerChecks()
+        {
+            Log("── paso 3: Inspeccionar y Energia ──");
+            UIManager ui = UIManager.Instance;
+            Click(B("DkMode1"));
+            yield return new WaitForSecondsRealtime(0.8f);
+            VisualElement grid = Root.Q<VisualElement>("ToolsCardGrid");
+            var cards = new List<string>();
+            foreach (Button b in grid.Query<Button>().ToList()) if (b.resolvedStyle.display != DisplayStyle.None && b.name != "SubmenuBackBtn") cards.Add(b.name);
+            Log("INSPECT cards: " + string.Join(", ", cards));
+            Check("INSPECT has exactly three cards: Pins, Isolate, Focus", cards.Count == 3 && cards.Contains("ToolHotspotBtn") && cards.Contains("ToolIsolateBtn") && cards.Contains("ToolFrameBtn"));
+            Check("the power card is no longer in INSPECT", B("ToolPowerBtn") != null && !grid.Contains(B("ToolPowerBtn")) && !grid.Contains(Root.Q<VisualElement>("ToolPowerLoadPanel")));
+            Check("the focus card says «Enfocar» / «Focus» and has a tooltip", !string.IsNullOrEmpty(B("ToolFrameBtn").Q<Label>(className: "submenu-label").text) && !string.IsNullOrEmpty(B("ToolFrameBtn").tooltip));
+            yield return Shot("ux_inspeccionar_tres_tarjetas", 0.2f);
+
+            // pins card: toggles
+            bool pinsBefore = B("ToolHotspotBtn").ClassListContains("submenu-card--active");
+            Click(B("ToolHotspotBtn"));
+            yield return new WaitForSecondsRealtime(0.8f);
+            Check("the Pins card still toggles the pins", B("ToolHotspotBtn").ClassListContains("submenu-card--active") != pinsBefore);
+            Click(B("ToolHotspotBtn"));
+            yield return new WaitForSecondsRealtime(0.8f);
+
+            // focus card: with the camera moved, it brings it back (no selection: reset the view)
+            Camera cam = Camera.main;
+            OrbitCameraController.Instance?.SetAngles(-5f, 120f, true);
+            yield return new WaitForSecondsRealtime(1.2f);
+            Vector3 moved = cam.transform.position;
+            Click(B("ToolFrameBtn"));
+            yield return new WaitForSecondsRealtime(2.0f);
+            Check("the Focus card moves the camera back to the framed view", (cam.transform.position - moved).magnitude > 0.05f);
+
+            // Studio > Render: the power card and its load panel
+            Click(B("DkMode3"));
+            yield return new WaitForSecondsRealtime(0.9f);
+            Button power = B("ToolPowerBtn");
+            VisualElement panel = Root.Q<VisualElement>("ToolPowerLoadPanel");
+            Check("the power card is inside the Studio panel, after the render modes", power != null && Root.Q<VisualElement>("StudioPanel").Contains(power) && Root.Q<VisualElement>("DkPowerBlock") != null);
+            Check("the render modes (with the thermal view) are in the same panel", Root.Q<VisualElement>("StudioPanel").Contains(B("ShaderMode_Thermal")) && Visible2(B("ShaderMode_Thermal")));
+            Check("the power card is shown in Render", Visible2(power));
+            Check("the load panel is hidden while the power is off", panel != null && panel.style.display == DisplayStyle.None && !(DroneStateController.Instance?.IsOn ?? true));
+            yield return Shot("ux_estudio_energia_apagada", 0.2f);
+            Click(power);
+            yield return new WaitForSecondsRealtime(3.0f);
+            Check("the switch turns the simulated power on", DroneStateController.Instance != null && DroneStateController.Instance.IsOn);
+            Check("the load panel shows while the power is on", panel.style.display != DisplayStyle.None && panel.enabledSelf);
+            Check("the power chip of the top bar appears", Visible2(Root.Q<Button>("DkChipPower")));
+            Slider slider = Root.Q<Slider>("ToolPowerLoadSlider");
+            slider.value = 0.6f;
+            yield return new WaitForSecondsRealtime(0.8f);
+            Check("the load slider sets the load command (0.6)", Mathf.Abs(DroneStateController.Instance.LoadCommandNormalized - 0.6f) < 0.02f);
+            Check("the load value reads 60%", Root.Q<Label>("ToolPowerLoadValue").text == "60%");
+            Check("the state label says the simulated high load", Root.Q<Label>("ToolPowerStateLabel").text.ToUpperInvariant().Contains(AppLanguageManager.IsSpanish ? "SIMUL" : "SIMULATED"));
+            yield return Shot("ux_estudio_energia_encendida", 0.3f);
+
+            // Environment section hides the power block
+            Click(B("DkStudioEnv"));
+            yield return new WaitForSecondsRealtime(0.8f);
+            Check("the Environment section does not show the power block", !Visible2(Root.Q<VisualElement>("DkPowerBlock")));
+            Click(B("DkStudioRender"));
+            yield return new WaitForSecondsRealtime(0.8f);
+            Check("back in Render the power block shows again", Visible2(Root.Q<VisualElement>("DkPowerBlock")));
+
+            // the chip still switches it off
+            Click(Root.Q<Button>("DkChipPower"));
+            yield return new WaitForSecondsRealtime(2.0f);
+            Check("the power chip still switches the simulated power off", DroneStateController.Instance != null && !DroneStateController.Instance.IsOn);
+            Check("the load panel hides again", panel.style.display == DisplayStyle.None);
+            Click(B("DkMode3"));
+            yield return new WaitForSecondsRealtime(0.6f);
+        }
+
+        private static bool Visible2(VisualElement e) => e != null && e.resolvedStyle.display != DisplayStyle.None && e.resolvedStyle.opacity > 0.01f;
 
         private HashSet<ToolId> ShownIds()
         {
