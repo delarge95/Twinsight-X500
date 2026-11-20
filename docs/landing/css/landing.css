@@ -401,6 +401,9 @@ html:not(.is-intro) .intro__mark { transform: scale(1.6); opacity: 0; }
 
 /* apps y cierre */
 .app__cta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: auto; padding-top: 34px; }
+/* Enlace secundario (p. ej. «Versiones» junto a la descarga): texto pequeño y apagado, sin forma de botón. */
+.app__more { font-size: 13px; color: var(--muted); text-decoration: none; padding: 6px 2px; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+.app__more:hover, .app__more:focus-visible { color: var(--text-2); border-bottom-color: currentColor; }
 .bridge { margin-top: 26px; font-size: 15px; line-height: 1.5; color: var(--text-2); text-align: center; }
 .bridge b { font: 500 15px/1.5 var(--display); color: #fff; }
 .outro__body { min-height: 78vh; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 9vh; }
