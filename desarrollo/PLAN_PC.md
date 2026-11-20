@@ -1363,3 +1363,55 @@ Ningun otro texto es nuevo: los ⓘ llevan los textos que ya estaban. (Observaci
 
 ### 40.3 NO verificado
 - Windows limpio / otro equipo, SmartScreen y Mark of the Web reales (el exe sigue sin firmar); GPU distinta de la de esta maquina; mando real (XInput); PX4 SITL real; `-ux-capture` solo a 1280x720 ES sobre el paquete; las sondas `-desk-*`, `-tools`, `-lote1*` no se repitieron sobre el paquete (se pasaron sobre `pc_ux2`, §39.4). Sin lector `.ulg` ni parametros/mision PX4 en escritorio (dicho en el LEEME). Release de GitHub y pagina de versiones: pendientes (los hace el usuario).
+
+
+## 41. Correcciones de escritorio tras la prueba del usuario: Corte, Entorno y Ultra (2026-11-20, rama `pc-fix-1`, desde `pc-desktop` 31cc1aa, solo PC)
+
+Commits: `05b5a08` (sonda `-fix1-capture`), `ed8efcd` (Corte), `e80bf04` (Entorno), `4bb8f59` (Ultra). Sin push, sin zip.
+
+### 41.1 Corte (Analizar > Corte)
+- **Causa del plano solido (medida, captura «antes» `corte_y_abajo`):** `CrossSectionManager.CreatePlaneVisual` creaba en tiempo de ejecucion un material `Universal Render Pipeline/Unlit` con `_Surface = 1` pero sin la palabra clave de superficie transparente; en el jugador esa variante no existe (ningun material de la build la usa y se descarta), asi que el alfa 0,006 salia **opaco**: un cuadrado azul macizo (el color del tinte) que, visto desde abajo, tapaba todo el dron. No era el recorte del shader (la banda naranja `_ClipColor` de 1 cm sigue igual y es el contorno de la seccion).
+- **Arreglo:** shader propio sin palabras clave `WebGL/CutPlane` (`Assets/Shaders/CutPlane.shader`: mezcla alfa, Cull Off, ZWrite Off) y material `Resources/CutPlane.mat` (mantiene el shader en la build, `Resources.Load` como `ClippableLitRef`). Tinte del 1,2 % y contorno fino del borde (55 %). El plano se dimensiona al modelo (8,5 m medido; el dron mide ~6,5 m en unidades de la escena). Si el material no existe cae al camino anterior. Es codigo compartido con WebGL: ahi solo deja de ser opaco.
+- **Pulsar la tarjeta de nuevo (solo escritorio, `#if UNITY_STANDALONE`; WebGL igual):** `AnalyzeCardToggle.ForCard(efectoActivo, panelAbierto)`. Corte activo con su panel abierto -> **desactiva** el corte y cierra el panel; corte activo con el panel cerrado (la X del panel lo cierra y el corte persiste) -> **reabre el panel de ajuste** y la siguiente pulsacion lo apaga (el ajuste fino sigue accesible); corte apagado -> lo enciende y abre el panel. Filtrar igual: panel abierto y filtro acotado -> quita el filtro y cierra; filtro acotado con el panel cerrado -> reabre el panel; sin filtro y panel abierto -> solo cierra el panel. Las teclas C y G pasan por la misma tarjeta. La tarjeta Filtrar queda iluminada mientras el filtro acota; las tarjetas siguen al chip de la barra y a Reset (suscripcion a `OnCrossSectionToggled`). Explotar no cambia.
+- **Decision a revisar:** «pulsar de nuevo apaga» es literal solo con el panel abierto; con el efecto activo y el panel cerrado la primera pulsacion reabre el panel (para no perder el ajuste fino) y la segunda apaga. Si se prefiere que apague siempre, se quita esa rama de `ForCard`.
+
+### 41.2 Entorno (Estudio > Entorno)
+- `AppLanguageManager`: «Luz de estudio» -> **«Estudio claro»** (y «LUZ DE ESTUDIO» -> «ESTUDIO CLARO»).
+- **Causa del desborde:** `UIEnvironmentPanel.FormatCycleLabel` partia la etiqueta de Estudio en una linea por palabra («LUZ / DE / ESTUDIO»: 3 lineas en una pastilla de 28 px) y «ATARDECER» + el icono de 16 px no cabian en el 31,5 % del popover. Ahora (solo escritorio): sin saltos forzados, el icono de las 3 pastillas se oculta, la etiqueta parte por palabras y la pastilla crece (`height: auto`, minimo 28 px); `DesktopPillFit` reduce la letra de forma controlada (12 -> minimo 9 px) solo si una palabra sola no cabe, nunca recorta. Fondo de las pastillas fijo y oscuro (con fondos claros las reglas `.ui-light-bg` las dejaban grises con texto claro).
+- **Causa de las pistas casi invisibles:** `.ui-light-bg .glass-slider ...` (Theme.uss) pinta la pista con `rgba(24,26,30,0.24)` en cuanto el fondo del entorno es claro, y los popovers del escritorio son siempre oscuros (`rgb(18,21,27)`): contraste ~1,0:1 (medido en «antes»: 1,01:1). Ahora (`DesktopUI.uss`, `.layout--desktop.chrome2 .glass-slider`): pista con borde claro, relleno en el acento de la app (70,175,255; `DesktopSliderFill` lo anade hasta el tirador y lo mantiene al dia) y tirador oscuro con aro claro (191,234,255). Medido en las 15 vistas del selector (3 Estudio, 3 Tiempo, 9 Color): pista **12,3:1** y relleno **7,7:1** sobre el popover (umbral de la sonda 3:1).
+
+### 41.3 Graficos Ultra al maximo (solo `PC_Ultra`; Low / Medium / High sin cambios: `git diff` solo toca `PC_Ultra.asset` y su nivel en `QualitySettings.asset`)
+| Valor | Antes | Ahora (maximo del motor / URP de este proyecto) |
+|---|---|---|
+| MSAA (asset URP y nivel) | 4x | **8x** |
+| Escala de render | 1,25 | **2,0** (maximo de `PcMaxRenderScale` y de URP) |
+| Mapa de sombras principal | 4096 | **8192** (maximo de `ShadowResolution`) |
+| Distancia de sombras (asset y nivel) | 40 m | **100 m** (`PcMaxShadowDistance`; el deslizador de la interfaz subio de 80 a 100) |
+| Cascadas / sombras suaves | 4 / alta | 4 / alta (ya eran el maximo) |
+| Sombras de luces adicionales: atlas / nivel «Alto» | 2048 / 2048 | **8192 / 4096** |
+| Luces adicionales por objeto (asset y nivel) | 6 | **8** (maximo de URP) |
+| Evaluacion de SH (ambiente) | por vertice | **por pixel** |
+| Mezcla y proyeccion de caja de sondas de reflejos | no | **si** |
+| Resolucion de la sonda de reflejos de estudio (`PCStudioReflections`) | 512 | **2048** (maximo de un cubemap de sonda) |
+| Tamaño de la LUT de gradacion | 64 | **65** (maximo de URP, `k_MaxLutSize`) |
+| LOD bias / fundido de LOD | 2 / no | **4 / si** |
+| Particulas suaves | no | **si** |
+| Ya al maximo (sin cambio) | | HDR 64 bits, filtrado anisotropico forzado, limite de mips 0, SSAO (12 muestras, normales y desenfoque en alta, sin submuestreo; encendido en High y Ultra), AA de camara SMAA alta, `maximumLODLevel` 0 |
+- Sin cambio a proposito: el perfil de post-procesado es **uno solo para todos los niveles** (tonemapping Neutral, bloom con filtrado alto); subirlo tocaria tambien High, Medium y Low.
+- **Rendimiento** (build de desarrollo, 1904x984, `-vsync 0`, vista 3/4 del dron, media de 4 s con la sonda `-fix1-capture`): Low 2,56 ms (390 fps), Medium 2,22 ms (450), High 2,69 ms (371), **Ultra 3,84 ms (260 fps)**, peor fotograma 5,6 ms. Antes: Ultra ~2,7 ms con la sonda `-desk-fps` (otra vista, mismo equipo); el Ultra nuevo da ~2,85 ms con esa misma sonda. Esta GPU lo absorbe; **no se midio en otra GPU** ni la memoria de video (sombras 8192 + escala 2 + MSAA 8x + sonda 2048 son varios cientos de MB; Auto solo elige Ultra con mas de 8 GB de VRAM).
+
+### 41.4 Verificado (build de desarrollo `E:\TwinSight_builds\pc_fix1`, receta 12.3 aplicada, puerta §33 OK)
+- Compilacion 0 errores con Standalone y con WebGL (la plataforma WebGL compila y pasa **EditMode 343/343**: las 2 pruebas de texto de pastilla corren tambien alli, las 6 de tarjetas son solo Standalone). **EditMode 354/354** en Standalone (346 + 8 nuevas: `AnalyzeCardToggleTests` x6 = tabla, Corte 2 pulsaciones, reabrir y apagar, Filtrar 2 pulsaciones / reabrir / solo cerrar; `EnvironmentPillTextTests` x2: «Estudio claro» ES/EN y ningun texto de pastilla de mas de dos palabras). El asmdef de pruebas de telemetria referencia ahora `Core`.
+- Sonda nueva **`-fix1-capture`: 156/156** a 1280x720 ES, 1280x720 EN, 1904x984 ES, 1904x984 EN y 1280x720 ES al 150 % (`-uiscale 1.5`): tinte del plano <= 0,12; tarjetas Corte y Filtrar (1.ª pulsacion enciende, 2.ª apaga, X mantiene, reabrir, chip, Explotar sin cambio); por cada uno de los 15 presets del selector ninguna palabra partida ni etiqueta fuera de su pastilla (tambien con un texto largo «ESTUDIO CLARO EXTENDIDO» y uno corto) y contraste de pista y relleno >= 3:1; 0 capturas negras. «Antes» (build `pc_fix1_antes`, mismo codigo sin los arreglos): fallan las tarjetas, las pistas (1,01:1) y las pastillas; capturas en `capturas_fix1/antes` y `despues`.
+- `-ux-capture` **250/250** a 1280x720 ES y EN y a 1904x984 ES y EN. `-mvp-capture` **133/133 en las cuatro** (1280x720 y 1904x984, ES y EN; la base de 1280x720 ES era 131/133 por dos fallos previos que hoy pasan). `-desk-close` 56/57 (= base: «select a part», previo). 0 apariciones de Blitter / shader is null / NullReference en los 15 `Player.log` de las sondas.
+- `Player.log` sin Blitter / shader is null / NullReference (puerta y registros de las sondas).
+- Capturas antes/despues en `twinsight-web-twin/docs/unity_pc/capturas_fix1/{antes,despues,logs}` (sin commitear en ese repo).
+
+### 41.5 Textos nuevos
+Ninguno nuevo; solo el cambio pedido de «Luz de estudio» por «Estudio claro» (ES; EN sigue «Studio Light»).
+
+### 41.6 NO verificado
+- Mando real; otra GPU o memoria de video con el Ultra nuevo; Ultra (escala 2,0, MSAA 8x) en una pantalla 4K; el corte con los modos X-Ray / Termico (solo se miro Realista).
+- La comprobacion de pastillas del «antes» usaba una medida demasiado estricta (fallaba hasta con «ESTUDIO» bien puesto): el «antes» de las pastillas se juzga por las capturas (`antes/*entorno_estudio1.png`: «LUZ DE ESTUDIO» en 3 lineas; `*entorno_tiempo3.png`: «ATARDECER» sobresale).
+- El Ultra anterior no se midio con la vista 3/4 de la sonda `-fix1-capture` (solo con `-desk-fps`).
+- Cierre: plataforma activa WebGL; `UniversalRenderPipelineGlobalSettings.asset`, `DynamicsManager.asset` y `ProjectSettings.asset` restaurados con `git checkout`. Sin zip, sin push.
