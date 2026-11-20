@@ -154,6 +154,13 @@ namespace WebGL.UI.Desktop
             _sitlMsg = Text("dk-note", _sitlBlock);
             _sitlMsg.AddToClassList("dk-note--warn");
             _popSource.Add(_sitlBlock);
+
+            // UX step 5: the long detail of each source moves behind an ⓘ next to its short badge (the badge, with the honesty label of the origin, stays visible);
+            // the SITL note goes behind an ⓘ next to the URL label. The texts stay in the tree (hidden labels + the tooltip of the ⓘ).
+            DesktopInfo.Beside(_repBadge, true, "DkInfoSrcReplay", _repDetail);
+            DesktopInfo.Beside(_simSub, true, "DkInfoSrcSim", _simDetail);
+            DesktopInfo.Beside(_sitlBadge, true, "DkInfoSrcSitl", _sitlDetail);
+            DesktopInfo.Beside(_sitlUrlLabel, true, "DkInfoSitlNote", _sitlNote);
         }
 
         private void SelectSitl()
@@ -306,7 +313,6 @@ namespace WebGL.UI.Desktop
             _simTitle.text = T("src.sim");
             _simSub.text = labels.TrySimText("title", lang, out string sim) ? sim : string.Empty;
             _simDetail.text = (labels.TrySimText("detail", lang, out string simDetail) ? TelemetryStrings.ForDesktop(simDetail, lang) : string.Empty) + " " + T("src.sim.params");
-            _rowSim.tooltip = _simDetail.text;
             _sitlTitle.text = T("src.sitl");
             _sitlBadge.text = labels.ClassificationTitle(SourceClassification.Sitl, lang);
             _sitlDetail.text = TelemetryStrings.ForDesktop(labels.ClassificationDetail(SourceClassification.Sitl, lang), lang);
