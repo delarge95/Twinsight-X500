@@ -501,6 +501,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-ux-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var ux = gameObject.AddComponent<DesktopCaptureUx>(); // UX cut (PLAN_PC 38): visible controls per source vs TelemetryMenu, first focus of the pad
+                    ux.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-mvp-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var mvp = gameObject.AddComponent<DesktopCaptureMvp>(); // MVP priorities: camera while piloting, active-effect chips, thermal field, battery

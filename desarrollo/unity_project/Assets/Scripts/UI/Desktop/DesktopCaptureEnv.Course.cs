@@ -92,7 +92,7 @@ namespace WebGL.UI.Desktop
             // hidden with another source / toggle off
             Tel.StartLocalReplay();
             yield return new WaitForSecondsRealtime(2.0f);
-            Check("with the local replay the course is gone, the pill hidden and «Escenario» dimmed", !Tel.CourseActive && !Tel.CoursePillVisible && !B("DkTelCourse").enabledSelf == (!Tel.CourseOn));
+            Check("with the local replay the course is gone, the pill hidden and «Escenario» hidden (not dimmed) unless it is placed", !Tel.CourseActive && !Tel.CoursePillVisible && !B("DkTelCourse").enabledSelf == (!Tel.CourseOn) && (Tel.CourseOn || !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Course)));
             Tel.StartSimulator();
             yield return new WaitForSecondsRealtime(2.0f);
             Check("back to the simulator: the course is placed again, fresh", Tel.CourseActive && Tel.CourseRunNow.State == CourseState.Waiting);

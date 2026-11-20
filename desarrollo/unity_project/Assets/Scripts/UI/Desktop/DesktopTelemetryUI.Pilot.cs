@@ -400,7 +400,8 @@ namespace WebGL.UI.Desktop
             bool accepts = DesktopTelemetry.AcceptsCommands;
             var client = DesktopTelemetry.Client;
 
-            // buttons: the toggle needs a source that takes commands; the command buttons stay clickable (a refusal explains why)
+            // buttons: the whole pill exists only on a source that takes commands (TelemetryMenu, ApplyMenuTable: hidden, not dimmed); here only the dynamic state is dimmed
+            // (e.g. PX4 SITL still connecting, no hello yet); a shortcut pressed without commands is refused with its reason
             _btnPilot.SetEnabled(accepts || _pilotOn);
             for (int i = 0; i < 4; i++) _btnCmd[i].EnableInClassList("dk-strip-btn--dim", !accepts);
             _btnPilot.EnableInClassList("dk-strip-btn--on", _pilotOn);

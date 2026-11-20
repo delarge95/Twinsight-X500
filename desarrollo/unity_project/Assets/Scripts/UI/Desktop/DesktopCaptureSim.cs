@@ -97,7 +97,7 @@ namespace WebGL.UI.Desktop
             // ── 1. the selector with the simulator enabled ──
             Tel.OpenMode();
             yield return new WaitForSecondsRealtime(0.6f);
-            Check("pilot strip exists in mode 4 and starts dimmed (no session)", Shown(Root.Q<VisualElement>("DkTelPilotStrip")) && !B("DkTelPilot").enabledSelf);
+            Check("pilot strip exists in the tree but is hidden in mode 4 with no session (nothing to command)", Root.Q<VisualElement>("DkTelPilotStrip") != null && !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Pilot) && !B("DkTelPilot").enabledSelf);
             Click(B("DkTelSource"));
             yield return new WaitForSecondsRealtime(0.8f);
             Button row = B("DkSrcSim");
@@ -252,8 +252,9 @@ namespace WebGL.UI.Desktop
             // ── 11. the replay is read-only ──
             Tel.StartLocalReplay();
             yield return new WaitForSecondsRealtime(2f);
-            Check("replay running; the pilot toggle is disabled, commands are not accepted", DesktopTelemetry.IsLocalReplay && !DesktopTelemetry.AcceptsCommands && !B("DkTelPilot").enabledSelf);
-            Click(B("DkCmdTakeoff"));
+            Check("replay running; the pilot pill is hidden and disabled, commands are not accepted", DesktopTelemetry.IsLocalReplay && !DesktopTelemetry.AcceptsCommands && !B("DkTelPilot").enabledSelf && !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Pilot) && !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Hold));
+            // the button is hidden (and disabled) now: the shortcut path (T) is what still reaches the refusal, and it explains why
+            Tel.SendPilotCommand(PilotCommand.Takeoff, "key T");
             yield return new WaitForSecondsRealtime(0.3f);
             Check("takeoff on the replay: toast 'la repetición no acepta comandos'", Tel.ToastText == TelemetryStrings.T("toast.replay", lang));
             yield return Shot("10_repeticion_solo_lectura", 0.1f);
@@ -261,7 +262,7 @@ namespace WebGL.UI.Desktop
             // ── 12. stop ──
             Tel.StopSession();
             yield return new WaitForSecondsRealtime(0.5f);
-            Check("stopped: no session, the pilot strip is dimmed again", !DesktopTelemetry.IsRunning && !B("DkTelPilot").enabledSelf);
+            Check("stopped: no session, the pilot strip is hidden again", !DesktopTelemetry.IsRunning && !B("DkTelPilot").enabledSelf && !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Pilot));
 
             Log("RESULT " + _pass + " pass, " + _fail + " fail");
             File.WriteAllText(Path.Combine(OutputDirectory, "simui_" + _tag + ".log"), _log.ToString());

@@ -397,7 +397,7 @@ namespace WebGL.UI.Desktop
                 _msUiDirty = true;
             }
 
-            _btnMission.SetEnabled(running);
+            _btnMission.SetEnabled(running && TelemetryMenu.Has(ToolId.Mission, CurrentSurface)); // hidden (not dimmed) where the source takes no orders: ApplyMenuTable
             _btnMission.EnableInClassList("dk-strip-btn--on", _openPop == "mission" || MissionBusy);
             string tip = !running ? T("tools.needTelemetry") : !DesktopTelemetry.AcceptsCommands && client.Classification == SourceClassification.Replay ? T("tools.missionReplay") : T("mission.title");
             if (_btnMission.tooltip != tip) _btnMission.tooltip = tip;

@@ -132,7 +132,7 @@ namespace WebGL.UI.Desktop
             var tel = Tel;
             tel.OpenMode();
             yield return new WaitForSecondsRealtime(0.6f);
-            Check("without telemetry «Mapa» and «Comprobar» are dimmed with their reason", B("DkTelMap") != null && B("DkTelPreflight") != null && !B("DkTelMap").enabledSelf && !B("DkTelPreflight").enabledSelf && B("DkTelPreflight").tooltip == T("tools.needTelemetry"));
+            Check("without telemetry «Mapa» and «Comprobar» are hidden (not dimmed), disabled and keep their reason", !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Map) && !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Preflight) && B("DkTelMap") != null && B("DkTelPreflight") != null && !B("DkTelMap").enabledSelf && !B("DkTelPreflight").enabledSelf && B("DkTelPreflight").tooltip == T("tools.needTelemetry"));
             Check("the third pill of the strip fits inside the window", Root.Q("DkTelToolsStrip") != null && Root.Q("DkTelToolsStrip").worldBound.xMax <= Root.worldBound.xMax + 0.5f && Root.Q("DkTelToolsStrip").worldBound.xMin >= -0.5f);
             yield return Shot("01_sin_telemetria", 0.2f);
 
@@ -339,7 +339,7 @@ namespace WebGL.UI.Desktop
             Check("M hides the map again", !tel.MapVisible);
             tel.StopSession();
             yield return new WaitForSecondsRealtime(0.8f);
-            Check("without a session the tools are dimmed again and the warning is gone", !B("DkTelMap").enabledSelf && !B("DkTelPreflight").enabledSelf && !tel.PreflightAskShown);
+            Check("without a session the tools are hidden again and the warning is gone", !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Map) && !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Preflight) && !B("DkTelMap").enabledSelf && !B("DkTelPreflight").enabledSelf && !tel.PreflightAskShown);
         }
     }
 }

@@ -284,7 +284,7 @@ namespace WebGL.UI.Desktop
             if (_btnTraining == null) return;
             bool running = DesktopTelemetry.IsRunning;
             bool can = CanTrain;
-            _btnTraining.SetEnabled(running);
+            _btnTraining.SetEnabled(running && TelemetryMenu.Has(ToolId.Train, CurrentSurface)); // hidden (not dimmed) outside the simulator: ApplyMenuTable
             _btnTraining.EnableInClassList("dk-strip-btn--on", _openPop == "training" || _trRun != null);
             string tip = !running ? T("tools.needTelemetry") : !can ? T("training.need") : T("training.title");
             if (_btnTraining.tooltip != tip) _btnTraining.tooltip = tip;

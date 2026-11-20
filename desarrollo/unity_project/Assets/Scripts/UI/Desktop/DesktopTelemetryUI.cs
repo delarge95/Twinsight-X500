@@ -490,6 +490,7 @@ namespace WebGL.UI.Desktop
             TickFlightTab();
             TickAnalysisTab();
             TickPilot();
+            ApplyMenuTable(); // PLAN_PC 38: hide what the source does not have (TelemetryMenu), do not dim it
         }
 
         private static void UpdateChipVisibility(Button chip, bool active)

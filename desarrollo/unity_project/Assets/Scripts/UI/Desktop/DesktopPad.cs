@@ -262,7 +262,12 @@ namespace WebGL.UI.Desktop
                 VisualElement pop = _root.Q<VisualElement>(tel.OpenPopover == "source" ? "DkPopSource" : tel.OpenPopover == "alerts" ? "DkPopAlerts" : "DkPopFaults");
                 target = FirstShownButton(pop);
             }
-            if (target == null && tel != null && tel.ModeOpen) target = _root.Q<Button>("DkTelPower");
+            if (target == null && tel != null && tel.ModeOpen)
+            {
+                // «Encendido» is the first focus of the Telemetry strip; if it is ever hidden, the first shown button of the mode container takes it
+                target = _root.Q<Button>("DkTelPower");
+                if (target == null || target.resolvedStyle.display == DisplayStyle.None) target = FirstShownButton(_root.Q<VisualElement>("DkTelemetry"));
+            }
             if (target == null && UIManager.Instance != null && UIManager.Instance.IsHeroVisible) target = _root.Q<Button>("HeroExploreBtn");
             if (target == null) target = _root.Q<Button>(className: "dk-seg-btn--on") ?? _root.Q<Button>("DkMode1");
             if (target == null) target = _root.Q<Button>("DesktopHintBtn");

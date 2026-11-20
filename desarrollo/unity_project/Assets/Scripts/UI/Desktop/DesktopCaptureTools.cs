@@ -188,7 +188,7 @@ namespace WebGL.UI.Desktop
 
             Tel.OpenMode();
             yield return new WaitForSecondsRealtime(0.6f);
-            Check("before the simulator: «Geocerca» and «Viento» are dimmed (the editable fence and wind belong to the simulator)", B("DkTelFence") != null && B("DkTelWind") != null && !B("DkTelFence").enabledSelf && !B("DkTelWind").enabledSelf);
+            Check("before the simulator: «Geocerca» and «Viento» are hidden (the editable fence and wind belong to the simulator)", !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Fence) && !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Wind) && B("DkTelFence") != null && B("DkTelWind") != null && !B("DkTelFence").enabledSelf && !B("DkTelWind").enabledSelf);
             Tel.StartSimulator();
             yield return new WaitForSecondsRealtime(2.5f);
             Check("simulator running and the drone model is engaged", DesktopTelemetry.IsSimulator && Drv != null && Drv.Engaged);
@@ -570,7 +570,7 @@ namespace WebGL.UI.Desktop
             var tel = Tel;
             tel.StartLocalReplay();
             yield return new WaitForSecondsRealtime(2.5f);
-            Check("with the replay «Geocerca» and «Viento» are dimmed with their reason in the tooltip", !B("DkTelFence").enabledSelf && !B("DkTelWind").enabledSelf && !string.IsNullOrEmpty(B("DkTelFence").tooltip) && !string.IsNullOrEmpty(B("DkTelWind").tooltip));
+            Check("with the replay «Geocerca» and «Viento» are hidden, disabled and keep their reason in the tooltip", !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Fence) && !DesktopUIController.Instance.Chrome.Telemetry.ToolShown(ToolId.Wind) && !B("DkTelFence").enabledSelf && !B("DkTelWind").enabledSelf && !string.IsNullOrEmpty(B("DkTelFence").tooltip) && !string.IsNullOrEmpty(B("DkTelWind").tooltip));
             Check("and the 3D fence and the wind arrow do not exist (PX4's fence does not reach the client; the wind is Gazebo's)", tel.FenceScene == null && tel.WindCue == null);
             tel.TogglePopover("faults");
             yield return new WaitForSecondsRealtime(0.4f);
