@@ -1,10 +1,10 @@
 # Estampa Company / Product / Version en los recursos de version del .exe de PC (PLAN_PC §36).
 # Unity 6000.6 no escribe CompanyName/ProductName en TwinSightX500.exe (quedan vacios y ProductVersion = version del motor),
 # asi que se sustituye el recurso RT_VERSION con la API de Windows UpdateResource (sin descargar herramientas).
-# Uso: powershell -File pc_stamp_exe.ps1 -Exe <ruta\TwinSightX500.exe> [-Version 0.0.1] [-Company TwinSight] [-Product "TwinSight X500"]
+# Uso: powershell -File pc_stamp_exe.ps1 -Exe <ruta\TwinSightX500.exe> [-Version 0.0.2] [-Company TwinSight] [-Product "TwinSight X500"]
 param(
   [Parameter(Mandatory=$true)][string]$Exe,
-  [string]$Version = "0.0.1",
+  [string]$Version = "0.0.2",
   [string]$Company = "TwinSight",
   [string]$Product = "TwinSight X500",
   [string]$Copyright = "Copyright (c) 2026 TwinSight"
