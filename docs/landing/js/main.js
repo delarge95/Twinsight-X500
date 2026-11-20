@@ -11,7 +11,7 @@ import { ES, EN } from './i18n.js';
 const LINKS = {
   app: './app/?embed=1', // embed=1: la app salta su pantalla de inicio y avisa cuando ha dibujado
   legacy: './Build/',
-  desktop: 'https://github.com/delarge95/Twinsight-X500/releases/download/v0.0.1/TwinSightX500_PC_v0.0.1.zip', // v0.0.1; el historial y el SHA-256 están en versiones.html
+  desktop: 'https://github.com/delarge95/Twinsight-X500/releases/download/v0.0.2/TwinSightX500_PC_v0.0.2.zip', // v0.0.2; el historial y el SHA-256 están en versiones.html
 };
 
 const $ = (s, r = document) => r.querySelector(s);
