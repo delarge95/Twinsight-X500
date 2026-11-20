@@ -2596,3 +2596,49 @@
 .dk-fold--inline { flex-direction: row; align-items: center; margin: 0; }
 .dk-fold--inline .dk-fold-head { height: 30px; padding: 0 10px 0 6px; border-radius: 15px; }
 .dk-fold--inline .dk-fold-body { flex-direction: row; align-items: center; margin: 0; padding: 0; border-left-width: 0; }
+
+/* PLAN_PC 41 (fix 1): environment pills never lose their text. The label wraps inside the pill and the pill grows with it (no fixed height, no forced line breaks);
+   the three pills of a row share the tallest one. */
+.layout--desktop.chrome2 .dk-pop #EnvGrid { align-items: stretch; }
+.layout--desktop.chrome2 .dk-pop #EnvGrid .submenu-card { height: auto; min-height: 28px; min-width: 0; padding: 3px 8px; justify-content: center; align-items: center; }
+.layout--desktop.chrome2 .dk-pop #EnvGrid .submenu-card { background-color: rgb(30, 35, 44); border-color: rgba(255, 255, 255, 0.16); }
+.layout--desktop.chrome2 .dk-pop #EnvGrid .submenu-card:hover { background-color: rgb(40, 46, 57); }
+.layout--desktop.chrome2 .dk-pop #EnvGrid .submenu-card--active, .layout--desktop.chrome2 .dk-pop #EnvGrid .submenu-card--active:hover { background-color: rgba(70, 175, 255, 0.16); border-color: rgba(70, 175, 255, 0.55); }
+.layout--desktop.chrome2 .dk-pop #EnvGrid .submenu-icon { display: none; }
+.layout--desktop.chrome2 .dk-pop #EnvGrid .submenu-label { flex-shrink: 1; min-width: 0; max-width: 100%; white-space: normal; -unity-text-align: middle-center; }
+
+/* PLAN_PC 41 (fix 1): slider track and fill that read over any background. The desktop popovers and the settings panel are always dark, but the shared light-background rules
+   (.ui-light-bg) turned the track into a faint dark line over them. Track = light line with a border, fill = the accent, dragger = dark with a light ring. Palette: the
+   accent rgb(70,175,255) / rgb(191,234,255) of the active cards. */
+.layout--desktop.chrome2 .glass-slider .unity-base-slider__tracker {
+    height: 4px;
+    border-radius: 2px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.55);
+    background-color: rgba(255, 255, 255, 0.24);
+}
+.layout--desktop.chrome2 .glass-slider .dk-slider-fill {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 4px;
+    margin-top: -1px;
+    border-radius: 2px;
+    background-color: rgb(70, 175, 255);
+}
+.layout--desktop.chrome2 .glass-slider .unity-base-slider__dragger {
+    background-color: rgb(18, 21, 27);
+    border-width: 2px;
+    border-color: rgb(191, 234, 255);
+}
+.layout--desktop.chrome2 .glass-slider .unity-base-slider__dragger:hover {
+    background-color: rgb(191, 234, 255);
+    border-width: 2px;
+    border-color: rgb(255, 255, 255);
+}
+.layout--desktop.chrome2 .glass-slider .unity-base-slider__dragger:hover:active,
+.layout--desktop.chrome2 .glass-slider .unity-base-slider__dragger:active {
+    background-color: rgb(70, 175, 255);
+    border-width: 2px;
+    border-color: rgb(255, 255, 255);
+}

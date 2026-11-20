@@ -607,6 +607,9 @@ namespace WebGL.UI.Desktop
             ClearInlineStyles(_root.Q<VisualElement>("ToolPowerLoadSlider"));
 
             DecorateDesktopControls();
+            DesktopSliderFill.AttachAll(_root); // PLAN_PC 41: filled part of the shared sliders (accent), readable over any environment
+            foreach (string pill in new[] { "EnvPreset_Studio", "EnvPreset_Night", "EnvPreset_Blueprint" })
+                DesktopPillFit.Attach(_root.Q<Button>(pill)?.Q<Label>(className: "submenu-label")); // PLAN_PC 41: no pill text leaves its pill
 
             // Render modes hidden in the shared UXML (Realistic, Wireframe, Ghosted) are exposed on PC.
             foreach (string n in new[] { "ShaderMode_Realistic", "ShaderMode_Wireframe", "ShaderMode_Ghosted" })

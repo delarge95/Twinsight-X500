@@ -410,7 +410,11 @@ namespace WebGL.UI.Panels
             }
 
             translated = translated.ToUpperInvariant();
+#if UNITY_STANDALONE
+            return translated; // PC: the pill wraps its own text (DesktopUI.uss); a forced line break per word made 3-line labels that left the pill
+#else
             return multiline ? translated.Replace(" ", "\n") : translated;
+#endif
         }
     }
 }
