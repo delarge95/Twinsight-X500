@@ -35,6 +35,7 @@ namespace WebGL.UI.Desktop
         private VisualElement _flBody, _flData;
         private Label _flBadge, _flBadgeDetail, _flWaiting, _flStarved, _flSource;
         private Label _secState, _secPos, _secAtt, _secBat, _secMotors, _secFc;
+        private DesktopFold _flAdv;
         private Reading _rMode, _rTime, _rAlt, _rHSpeed, _rVSpeed, _rHeading, _rRollPitch, _rBatLevel, _rBatVolt, _rBatCurrent, _rBatTemp, _rFcTemp, _rVib;
         private VisualElement _batFill;
         private readonly MotorRow[] _motors = new MotorRow[4];
@@ -178,16 +179,20 @@ namespace WebGL.UI.Desktop
             _rBatVolt = AddReading(_flData, "fl.voltage");
             _rBatCurrent = AddReading(_flData, "fl.current");
             _rBatTemp = AddReading(_flData, "fl.batteryTemp");
-            BuildBatteryRows(_flData); // Lote 1b, tool 8: the estimated health of the battery
+            // UX step 5: the health of the battery, the motors and the controller / vibration go in the «Avanzado» fold (closed). The tags of origin stay in the tree.
+            _flAdv = new DesktopFold("flight", "DkFlFold");
+            _flData.Add(_flAdv);
+            VisualElement adv = _flAdv.Body;
+            BuildBatteryRows(adv); // Lote 1b, tool 8: the estimated health of the battery
 
-            _secMotors = Section(_flData);
+            _secMotors = Section(adv);
             var heads = new VisualElement { pickingMode = PickingMode.Ignore };
             heads.AddToClassList("dk-motor-heads");
             _motorRpmHead = Text("dk-reading-name", heads);
             _tagRpm = Text("dk-tag", heads);
             _motorTempHead = Text("dk-reading-name", heads);
             _tagMotorTemp = Text("dk-tag", heads);
-            _flData.Add(heads);
+            adv.Add(heads);
             for (int i = 0; i < 4; i++)
             {
                 var m = new MotorRow { Motor = i + 1 };
@@ -205,18 +210,20 @@ namespace WebGL.UI.Desktop
                 m.UFill.AddToClassList("dk-motor-ufill");
                 u.Add(m.UFill);
                 m.Root.Add(u);
-                _flData.Add(m.Root);
+                adv.Add(m.Root);
                 _motors[i] = m;
             }
 
-            _propNote = Text("dk-note", _flData);
+            _propNote = Text("dk-note", adv);
             _propNote.AddToClassList("dk-note--muted");
 
-            _secFc = Section(_flData);
-            _rFcTemp = AddReading(_flData, "fl.fcTemp");
-            _rVib = AddReading(_flData, "fl.vibration");
+            _secFc = Section(adv);
+            _rFcTemp = AddReading(adv, "fl.fcTemp");
+            _rVib = AddReading(adv, "fl.vibration");
             _flSource = Text("dk-note", _flData);
             _flSource.AddToClassList("dk-note--muted");
+            DesktopInfo.Beside(_flBadge, true, "DkInfoFlBadge", _flBadgeDetail, _flSource);
+            DesktopInfo.Beside(_secMotors, true, "DkInfoFlMotors", _propNote);
             _flightPanel.Add(_flBody);
         }
 
@@ -296,6 +303,7 @@ namespace WebGL.UI.Desktop
             _flEmptyText.text = T("fl.empty");
             _flWaiting.text = T("fl.waiting");
             _secState.text = T("fl.sec.state");
+            _flAdv?.SetTitle(T("ux.advanced"));
             _secPos.text = T("fl.sec.pos");
             _secAtt.text = T("fl.sec.att");
             _secBat.text = T("fl.sec.bat");
