@@ -44,6 +44,13 @@ namespace WebGL.UI.Desktop
             using (var e = NavigationSubmitEvent.GetPooled()) { e.target = b; b.SendEvent(e); }
         }
 
+        /// <summary>The category chips listen to ClickEvent (a double click makes it exclusive), not to the navigation submit.</summary>
+        private static void ClickEv(Button b)
+        {
+            if (b == null) return;
+            using (var e = ClickEvent.GetPooled()) { e.target = b; b.SendEvent(e); }
+        }
+
         private IEnumerator Shot(string name, float wait = 0.4f, Action<Texture2D> inspect = null)
         {
             if (wait > 0f) yield return new WaitForSecondsRealtime(wait);
@@ -111,7 +118,9 @@ namespace WebGL.UI.Desktop
                 float a = m.HasProperty("_BaseColor") ? m.GetColor("_BaseColor").a : -1f;
                 Log("plane: shader " + m.shader.name + " alpha " + F2(a) + " _Surface " + (m.HasProperty("_Surface") ? F2(m.GetFloat("_Surface")) : "-") + " queue " + m.renderQueue +
                     " ZWrite " + (m.HasProperty("_ZWrite") ? F2(m.GetFloat("_ZWrite")) : "-") + " active " + plane.activeSelf + " size " + plane.transform.localScale);
-                Check("the cut plane tint is faint (alpha <= 0.12)", a >= 0f && a <= 0.12f);
+                float fill = m.HasProperty("_Fill") ? m.GetFloat("_Fill") : a;
+                Log("plane fill alpha " + F2(fill) + (m.HasProperty("_Edge") ? " edge " + F2(m.GetFloat("_Edge")) : ""));
+                Check("the cut plane tint is faint (fill alpha <= 0.12)", fill <= 0.12f);
             }
             else Check("the cut plane exists", false);
 
@@ -188,7 +197,7 @@ namespace WebGL.UI.Desktop
             // filter
             Click(filter); yield return new WaitForSecondsRealtime(0.8f);
             Check("Filter: 1st press opens the panel", !filterPanel.ClassListContains("submenu--hidden"));
-            Click(B("CatBtn_Propulsion")); yield return new WaitForSecondsRealtime(0.5f);
+            ClickEv(B("CatBtn_Propulsion")); yield return new WaitForSecondsRealtime(0.5f);
             Check("Filter: a category narrows the filter", UIManager.Instance.FilterActive);
             Check("Filter: the card is lit", filter.ClassListContains("submenu-card--active"));
             yield return Shot("tarjeta_filtrar_activa", 0.2f);
@@ -197,7 +206,7 @@ namespace WebGL.UI.Desktop
             Check("Filter: 2nd press closes the panel", filterPanel.ClassListContains("submenu--hidden"));
             Check("Filter: the card is no longer lit", !filter.ClassListContains("submenu-card--active"));
             Click(filter); yield return new WaitForSecondsRealtime(0.8f);
-            Click(B("CatBtn_Avionics")); yield return new WaitForSecondsRealtime(0.4f);
+            ClickEv(B("CatBtn_Avionics")); yield return new WaitForSecondsRealtime(0.4f);
             Click(B("FilterBackBtn")); yield return new WaitForSecondsRealtime(0.5f);
             Check("Filter: the panel's X keeps the filter and the card lit", UIManager.Instance.FilterActive && filter.ClassListContains("submenu-card--active"));
             Click(filter); yield return new WaitForSecondsRealtime(0.8f);
@@ -265,9 +274,15 @@ namespace WebGL.UI.Desktop
                 if (btn == null || lab == null) { Check(tag + ": pill " + n + " exists", false); continue; }
                 Rect br = btn.layout, lr = lab.layout;
                 bool layoutOk = br.width > 8f && lr.width > 1f;
-                Vector2 want = lab.MeasureTextSize(lab.text, lab.contentRect.width, VisualElement.MeasureMode.AtMost, 0f, VisualElement.MeasureMode.Undefined);
-                bool textFits = want.x <= lab.contentRect.width + 1f && want.y <= lab.contentRect.height + 1f;
+                // no word may be broken: the widest word (measured on one line) must fit the label's content width; the label box must hold its wrapped height
+                float widest = 0f;
+                foreach (string word in lab.text.Split(' ', (char)10)) if (word.Length > 0) widest = Mathf.Max(widest, lab.MeasureTextSize(word, 0f, VisualElement.MeasureMode.Undefined, 0f, VisualElement.MeasureMode.Undefined).x);
+                float contentW = lr.width - lab.resolvedStyle.paddingLeft - lab.resolvedStyle.paddingRight;
+                Vector2 want = lab.MeasureTextSize(lab.text, contentW, VisualElement.MeasureMode.AtMost, 0f, VisualElement.MeasureMode.Undefined);
+                bool textFits = widest <= contentW + 1.5f && lr.height <= br.height + 0.5f;
                 bool inside = lr.xMin >= -0.5f && lr.xMax <= br.width + 0.5f && lr.yMin >= -0.5f && lr.yMax <= br.height + 0.5f;
+                IResolvedStyle ls = lab.resolvedStyle, bs = btn.resolvedStyle;
+                Log("  (font " + F2(ls.fontSize) + " lab pad " + F2(ls.paddingLeft) + "/" + F2(ls.paddingRight) + " mar " + F2(ls.marginLeft) + "/" + F2(ls.marginRight) + " btn pad " + F2(bs.paddingLeft) + "/" + F2(bs.paddingRight) + " border " + F2(bs.borderLeftWidth) + " ws " + ls.whiteSpace + ")");
                 Log("  " + tag + " " + n + " text «" + lab.text.Replace("\n", "\\n") + "» btn " + F2(br.width) + "x" + F2(br.height) + " label " + F2(lr.width) + "x" + F2(lr.height) + " text " + F2(want.x) + "x" + F2(want.y));
                 Check(tag + ": «" + lab.text.Replace("\n", " ") + "» stays inside its pill (" + n + ")", layoutOk && textFits && inside);
             }

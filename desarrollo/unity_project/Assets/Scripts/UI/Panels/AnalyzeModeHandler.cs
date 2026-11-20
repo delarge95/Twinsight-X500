@@ -61,7 +61,7 @@ namespace WebGL.UI.Panels
         {
             if (_crossSectionBtn != null)
             {
-                Action onCross = () => DelayAction(() => NavigateToSubPanel("cross-section"));
+                Action onCross = () => DelayAction(PressCutCard);
                 _crossSectionBtn.clicked += onCross;
                 AddCleanup(() => _crossSectionBtn.clicked -= onCross);
             }
@@ -75,7 +75,7 @@ namespace WebGL.UI.Panels
 
             if (_filterBtn != null)
             {
-                Action onFilter = () => DelayAction(() => NavigateToSubPanel("filter"));
+                Action onFilter = () => DelayAction(PressFilterCard);
                 _filterBtn.clicked += onFilter;
                 AddCleanup(() => _filterBtn.clicked -= onFilter);
             }
@@ -99,6 +99,8 @@ namespace WebGL.UI.Panels
             ShowLevel();
             ApplyCategoryFilters();
             UpdateCategoryButtonStates();
+            WatchCutState();
+            RefreshActiveStates();
 
             // Restore inline slider if explode is active
             if (_isExploded)
@@ -124,9 +126,9 @@ namespace WebGL.UI.Panels
             // Hide inline explode slider when navigating to a sub-panel
             _explodeInlineSlider?.AddToClassList("submenu--hidden");
 
-            _crossSectionBtn?.EnableInClassList("submenu-card--active", panelId == "cross-section");
+            _crossSectionBtn?.EnableInClassList("submenu-card--active", panelId == "cross-section" || CutOnPc());
             _explodeBtn?.EnableInClassList("submenu-card--active", _isExploded);
-            _filterBtn?.EnableInClassList("submenu-card--active", panelId == "filter");
+            _filterBtn?.EnableInClassList("submenu-card--active", panelId == "filter" || FilterOn());
 
             if (panelId == "cross-section")
                 CrossSectionManager.Instance?.EnableCrossSection();
@@ -142,10 +144,7 @@ namespace WebGL.UI.Panels
             _activePanel = null;
             ShowLevel();
 
-            bool csActive = CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled;
-            _crossSectionBtn?.EnableInClassList("submenu-card--active", csActive);
-            _explodeBtn?.EnableInClassList("submenu-card--active", _isExploded);
-            _filterBtn?.RemoveFromClassList("submenu-card--active");
+            RefreshActiveStates();
 
             // Restore inline slider if explode is active
             if (_isExploded)
@@ -176,10 +175,93 @@ namespace WebGL.UI.Panels
             _filterSubPanel?.AddToClassList("submenu--hidden");
 
             // Keep cross-section card highlighted if cross-section is active
-            bool csActive = CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled;
-            _crossSectionBtn?.EnableInClassList("submenu-card--active", csActive);
+            RefreshActiveStates();
+        }
+
+
+        // ── Card toggles (PC: pressing an active card again turns its effect off; PLAN_PC 41) ──
+
+        /// <summary>PC only: the cut card stays lit while another panel is open (WebGL lights it only with its own panel).</summary>
+        private static bool CutOnPc()
+        {
+#if UNITY_STANDALONE
+            return CutOn();
+#else
+            return false;
+#endif
+        }
+
+        private static bool CutOn() => CrossSectionManager.Instance != null && CrossSectionManager.Instance.IsEnabled;
+
+        /// <summary>The category filter is narrowed (PC only: WebGL keeps its card behaviour, the Filter card is lit only while its panel is open).</summary>
+        private bool FilterOn()
+        {
+#if UNITY_STANDALONE
+            return IsCategoryFilterActive;
+#else
+            return false;
+#endif
+        }
+
+        /// <summary>Lights the three cards from the real state: cut on, exploded, filter narrowed (or its panel open).</summary>
+        private void RefreshActiveStates()
+        {
+            bool cutPanel = _level == SubLevel.SubPanel && _activePanel == "cross-section";
+            bool filterPanel = _level == SubLevel.SubPanel && _activePanel == "filter";
+            _crossSectionBtn?.EnableInClassList("submenu-card--active", cutPanel || CutOn());
             _explodeBtn?.EnableInClassList("submenu-card--active", _isExploded);
-            _filterBtn?.RemoveFromClassList("submenu-card--active");
+            _filterBtn?.EnableInClassList("submenu-card--active", filterPanel || FilterOn());
+        }
+
+        public void PressCutCard()
+        {
+#if UNITY_STANDALONE
+            bool panelOpen = _level == SubLevel.SubPanel && _activePanel == "cross-section";
+            switch (AnalyzeCardToggle.ForCard(CutOn(), panelOpen && CutOn())) // the cut off: pressing always switches it on (a stale open panel does not count)
+            {
+                case AnalyzeCardToggle.Step.TurnOff:
+                    CrossSectionManager.Instance?.DisableCrossSection();
+                    NavigateToCardGrid();
+                    return;
+                case AnalyzeCardToggle.Step.ClosePanel:
+                    NavigateToCardGrid();
+                    return;
+            }
+#endif
+            NavigateToSubPanel("cross-section");
+        }
+
+        public void PressFilterCard()
+        {
+#if UNITY_STANDALONE
+            bool panelOpen = _level == SubLevel.SubPanel && _activePanel == "filter";
+            switch (AnalyzeCardToggle.ForCard(FilterOn(), panelOpen))
+            {
+                case AnalyzeCardToggle.Step.TurnOff:
+                    ClearCategoryFilters();
+                    NavigateToCardGrid();
+                    return;
+                case AnalyzeCardToggle.Step.ClosePanel:
+                    NavigateToCardGrid();
+                    return;
+            }
+#endif
+            NavigateToSubPanel("filter");
+        }
+
+        private bool _watchingCut;
+
+        /// <summary>The top-bar chip, Reset or the axis buttons can switch the cut off: the card follows the real state.</summary>
+        private void WatchCutState()
+        {
+#if UNITY_STANDALONE
+            CrossSectionManager mgr = CrossSectionManager.Instance;
+            if (mgr == null || _watchingCut) return;
+            _watchingCut = true;
+            Action<bool> onToggled = _ => RefreshActiveStates();
+            mgr.OnCrossSectionToggled += onToggled;
+            AddCleanup(() => { if (mgr != null) mgr.OnCrossSectionToggled -= onToggled; });
+#endif
         }
 
         // ── Explode State Sync ──
@@ -288,6 +370,9 @@ namespace WebGL.UI.Panels
             UpdateBtn("CatBtn_Sensors", "SensorsComms");
             UpdateBtn("CatBtn_Power", "PowerDistribution");
             UpdateBtn("CatBtn_Payload", "Fasteners");
+#if UNITY_STANDALONE
+            RefreshActiveStates();
+#endif
         }
 
         // ── Legacy API ──

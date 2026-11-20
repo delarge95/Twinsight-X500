@@ -158,16 +158,59 @@ namespace WebGL.Core.Managers
             if (collider != null) Destroy(collider);
 
             var renderer = visual.GetComponent<Renderer>();
-            var mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-            mat.SetColor("_BaseColor", planeColor);
-            mat.SetFloat("_Surface", 1); // Transparent
-            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            mat.SetInt("_ZWrite", 0);
-            mat.renderQueue = 3000;
+            // PLAN_PC 41: own keyword-free shader (see CutPlane.shader). The URP/Unlit material created here lost its transparent variant in the player
+            // and drew the plane OPAQUE (a solid blue plane over the drone). Resources/CutPlane.mat keeps the shader in the build.
+            Material baseMat = Resources.Load<Material>("CutPlane");
+            Material mat;
+            if (baseMat != null)
+            {
+                mat = new Material(baseMat);
+                mat.SetColor("_BaseColor", new Color(planeColor.r, planeColor.g, planeColor.b, 1f));
+            }
+            else
+            {
+                mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                mat.SetColor("_BaseColor", planeColor);
+                mat.SetFloat("_Surface", 1); // Transparent
+                mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                mat.SetInt("_ZWrite", 0);
+                mat.renderQueue = 3000;
+            }
             renderer.material = mat;
 
             visual.SetActive(false);
+        }
+
+        /// <summary>PLAN_PC 41: the visual plane is sized to the model (its outline then frames the cut) instead of a fixed 10 m square.</summary>
+        private void FitPlaneSize()
+        {
+            float size = 10f;
+            int renderersCount = 0, skippedCount = 0;
+            try
+            {
+                var renderers = new List<Renderer>();
+                foreach (var part in FindObjectsByType<WebGL.Core.Content.ExplodablePart>(FindObjectsSortMode.None))
+                    if (part != null) renderers.AddRange(part.GetComponentsInChildren<Renderer>());
+                int skipped = 0;
+                Bounds bounds = default;
+                bool any = false;
+                foreach (var r in renderers)
+                {
+                    if (r == null) continue;
+                    Vector3 rs = r.bounds.size;
+                    if (Mathf.Max(rs.x, Mathf.Max(rs.y, rs.z)) > 3f) { skipped++; continue; } // helpers / ground: not the drone
+                    if (!any) { bounds = r.bounds; any = true; }
+                    else bounds.Encapsulate(r.bounds);
+                }
+                renderersCount = renderers.Count; skippedCount = skipped;
+                if (any) size = Mathf.Clamp(Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z)) * 1.3f, 0.6f, 10f);
+            }
+            catch (System.Exception) { size = 10f; }
+
+            Debug.Log("[CrossSection] plane size " + size.ToString("0.00") + " m (" + renderersCount + " renderers, " + skippedCount + " skipped)");
+            if (planeVisual1 != null) planeVisual1.transform.localScale = new Vector3(size, size, 1f);
+            if (planeVisual2 != null) planeVisual2.transform.localScale = new Vector3(size, size, 1f);
         }
 
         // ═══════════════════════════════════════════════════════
@@ -179,6 +222,7 @@ namespace WebGL.Core.Managers
             if (targetObject == null) FindTargetObject();
 
             isEnabled = true;
+            FitPlaneSize();
             UpdateAndApply();
 
             if (planeVisual1 != null && showPlane && plane1Active)
