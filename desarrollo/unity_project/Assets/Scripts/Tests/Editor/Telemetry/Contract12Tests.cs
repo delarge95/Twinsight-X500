@@ -95,7 +95,7 @@ namespace WebGL.Telemetry.Tests
         }
 
         [Test]
-        public void MapCaption_Text_Exists_Only_As_A_Proposed_Neutral_Text()
+        public void MapCaption_Text_Exists_As_The_Approved_Neutral_Text()
         {
             Assert.IsTrue(TelemetryStrings.TryT("map.posEstimated", "es", out string es));
             Assert.AreEqual("Posición: estimado", es);
@@ -609,7 +609,7 @@ namespace WebGL.Telemetry.Tests
         {
             var l = HonestyLabels.Load();
             Assert.AreEqual("1.2.0", l.ProtocolVersion);
-            // no 1.2 text was added to labels.json (CONTRATO_1_2.md section 9: all proposed, none approved)
+            // no 1.2 text was added to labels.json (CONTRATO_1_2.md section 9: the rest stay proposed; only map.posEstimated is approved, 2026-11-19, and it is in the dictionary)
             Assert.AreEqual(C.Text("labels.json"), System.IO.File.ReadAllText(System.IO.Path.Combine(UnityEngine.Application.dataPath, "Scripts", "Telemetry", "Resources", "TelemetryLabels.json")));
         }
     }

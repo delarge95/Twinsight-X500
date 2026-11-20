@@ -624,7 +624,7 @@ namespace WebGL.Telemetry
             { "map.originTakeoff", new[] { "Punto de despegue", "Takeoff point" } },
             { "map.posMeasured", new[] { "Posición: medido", "Position: measured" } },
             { "map.posSimulated", new[] { "Posición: simulado", "Position: simulated" } },
-            // contract 1.2 (CONTRATO_1_2.md section 9, D-10): neutral text PROPOSED, NOT YET APPROVED by the user; it replaces «Posición: medido» in the replay footer
+            // contract 1.2 (CONTRATO_1_2.md section 9, D-10): neutral text, APPROVED by the user on 2026-11-19; it replaces «Posición: medido» in the replay footer
             { "map.posEstimated", new[] { "Posición: estimado", "Position: estimated" } },
             { "map.readout", new[] { "A {dist} m del origen · rumbo {hdg}°", "{dist} m from the origin · heading {hdg}°" } },
             { "map.honest", new[] { "Sin mapa de fondo ni coordenadas geográficas: el enlace no las trae.", "No base map and no geographic coordinates: the link does not carry them." } },
