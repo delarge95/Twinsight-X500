@@ -1348,3 +1348,18 @@ Ningun otro texto es nuevo: los ⓘ llevan los textos que ya estaban. (Observaci
 - Mando real (solo `NavigationMoveEvent` / `Submit` enviados por codigo como los envia `DesktopPad`; B dentro del pliegue probado con `TryCloseFor`, no con un XInput real); SITL real (fuente manual); 150 % (`-uiscale 1.5`); la tecla Tab del sistema (la sonda envia el movimiento de navegacion); las capturas solo se revisaron a ojo en una muestra.
 - «Seguir / Libre» y «Modo juego» dentro del pliegue Avanzado es una decision de esta version: las teclas B y X siguen igual; si se prefieren visibles, se sacan del pliegue en `BuildCameraButtons`.
 - Pasos 6-8 (fuentes por tarjetas, secciones fijas, cierre) siguen sin hacerse. Sin zip, sin push. Plataforma activa WebGL; `UniversalRenderPipelineGlobalSettings.asset`, `DynamicsManager.asset` y `ProjectSettings.asset` restaurados con `git checkout`. Capturas antes/despues en `twinsight-web-twin/docs/unity_pc/capturas_ux2` (sin commitear en ese repo).
+
+## 40. Version publica 0.0.2 (2026-11-20, rama `pc-desktop`, solo PC)
+
+### 40.1 Que se hizo
+- `pc-desktop` avanzo por fast-forward a `pc-ux-1` (`53fd6a1`: UX ligera, ⓘ, «Avanzado», Enfocar y Energia en Estudio, «Posicion: estimado»). Version: `bundleVersion` 0.0.1 -> **0.0.2** (`companyName` y `productName` sin cambio), `pc_stamp_exe.ps1` y `pc_make_notices.py` apuntan a 0.0.2; `tools/release_0.0.2/` con `LEEME.txt` (novedades y limites) y `THIRD_PARTY_NOTICES.txt` regenerado con el script (mismo contenido que el de 0.0.1 salvo la version).
+- **Build de RELEASE** (no de desarrollo; `managedCodeVariant` Release) desde el Editor, receta §12.3 (Standalone activo, reimportar `Assets/Shaders` y los shaders de URP, esperar, construir): `E:\TwinSight_builds\pc_v002` (0 errores, 186 avisos, 236,9 MB). **Puerta `pc_postbuild_gate.ps1` OK.**
+- Paquete `E:\TwinSight_builds\release\TwinSightX500_PC_v0.0.2\TwinSightX500_PC\` (`robocopy /XD` sin `..._BackUpThisFolder_ButDontShipItWithYourGame`; 192 archivos, igual que 0.0.1; sin `.pdb`, sin `WinPixEventRuntime.dll`), exe estampado TwinSight / TwinSight X500 / 0.0.2 (`FileVersion` 0.0.2.0).
+
+### 40.2 Verificado
+- **Zip** `E:\TwinSight_builds\release\TwinSightX500_PC_v0.0.2.zip`, 84 791 396 bytes (80,9 MiB), **SHA-256 `6f493b86b401f6f3264610ded799f57f90322a7dc9d55a44f745365f81a4e70a`**, `.sha256` de 94 bytes (`hash  nombre`). Extraido en carpeta nueva: 192 archivos, sin BackUp ni `.pdb`, hash del exe = el del paquete, VersionInfo 0.0.2, **puerta OK 15 s**.
+- Sondas sobre el exe del paquete (1280x720 ES): `-mvp-capture` **133/133** (la primera ejecucion dio 132/133 por la comprobacion de pixel del campo termico, el intermitente ya anotado en §37.4); `-ux-capture` **250/250** con las preferencias limpias (con las que dejan las sondas de antes dio 248/250, «mission ? hover», en el exe de release y en el de desarrollo `pc_ux2` por igual: estado guardado, no un fallo de la build). `Player.log` sin Blitter / shader is null / NullReference / Exception.
+- Cierre: plataforma WebGL; `UniversalRenderPipelineGlobalSettings.asset` restaurado con `git checkout`.
+
+### 40.3 NO verificado
+- Windows limpio / otro equipo, SmartScreen y Mark of the Web reales (el exe sigue sin firmar); GPU distinta de la de esta maquina; mando real (XInput); PX4 SITL real; `-ux-capture` solo a 1280x720 ES sobre el paquete; las sondas `-desk-*`, `-tools`, `-lote1*` no se repitieron sobre el paquete (se pasaron sobre `pc_ux2`, §39.4). Sin lector `.ulg` ni parametros/mision PX4 en escritorio (dicho en el LEEME). Release de GitHub y pagina de versiones: pendientes (los hace el usuario).
