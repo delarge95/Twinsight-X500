@@ -501,6 +501,13 @@ namespace WebGL.UI.Desktop
                     return;
                 }
 
+                if (args[i].Equals("-fix1-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
+                {
+                    var fix1 = gameObject.AddComponent<DesktopCaptureFix1>(); // PLAN_PC 41: cut plane, Cut / Filter cards toggle, environment pills and slider tracks
+                    fix1.OutputDirectory = args[i + 1];
+                    return;
+                }
+
                 if (args[i].Equals("-ux-capture", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
                 {
                     var ux = gameObject.AddComponent<DesktopCaptureUx>(); // UX cut (PLAN_PC 38): visible controls per source vs TelemetryMenu, first focus of the pad
