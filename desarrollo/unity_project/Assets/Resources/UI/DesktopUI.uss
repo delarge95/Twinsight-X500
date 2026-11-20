@@ -2590,3 +2590,8 @@
 .dk-fold-title { margin: 0; font-size: 12px; color: rgb(182, 192, 204); -unity-text-align: middle-left; }
 .dk-fold-body { margin: 2px 0 0 0; padding: 0 0 0 8px; border-left-width: 1px; border-left-color: rgba(255, 255, 255, 0.12); }
 .dk-keynav .dk-fold-head:focus { border-color: rgb(70, 175, 255); }
+.dk-avail { flex-direction: row; align-self: center; align-items: center; height: 26px; margin: 6px 0 0 0; padding: 0 4px 0 12px; border-radius: 13px; background-color: rgba(1, 1, 1, 0.55); }
+.dk-avail-text { margin: 0; font-size: 12px; color: rgb(182, 192, 204); -unity-text-align: middle-left; }
+.dk-fold--inline { flex-direction: row; align-items: center; margin: 0; }
+.dk-fold--inline .dk-fold-head { height: 30px; padding: 0 10px 0 6px; border-radius: 15px; }
+.dk-fold--inline .dk-fold-body { flex-direction: row; align-items: center; margin: 0; padding: 0; border-left-width: 0; }

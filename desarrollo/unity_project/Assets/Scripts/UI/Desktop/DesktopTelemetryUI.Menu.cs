@@ -80,12 +80,53 @@ namespace WebGL.UI.Desktop
             ToolId.Map, ToolId.Preflight, ToolId.Mission, ToolId.Sessions, ToolId.Train, ToolId.Record,
         };
 
+        private VisualElement _availRow;
+        private Label _availText;
+        private Button _availInfo;
+
+        public VisualElement AvailRow => _availRow;
+        public string AvailText => _availText?.text;
+        public string AvailInfoText => _availInfo?.tooltip;
+
+        /// <summary>UX step 5: the line «Disponible en: ...» with its ⓘ (the web's tools.availableIn): where the hole left by the hidden controls can be filled.</summary>
+        private void BuildAvailRow()
+        {
+            _availRow = new VisualElement { name = "DkAvailRow", pickingMode = PickingMode.Ignore };
+            _availRow.AddToClassList("dk-avail");
+            _availText = new Label { pickingMode = PickingMode.Ignore };
+            _availText.AddToClassList("dk-avail-text");
+            _availRow.Add(_availText);
+            _availInfo = DesktopInfo.Create("DkInfoAvail");
+            _availRow.Add(_availInfo);
+            _availRow.style.display = DisplayStyle.None;
+            _container.Add(_availRow);
+        }
+
+        private void RefreshAvailRow(MenuSurface s)
+        {
+            if (_availRow == null) return;
+            List<PickSource> where = TelemetryMenu.AvailableIn(s);
+            if (where.Count == 0) { _availRow.style.display = DisplayStyle.None; return; }
+            var names = new List<string>();
+            foreach (PickSource p in where) names.Add(T(p == PickSource.Replay ? "src.replay" : p == PickSource.Sim ? "src.sim" : "src.sitl"));
+            _availText.text = TelemetryStrings.F("ux.availableIn", Lang, "sources", string.Join(", ", names));
+            var tools = new List<string>();
+            foreach (ToolId id in TelemetryMenu.ToolsMissing(s))
+            {
+                if (id == ToolId.Record) continue;
+                string label = StripButtonOf(id)?.Q<Label>()?.text;
+                if (!string.IsNullOrEmpty(label)) tools.Add(label);
+            }
+            DesktopInfo.SetText(_availInfo, string.Join(", ", tools));
+            _availRow.style.display = DisplayStyle.Flex;
+        }
+
         /// <summary>Cada fotograma (solo hace algo cuando cambia la fuente o el circuito): muestra u oculta los controles segun la tabla.</summary>
         private void ApplyMenuTable()
         {
             if (_btnPilot == null) return;
             MenuSurface s = CurrentSurface;
-            int key = (int)s * 4 + (_courseOn ? 1 : 0);
+            int key = (int)s * 8 + (_courseOn ? 1 : 0) + (Lang == "es" ? 0 : 2);
             if (key == _menuKey) return;
             _menuKey = key;
             var shown = new HashSet<ToolId>(TelemetryMenu.ToolsFor(s));
@@ -100,6 +141,8 @@ namespace WebGL.UI.Desktop
             }
             // la pastilla de pilotaje entera: sin ordenes no queda nada que mostrar (ni separadores)
             SetShown(_pilotStrip, shown.Contains(ToolId.Pilot));
+            RefreshAvailRow(s);
+            SetShown(_camFold, shown.Contains(ToolId.Follow) || shown.Contains(ToolId.Game)); // the «Avanzado» fold of the commands (camera, game mode)
         }
     }
 }

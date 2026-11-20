@@ -45,15 +45,22 @@ namespace WebGL.UI.Desktop
         // ───────────────────────── build ─────────────────────────
 
         /// <summary>Two more buttons at the end of the piloting pill: camera mode and game mode.</summary>
+        private DesktopFold _camFold;
+
         private void BuildCameraButtons()
         {
             _pilotStrip.Add(MakeSep());
             _btnCam = StripButton("DkCamMode", "camera", out _camLabel, () => ToggleCameraMode("button"));
             _btnCam.Add(Kbd("B"));
-            _pilotStrip.Add(_btnCam);
+            // UX step 5: the camera («Seguir / Libre», B) and «Modo juego» (X) go in the «Avanzado» fold of the commands (closed, inline in the pill). Takeoff, Land, Hold (H)
+            // and Return (R) stay visible: a safety command is never hidden. (Turn and Orbit have no button on the desktop: they are keys, listed in the pilot legend.)
+            _camFold = new DesktopFold("commands", "DkCmdFold");
+            _camFold.AddToClassList("dk-fold--inline");
+            _camFold.Body.Add(_btnCam);
             _btnGame = StripButton("DkGameMode", "mouse", out _gameLabel, () => ToggleGameMode("button"));
             _btnGame.Add(Kbd("X"));
-            _pilotStrip.Add(_btnGame);
+            _camFold.Body.Add(_btnGame);
+            _pilotStrip.Add(_camFold);
         }
 
         private void BuildGameOverlay()
@@ -100,6 +107,7 @@ namespace WebGL.UI.Desktop
         {
             if (_btnCam == null) return;
             bool follow = _camMode == CameraMode.Follow;
+            _camFold?.SetTitle(T("ux.advanced"));
             _camLabel.text = T(follow ? "cam.follow" : "cam.free");
             _btnCam.tooltip = T(follow ? "cam.follow.tip" : "cam.free.tip");
             _gameLabel.text = T("cam.game");

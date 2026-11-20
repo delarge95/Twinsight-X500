@@ -158,6 +158,7 @@ namespace WebGL.UI.Desktop
             _strip.Add(_btnAnalysis);
 
             _container.Add(_strip);
+            BuildAvailRow(); // UX step 5: «Disponible en: ...» (what the current source does not have)
             BuildPilotStrip(); // E-6: second pill (Pilotar + the four commands); the popovers added after it open on top of it
             BuildPopovers();
             // after the Studio container: keeps the other modes' order
