@@ -82,6 +82,8 @@ namespace WebGL.UI.Desktop
             _fcFlightRule.AddToClassList("dk-note--muted");
             _fcHonest = Text("dk-note", _popFence);
             _fcHonest.AddToClassList("dk-note--muted");
+            // UX step 5: the two long notes (flight rule, what is and is not modelled) go behind an ⓘ next to the origin tag («simulado», which stays visible)
+            DesktopInfo.Beside(_fcTag, false, "DkInfoFence", _fcFlightRule, _fcHonest);
             RegisterToolPopover("fence", _popFence);
             RefreshFenceSliders();
         }

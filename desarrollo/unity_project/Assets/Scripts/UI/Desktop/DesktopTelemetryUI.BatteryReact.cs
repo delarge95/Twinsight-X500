@@ -54,6 +54,7 @@ namespace WebGL.UI.Desktop
             _brParams = Text("dk-note", _popBattery);
             _brParams.AddToClassList("dk-note--muted");
             _brState = Text("dk-fault-row", _popBattery);
+            DesktopInfo.Beside(_brTag, false, "DkInfoBattery", _brNote); // UX step 5: the long note («no es PX4 ni un dron real») behind an ⓘ next to the «simulado» tag; the thresholds stay visible
             RegisterToolPopover("batteryreact", _popBattery);
             RefreshBatteryControls();
         }

@@ -101,6 +101,7 @@ namespace WebGL.UI.Desktop
             _popWind.Add(foot);
             _wnHonest = Text("dk-note", _popWind);
             _wnHonest.AddToClassList("dk-note--muted");
+            DesktopInfo.Beside(_wnTag, false, "DkInfoWind", _wnHonest); // UX step 5: the long honesty note behind an ⓘ next to the «simulado» tag
             RegisterToolPopover("wind", _popWind);
             RefreshWindControls();
         }
