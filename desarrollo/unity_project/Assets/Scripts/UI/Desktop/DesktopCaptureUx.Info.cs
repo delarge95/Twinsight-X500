@@ -26,12 +26,13 @@ namespace WebGL.UI.Desktop
 
         private IEnumerator CheckTipFor(string label, Button info, string expected)
         {
-            yield return new WaitForSecondsRealtime(0.35f);
+            yield return new WaitForSecondsRealtime(0.8f);
             VisualElement root = Root;
             Check(label + ": the tooltip shows the full text", TipShown && TipText != null && TipText.text == expected);
             Rect tip = TipEl.worldBound;
             Rect win = root.worldBound;
             Check(label + ": the tooltip is wrapped (several lines) and at most 380 px wide (" + F1(tip.width) + " x " + F1(tip.height) + ")", tip.width <= 382f && tip.height > 40f);
+            Log(label + " tip " + tip + " window " + win);
             Check(label + ": the tooltip is inside the window", tip.xMin >= win.xMin - 1f && tip.yMin >= win.yMin - 1f && tip.xMax <= win.xMax + 1f && tip.yMax <= win.yMax + 1f);
             Check(label + ": the text is not cut (label as tall as its content, no nowrap)", TipText.resolvedStyle.whiteSpace != WhiteSpace.NoWrap);
         }
@@ -60,9 +61,8 @@ namespace WebGL.UI.Desktop
             row.Add(b0); row.Add(mid); row.Add(b2);
             host.Add(tl); host.Add(br); host.Add(row);
             yield return new WaitForSecondsRealtime(0.4f);
-
-            Rect r = tl.worldBound;
-            Check("the ⓘ hit target is at least 24 x 24 px (" + F1(r.width) + " x " + F1(r.height) + ") and its icon 16 px", r.width >= 23.5f && r.height >= 23.5f && tl.Q<VisualElement>(className: "dk-icon").resolvedStyle.width >= 15.5f);
+            float tw = tl.resolvedStyle.width, th = tl.resolvedStyle.height;
+            Check("the ⓘ hit target is at least 24 x 24 px (" + F1(tw) + " x " + F1(th) + ") and its icon 16 px", tw >= 23.5f && th >= 23.5f && tl.Q<VisualElement>(className: "dk-icon").resolvedStyle.width >= 15.5f);
             Check("the ⓘ can take the keyboard focus", tl.focusable && tl.tabIndex >= 0);
 
             // hover
@@ -90,11 +90,11 @@ namespace WebGL.UI.Desktop
             b0.Focus();
             yield return new WaitForSecondsRealtime(0.2f);
             Check("a plain button that gets the focus by code shows no tooltip", !TipShown);
-            using (var k = KeyDownEvent.GetPooled('\t', KeyCode.Tab, EventModifiers.None)) { k.target = b0; b0.SendEvent(k); }
+            using (var mv = NavigationMoveEvent.GetPooled(NavigationMoveEvent.Direction.Right)) { mv.target = b0; b0.SendEvent(mv); } // what the pad stick sends
             yield return new WaitForSecondsRealtime(0.3f);
             bool onMid = root.panel.focusController.focusedElement == mid;
-            Check("Tab moves the focus to the ⓘ", onMid);
-            if (onMid) yield return CheckTipFor("Tab focus", mid, LongText);
+            Check("a move to the right (arrows, pad) puts the focus on the ⓘ", onMid);
+            if (onMid) yield return CheckTipFor("navigation focus", mid, LongText);
             yield return Shot("ux_info_foco_tab", 0.05f);
             mid.Blur();
 

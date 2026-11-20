@@ -71,6 +71,7 @@ namespace WebGL.UI.Desktop
             root.RegisterCallback<FocusInEvent>(OnFocusIn, TrickleDown.TrickleDown);
             root.RegisterCallback<FocusOutEvent>(OnFocusOut, TrickleDown.TrickleDown);
             root.RegisterCallback<ClickEvent>(OnClick, TrickleDown.TrickleDown);
+            root.RegisterCallback<NavigationSubmitEvent>(OnSubmit, TrickleDown.TrickleDown);
             root.RegisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
         }
 
@@ -83,6 +84,7 @@ namespace WebGL.UI.Desktop
             _root.UnregisterCallback<FocusInEvent>(OnFocusIn, TrickleDown.TrickleDown);
             _root.UnregisterCallback<FocusOutEvent>(OnFocusOut, TrickleDown.TrickleDown);
             _root.UnregisterCallback<ClickEvent>(OnClick, TrickleDown.TrickleDown);
+            _root.UnregisterCallback<NavigationSubmitEvent>(OnSubmit, TrickleDown.TrickleDown);
             _root.UnregisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
             _pending?.Pause();
             _tip.RemoveFromHierarchy();
@@ -170,6 +172,12 @@ namespace WebGL.UI.Desktop
 
         // A click or a submit (Enter, Space, the pad's A) on an ⓘ shows its text at once.
         private void OnClick(ClickEvent evt)
+        {
+            if (evt.target is VisualElement target && FindTooltipHost(target) is VisualElement host && DesktopInfo.IsInfo(host)) ShowFor(host);
+        }
+
+        // Enter, Space and the pad A do not make a ClickEvent: a submit on an info button shows the text too.
+        private void OnSubmit(NavigationSubmitEvent evt)
         {
             if (evt.target is VisualElement target && FindTooltipHost(target) is VisualElement host && DesktopInfo.IsInfo(host)) ShowFor(host);
         }
