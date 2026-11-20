@@ -36,6 +36,7 @@ namespace WebGL.UI.Desktop
         private Label _msBtnLabel;
         private VisualElement _popMission, _msList, _msEdit, _msFinishRow, _msFilesBox, _msFoot;
         private Label _msTitle, _msOrigin, _msStatus, _msProgress, _msLocked, _msEmpty, _msFinishLabel, _msIssues, _msFileNote, _msSpeedNote, _msRunReason;
+        private DesktopFold _msFold;
         private Button _msAdd, _msExport, _msImport, _msClear, _msGo, _msAbort, _msRtl;
         private readonly Button[] _msFinish = new Button[3];
         private static readonly string[] MsFinishIds = { "hold", "land", "rtl" };
@@ -138,14 +139,18 @@ namespace WebGL.UI.Desktop
             _msImport = ToolButton("DkMsImport", "dk-b--ghost", () => { _msImportOpen = !_msImportOpen; _msFileMessage = null; _msUiDirty = true; });
             _msClear = ToolButton("DkMsClear", "dk-b--ghost", () => { if (!MissionBusy) { MissionDoc m = _mission.Clone(); m.waypoints.Clear(); SetMission(m); } });
             foreach (Button b in new[] { _msExport, _msImport, _msClear }) { b.AddToClassList("dk-fault-footbtn"); files.Add(b); }
-            _popMission.Add(files);
+            // UX step 5: Export / Import / Clear and the file list live in the «Avanzado» fold (closed); the speed note goes behind an ⓘ next to the title
+            _msFold = new DesktopFold("mission", "DkMsFold");
+            _msFold.Body.Add(files);
             _msFilesBox = new VisualElement { name = "DkMsFiles" };
             _msFilesBox.AddToClassList("dk-ms-filelist");
-            _popMission.Add(_msFilesBox);
-            _msFileNote = Text("dk-note", _popMission);
+            _msFold.Body.Add(_msFilesBox);
+            _msFileNote = Text("dk-note", _msFold.Body);
             _msFileNote.AddToClassList("dk-note--muted");
+            _popMission.Add(_msFold);
             _msSpeedNote = Text("dk-note", _popMission);
             _msSpeedNote.AddToClassList("dk-note--muted");
+            DesktopInfo.Beside(_msTitle, false, "DkInfoMission", _msSpeedNote);
 
             _msFoot = new VisualElement { name = "DkMsFoot" };
             _msFoot.AddToClassList("dk-ms-foot");
@@ -181,6 +186,7 @@ namespace WebGL.UI.Desktop
             if (_btnMission == null || _popMission == null) return;
             _msBtnLabel.text = T("tools.mission");
             _msTitle.text = T("mission.title");
+            _msFold.SetTitle(T("ux.advanced"));
             _msLocked.text = T("mission.editLocked");
             _msEmpty.text = T("mission.empty");
             _msFinishLabel.text = T("mission.finish");
