@@ -11,7 +11,7 @@ mit = rd(glob.glob(pc + "com.lilytech-lab.wireframe-shader@*/LICENSE")[0])
 urp = rd(glob.glob(pc + "com.unity.render-pipelines.universal@*/Third Party Notices.md")[0])
 core = rd(glob.glob(pc + "com.unity.render-pipelines.core@*/THIRD PARTY NOTICES.md")[0])
 
-head = """TwinSight X500 para PC - version 0.0.2
+head = """TwinSight X500 para PC - version 0.0.3
 AVISOS DE LICENCIA DE TERCEROS (THIRD PARTY NOTICES)
 ======================================================================
 
