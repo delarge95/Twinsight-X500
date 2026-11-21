@@ -13,7 +13,7 @@ namespace WebGL.Telemetry
             AddUx42(d);
         }
 
-        // PLAN_PC 42 (rama pc-fix-2): PENDIENTES de aprobacion. Etiquetas cortas; lo largo va al tooltip / ⓘ.
+        // PLAN_PC 42 (rama pc-fix-2): textos aprobados 2026-11-21. Etiquetas cortas; lo largo va al tooltip / ⓘ.
         static void AddUx42(Dictionary<string, string[]> d)
         {
             d["ux.sec.cmd"] = new[] { "Mando", "Controls" };
