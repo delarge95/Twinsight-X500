@@ -167,8 +167,6 @@ namespace WebGL.UI.Desktop
 
         private void SelectSitl()
         {
-            _preferred = TelSource.Sitl;
-            PlayerPrefs.SetString(PrefSource, "sitl");
             _sitlBlockOpen = true;
         }
 
@@ -288,6 +286,7 @@ namespace WebGL.UI.Desktop
             _alertSig = null;
             pop.style.display = DisplayStyle.Flex;
             pop.BringToFront();
+            PlaceWindow(which); // PLAN_PC 42: a side window, where it was left (or beside the tree / the inspector)
             RelabelPopovers();
             TickPopovers(true);
         }
@@ -384,7 +383,7 @@ namespace WebGL.UI.Desktop
             _rowSim.EnableInClassList("dk-src-row--on", active == TelSource.Simulator);
             _rowSitl.EnableInClassList("dk-src-row--on", active == TelSource.Sitl);
 
-            bool showSitl = _sitlBlockOpen || active == TelSource.Sitl || _preferred == TelSource.Sitl;
+            bool showSitl = _sitlBlockOpen || active == TelSource.Sitl;
             _sitlBlock.style.display = showSitl ? DisplayStyle.Flex : DisplayStyle.None;
             if (_sitlField.value != _sitlUrl && !IsFieldFocused()) _sitlField.SetValueWithoutNotify(_sitlUrl);
 

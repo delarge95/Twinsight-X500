@@ -259,14 +259,12 @@ namespace WebGL.UI.Desktop
             if (_ctrl.IsHelpOpen) return null;
             if (tel != null && tel.OpenPopover != null)
             {
-                VisualElement pop = _root.Q<VisualElement>(tel.OpenPopover == "source" ? "DkPopSource" : tel.OpenPopover == "alerts" ? "DkPopAlerts" : "DkPopFaults");
-                target = FirstShownButton(pop);
+                target = FirstShownButton(tel.OpenPopoverElement); // PLAN_PC 42: any side window of the tab, not only the three of before
             }
             if (target == null && tel != null && tel.ModeOpen)
             {
-                // «Encendido» is the first focus of the Telemetry strip; if it is ever hidden, the first shown button of the mode container takes it
-                target = _root.Q<Button>("DkTelPower");
-                if (target == null || target.resolvedStyle.display == DisplayStyle.None) target = FirstShownButton(_root.Q<VisualElement>("DkTelemetry"));
+                // PLAN_PC 42: the first shown source pill (the four sources with the telemetry off, the active one when on) is the first focus of the tab
+                target = FirstShownButton(_root.Q<VisualElement>("DkTelemetry"));
             }
             if (target == null && UIManager.Instance != null && UIManager.Instance.IsHeroVisible) target = _root.Q<Button>("HeroExploreBtn");
             if (target == null) target = _root.Q<Button>(className: "dk-seg-btn--on") ?? _root.Q<Button>("DkMode1");
@@ -275,12 +273,23 @@ namespace WebGL.UI.Desktop
             return target;
         }
 
+        /// <summary>Shown = neither the element nor any ancestor up to <paramref name="top"/> has display none (a collapsed section hides its strip, not its buttons).</summary>
+        private static bool Shown(VisualElement e, VisualElement top)
+        {
+            for (VisualElement v = e; v != null; v = v.parent)
+            {
+                if (v.resolvedStyle.display == DisplayStyle.None) return false;
+                if (v == top) break;
+            }
+            return true;
+        }
+
         private static Button FirstShownButton(VisualElement parent)
         {
             if (parent == null) return null;
             foreach (Button b in parent.Query<Button>().ToList())
             {
-                if (b.enabledSelf && b.resolvedStyle.display != DisplayStyle.None && b.focusable) return b;
+                if (b.enabledSelf && b.focusable && Shown(b, parent)) return b;
             }
             return null;
         }

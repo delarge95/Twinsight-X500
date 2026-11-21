@@ -53,19 +53,25 @@ namespace WebGL.UI.Desktop
                 case ToolId.Sessions: return _btnRecord;
                 case ToolId.Train: return _btnTraining;
                 case ToolId.Record: return _rcToggle;
+                case ToolId.Alerts: return _btnAlerts;
+                case ToolId.Faults: return _btnFaults;
+                case ToolId.Analysis: return _btnAnalysis;
                 default: return null;
             }
         }
 
-        /// <summary>Verificacion: el control esta a la vista (existe en la fuente y su pastilla tampoco esta oculta).</summary>
+        /// <summary>Verificacion: el control esta a la vista (existe en la fuente, su seccion esta abierta y su fila tampoco esta oculta).</summary>
         public bool ToolShown(ToolId id)
         {
             Button b = StripButtonOf(id);
             if (b == null) return false;
-            if (b.style.display == DisplayStyle.None) return false;
-            VisualElement strip = id <= ToolId.Game ? _pilotStrip : null;
-            return strip == null || strip.style.display != DisplayStyle.None;
+            for (VisualElement e = b; e != null && e != _container; e = e.parent)
+                if (e.style.display == DisplayStyle.None) return false;
+            return true;
         }
+
+        /// <summary>La fila (pastilla) de cada seccion.</summary>
+        private VisualElement RowOf(TSection s) => s == TSection.Cmd ? _pilotStrip : s == TSection.Scene ? _envStrip : _toolsStrip;
 
         private static void SetShown(VisualElement e, bool shown)
         {
@@ -77,7 +83,8 @@ namespace WebGL.UI.Desktop
         {
             ToolId.Pilot, ToolId.Takeoff, ToolId.Land, ToolId.Hold, ToolId.Rtl, ToolId.Follow, ToolId.Game,
             ToolId.Ground, ToolId.Course, ToolId.Fence, ToolId.Wind, ToolId.Battery,
-            ToolId.Map, ToolId.Preflight, ToolId.Mission, ToolId.Sessions, ToolId.Train, ToolId.Record,
+            ToolId.Map, ToolId.Preflight, ToolId.Mission, ToolId.Sessions, ToolId.Train,
+            ToolId.Alerts, ToolId.Faults, ToolId.Analysis, ToolId.Record,
         };
 
         private VisualElement _availRow;
@@ -121,27 +128,65 @@ namespace WebGL.UI.Desktop
             _availRow.style.display = DisplayStyle.Flex;
         }
 
-        /// <summary>Cada fotograma (solo hace algo cuando cambia la fuente o el circuito): muestra u oculta los controles segun la tabla.</summary>
+        private bool _lastPiloting;
+
+        /// <summary>
+        /// Cada fotograma (solo hace algo cuando cambia la fuente, la seccion abierta, el pilotaje, «Mas», el circuito o el idioma): muestra u oculta las pastillas
+        /// segun <see cref="TelemetryMenu.ViewFor"/> (PLAN_PC 42). Al cambiar de fuente se abre su seccion por defecto («Mando» donde hay ordenes) y se cierran los
+        /// paneles que la nueva fuente no tiene.
+        /// </summary>
         private void ApplyMenuTable()
         {
             if (_btnPilot == null) return;
             MenuSurface s = CurrentSurface;
-            int key = (int)s * 8 + (_courseOn ? 1 : 0) + (Lang == "es" ? 0 : 2);
+            if (_lastSurface != s)
+            {
+                _lastSurface = s;
+                _openSection = TelemetryMenu.DefaultSection(s);
+                _moreOpen = false;
+                string keep = _openPop;
+                bool keepIt = keep == "source" || keep == "record" && (s == MenuSurface.Inspector || s == MenuSurface.Own || TelemetryMenu.Has(ToolId.Sessions, s))
+                    || keep == "alerts" && TelemetryMenu.Has(ToolId.Alerts, s) || keep == "faults" && TelemetryMenu.Has(ToolId.Faults, s);
+                if (keep != null && !keepIt) CloseAllPopovers();
+            }
+            if (_pilotOn != _lastPiloting) { _lastPiloting = _pilotOn; _moreOpen = false; }
+            int key = (int)s * 4096 + (_openSection.HasValue ? 1 + (int)_openSection.Value : 0) * 256 + (_pilotOn ? 128 : 0) + (_moreOpen ? 64 : 0) + (_courseOn ? 1 : 0) + (Lang == "es" ? 0 : 2);
             if (key == _menuKey) return;
             _menuKey = key;
-            var shown = new HashSet<ToolId>(TelemetryMenu.ToolsFor(s));
+            StripView view = _view = TelemetryMenu.ViewFor(s, _openSection, _pilotOn, _moreOpen);
+            var shown = new HashSet<ToolId>(view.Tools);
             foreach (ToolId id in Drawn)
             {
-                bool on = shown.Contains(id);
-                if (id == ToolId.Course && _courseOn) on = true; // un circuito colocado se puede quitar aunque la fuente ya no sea el simulador
+                bool exists = TelemetryMenu.Has(id, s);
+                bool on = id == ToolId.Record ? exists : shown.Contains(id);
+                // un circuito colocado se puede quitar aunque la fuente ya no sea el simulador (con su seccion abierta)
+                if (id == ToolId.Course && _courseOn && s != MenuSurface.Inspector && (view.Open == TSection.Scene || shown.Contains(ToolId.Ground))) on = true;
                 Button b = StripButtonOf(id);
                 SetShown(b, on);
-                // the buttons that have no enabled state of their own: a hidden one is also disabled (the others do it in their Tick)
-                if (b != null && (id >= ToolId.Takeoff && id <= ToolId.Game)) b.SetEnabled(on);
+                // the buttons that have no enabled state of their own: one the source lacks is also disabled (the others do it in their Tick)
+                if (b != null && (id >= ToolId.Takeoff && id <= ToolId.Game || id >= ToolId.Alerts && id <= ToolId.Analysis || id == ToolId.Ground || id == ToolId.Sessions)) b.SetEnabled(exists);
             }
-            // la pastilla de pilotaje entera: sin ordenes no queda nada que mostrar (ni separadores)
-            SetShown(_pilotStrip, shown.Contains(ToolId.Pilot));
-            RefreshAvailRow(s);
+            // una fila por seccion: se ve si tiene alguna pastilla a la vista
+            foreach (TSection sec in TelemetryMenu.Sections)
+            {
+                bool any = false;
+                foreach (ToolId id in view.Tools) if (TelemetryMenu.SectionOf(id) == sec) { any = true; break; }
+                if (sec == TSection.Scene && _courseOn && view.Open == TSection.Scene) any = true;
+                SetShown(RowOf(sec), any);
+            }
+            foreach (KeyValuePair<SourcePill, Button> kv in _srcPills) SetShown(kv.Value, view.Pills.Contains(kv.Key));
+            SetShown(_srcGear, s != MenuSurface.Inspector);
+            foreach (KeyValuePair<TSection, Button> kv in _secBtns)
+            {
+                SetShown(kv.Value, view.Sections.Contains(kv.Key));
+                kv.Value.EnableInClassList("dk-strip-btn--on", view.Open == kv.Key);
+                kv.Value.EnableInClassList("dk-secbtn--open", view.Open == kv.Key);
+            }
+            SetShown(_moreBtn, view.More);
+            _moreBtn.EnableInClassList("dk-strip-btn--on", _moreOpen);
+            _moreBtn.EnableInClassList("dk-secbtn--open", _moreOpen);
+            SetShown(_sepData, s != MenuSurface.Inspector);
+            if (s == MenuSurface.Inspector || _pilotOn) SetShown(_availRow, false); else RefreshAvailRow(s);
             SetShown(_camFold, shown.Contains(ToolId.Follow) || shown.Contains(ToolId.Game)); // the «Avanzado» fold of the commands (camera, game mode)
         }
     }

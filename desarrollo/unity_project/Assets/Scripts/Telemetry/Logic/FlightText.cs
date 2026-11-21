@@ -567,7 +567,7 @@ namespace WebGL.Telemetry
             { "tut.tel.desc", new[] { "Datos de vuelo sobre el modelo, siempre con su origen.", "Flight data on the model, always with its origin." } },
             { "tut.tel.mode", new[] { "Modo Telemetría", "Telemetry mode" } },
             { "tut.tel.mode.key", new[] { "Tecla 4", "Key 4" } },
-            { "tut.tel.mode.strip", new[] { "Tira: Encendido, Fuente, Alertas, Fallas", "Strip: Power, Source, Alerts, Faults" } },
+            { "tut.tel.mode.strip", new[] { "Arriba: elige la fuente; púlsala otra vez para apagar", "Top: pick a source; press it again to turn off" } }, // PLAN_PC 42: PENDIENTE de aprobacion
             { "tut.tel.src", new[] { "Fuente", "Source" } },
             { "tut.tel.key.l", new[] { "L", "L" } },
             { "tut.tel.src.replay", new[] { "Sombra digital: vuelo real repetido aquí", "Digital shadow: a real flight replayed here" } },
@@ -584,7 +584,7 @@ namespace WebGL.Telemetry
             { "tut.tel.pilot.esc", new[] { "Esc: soltar el pilotaje", "Esc: release piloting" } },
             // touch variant (finger glyphs, no keyboard)
             { "tut.tel.t.mode", new[] { "Toca Telemetría en el conmutador de modos", "Tap Telemetry in the mode switch" } },
-            { "tut.tel.t.power", new[] { "Toca Encendido en la tira", "Tap Power in the strip" } },
+            { "tut.tel.t.power", new[] { "Toca una fuente arriba", "Tap a source on top" } }, // PLAN_PC 42: PENDIENTE de aprobacion
             { "tut.tel.t.src", new[] { "Toca Fuente", "Tap Source" } },
             { "tut.tel.t.flight", new[] { "Toca la pestaña Vuelo", "Tap the Flight tab" } },
             { "tut.tel.t.alerts", new[] { "Toca Alertas", "Tap Alerts" } },

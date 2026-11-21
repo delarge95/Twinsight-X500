@@ -33,7 +33,7 @@ namespace WebGL.UI.Desktop
             { "OnboardCloseBtn", "Esc" },
             { "HeroInfoBtn", "F1" },
             { "DkMode1", "1" }, { "DkMode2", "2" }, { "DkMode3", "3" }, { "DkMode4", "4" },
-            { "DkTelSource", "L" }, { "DkTelAlerts", "Shift+A" },
+            { "DkSrcGear", "L" }, { "DkTelAlerts", "Shift+A" },
             { "DkPins", "H" }, { "DkChipFilter", "G" }, { "DkChipExplode", "E" }, { "DkChipCut", "C" }, { "DkIso", "I" }, { "DkReset", "R|Home" },
             { "DkTree", "T" }, { "DkRailTree", "T" }, { "DkRailSearch", "Ctrl+F" }, { "DkInspector", "P" }, { "DkRailInspector", "P" },
             { "DkHelp", "?" }, { "DkStatusHelp", "?" }, { "DkFocus", "F" }, { "DkIsolate", "I" },

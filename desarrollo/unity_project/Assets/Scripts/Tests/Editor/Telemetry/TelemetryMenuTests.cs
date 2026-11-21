@@ -10,9 +10,15 @@ namespace WebGL.Telemetry.Tests
         static readonly MenuSurface[] All = TelemetryMenu.Surfaces;
 
         [Test]
-        public void Inspector_Has_Only_The_Ground_And_The_Sessions_Hub()
+        public void Inspector_Has_No_Tool_Only_The_Four_Source_Pills()
         {
-            CollectionAssert.AreEqual(new[] { ToolId.Ground, ToolId.Sessions }, TelemetryMenu.ToolsFor(MenuSurface.Inspector));
+            // PLAN_PC 42 (A): con la telemetria apagada solo se ofrecen las cuatro fuentes; ni Suelo (no hay nada que reflejar) ni Grabar ni Alertas
+            Assert.IsEmpty(TelemetryMenu.ToolsFor(MenuSurface.Inspector));
+            var v = TelemetryMenu.ViewFor(MenuSurface.Inspector, TSection.Cmd, false, false);
+            CollectionAssert.AreEqual(new[] { SourcePill.Replay, SourcePill.Sim, SourcePill.Sitl, SourcePill.Own }, v.Pills);
+            Assert.IsEmpty(v.Tools);
+            Assert.IsEmpty(v.Sections);
+            Assert.IsFalse(v.More);
         }
 
         [Test]
@@ -28,14 +34,16 @@ namespace WebGL.Telemetry.Tests
             CollectionAssert.AreEqual(new[]
             {
                 ToolId.Pilot, ToolId.Takeoff, ToolId.Land, ToolId.Hold, ToolId.Rtl, ToolId.Follow, ToolId.Game,
-                ToolId.Ground, ToolId.Map, ToolId.Preflight, ToolId.Mission, ToolId.Sessions, ToolId.Record,
+                ToolId.Ground, ToolId.Map, ToolId.Preflight, ToolId.Mission, ToolId.Sessions,
+                ToolId.Alerts, ToolId.Faults, ToolId.Analysis, ToolId.Record,
             }, TelemetryMenu.ToolsFor(MenuSurface.Sitl));
         }
 
         [Test]
-        public void Replay_And_Own_Take_No_Orders_So_Only_Map_Preflight_Ground_And_Sessions()
+        public void Replay_And_Own_Take_No_Orders_No_Faults_No_Record_But_Alerts_From_The_Log()
         {
-            var expected = new[] { ToolId.Ground, ToolId.Map, ToolId.Preflight, ToolId.Sessions };
+            // PLAN_PC 42 (B): sin Fallas (en la repeticion el dron no reacciona), sin Grabar; Alertas si (el vuelo de muestra produce motor4:out)
+            var expected = new[] { ToolId.Ground, ToolId.Map, ToolId.Preflight, ToolId.Alerts, ToolId.Analysis };
             CollectionAssert.AreEquivalent(expected, TelemetryMenu.ToolsFor(MenuSurface.Replay));
             CollectionAssert.AreEquivalent(expected, TelemetryMenu.ToolsFor(MenuSurface.Own));
         }
@@ -180,6 +188,96 @@ namespace WebGL.Telemetry.Tests
             Assert.IsNull(TelemetryMenu.GroupOn(TGroup.Cmd, MenuSurface.Replay));
             Assert.IsNull(TelemetryMenu.GroupOn(TGroup.Flights, MenuSurface.Sim));
             Assert.AreEqual(TGroup.Cmd, TelemetryMenu.GroupOn(TGroup.Cmd, MenuSurface.Sitl));
+        }
+        // ───────────────────────── PLAN_PC 42 ─────────────────────────
+
+        [Test]
+        public void Running_Shows_Only_The_Active_Source_Pill_And_Pressing_It_Again_Turns_Off()
+        {
+            Assert.AreEqual(SourcePill.Sim, TelemetryMenu.SourcePillsFor(MenuSurface.Sim).Single());
+            Assert.AreEqual(SourcePill.Own, TelemetryMenu.SourcePillsFor(MenuSurface.Own).Single());
+            Assert.AreEqual(SourcePill.Sitl, TelemetryMenu.SourcePillsFor(MenuSurface.Sitl).Single());
+            Assert.AreEqual(SourcePill.Replay, TelemetryMenu.SourcePillsFor(MenuSurface.Replay).Single());
+            Assert.IsNull(TelemetryMenu.PressPill(MenuSurface.Sim, SourcePill.Sim));
+            Assert.IsNull(TelemetryMenu.PressPill(MenuSurface.Own, SourcePill.Own));
+            Assert.AreEqual(SourcePill.Sitl, TelemetryMenu.PressPill(MenuSurface.Inspector, SourcePill.Sitl));
+        }
+
+        [Test]
+        public void Faults_Only_Where_The_Drone_Reacts_And_Record_Only_Where_It_Can_Be_Recorded()
+        {
+            CollectionAssert.AreEqual(new[] { MenuSurface.Sim, MenuSurface.Sitl }, All.Where(s => TelemetryMenu.Has(ToolId.Faults, s)).ToList());
+            CollectionAssert.AreEqual(new[] { MenuSurface.Sim, MenuSurface.Sitl }, All.Where(s => TelemetryMenu.Has(ToolId.Sessions, s)).ToList());
+            CollectionAssert.AreEqual(new[] { MenuSurface.Replay, MenuSurface.Own, MenuSurface.Sim, MenuSurface.Sitl }, All.Where(s => TelemetryMenu.Has(ToolId.Alerts, s)).ToList());
+            Assert.IsFalse(TelemetryMenu.Has(ToolId.Ground, MenuSurface.Inspector));
+        }
+
+        [Test]
+        public void Sections_Group_The_Pills_And_Only_Those_With_Something_Appear()
+        {
+            CollectionAssert.AreEqual(new[] { TSection.Cmd, TSection.Scene, TSection.Tools }, TelemetryMenu.SectionsFor(MenuSurface.Sim));
+            CollectionAssert.AreEqual(new[] { TSection.Cmd, TSection.Scene, TSection.Tools }, TelemetryMenu.SectionsFor(MenuSurface.Sitl));
+            CollectionAssert.AreEqual(new[] { TSection.Scene, TSection.Tools }, TelemetryMenu.SectionsFor(MenuSurface.Replay));
+            Assert.IsEmpty(TelemetryMenu.SectionsFor(MenuSurface.Inspector));
+            Assert.AreEqual(TSection.Cmd, TelemetryMenu.DefaultSection(MenuSurface.Sim));
+            Assert.IsNull(TelemetryMenu.DefaultSection(MenuSurface.Replay));
+            Assert.IsNull(TelemetryMenu.ToggleSection(TSection.Scene, TSection.Scene));
+            Assert.AreEqual(TSection.Tools, TelemetryMenu.ToggleSection(TSection.Scene, TSection.Tools));
+            foreach (var id in TelemetryMenu.ToolIds)
+            {
+                bool row1 = id == ToolId.Alerts || id == ToolId.Faults || id == ToolId.Analysis || id == ToolId.Record;
+                Assert.AreEqual(row1, TelemetryMenu.SectionOf(id) == null, id.ToString());
+            }
+        }
+
+        [Test]
+        public void One_Section_Open_At_A_Time_Shows_Only_Its_Pills_Plus_The_Row1_Pills()
+        {
+            var v = TelemetryMenu.ViewFor(MenuSurface.Sim, TSection.Scene, false, false);
+            CollectionAssert.AreEqual(new[] { ToolId.Ground, ToolId.Course, ToolId.Fence, ToolId.Wind, ToolId.Battery, ToolId.Alerts, ToolId.Faults, ToolId.Analysis }, v.Tools);
+            CollectionAssert.AreEqual(new[] { SourcePill.Sim }, v.Pills);
+            Assert.AreEqual(3, v.Sections.Count);
+            var closed = TelemetryMenu.ViewFor(MenuSurface.Replay, null, false, false);
+            CollectionAssert.AreEqual(new[] { ToolId.Alerts, ToolId.Analysis }, closed.Tools);
+            // a section the source lacks reads as none
+            Assert.IsNull(TelemetryMenu.ViewFor(MenuSurface.Replay, TSection.Cmd, false, false).Open);
+        }
+
+        [Test]
+        public void Piloting_Is_Compact_With_Hold_And_Return_Always_Visible()
+        {
+            foreach (var s in new[] { MenuSurface.Sim, MenuSurface.Sitl })
+                foreach (TSection? open in new TSection?[] { null, TSection.Cmd, TSection.Scene, TSection.Tools })
+                    foreach (bool more in new[] { false, true })
+                    {
+                        var v = TelemetryMenu.ViewFor(s, open, true, more);
+                        Assert.IsTrue(v.Tools.Contains(ToolId.Hold) && v.Tools.Contains(ToolId.Rtl) && v.Tools.Contains(ToolId.Takeoff) && v.Tools.Contains(ToolId.Land), s + " " + open + " " + more);
+                        Assert.IsTrue(v.Tools.Contains(ToolId.Alerts), "alerts are a dynamic warning: always visible");
+                        Assert.IsTrue(v.More);
+                        if (!more)
+                        {
+                            Assert.IsEmpty(v.Sections);
+                            Assert.IsFalse(v.Tools.Contains(ToolId.Faults) || v.Tools.Contains(ToolId.Analysis) || v.Tools.Contains(ToolId.Ground) || v.Tools.Contains(ToolId.Map));
+                        }
+                    }
+            var compact = TelemetryMenu.ViewFor(MenuSurface.Sim, TSection.Tools, true, false);
+            Assert.AreEqual(8, compact.Tools.Count); // 7 de Mando (2 dentro de «Avanzado») + Alertas
+            var expanded = TelemetryMenu.ViewFor(MenuSurface.Sim, TSection.Tools, true, true);
+            CollectionAssert.IsSubsetOf(new[] { ToolId.Map, ToolId.Mission, ToolId.Hold, ToolId.Rtl }, expanded.Tools);
+        }
+
+        [Test]
+        public void Nothing_Is_Lost_Every_Tool_Of_A_Source_Is_Reachable_From_Some_Section_State()
+        {
+            foreach (var s in All)
+                foreach (var id in TelemetryMenu.ToolsFor(s))
+                {
+                    if (id == ToolId.Record) continue; // dentro del panel «Grabar»
+                    bool reach = false;
+                    foreach (TSection? open in new TSection?[] { null, TSection.Cmd, TSection.Scene, TSection.Tools })
+                        reach |= TelemetryMenu.ViewFor(s, open, false, false).Tools.Contains(id) || TelemetryMenu.ViewFor(s, open, true, true).Tools.Contains(id);
+                    Assert.IsTrue(reach, id + " on " + s);
+                }
         }
     }
 }

@@ -30,8 +30,26 @@ namespace WebGL.Telemetry
         Ground, Course, Fence, Wind, Battery,
         // pastilla 4: herramientas
         Map, Preflight, Mission, Sessions, Train,
+        // fila 1 (PLAN_PC 42): pastillas pequenas que abren un panel lateral
+        Alerts, Faults, Analysis,
         // dentro del popover de «Grabar»
         Record,
+    }
+
+    /// <summary>Las cuatro fuentes que ofrece la fila 1 (PLAN_PC 42): repeticion local, simulador, PX4 SITL y «Mis sesiones» (una sesion propia).</summary>
+    public enum SourcePill { Replay, Sim, Sitl, Own }
+
+    /// <summary>Las secciones plegables de la fila 1 (PLAN_PC 42): una abierta a la vez.</summary>
+    public enum TSection { Cmd, Scene, Tools }
+
+    /// <summary>Lo que dibujan las filas de arriba (ver <see cref="TelemetryMenu.ViewFor"/>).</summary>
+    public sealed class StripView
+    {
+        public List<SourcePill> Pills;
+        public List<TSection> Sections;
+        public List<ToolId> Tools;
+        public TSection? Open;
+        public bool More;
     }
 
     /// <summary>Las secciones de la telemetria, en el orden en que se dibujan: ver (datos), actuar (mando / vuelos) y preparar (herramientas).</summary>
@@ -64,7 +82,7 @@ namespace WebGL.Telemetry
             { ToolId.Rtl, Commands },
             { ToolId.Follow, Commands }, // «Seguir / Libre»: la camara de persecucion solo actua pilotando
             { ToolId.Game, Commands },   // «Modo juego»
-            { ToolId.Ground, AllSurfaces },  // el suelo es una vista de la escena: toda fuente
+            { ToolId.Ground, Running },      // el suelo refleja el vuelo: con la telemetria apagada no hay nada que reflejar (PLAN_PC 42)
             { ToolId.Course, SimOnly },      // el circuito de pruebas simulado
             { ToolId.Fence, SimOnly },       // la geocerca editable es la del simulador
             { ToolId.Wind, SimOnly },        // viento simulado; en PX4 SITL el viento es de Gazebo
@@ -72,12 +90,94 @@ namespace WebGL.Telemetry
             { ToolId.Map, Running },         // necesita un vuelo que dibujar
             { ToolId.Preflight, Running },
             { ToolId.Mission, Commands },    // da ordenes
-            { ToolId.Sessions, AllSurfaces },
+            { ToolId.Sessions, Commands },   // «Grabar»: solo donde se puede grabar; «Mis sesiones» es una fuente (SourcePill.Own), no esta herramienta
+            { ToolId.Alerts, Running },      // la repeticion de muestra SI produce alertas del propio log (motor4:out, 4 de 9492 marcos; PLAN_PC 42)
+            { ToolId.Faults, Commands },     // solo donde el dron reacciona de verdad: corte de motor del simulador, «Agotar bateria» de PX4 SITL
+            { ToolId.Analysis, Running },
             { ToolId.Train, SimOnly },       // aprender a volar necesita el simulador
             { ToolId.Record, Commands },     // grabar necesita una fuente viva (su estado de enlace es un aviso dinamico, no parte de la tabla)
         };
 
         public static bool Has(ToolId id, MenuSurface s) => Array.IndexOf(ToolSurfaces[id], s) >= 0;
+
+        // ───────────────────────── PLAN_PC 42: fuentes como pastillas, secciones plegables y modo compacto al pilotar ─────────────────────────
+
+        /// <summary>Las cuatro pastillas de fuente de la fila 1. Con la telemetria apagada salen las cuatro; encendida, solo la activa (pulsarla la apaga).</summary>
+        public static readonly SourcePill[] SourcePills = { SourcePill.Replay, SourcePill.Sim, SourcePill.Sitl, SourcePill.Own };
+
+        public static SourcePill? PillOf(MenuSurface s)
+        {
+            switch (s)
+            {
+                case MenuSurface.Replay: return SourcePill.Replay;
+                case MenuSurface.Own: return SourcePill.Own;
+                case MenuSurface.Sim: return SourcePill.Sim;
+                case MenuSurface.Sitl: return SourcePill.Sitl;
+                default: return null;
+            }
+        }
+
+        public static List<SourcePill> SourcePillsFor(MenuSurface s)
+        {
+            SourcePill? on = PillOf(s);
+            return on.HasValue ? new List<SourcePill> { on.Value } : new List<SourcePill>(SourcePills);
+        }
+
+        /// <summary>Pulsar una pastilla de fuente: la activa apaga la telemetria (null); otra la enciende.</summary>
+        public static SourcePill? PressPill(MenuSurface s, SourcePill p) => PillOf(s) == p ? (SourcePill?)null : p;
+
+        /// <summary>La seccion plegable de cada herramienta de pastilla; null = va directa en la fila 1 (Alertas, Fallas, Analisis) o dentro de un panel (Grabar).</summary>
+        public static TSection? SectionOf(ToolId id)
+        {
+            if (id <= ToolId.Game) return TSection.Cmd;
+            if (id <= ToolId.Battery) return TSection.Scene;
+            if (id <= ToolId.Train) return TSection.Tools;
+            return null;
+        }
+
+        public static readonly TSection[] Sections = { TSection.Cmd, TSection.Scene, TSection.Tools };
+
+        /// <summary>Las secciones con algo que mostrar en la fuente (ninguna con la telemetria apagada).</summary>
+        public static List<TSection> SectionsFor(MenuSurface s)
+        {
+            var l = new List<TSection>();
+            foreach (TSection sec in Sections)
+                foreach (ToolId id in ToolIds)
+                    if (SectionOf(id) == sec && Has(id, s)) { l.Add(sec); break; }
+            return l;
+        }
+
+        /// <summary>La seccion que se abre al elegir la fuente: «Mando» donde hay ordenes; si no, ninguna (menos ruido).</summary>
+        public static TSection? DefaultSection(MenuSurface s) => Has(ToolId.Pilot, s) ? (TSection?)TSection.Cmd : null;
+
+        public static TSection? ToggleSection(TSection? cur, TSection next) => cur == next ? (TSection?)null : next;
+
+        /// <summary>
+        /// Lo que se ve en las filas de arriba. Fila 1: pastillas de fuente, secciones y Alertas / Fallas / Analisis. Fila 2: la seccion abierta.
+        /// Pilotando (modo compacto): fila 1 = la fuente, Alertas (aviso dinamico) y «Mas»; fila 2 = «Mando» siempre (Mantener y Volver a la vista);
+        /// «Mas» devuelve las secciones y, si se abre otra, sale como fila 3.
+        /// </summary>
+        public static StripView ViewFor(MenuSurface s, TSection? open, bool piloting, bool more)
+        {
+            var v = new StripView { Pills = SourcePillsFor(s), Sections = new List<TSection>(), Tools = new List<ToolId>() };
+            if (s == MenuSurface.Inspector) return v;
+            open = open.HasValue && SectionsFor(s).Contains(open.Value) ? open : null;
+            bool full = !piloting || more;
+            v.More = piloting;
+            if (full) v.Sections = SectionsFor(s);
+            foreach (ToolId id in ToolIds)
+            {
+                if (id == ToolId.Record || !Has(id, s)) continue;
+                TSection? sec = SectionOf(id);
+                bool show;
+                if (sec == null) show = id == ToolId.Alerts || full;
+                else if (piloting && sec == TSection.Cmd) show = true;
+                else show = full && open == sec;
+                if (show) v.Tools.Add(id);
+            }
+            v.Open = open;
+            return v;
+        }
 
         /// <summary>Los controles que existen en <paramref name="s"/>, en el orden de dibujo.</summary>
         public static List<ToolId> ToolsFor(MenuSurface s)

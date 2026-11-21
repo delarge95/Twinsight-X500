@@ -22,6 +22,7 @@ namespace WebGL.UI.Desktop
     /// </summary>
     internal sealed partial class DesktopTelemetryUI
     {
+        /// <summary>Legacy (removed in PLAN_PC 42): the «last source» preference is no longer written and is deleted at start.</summary>
         public const string PrefSource = "Desk_Source";
         public const string PrefSitlUrl = "Desk_SitlUrl";
 
@@ -38,15 +39,14 @@ namespace WebGL.UI.Desktop
         // mode 4 strip
         private VisualElement _container;
         private VisualElement _strip;
-        private Button _btnPower, _btnSource, _btnAlerts, _btnFaults;   // + _btnAnalysis (DesktopTelemetryUI.Analysis.cs)
-        private Label _powerLabel, _stateLabel, _sourceLabel, _alertsLabel, _alertsCount, _faultsLabel;
+        private Button _btnAlerts, _btnFaults;   // + _btnAnalysis (DesktopTelemetryUI.Analysis.cs); the source pills: DesktopTelemetryUI.Layout.cs
+        private Label _alertsLabel, _alertsCount, _faultsLabel;
         private VisualElement _bar2;
 
         // status bar
         private Label _statusLink;
 
         // session state
-        private TelSource _preferred = TelSource.LocalReplay;
         private string _sitlUrl;
         private string _sitlError;
         private string _startError;
@@ -72,8 +72,7 @@ namespace WebGL.UI.Desktop
 
             _sitlUrl = PlayerPrefs.GetString(PrefSitlUrl, TelemetryEndpoints.Sitl);
             if (TelemetryEndpoints.CommandLine("-sitl-url") != null) _sitlUrl = TelemetryEndpoints.CommandLine("-sitl-url");
-            string pref = PlayerPrefs.GetString(PrefSource, "replay");
-            _preferred = pref == "sitl" ? TelSource.Sitl : pref == "sim" ? TelSource.Simulator : TelSource.LocalReplay;
+            PlayerPrefs.DeleteKey(PrefSource); // PLAN_PC 42: the app no longer remembers the last source
 
             BuildChips();
             AppLanguageManager.LanguageChanged += OnLanguage;
@@ -133,16 +132,7 @@ namespace WebGL.UI.Desktop
             _strip.AddToClassList("dk-strip");
             _strip.AddToClassList("dk-strip--tel");
 
-            _btnPower = StripButton("DkTelPower", "power", out _powerLabel, ToggleSession);
-            _stateLabel = new Label { name = "DkTelState", pickingMode = PickingMode.Ignore };
-            _stateLabel.AddToClassList("dk-strip-state");
-            _btnPower.Add(_stateLabel);
-            _strip.Add(_btnPower);
-            _strip.Add(MakeSep());
-
-            _btnSource = StripButton("DkTelSource", "source", out _sourceLabel, () => TogglePopover("source"));
-            _btnSource.Add(Kbd("L"));
-            _strip.Add(_btnSource);
+            BuildSourcePills(); // PLAN_PC 42: the four sources (no «Encendido», no «Fuente»), the sections and «Más»
 
             _btnAlerts = StripButton("DkTelAlerts", "alert", out _alertsLabel, () => TogglePopover("alerts"));
             _alertsCount = new Label { name = "DkTelAlertsCount", pickingMode = PickingMode.Ignore };
@@ -163,6 +153,7 @@ namespace WebGL.UI.Desktop
             BuildPopovers();
             // after the Studio container: keeps the other modes' order
             bar.Add(_container);
+            BuildWindows(); // PLAN_PC 42: every panel of the tab is a side window
             DesktopMotion.WatchVisible(_container);
 
             BuildPilotOverlay();
@@ -255,9 +246,10 @@ namespace WebGL.UI.Desktop
 
         // ───────────────────────── session ─────────────────────────
 
+        /// <summary>The session chip / tests: on = off; off = the simulator (no «last source» is remembered any more, PLAN_PC 42).</summary>
         public void ToggleSession()
         {
-            if (DesktopTelemetry.IsRunning) StopSession(); else StartPreferred();
+            if (DesktopTelemetry.IsRunning) StopSession(); else StartSimulator();
         }
 
         public void StopSession()
@@ -266,20 +258,8 @@ namespace WebGL.UI.Desktop
             _startError = null;
         }
 
-        public void StartPreferred()
-        {
-            switch (_preferred)
-            {
-                case TelSource.Sitl: StartSitl(_sitlUrl); break;
-                case TelSource.Simulator: StartSimulator(); break;
-                default: StartLocalReplay(); break;
-            }
-        }
-
         public void StartLocalReplay()
         {
-            _preferred = TelSource.LocalReplay;
-            PlayerPrefs.SetString(PrefSource, "replay");
             _sitlError = null;
             bool ok = DesktopTelemetry.StartLocalReplay();
             _startError = ok ? null : DesktopTelemetry.LastError;
@@ -288,8 +268,6 @@ namespace WebGL.UI.Desktop
         /// <summary>The flight simulator (E-5): the kinematic model of the app. Not PX4, not a real drone; accepts the flight commands.</summary>
         public void StartSimulator()
         {
-            _preferred = TelSource.Simulator;
-            PlayerPrefs.SetString(PrefSource, "sim");
             _sitlError = null;
             DesktopTelemetry.StartSimulator();
             _startError = null;
@@ -298,8 +276,6 @@ namespace WebGL.UI.Desktop
         /// <summary>PX4 SITL through the local bridge (WebSocketTelemetrySource). A bad URL is reported in the popover; a dead bridge shows as Connecting then Error.</summary>
         public void StartSitl(string url)
         {
-            _preferred = TelSource.Sitl;
-            PlayerPrefs.SetString(PrefSource, "sitl");
             url = (url ?? string.Empty).Trim();
             WebSocketTelemetrySource src;
             try
@@ -338,12 +314,8 @@ namespace WebGL.UI.Desktop
         private void OnLanguage(string _)
         {
             if (_container == null) return;
-            _powerLabel.text = T("power.switch");
-            _sourceLabel.text = T("strip.source");
             _alertsLabel.text = T("strip.alerts");
             _faultsLabel.text = T("strip.faults");
-            _btnPower.tooltip = T(DesktopTelemetry.IsRunning ? "power.switch.stop" : "power.switch.start");
-            _btnSource.tooltip = T("src.title");
             _btnAlerts.tooltip = T("alerts.title");
             _btnFaults.tooltip = T("faults.title");
             _statusChip.tooltip = T("chip.status.tip");
@@ -354,6 +326,7 @@ namespace WebGL.UI.Desktop
             RelabelFlightTab();
             RelabelPilot();
             RelabelFaultExplain();
+            RelabelLayout();
         }
 
         private void OnRunningChanged(bool running)
@@ -429,8 +402,6 @@ namespace WebGL.UI.Desktop
                 _lastLang = lang;
                 _statusText.text = badge;
                 _statusChip.tooltip = badge + " · " + T("chip.status.tip");
-                _btnPower.tooltip = T(running ? "power.switch.stop" : "power.switch.start");
-                _sourceLabel.text = SourceButtonText();
             }
 
             if (running != _wasRunning || link != _lastLink)
@@ -442,9 +413,6 @@ namespace WebGL.UI.Desktop
                 _statusDot.AddToClassList(DotClass(running, link));
                 _statusChip.EnableInClassList("dk-stchip--on", running);
                 DesktopMotion.Flash(_statusChip, "dk-flash", 200);
-                _btnPower.EnableInClassList("dk-strip-btn--on", running);
-                _btnPower.tooltip = T(running ? "power.switch.stop" : "power.switch.start");
-                _sourceLabel.text = SourceButtonText();
                 UpdatePulse(running && link == LinkState.Connecting);
                 if (started && ModeOpen && !_analysisTab) ShowFlightTab(true); // the Analysis tab stays when a session starts under it
             }
@@ -452,10 +420,7 @@ namespace WebGL.UI.Desktop
             UIDetailsSheetFlightSync();
             TickAnalysisRecorder();
             UpdateChipVisibility(_sessionChip, running);
-            _stateLabel.text = running ? LinkText(link) : T("link.off");
-            _stateLabel.EnableInClassList("dk-strip-state--live", running && link == LinkState.Live);
-            _stateLabel.EnableInClassList("dk-strip-state--warn", running && (link == LinkState.Connecting || link == LinkState.Stale));
-            _stateLabel.EnableInClassList("dk-strip-state--crit", running && link == LinkState.Error);
+            TickSourcePills(running, link);
 
             // alerts button: count + worst severity (cheap: the client already derived them)
             var client = DesktopTelemetry.Client;
@@ -468,7 +433,6 @@ namespace WebGL.UI.Desktop
             _alertsCount.EnableInClassList("dk-count--warn", worst == AlertSeverity.Warning);
             _btnAlerts.EnableInClassList("dk-strip-btn--alert", count > 0);
 
-            _btnSource.EnableInClassList("dk-strip-btn--on", _openPop == "source");
             _btnAlerts.EnableInClassList("dk-strip-btn--on", _openPop == "alerts");
             _btnFaults.EnableInClassList("dk-strip-btn--on", _openPop == "faults");
 

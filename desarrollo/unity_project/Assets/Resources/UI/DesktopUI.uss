@@ -2642,3 +2642,15 @@
     border-width: 2px;
     border-color: rgb(255, 255, 255);
 }
+
+/* PLAN_PC 42: Telemetry tab, source pills, folding sections, gears of the switches and side windows */
+.dk-strip--tel .dk-strip-btn { padding: 0 10px; }
+.dk-strip-gear { width: 24px; height: 24px; min-width: 24px; min-height: 24px; margin: 0 2px 0 -2px; padding: 0; border-radius: 12px; }
+.dk-sec-chev { margin-left: 4px; rotate: 90deg; }
+.dk-secbtn--open .dk-sec-chev { rotate: -90deg; }
+#DkTelMore .dk-icon { rotate: 90deg; }
+#DkTelMore.dk-secbtn--open .dk-icon { rotate: -90deg; }
+.dk-winlayer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.layout--desktop.chrome2 .dk-pop.dk-win { translate: 0 0; overflow: hidden; }
+.dk-win-head { padding-bottom: 2px; border-bottom-width: 1px; border-color: rgba(255, 255, 255, 0.06); }
+.dk-keynav .dk-strip-gear:focus, .dk-padnav .dk-strip-gear:focus { border-width: 2px; border-color: rgb(245, 185, 66); }
