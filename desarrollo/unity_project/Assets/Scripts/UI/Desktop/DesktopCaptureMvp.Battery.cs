@@ -32,7 +32,7 @@ namespace WebGL.UI.Desktop
             Check("the «Batería» button exists in the simulator strip and is enabled", B("DkTelBatteryReact") != null && B("DkTelBatteryReact").enabledSelf);
             Check("by default the battery acts on the flight (the switch is off)", Sim.Model.cfg.battery.react && Tel.BatteryReactOn);
 
-            Click(B("DkTelBatteryReact"));
+            Click(Tel.BatteryGear); // PLAN_PC 42: the pill is the switch; its gear opens the settings
             yield return new WaitForSecondsRealtime(0.5f);
             Check("the popover opens", Tel.OpenPopover == "batteryreact" && Shown(Tel.BatteryPopover));
             Check("it shows the approved note «no es PX4 ni un dron real»", HelpHas(T("simbat.note")) && T("simbat.note").Contains(AppLanguageManager.IsSpanish ? "no es PX4 ni un dron real" : "not PX4 and not a real drone"));
@@ -60,7 +60,7 @@ namespace WebGL.UI.Desktop
             Sim.Model.rem = 0.1505;
             yield return WaitUntil(() => Sim.Model.batReact.stage >= 1, 12f);
             Check("warning at 15 %: stage 1 and the drone keeps its mode (no return yet)", Sim.Model.batReact.stage == 1 && Sim.Model.mode != SimMode.Rtl && Sim.Model.mode != SimMode.Land);
-            Click(B("DkTelBatteryReact"));
+            Click(Tel.BatteryGear); // PLAN_PC 42: the pill is the switch; its gear opens the settings
             yield return new WaitForSecondsRealtime(0.6f);
             Check("the popover says «Batería baja · aviso»", Tel.BatteryStateText == T("simbat.state.low"));
             yield return Shot("52_p2_aviso_15", 0.1f);
@@ -69,7 +69,7 @@ namespace WebGL.UI.Desktop
             yield return WaitUntil(() => Sim.Model.batReact.stage >= 2, 12f);
             yield return new WaitForSecondsRealtime(0.5f);
             Check("critical at 7 %: the automatic return starts (RTL)", Sim.Model.batReact.stage == 2 && Sim.Model.mode == SimMode.Rtl);
-            Click(B("DkTelBatteryReact"));
+            Click(Tel.BatteryGear); // PLAN_PC 42: the pill is the switch; its gear opens the settings
             yield return new WaitForSecondsRealtime(0.6f);
             Check("the popover says «Batería crítica · retorno automático»", Tel.BatteryStateText == T("simbat.state.crit"));
             yield return Shot("53_p2_critica_7_retorno", 0.1f);
@@ -82,7 +82,7 @@ namespace WebGL.UI.Desktop
             yield return new WaitForSecondsRealtime(0.4f);
             AckMessage ack = DesktopTelemetry.Client.LastAck;
             Check("during the emergency a manoeuvre is refused with the approved reason", ack != null && !ack.ok && ack.detail == BatteryReact.EmergencyDetail);
-            Click(B("DkTelBatteryReact"));
+            Click(Tel.BatteryGear); // PLAN_PC 42: the pill is the switch; its gear opens the settings
             yield return new WaitForSecondsRealtime(0.6f);
             Check("the popover says «Batería agotada · aterrizaje de emergencia»", Tel.BatteryStateText == T("simbat.state.empty"));
             yield return Shot("54_p2_agotada_emergencia", 0.1f);

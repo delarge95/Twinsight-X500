@@ -277,7 +277,7 @@ namespace WebGL.Telemetry
                 case "takeoff":
                 {
                     if (Flying(s)) return No("ya está en vuelo");
-                    double alt = Clamp(NumOr(msg.altitude, 5), 1, s.cfg.ceiling);
+                    double alt = Clamp(NumOr(msg.altitude, 5), 1, s.cfg.FenceCeiling);
                     string evt = "Despegue a " + JsMath.ToFixed(alt, 0) + " m";
                     if (s.rem < 0.2)
                     {
@@ -294,7 +294,7 @@ namespace WebGL.Telemetry
                 case "set_altitude":
                 {
                     if (NeedFlight(s, out no)) return no;
-                    s.target = new SimTarget { n = s.p[0], e = s.p[1], alt = Clamp(NumOr(msg.altitude, 5), 1, s.cfg.ceiling) };
+                    s.target = new SimTarget { n = s.p[0], e = s.p[1], alt = Clamp(NumOr(msg.altitude, 5), 1, s.cfg.FenceCeiling) };
                     s.orbit = null;
                     s.mode = SimMode.Hold;
                     return Ok();
@@ -313,8 +313,8 @@ namespace WebGL.Telemetry
                     double north = msg.north ?? double.NaN, east = msg.east ?? double.NaN;
                     double d = Math.Sqrt(north * north + east * east);
                     if (double.IsNaN(d) || double.IsInfinity(d)) return No("punto no válido");
-                    double k = d > s.cfg.radius ? s.cfg.radius / d : 1;
-                    s.target = new SimTarget { n = north * k, e = east * k, alt = Clamp(NumOr(msg.altitude, -s.p[2]), 1, s.cfg.ceiling) };
+                    double k = d > s.cfg.FenceRadius ? s.cfg.FenceRadius / d : 1;
+                    s.target = new SimTarget { n = north * k, e = east * k, alt = Clamp(NumOr(msg.altitude, -s.p[2]), 1, s.cfg.FenceCeiling) };
                     s.yawTarget = Math.Atan2(s.target.e - s.p[1], s.target.n - s.p[0]);
                     s.orbit = null;
                     s.mode = SimMode.Goto;
@@ -402,6 +402,7 @@ namespace WebGL.Telemetry
             if (next.ceiling.HasValue) merged.ceiling = next.ceiling.Value;
             if (next.rtlAltitude.HasValue) merged.rtlAltitude = next.rtlAltitude.Value;
             if (next.faultComp.HasValue) merged.faultComp = next.faultComp.Value;
+            if (next.fenceOn.HasValue) merged.fenceOn = next.fenceOn.Value;
             if (next.battery != null)
             {
                 BatteryPatch bp = next.battery;
@@ -419,7 +420,8 @@ namespace WebGL.Telemetry
                 if (w.gustTau.HasValue) merged.wind.gustTau = w.gustTau.Value;
                 if (w.seed.HasValue) merged.wind.seed = w.seed.Value;
             }
-            ConfigCheck check = Geofence.Validate(merged, s.p, s.armed, s.landed);
+            // a fence that is off only has to be in range; turning it on in flight is checked against the position like any new fence
+            ConfigCheck check = Geofence.Validate(merged, s.p, s.armed && merged.fenceOn, s.landed);
             if (!check.ok) return check;
             ConfigCheck wind = Wind.Validate(merged.wind);
             if (!wind.ok) return wind;
@@ -570,8 +572,8 @@ namespace WebGL.Telemetry
                 s.p[0] += s.v[0] * dt; s.p[1] += s.v[1] * dt; s.p[2] = Math.Min(0, s.p[2] + s.v[2] * dt);
                 // Geofence: no further out, no higher.
                 double d = Math.Sqrt(s.p[0] * s.p[0] + s.p[1] * s.p[1]);
-                if (d > s.cfg.radius) { s.p[0] *= s.cfg.radius / d; s.p[1] *= s.cfg.radius / d; }
-                if (-s.p[2] > s.cfg.ceiling) { s.p[2] = -s.cfg.ceiling; s.v[2] = Math.Max(0, s.v[2]); }
+                if (d > s.cfg.FenceRadius) { s.p[0] *= s.cfg.FenceRadius / d; s.p[1] *= s.cfg.FenceRadius / d; }
+                if (-s.p[2] > s.cfg.FenceCeiling) { s.p[2] = -s.cfg.FenceCeiling; s.v[2] = Math.Max(0, s.v[2]); }
                 s.yawRate += (yawRateCmd - s.yawRate) * Math.Min(1, dt / 0.12);
                 s.yaw = WrapPi(s.yaw + s.yawRate * dt);
                 // Restored from a cut motor and still falling: the ground wins if MaxAccel cannot stop the fall in the height left (no magic).

@@ -13,11 +13,17 @@ namespace WebGL.Telemetry
         public bool faultComp;
         /// <summary>What the battery does to the flight (P2 of the MVP, BatteryReact.cs): warning, return, emergency landing. On by default.</summary>
         public BatteryReactConfig battery = new BatteryReactConfig();
+        /// <summary>PLAN_PC 42: the geofence acts (default) or not. Off = the model only keeps the widest envelope of the ranges (Geofence.RadiusMax / CeilingMax).</summary>
+        public bool fenceOn = true;
 
         public SimConfig() { }
 
+        /// <summary>Radius and ceiling in force: the fence when it is on, the widest envelope of the simulator when it is off.</summary>
+        public double FenceRadius => fenceOn ? radius : Geofence.RadiusMax;
+        public double FenceCeiling => fenceOn ? ceiling : Geofence.CeilingMax;
+
         /// <summary>A copy with every member present, nothing shared with the original.</summary>
-        public SimConfig Clone() => new SimConfig { radius = radius, ceiling = ceiling, rtlAltitude = rtlAltitude, wind = wind.Clone(), faultComp = faultComp, battery = battery.Clone() };
+        public SimConfig Clone() => new SimConfig { radius = radius, ceiling = ceiling, rtlAltitude = rtlAltitude, wind = wind.Clone(), faultComp = faultComp, battery = battery.Clone(), fenceOn = fenceOn };
     }
 
     /// <summary>What <see cref="FlightSim.SetConfig"/> takes: any members of the configuration (null = leave as is).</summary>
@@ -27,5 +33,6 @@ namespace WebGL.Telemetry
         public WindPatch wind;
         public bool? faultComp;
         public BatteryPatch battery;
+        public bool? fenceOn;
     }
 }

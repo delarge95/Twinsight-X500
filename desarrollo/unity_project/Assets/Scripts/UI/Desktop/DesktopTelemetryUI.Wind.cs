@@ -27,6 +27,40 @@ namespace WebGL.UI.Desktop
         private Button _wnSeedNew, _wnReset;
         private DkWindDial _wnDial;
         private WindConfig _wind;
+        private Button _windGear;
+        private bool _windOn;
+        public Button WindGear => _windGear;
+        public bool WindOn => WindOnNow();
+
+        /// <summary>On = the wind the model has is not calm (a running simulator), else the remembered switch.</summary>
+        private bool WindOnNow()
+        {
+            var src = RunningSimulator;
+            if (src == null) return _windOn;
+            WindConfig w = src.Model.cfg.wind;
+            return w.speed > 0 || w.gustSigma > 0;
+        }
+        /// <summary>PLAN_PC 42: the speed a calm wind gets when the switch is turned on (the slider changes it).</summary>
+        public const double WindOnDefault = 4;
+
+        /// <summary>PLAN_PC 42: «Viento» on / off. Off = calm in the model; the values stay remembered (Desk_SimWind) for the next «on».</summary>
+        public ConfigCheck SetWindOn(bool on)
+        {
+            if (on && _wind.speed <= 0 && _wind.gustSigma <= 0) { _wind.speed = WindOnDefault; SimSettings.SaveWind(_wind); }
+            WindConfig eff = SimSettings.Effective(_wind, on);
+            var src = RunningSimulator;
+            ConfigCheck r = src != null
+                ? src.SetConfig(new SimConfigPatch { wind = new WindPatch { speed = eff.speed, fromDeg = eff.fromDeg, gustSigma = eff.gustSigma, gustTau = eff.gustTau, seed = eff.seed } })
+                : ConfigCheck.Ok;
+            if (r.ok)
+            {
+                _windOn = on;
+                SimSettings.SaveWindOn(on);
+                if (!on && _openPop == "wind") CloseAllPopovers();
+                RefreshWindControls();
+            }
+            return r;
+        }
         private TelemetryWindCue _windCue;
         private string _windRefusedCode;
         private double _windRefusedMin, _windRefusedMax;
@@ -48,8 +82,10 @@ namespace WebGL.UI.Desktop
         partial void BuildWindButton(VisualElement strip)
         {
             _wind = SimSettings.LoadWind();
-            _btnWind = StripButton("DkTelWind", "wind", out _windBtnLabel, () => TogglePopover("wind"));
+            _windOn = SimSettings.LoadWindOn();
+            _btnWind = StripButton("DkTelWind", "wind", out _windBtnLabel, () => SetWindOn(!WindOnNow()));
             strip.Add(_btnWind);
+            _windGear = AddGear(strip, "DkTelWindGear", "wind"); // direction, speed, gusts in a side window
         }
 
         partial void BuildWindPopover()
@@ -181,6 +217,8 @@ namespace WebGL.UI.Desktop
             {
                 _wind = next.Clone();
                 SimSettings.SaveWind(_wind);
+                _windOn = next.speed > 0 || next.gustSigma > 0; // a calm wind is the switch off (PLAN_PC 42)
+                SimSettings.SaveWindOn(_windOn);
                 _windRefusedCode = null;
                 _wnRefused.style.display = DisplayStyle.None;
             }
@@ -233,7 +271,9 @@ namespace WebGL.UI.Desktop
             if (_btnWind == null) return;
             bool sim = DesktopTelemetry.IsRunning && DesktopTelemetry.IsSimulator;
             _btnWind.SetEnabled(sim);
-            _btnWind.EnableInClassList("dk-strip-btn--on", _openPop == "wind");
+            bool windOn = WindOnNow();
+            _btnWind.EnableInClassList("dk-strip-btn--on", windOn);
+            ShowGear(_windGear, _btnWind, windOn, _openPop == "wind");
             string tip = sim ? WindReading(WindNowConfig(), Lang) : T("tools.wind.need");
             if (_btnWind.tooltip != tip) _btnWind.tooltip = tip;
             if (!sim && _openPop == "wind") CloseAllPopovers();

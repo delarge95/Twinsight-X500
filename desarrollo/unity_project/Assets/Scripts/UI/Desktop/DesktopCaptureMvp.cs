@@ -129,6 +129,7 @@ namespace WebGL.UI.Desktop
             PlayerPrefs.SetInt("Onboarding_Seen", 1);
             PlayerPrefs.DeleteKey(DesktopTelemetryUI.PrefSource);
             PlayerPrefs.DeleteKey(DesktopTelemetryUI.PrefGround);
+            PlayerPrefs.DeleteKey(SimSettings.PrefFenceOn); PlayerPrefs.DeleteKey(SimSettings.PrefWindOn); PlayerPrefs.DeleteKey(SimSettings.PrefWind); // PLAN_PC 42 switches: start from the defaults
             PlayerPrefs.DeleteKey("Desk_CamMode");
             PlayerPrefs.DeleteKey("Desk_ChaseDist");
             DesktopTelemetryUI.IgnoreFocusLoss = true;

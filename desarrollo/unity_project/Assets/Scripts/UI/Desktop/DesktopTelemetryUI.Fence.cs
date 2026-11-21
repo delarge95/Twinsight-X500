@@ -18,7 +18,36 @@ namespace WebGL.UI.Desktop
     /// </summary>
     internal sealed partial class DesktopTelemetryUI
     {
-        private Button _btnFence;
+        private Button _btnFence, _fenceGear;
+        private bool _fenceOn = true;
+        public Button FenceGear => _fenceGear;
+        public bool FenceOn => FenceOnNow();
+
+        /// <summary>The switch as the model has it while a simulator runs, else the remembered one.</summary>
+        private bool FenceOnNow()
+        {
+            var src = RunningSimulator;
+            return src != null ? src.Model.cfg.fenceOn : _fenceOn;
+        }
+
+        /// <summary>PLAN_PC 42: «Geocerca» on / off. Turning it on in flight outside the fence is refused with its reason (a toast: a dynamic warning stays in sight).</summary>
+        public ConfigCheck SetFenceOn(bool on)
+        {
+            var src = RunningSimulator;
+            ConfigCheck r = src != null ? src.SetConfig(new SimConfigPatch { fenceOn = on }) : ConfigCheck.Ok;
+            if (r.ok)
+            {
+                _fenceOn = on;
+                SimSettings.SaveFenceOn(on);
+                if (!on && _openPop == "fence") CloseAllPopovers();
+            }
+            else
+            {
+                double mn = r.min ?? 0, mx = r.max ?? 0;
+                ShowToast(TelemetryStrings.F("fence.err." + r.code, Lang, "min", mn.ToString("0.#", CultureInfo.InvariantCulture), "max", mx.ToString("0.#", CultureInfo.InvariantCulture)), true, 5f);
+            }
+            return r;
+        }
         private Label _fenceBtnLabel;
         private VisualElement _popFence;
         private Label _fcTitle, _fcRadiusLabel, _fcCeilLabel, _fcRtl, _fcStatus, _fcRefused, _fcFlightRule, _fcHonest, _fcTag;
@@ -45,9 +74,11 @@ namespace WebGL.UI.Desktop
         partial void BuildFenceButton(VisualElement strip)
         {
             _fence = SimSettings.LoadFence();
-            _btnFence = StripButton("DkTelFence", "fence", out _fenceBtnLabel, () => TogglePopover("fence"));
-            _btnFence.Add(Kbd("Shift+G"));
+            _fenceOn = SimSettings.LoadFenceOn();
+            _btnFence = StripButton("DkTelFence", "fence", out _fenceBtnLabel, () => SetFenceOn(!FenceOnNow()));
+            _btnFence.Add(Kbd("Shift+G")); // the shortcut opens the fine settings (radius, ceiling)
             strip.Add(_btnFence);
+            _fenceGear = AddGear(strip, "DkTelFenceGear", "fence"); // the radius / ceiling (Shift+G) in a side window
         }
 
         partial void BuildFencePopover()
@@ -166,6 +197,7 @@ namespace WebGL.UI.Desktop
         public void ToggleFencePopover()
         {
             if (RunningSimulator == null) return;
+            if (!FenceOnNow() && _openPop != "fence") SetFenceOn(true); // the settings belong to a fence that acts
             TogglePopover("fence");
         }
 
@@ -191,7 +223,9 @@ namespace WebGL.UI.Desktop
             if (_btnFence == null) return;
             bool sim = DesktopTelemetry.IsRunning && DesktopTelemetry.IsSimulator;
             _btnFence.SetEnabled(sim);
-            _btnFence.EnableInClassList("dk-strip-btn--on", _openPop == "fence");
+            bool fenceOn = FenceOnNow();
+            _btnFence.EnableInClassList("dk-strip-btn--on", fenceOn);
+            ShowGear(_fenceGear, _btnFence, fenceOn, _openPop == "fence");
             string tip = sim ? T("fence.origin") : T("tools.fence.need");
             if (_btnFence.tooltip != tip) _btnFence.tooltip = tip;
             if (!sim && _openPop == "fence") CloseAllPopovers();
@@ -199,7 +233,7 @@ namespace WebGL.UI.Desktop
             var drv = TelemetryDroneDriver.Instance;
             var client = DesktopTelemetry.Client;
             TelemetryFrame f = client != null ? client.Displayed : null;
-            bool active = sim && f != null && drv != null && drv.Engaged && drv.GroundRef != null && !drv.GroundRef.IsLegacy;
+            bool active = sim && fenceOn && f != null && drv != null && drv.Engaged && drv.GroundRef != null && !drv.GroundRef.IsLegacy;
             if (!active) { if (_fenceScene != null) DestroyFenceScene(); return; }
             if (_fenceScene == null)
             {

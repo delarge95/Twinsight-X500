@@ -28,6 +28,8 @@ namespace WebGL.UI.Desktop
         public Button BatteryButton => _btnBattery;
         public VisualElement BatteryPopover => _popBattery;
         public Button BatteryIgnoreButton => _brIgnore;
+        private Button _batteryGear;
+        public Button BatteryGear => _batteryGear;
         /// <summary>The switch as the person left it (true = the battery acts on the flight). With a simulator running, what the model has.</summary>
         public bool BatteryReactOn => BatteryReactNow();
         public string BatteryStateText => _brState?.text;
@@ -36,8 +38,9 @@ namespace WebGL.UI.Desktop
         partial void BuildBatteryReactButton(VisualElement strip)
         {
             _batteryReact = SimSettings.LoadBatteryReact();
-            _btnBattery = StripButton("DkTelBatteryReact", "battery", out _batteryBtnLabel, () => TogglePopover("batteryreact"));
+            _btnBattery = StripButton("DkTelBatteryReact", "battery", out _batteryBtnLabel, () => ApplyBatteryReact(!BatteryReactNow()));
             strip.Add(_btnBattery);
+            _batteryGear = AddGear(strip, "DkTelBatteryGear", "batteryreact"); // thresholds and state in a side window
         }
 
         partial void BuildBatteryReactPopover()
@@ -117,7 +120,9 @@ namespace WebGL.UI.Desktop
             if (_btnBattery == null) return;
             bool sim = DesktopTelemetry.IsRunning && DesktopTelemetry.IsSimulator;
             _btnBattery.SetEnabled(sim);
-            _btnBattery.EnableInClassList("dk-strip-btn--on", _openPop == "batteryreact");
+            bool react = BatteryReactNow();
+            _btnBattery.EnableInClassList("dk-strip-btn--on", react);
+            ShowGear(_batteryGear, _btnBattery, react, _openPop == "batteryreact");
             string tip = sim ? T("simbat.note") : T("tools.battery.need");
             if (_btnBattery.tooltip != tip) _btnBattery.tooltip = tip;
             if (!sim && _openPop == "batteryreact") CloseAllPopovers();
