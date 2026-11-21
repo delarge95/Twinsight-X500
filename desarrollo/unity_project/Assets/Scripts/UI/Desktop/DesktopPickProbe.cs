@@ -191,7 +191,7 @@ namespace WebGL.UI.Desktop
 
             // telemetry: replay
             Tel.OpenMode(); yield return new WaitForSecondsRealtime(0.6f); yield return Probe("10 mode 4 strip, no session");
-            Click(B("DkTelSource")); yield return new WaitForSecondsRealtime(0.6f); yield return Probe("10 source popover open");
+            Tel.OpenSourcePopover(); yield return new WaitForSecondsRealtime(0.6f); yield return Probe("10 source popover open"); // PLAN_PC 42: no «Fuente» button (L / the gear of the active source)
             Click(B("DkSrcReplay")); yield return new WaitForSecondsRealtime(4f); Tel.CloseAllPopovers();
             yield return Probe("11 replay running t=4s");
             yield return new WaitForSecondsRealtime(8f);
@@ -201,7 +201,7 @@ namespace WebGL.UI.Desktop
             Tel.ShowAnalysisTab(); yield return new WaitForSecondsRealtime(0.6f); yield return Probe("11 replay + Analisis tab"); Tel.ShowFlightTab(true);
 
             // simulator + piloting
-            Click(B("DkTelSource")); yield return new WaitForSecondsRealtime(0.6f);
+            Tel.OpenSourcePopover(); yield return new WaitForSecondsRealtime(0.6f); // PLAN_PC 42: no «Fuente» button (L / the gear of the active source)
             Click(B("DkSrcSim")); yield return new WaitForSecondsRealtime(1.6f); Tel.CloseAllPopovers();
             yield return Probe("12 simulator on the ground");
             Click(B("DkTelPilot")); yield return new WaitForSecondsRealtime(0.5f);
@@ -211,7 +211,7 @@ namespace WebGL.UI.Desktop
             yield return Probe("12 piloting after W forward");
             Tel.HandleBack(); yield return new WaitForSecondsRealtime(0.6f);
             yield return Probe("12 piloting OFF, flying");
-            Click(B("DkTelPower")); yield return new WaitForSecondsRealtime(1f);
+            Click(B("DkSrcPillSim")); yield return new WaitForSecondsRealtime(1f); // PLAN_PC 42: the active source pill turns it off
             yield return Probe("13 session stopped");
             Tel.CloseMode(); yield return new WaitForSecondsRealtime(0.6f);
             Click(B("DkReset")); yield return new WaitForSecondsRealtime(2f);

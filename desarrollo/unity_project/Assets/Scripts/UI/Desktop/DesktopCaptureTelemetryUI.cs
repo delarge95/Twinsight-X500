@@ -164,9 +164,10 @@ namespace WebGL.UI.Desktop
             yield return Shot("03_telemetria_sin_sesion");
 
             // ── 3. session switch: local replay at a quiet second ──
-            Click(B("DkTelPower"));
+            Check("telemetry off: only the four source pills (PLAN_PC 42)", Shown4Pills());
+            Click(B("DkSrcPillReplay"));
             yield return new WaitForSecondsRealtime(2.5f);
-            Check("Encendido starts the local replay", DesktopTelemetry.IsRunning && DesktopTelemetry.IsLocalReplay);
+            Check("the «Repetición local» pill starts the local replay", DesktopTelemetry.IsRunning && DesktopTelemetry.IsLocalReplay);
             Check("status chip = approved local replay label", L("DkStatusText").text == DesktopTelemetry.BadgeText(lang) && labels.TryLocalReplayText(lang, out string approved) && approved == L("DkStatusText").text);
             Check("status dot is live green", Root.Q<VisualElement>("DkStatusDot").ClassListContains("dk-dot--live"));
             Check("session chip appears next to the power chip", DisplayedFlex(B("DkChipSession")) && DisplayedFlex(B("DkChipPower")));
@@ -179,7 +180,7 @@ namespace WebGL.UI.Desktop
             DroneStateController.Instance.TurnOff();
 
             // ── 4. source popover ──
-            Click(B("DkTelSource"));
+            Tel.OpenSourcePopover(); // PLAN_PC 42: no «Fuente» button; L / the gear of the active source
             yield return new WaitForSecondsRealtime(0.8f);
             Check("source popover open with four rows", Tel.OpenPopover == "source" && Root.Q<VisualElement>("DkPopSource") != null);
             Button sim = B("DkSrcSim");
@@ -231,7 +232,7 @@ namespace WebGL.UI.Desktop
             Tel.CloseAllPopovers();
 
             // ── 6. Esc closes popover then mode; chips ──
-            Click(B("DkTelSource"));
+            Tel.OpenSourcePopover(); // PLAN_PC 42: no «Fuente» button; L / the gear of the active source
             yield return new WaitForSecondsRealtime(0.3f);
             Check("Esc handler closes the popover first", Tel.HandleBack() && Tel.OpenPopover == null && Tel.ModeOpen);
             // mode 1 while mode 4 is open closes mode 4
@@ -249,7 +250,7 @@ namespace WebGL.UI.Desktop
             Check("drone back at rest (ExternalMotion off)", !DroneStateController.Instance.ExternalMotion);
 
             // ── 7. SITL: bad URL, then an unreachable bridge ──
-            Click(B("DkTelSource"));
+            Tel.OpenSourcePopover(); // PLAN_PC 42: no «Fuente» button; L / the gear of the active source
             yield return new WaitForSecondsRealtime(0.4f);
             Click(B("DkSrcSitl"));
             yield return new WaitForSecondsRealtime(0.5f);
@@ -268,7 +269,7 @@ namespace WebGL.UI.Desktop
             while (DesktopTelemetry.LinkState != LinkState.Error && Time.realtimeSinceStartup - t0 < 20f) yield return null;
             yield return new WaitForSecondsRealtime(0.8f);
             Check("unreachable bridge ends in the Error link state (not live)", DesktopTelemetry.LinkState == LinkState.Error);
-            Check("status dot is red; the strip says 'sin conexión'", Root.Q<VisualElement>("DkStatusDot").ClassListContains("dk-dot--error") && L("DkTelState").text == TelemetryStrings.T("link.offline", lang));
+            Check("status dot is red; the strip says 'sin conexión'", Root.Q<VisualElement>("DkStatusDot").ClassListContains("dk-dot--error") && B("DkSrcPillSitl").Q<Label>(className: "dk-strip-state").text == TelemetryStrings.T("link.offline", lang));
             Check("source popover explains what the bridge needs", Root.Q<VisualElement>("DkSitlBlock").Q<Label>(className: "dk-note--warn").text.StartsWith(TelemetryStrings.T("src.sitl.help", lang)));
             yield return Shot("11_sitl_sin_conexion");
             Tel.CloseAllPopovers();
@@ -292,6 +293,20 @@ namespace WebGL.UI.Desktop
         }
 
         private static bool DisplayedFlex(VisualElement e) => e != null && e.resolvedStyle.display != DisplayStyle.None && e.style.display != DisplayStyle.None && DesktopMotion.IsShown(e);
+
+        /// <summary>PLAN_PC 42: with the telemetry off the tab shows the four source pills and no other button.</summary>
+        private bool Shown4Pills()
+        {
+            int pills = 0, others = 0;
+            foreach (Button b in Root.Q<VisualElement>("DkTelemetry").Query<Button>().ToList())
+            {
+                bool shown = true;
+                for (VisualElement e = b; e != null; e = e.parent) if (e.resolvedStyle.display == DisplayStyle.None) { shown = false; break; }
+                if (!shown) continue;
+                if (b.ClassListContains("dk-srcpill")) pills++; else others++;
+            }
+            return pills == 4 && others == 0;
+        }
     }
 }
 #endif

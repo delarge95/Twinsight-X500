@@ -32,6 +32,7 @@ namespace WebGL.UI.Desktop
             { ToolId.Follow, "DkCamMode" }, { ToolId.Game, "DkGameMode" }, { ToolId.Ground, "DkTelGround" }, { ToolId.Course, "DkTelCourse" }, { ToolId.Fence, "DkTelFence" },
             { ToolId.Wind, "DkTelWind" }, { ToolId.Battery, "DkTelBatteryReact" }, { ToolId.Map, "DkTelMap" }, { ToolId.Preflight, "DkTelPreflight" },
             { ToolId.Mission, "DkTelMission" }, { ToolId.Sessions, "DkTelRecord" }, { ToolId.Train, "DkTelTraining" }, { ToolId.Record, "DkRecToggle" },
+            { ToolId.Alerts, "DkTelAlerts" }, { ToolId.Faults, "DkTelFaults" }, { ToolId.Analysis, "DkTelAnalysis" },
         };
 
         private void Start() { StartCoroutine(Run()); }
@@ -123,8 +124,11 @@ namespace WebGL.UI.Desktop
             {
                 Tel.StartRecording();
                 yield return new WaitForSecondsRealtime(3.5f);
+                Log("recording: on " + Tel.Recording + ", frames " + Tel.RecordedFrames);
                 path = Tel.StopRecording();
+                Log("recording stopped: " + (path ?? "null") + " msg " + Tel.RecordMessage);
             }
+            else Log("cannot record: running " + DesktopTelemetry.IsRunning + " sim " + DesktopTelemetry.IsSimulator + " hello " + (DesktopTelemetry.Client?.Hello != null));
             Check("a short session was recorded for the own-session surface", !string.IsNullOrEmpty(path) && File.Exists(path));
 
             // 4. sesion propia
@@ -150,10 +154,10 @@ namespace WebGL.UI.Desktop
             {
                 DesktopTelemetry.Stop();
                 yield return new WaitForSecondsRealtime(0.4f);
-                Check("loop " + k + ": Inspector again, only the ground and the sessions hub", ShownIds().SetEquals(TelemetryMenu.StripToolsFor(MenuSurface.Inspector)));
+                Check("loop " + k + ": Inspector again, only the four source pills", ShownIds().Count == 0 && ShownPills().SetEquals(TelemetryMenu.SourcePills));
                 Tel.StartSimulator();
                 yield return new WaitForSecondsRealtime(1.2f);
-                Check("loop " + k + ": simulator again, every control", ShownIds().SetEquals(TelemetryMenu.StripToolsFor(MenuSurface.Sim)));
+                Check("loop " + k + ": simulator again, its default view («Mando» open)", Tel.OpenSection == TSection.Cmd && ShownIds().SetEquals(TelemetryMenu.ViewFor(MenuSurface.Sim, TSection.Cmd, false, false).Tools));
             }
             DesktopTelemetry.Stop();
             yield return new WaitForSecondsRealtime(0.4f);
@@ -256,32 +260,61 @@ namespace WebGL.UI.Desktop
             return set;
         }
 
+        private HashSet<SourcePill> ShownPills()
+        {
+            var set = new HashSet<SourcePill>();
+            foreach (SourcePill p in TelemetryMenu.SourcePills) if (Visible(Tel.SourcePillButton(p))) set.Add(p);
+            return set;
+        }
+
         private IEnumerator CheckSurface(string label, MenuSurface expected)
         {
             Log("── " + label + " ──");
             Check(label + ": the app reads the source as " + expected, Tel.CurrentSurface == expected);
-            var want = new HashSet<ToolId>(TelemetryMenu.StripToolsFor(expected));
-            HashSet<ToolId> got = ShownIds();
-            Check(label + ": the shown buttons are exactly the table's (" + got.Count + " of " + want.Count + ")", got.SetEquals(want));
-            foreach (var id in TelemetryMenu.ToolIds)
+            // PLAN_PC 42: the source pills, then every section state (none open and each one) against TelemetryMenu.ViewFor
+            Check(label + ": the shown source pills are the table's (" + string.Join(",", ShownPills()) + ")", ShownPills().SetEquals(TelemetryMenu.SourcePillsFor(expected)));
+            Check(label + ": the default section is the table's (" + Tel.OpenSection + ")", Tel.OpenSection == TelemetryMenu.DefaultSection(expected));
+            var states = new List<TSection?> { null };
+            foreach (TSection sec in TelemetryMenu.SectionsFor(expected)) states.Add(sec);
+            foreach (TSection? open in states)
             {
-                if (id == ToolId.Record) continue;
-                Button b = B(Names[id]);
-                bool should = want.Contains(id);
-                if (!should && b != null) Check(label + ": " + Names[id] + " is hidden and cannot take the focus or a click", !Visible(b) && !b.enabledSelf);
-                if (should && b != null) Check(label + ": " + Names[id] + " is shown", Visible(b));
+                Tel.SetOpenSection(open);
+                yield return new WaitForSecondsRealtime(0.15f);
+                var want = new HashSet<ToolId>(TelemetryMenu.ViewFor(expected, open, false, false).Tools);
+                HashSet<ToolId> got = ShownIds();
+                string st = label + " [" + (open.HasValue ? open.Value.ToString() : "closed") + "]";
+                Check(st + ": the shown buttons are exactly the table's (" + got.Count + " of " + want.Count + ")", got.SetEquals(want));
+                int sections = 0;
+                foreach (TSection sec in TelemetryMenu.Sections) if (Visible(Tel.SectionButton(sec))) sections++;
+                Check(st + ": the section pills are the table's (" + sections + ")", sections == TelemetryMenu.SectionsFor(expected).Count);
+                foreach (var id in TelemetryMenu.ToolIds)
+                {
+                    if (id == ToolId.Record) continue;
+                    Button b = B(Names[id]);
+                    if (b == null) { Check(st + ": " + Names[id] + " exists in the tree", false); continue; }
+                    bool should = want.Contains(id);
+                    if (!TelemetryMenu.Has(id, expected)) Check(st + ": " + Names[id] + " (not in this source) is hidden and cannot take the focus or a click", !Visible(b) && !b.enabledSelf);
+                    else Check(st + ": " + Names[id] + (should ? " is shown" : " is folded away (its section is closed)"), Visible(b) == should);
+                }
             }
+            Tel.SetOpenSection(TelemetryMenu.DefaultSection(expected));
+            yield return new WaitForSecondsRealtime(0.15f);
             Check(label + ": the Telemetry mode is open", Tel.ModeOpen);
             var where = TelemetryMenu.AvailableIn(expected);
-            Check(label + ": the «Disponible en» line " + (where.Count == 0 ? "is hidden (nothing missing)" : "shows (" + Tel.AvailText + ") with its ⓘ"),
-                where.Count == 0 ? !Shown(Tel.AvailRow) : Shown(Tel.AvailRow) && !string.IsNullOrEmpty(Tel.AvailText) && !string.IsNullOrEmpty(Tel.AvailInfoText));
+            bool availShown = where.Count > 0 && expected != MenuSurface.Inspector;
+            Check(label + ": the «Disponible en» line " + (!availShown ? "is hidden" : "shows (" + Tel.AvailText + ") with its ⓘ"),
+                !availShown ? !Shown(Tel.AvailRow) : Shown(Tel.AvailRow) && !string.IsNullOrEmpty(Tel.AvailText) && !string.IsNullOrEmpty(Tel.AvailInfoText));
 
             // the record switch lives in the popover of «Grabar»
             Tel.TogglePopover("record");
             yield return new WaitForSecondsRealtime(0.5f);
             Button rec = B("DkRecToggle");
             Check(label + ": the record switch " + (TelemetryMenu.Has(ToolId.Record, expected) ? "is shown" : "is hidden"), rec != null && Visible(rec) == TelemetryMenu.Has(ToolId.Record, expected));
-            Check(label + ": «Mis sesiones» is reachable from «Grabar»", Visible(B("DkTelRecord")) && Tel.OpenPopover == "record");
+            bool sessionsReach = TelemetryMenu.Has(ToolId.Sessions, expected)
+                ? Visible(B("DkTelRecord")) || Visible(Tel.SectionButton(TSection.Tools))   // «Grabar», in «Herramientas»
+                : expected == MenuSurface.Replay ? Visible(Tel.SourcePillButton(SourcePill.Replay)) // turn off, then «Mis sesiones»
+                : Visible(Tel.SourcePillButton(SourcePill.Own));                                  // the «Mis sesiones» pill itself
+            Check(label + ": «Mis sesiones» is reachable", sessionsReach && Tel.OpenPopover == "record");
             Tel.CloseAllPopovers();
             yield return new WaitForSecondsRealtime(0.2f);
 

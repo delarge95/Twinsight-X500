@@ -220,7 +220,7 @@ namespace WebGL.UI.Desktop
                 {
                     Tel.OpenMode();
                     yield return Frames(3);
-                    Click(B("DkTelSource"));
+                    Tel.OpenSourcePopover(); // PLAN_PC 42: no «Fuente» button; L / the gear of the active source
                     yield return new WaitForSecondsRealtime(0.3f);
                     Click(B("DkSrcSitl"));
                     yield return new WaitForSecondsRealtime(0.4f);
@@ -353,7 +353,7 @@ namespace WebGL.UI.Desktop
             // 2. the SITL URL field
             Tel.OpenMode();
             yield return Frames(3);
-            Click(B("DkTelSource"));
+            Tel.OpenSourcePopover(); // PLAN_PC 42: no «Fuente» button; L / the gear of the active source
             yield return new WaitForSecondsRealtime(0.3f);
             Click(B("DkSrcSitl"));
             yield return new WaitForSecondsRealtime(0.4f);
@@ -538,7 +538,7 @@ namespace WebGL.UI.Desktop
             Tel.HandleBack(); // leave piloting so Esc semantics are clean
             Tel.OpenMode();
             yield return Frames(3);
-            B("DkTelPower").Focus();
+            B("DkSrcPillSim").Focus(); // PLAN_PC 42: the active source pill is the first control of the tab
             yield return Frames(3);
             var f0 = FocusedEl;
             int d0 = Pad.DispatchedNavEvents;
@@ -552,7 +552,7 @@ namespace WebGL.UI.Desktop
             _fake = PadOf();
             yield return Frames(3);
             Check("MENUS: the left stick also moves it (second control now)", FocusedEl != null);
-            B("DkTelSource").Focus();
+            B("DkSrcGear").Focus(); // PLAN_PC 42: the gear of the active source opens the «Fuente» window
             yield return Frames(3);
             var ackA = DesktopTelemetry.Client.LastAck;
             yield return PadPress(PadButtons.A);

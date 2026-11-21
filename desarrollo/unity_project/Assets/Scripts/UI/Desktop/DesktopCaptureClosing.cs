@@ -247,7 +247,7 @@ namespace WebGL.UI.Desktop
             // ── 9. telemetry replay ──
             SelectionManager.Instance.Deselect();
             Tel.OpenMode(); yield return new WaitForSecondsRealtime(0.6f);
-            Click(B("DkTelSource")); yield return new WaitForSecondsRealtime(0.6f);
+            Tel.OpenSourcePopover(); yield return new WaitForSecondsRealtime(0.6f); // PLAN_PC 42: no «Fuente» button (L / the gear of the active source)
             Click(B("DkSrcReplay")); yield return new WaitForSecondsRealtime(4f);
             Tel.CloseAllPopovers();
             Step("replay: the source selector starts the local replay with the approved badge", DesktopTelemetry.IsRunning && DesktopTelemetry.IsLocalReplay && labels.TryLocalReplayText(lang, out string rep) && L("DkStatusText").text == rep);
@@ -277,7 +277,7 @@ namespace WebGL.UI.Desktop
             Tel.ShowFlightTab(true);
 
             // ── 12. simulator + piloting ──
-            Click(B("DkTelSource")); yield return new WaitForSecondsRealtime(0.6f);
+            Tel.OpenSourcePopover(); yield return new WaitForSecondsRealtime(0.6f); // PLAN_PC 42: no «Fuente» button (L / the gear of the active source)
             Click(B("DkSrcSim")); yield return new WaitForSecondsRealtime(1.6f);
             Tel.CloseAllPopovers();
             Step("simulator starts; never SITL, takes commands", DesktopTelemetry.IsSimulator && DesktopTelemetry.AcceptsCommands && labels.TrySimText("title", lang, out string simT) && L("DkStatusText").text == simT);
@@ -292,8 +292,8 @@ namespace WebGL.UI.Desktop
             Step("piloting: W moves the drone forward (north)", sim != null && Math.Abs(sim.Model.p[0] - n0) > 0.5);
             yield return Shot("12_pilotaje", 0.3f);
             Step("Esc releases piloting (hold)", Tel.HandleBack() && !Tel.Piloting);
-            Click(B("DkTelPower")); yield return new WaitForSecondsRealtime(0.8f);
-            Step("Encendido stops the session", !DesktopTelemetry.IsRunning);
+            Click(B("DkSrcPillSim")); yield return new WaitForSecondsRealtime(0.8f);
+            Step("pressing the active source pill stops the session", !DesktopTelemetry.IsRunning);
             Tel.CloseMode();
 
             // ── 13. reset and quit ──
