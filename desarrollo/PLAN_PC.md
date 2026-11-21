@@ -1472,3 +1472,18 @@ Mando real (XInput), PX4 SITL real, otra GPU (todo en una RTX 5060 Ti), Windows 
 
 ### 43.5 Cierre
 Plataforma activa WebGL; `UniversalRenderPipelineGlobalSettings.asset`, `DynamicsManager.asset` y `ProjectSettings.asset` restaurados con `git checkout`. Etiqueta y `pc-desktop` subidas a `origin`.
+
+## 44. Version publica 0.0.3 (2026-11-21, rama `pc-desktop`, solo PC)
+
+### 44.1 Que se hizo
+- Sobre `cb110af` (todo lo de §43: UX, Corte / Entorno / Ultra, Telemetria rehecha). Version: `bundleVersion` 0.0.2 -> **0.0.3** (`companyName` y `productName` sin cambio), `pc_stamp_exe.ps1` y `pc_make_notices.py` apuntan a 0.0.3; `tools/release_0.0.3/` con `LEEME.txt` (novedades de 0.0.3, cambios de 0.0.2 y 0.0.1, limites) y `THIRD_PARTY_NOTICES.txt` regenerado con el script (commit `f85dd89`).
+- **Build de RELEASE** (no de desarrollo; `managedCodeVariant` Release) desde el Editor por MCP, receta §12.3 (Standalone activo, reimportar `Assets/Shaders` y los shaders de URP, esperar, construir): `E:\TwinSight_builds\pc_v003` (0 errores, 187 avisos, 237 041 282 bytes segun Unity). **Puerta `pc_postbuild_gate.ps1` OK.**
+- Paquete `E:\TwinSight_buildselease\TwinSightX500_PC_v0.0.3\TwinSightX500_PC\` (`robocopy /XD` sin `..._BackUpThisFolder_ButDontShipItWithYourGame`; 192 archivos, igual que 0.0.2; sin `.pdb`, sin `WinPixEventRuntime.dll`), exe estampado TwinSight / TwinSight X500 / 0.0.3 (`FileVersion` 0.0.3.0).
+
+### 44.2 Verificado
+- **Zip** `E:\TwinSight_buildselease\TwinSightX500_PC_v0.0.3.zip`, 84 427 859 bytes (80,5 MiB; 214 entradas, raiz `TwinSightX500_PC/`, nombres con `/`), **SHA-256 `d07e2b50e5275556bd541a988bce8d64c856d6a7ed53904a6bf8bcd2c9159bc0`**, `.sha256` de 94 bytes (`hash  nombre`). Extraido en carpeta nueva (`release\extract_v003`): 192 archivos, sin BackUp ni `.pdb`, hash del exe = el del paquete, VersionInfo 0.0.3, **puerta OK 15 s**.
+- Sondas sobre el exe del paquete (1280x720 ES; logs y capturas en `E:\TwinSight_buildselease\probe_v003`): `-mvp-capture` **133/133** (la primera ejecucion dio 132/133 por el pixel del campo termico, «the hot motor is drawn warmer and brighter...», el intermitente de §37.4; repetida una vez: 133/133); `-ux-capture` **503/503**; `-fix1-capture` **156/156**; `-fix2-capture` **67/67**. Los `Player.log` sin Blitter / shader is null / NullReference / Exception.
+- Cierre: plataforma WebGL; `UniversalRenderPipelineGlobalSettings.asset` restaurado con `git checkout` (`DynamicsManager.asset` y `ProjectSettings.asset` no cambiaron: la version ya iba en el commit).
+
+### 44.3 NO verificado
+- Windows limpio / otro equipo, SmartScreen y Mark of the Web reales (exe sin firmar); GPU distinta de la RTX 5060 Ti de esta maquina (Ultra exige una GPU potente, dicho en el LEEME); mando real (XInput); PX4 SITL real; sondas solo a 1280x720 ES sobre el paquete (1904 y EN, 150 %, `-desk-*`, `-tools`, `-lote1*`, `-env`, `-tel-ui` se pasaron en la build de desarrollo, §43.2); la causa de los fallos intermitentes de `-mvp-capture` (§43.3); ninguna captura revisada a ojo. Sin lector `.ulg` ni parametros/mision PX4 en escritorio (dicho en el LEEME). Release de GitHub y pagina de versiones: pendientes (los hace el usuario).
