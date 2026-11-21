@@ -192,9 +192,11 @@ namespace WebGL.UI.Desktop
 
             // ── 5. alerts with a synthetic fault ──
             Tel.CloseAllPopovers();
-            Click(B("DkTelFaults"));
+            // PLAN_PC 42 (B): the replay does not offer «Fallas» (the drone does not react to a synthetic fault); the injection itself still exists in code
+            Check("«Fallas» is not offered on the local replay (hidden and disabled)", !Tel.ToolShown(ToolId.Faults) && !B("DkTelFaults").enabledSelf);
+            Tel.TogglePopover("faults");
             yield return new WaitForSecondsRealtime(0.5f);
-            Check("faults popover: controls visible on the local replay", DisplayedFlex(Root.Q<VisualElement>("DkFaultControls")));
+            Check("faults popover (opened by code): injection controls on the local replay", DisplayedFlex(Root.Q<VisualElement>("DkFaultControls")));
             Click(B("DkFault_motor_failure"));
             yield return new WaitForSecondsRealtime(3.2f);
             Check("synthetic fault registered by the replay source (Client.Faults)", DesktopTelemetry.Client.Faults.Count == 1);

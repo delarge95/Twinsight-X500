@@ -648,7 +648,7 @@ namespace WebGL.UI.Desktop
             Check("the docked explanation exists in the Flight tab and is COLLAPSED by default", Tel.FaultDock != null && !Tel.DockOpen && !Shown(Root.Q<VisualElement>("DkFxDockBody")));
             Check("there is no fault banner any more", Root.Q<VisualElement>("DkFaultBanner") == null);
 
-            Click(B("DkTelFaults"));
+            Tel.TogglePopover("faults"); // PLAN_PC 42: the replay does not offer «Fallas»; the window itself is measured
             yield return new WaitForSecondsRealtime(0.6f);
             float popPct = PopCoverage("DkPopFaults");
             Log("Faults popover (replay, controls shown) covers " + popPct.ToString("F2") + " % of the canvas");
