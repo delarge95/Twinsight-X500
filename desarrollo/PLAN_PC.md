@@ -1448,3 +1448,27 @@ Sustituye a los pasos 6-8 de `PLAN_UX_ESCRITORIO.md`. Commits: `610d4b2` (D, ven
 - Con el árbol abierto las ventanas izquierdas se colocan a su derecha (código y prueba de `DefaultPos`), no capturado.
 - **Entorno de esta sesión:** el jugador corrió en segundo plano a muy pocos fps (enlace a 4 Hz, GPU al 4 %). Con eso fallan en `-ux-capture` la grabación corta (14 marcos en 3,5 s → «demasiado corta», y en cascada las ≈57 comprobaciones de «sesión propia») y las 9 de tooltip por hover/submit; **la build anterior `pc_fix1` falla exactamente igual hoy** (`capturas_fix2/logs/antes_ux_1904_es.log`: 222/249). La sonda espera ahora hasta 2 s de muestras para grabar (sin rebajar la comprobación).
 - Cierre: plataforma activa WebGL; `UniversalRenderPipelineGlobalSettings.asset`, `DynamicsManager.asset` y `ProjectSettings.asset` restaurados con `git checkout`. Capturas antes/después en `twinsight-web-twin/docs/unity_pc/capturas_fix2/{antes,despues,logs}` (sin commitear en ese repo).
+
+## 43. Checkpoint de la app de escritorio (2026-11-21, etiqueta `checkpoint-2026-11-21`, rama `pc-desktop`, solo PC)
+
+Etiqueta anotada sobre `95cbe79` (fusión rápida de `pc-fix-2` en `pc-desktop`; sin zip ni release). Mensaje: «Checkpoint: UX de escritorio (ocultar, ⓘ, Avanzado), Corte/Entorno/Ultra y Telemetría rehecha; antes de la fase Gazebo físico».
+
+### 43.1 Qué incluye
+UX de escritorio (ocultar, ⓘ, «Avanzado», Piezas con búsqueda y Pilotar junto a la barra), Corte / Entorno / Ultra, y la pestaña Telemetría rehecha (§42: fuentes como pastillas, botones por fuente, interruptores con engranaje, ventanas laterales, modo compacto al pilotar). Los textos nuevos de §42.2 fueron aprobados por el usuario el 2026-11-21 y sus marcas de pendiente se quitaron. Gazebo físico (ESC real, HITL) queda fuera: es la fase siguiente.
+
+### 43.2 Verificado (build de desarrollo `E:\TwinSight_builds\pc_cp1`, receta §12.3, puerta `pc_postbuild_gate.ps1` OK; segunda build `pc_cp1b` = la misma más el diagnóstico de `-mvp-capture`)
+- Compilación 0 errores (Standalone y WebGL). **EditMode 370/370** (Standalone) y **352/352** (WebGL).
+- Equipo al medir: 3 editores Unity abiertos (el principal, PID 24796, y dos de otros proyectos, no tocados), Unity Hub y ~24 `msedge`; ningún jugador `TwinSightX500` colgado salvo uno de esta sesión (ver abajo). CPU del equipo 10-57 % entre sondas (una vez 100 % por una compilación del Editor).
+- A 1280x720 ES salvo que se diga otra cosa. `-ux-capture` **503/503** a 1280 ES, 1904 ES, 1280 EN y 1904 EN (antes 494/503). `-fix1-capture` **156/156** (1280 ES, 1904 EN, 150 %). `-fix2-capture` **67/67** (1280 ES/EN, 1904 ES/EN, 150 %). `-tel-ui` **49/49** con `Desk_SitlUrl` limpia (48/49 con la URL que dejan otras sondas: «SITL block shows the default URL», ya anotado en §41). `-desk-fix` **112/112**. `-desk-close` 56/57 (= base, «select a part»). `-desk-pickprobe` 26/30 (preexistente, rango 25-30). `-tools` **80/80**. `-lote1b` **53/53** (antes 49/53). `-lote1c` **49/49**. `-env` **48/48** (antes 38/48).
+- `-mvp-capture` **133/133 o 132/133** a 1280 ES, 1904 ES, 1280 EN, 1904 EN. El único fallo que aparece a veces es «el motor caliente se pinta más cálido...» (intermitente ya anotado en §37.4: el píxel muestreado cae a veces en el borde del motor, R 0,494 frente a un umbral de 0,495 o un píxel fuera del campo; 2 de 6 ejecuciones). `-mvp-capture` y `-ux-capture` fuerzan la escala de interfaz al 100 % y no leen `-uiscale`: el 150 % está cubierto por `-fix1-capture` y `-fix2-capture`.
+- Sin Blitter / «shader is null» / NullReference en los 26 `Player.log` de la primera pasada ni en las demás.
+
+### 43.3 Fallos vistos y qué se hizo
+- Las cinco primeras ejecuciones de `-mvp-capture` (build `pc_cp1`) dieron 130-131/133 con los mismos dos fallos («indicator and shield visible», «top bar does not overflow», nivel de barra 6 incluso a 1904 px). **No eran de un jugador lento** (los chips salían a tiempo, enlace a 37 Hz). Con la misma build, más tarde, pasan; tampoco se reproducen con la CPU al 100 %, con la escala 150 % heredada de otra sonda ni con las preferencias limpias (7 ejecuciones). **Causa no identificada**; se dejó el diagnóstico (`DesktopChrome.TopBarWhy()` y las medidas del escudo se escriben en el log de la sonda si vuelve a fallar). Sospecha sin probar: la barra superior solo sube de nivel y no baja hasta que cambia el ancho, así que un solapamiento momentáneo en el arranque la deja degradada.
+- `-mvp-capture` 1280 EN (primera pasada): el jugador no arrancó la interfaz (excepción al inicializar `UIDocument`, «Destination array was not long enough» en el diccionario estático de estilos de Unity; condición de carrera de arranque, 1 vez en ~40 arranques); se cerró ese proceso colgado de la sonda y se repitió: 133/133.
+
+### 43.4 NO verificado
+Mando real (XInput), PX4 SITL real, otra GPU (todo en una RTX 5060 Ti), Windows limpio (sin Unity ni preferencias previas), arrastre con ratón real del SO, la causa de los dos fallos intermitentes de `-mvp-capture` de §43.3, y ninguna captura revisada a ojo salvo las de §43.3.
+
+### 43.5 Cierre
+Plataforma activa WebGL; `UniversalRenderPipelineGlobalSettings.asset`, `DynamicsManager.asset` y `ProjectSettings.asset` restaurados con `git checkout`. Etiqueta y `pc-desktop` subidas a `origin`.
