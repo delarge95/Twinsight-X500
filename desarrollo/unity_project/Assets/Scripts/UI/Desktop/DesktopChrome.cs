@@ -188,8 +188,8 @@ namespace WebGL.UI.Desktop
                 () => ViewModeManager.Instance?.SetViewMode(ViewMode.Realistic), "Volver a la vista realista", "Back to the realistic view", false);
             // the tools of the telemetry mode (state read from DesktopTelemetryUI)
             AddToolChip("pilot", "gamepad", "DkChipPilot", () => _tel.Piloting, () => _tel.SetPilot(false, "chip"), "Dejar de pilotar", "Stop piloting");
-            AddToolChip("wind", "wind", "DkChipWind", () => _tel.IsRunning && DesktopTelemetry.IsSimulator && (_tel.WindRemembered.speed > 0 || _tel.WindRemembered.gustSigma > 0),
-                () => { var w = _tel.WindRemembered.Clone(); w.speed = 0; w.gustSigma = 0; _tel.ApplyWind(w); }, "Quitar viento", "Remove wind");
+            AddToolChip("wind", "wind", "DkChipWind", () => _tel.IsRunning && DesktopTelemetry.IsSimulator && _tel.WindOn && (_tel.WindRemembered.speed > 0 || _tel.WindRemembered.gustSigma > 0),
+                () => { var w = _tel.WindRemembered.Clone(); w.speed = 0; w.gustSigma = 0; _tel.ApplyWind(w); _tel.SetWindOn(false); }, "Quitar viento", "Remove wind");
             AddToolChip("fence", "fence", "DkChipFence", () => _tel.IsRunning && DesktopTelemetry.IsSimulator && !FenceIsDefault(_tel.FenceRemembered),
                 () => _tel.ApplyFence(Geofence.Default()), "Quitar geocerca personalizada", "Remove custom geofence");
             AddToolChip("batteryignore", "battery", "DkChipBatteryIgnore", () => _tel.IsRunning && DesktopTelemetry.IsSimulator && !_tel.BatteryReactOn,
@@ -213,6 +213,10 @@ namespace WebGL.UI.Desktop
             FenceConfig d = Geofence.Default();
             return f == null || (f.radius == d.radius && f.ceiling == d.ceiling && f.rtlAltitude == d.rtlAltitude);
         }
+
+        /// <summary>PLAN_PC 42: the width taken by the left rail + the part tree and by the right rail + the inspector (side windows are placed next to them).</summary>
+        internal float LeftOccupied => RailWidth + (_tree != null ? _tree.OccupiedWidth : 0f);
+        internal float RightOccupied => RailWidth + (_side != null ? _side.OccupiedWidth : 0f);
 
         internal Button MakeChipPublic(string shape, string name, Action off) => MakeChip(shape, name, off);
         internal DesktopVectorIcon NewIconPublic(string shape, float size) => NewIcon(shape, size);
@@ -537,8 +541,15 @@ namespace WebGL.UI.Desktop
             _settingsBody = new VisualElement();
             _settingsBody.AddToClassList("dk-settings-body");
             _settings.Add(_settingsBody);
+            // PLAN_PC 42: the side windows of the Telemetry tab go back to their default place (forgets every Desk_Win_<id>)
+            _winReset = new Button(() => DesktopWindow.ResetAll()) { name = "DkWinReset" };
+            _winReset.AddToClassList("dk-b");
+            _winReset.AddToClassList("dk-b--ghost");
+            _settings.Add(_winReset);
             _root.Add(_settings);
         }
+
+        private Button _winReset;
 
         private void ToggleSettings()
         {
@@ -558,6 +569,7 @@ namespace WebGL.UI.Desktop
             cfg.AddToClassList("hero-submenu--active");
             cfg.AddToClassList("dk-config-embedded");
             _settings.RemoveFromClassList("dk-settings--hidden");
+            if (_winReset != null) _winReset.text = WebGL.Telemetry.TelemetryStrings.T("ux.win.reset", AppLanguageManager.IsSpanish ? "es" : "en");
             _settings.BringToFront();
             _settingsOpen = true;
             _btnGear.AddToClassList("dk-ibtn--on");
