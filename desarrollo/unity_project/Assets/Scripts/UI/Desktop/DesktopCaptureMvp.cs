@@ -274,6 +274,7 @@ namespace WebGL.UI.Desktop
             yield return PressKey(KeyCode.X);
             yield return new WaitForSecondsRealtime(0.3f);
             Check("X enters «Modo juego»: the cursor is locked", DesktopGameMode.Active && DesktopGameMode.CursorLocked && !UnityEngine.Cursor.visible);
+            Log("game shield: badge display " + Tel.GameBadge.resolvedStyle.display + ", shield display " + Tel.GameShield.resolvedStyle.display + ", shield width " + Tel.GameShield.resolvedStyle.width + " vs root " + Root.resolvedStyle.width);
             Check("the indicator and the shield are visible", Tel.GameBadge.resolvedStyle.display != DisplayStyle.None && Tel.GameShield.resolvedStyle.display != DisplayStyle.None && Tel.GameShield.resolvedStyle.width > Root.resolvedStyle.width * 0.9f);
             Check("the strip button is lit", B("DkGameMode").ClassListContains("dk-strip-btn--on"));
             Vector2 mouse = new Vector2(2.5f, 0f);

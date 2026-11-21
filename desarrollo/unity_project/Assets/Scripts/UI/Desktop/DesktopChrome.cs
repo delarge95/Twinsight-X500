@@ -850,9 +850,23 @@ namespace WebGL.UI.Desktop
         /// <summary>How much the top bar has given up (0 = nothing, 6 = everything optional). Read by the probes.</summary>
         public int BarLevel => _barLevel;
 
+        // why the last TopBarOverflows() said true (plain numbers: no allocation per frame); read by the probes through TopBarWhy()
+        private int _ovKind = -1, _ovIdx;
+        private float _ovA, _ovB;
+
+        /// <summary>Verification harness: which child of the top bar made the last measure overflow (empty when it did not).</summary>
+        internal string TopBarWhy()
+        {
+            if (_ovKind < 0 || _top == null || _ovIdx >= _top.childCount) return "";
+            VisualElement c = _top[_ovIdx];
+            string[] kinds = { "spacer squeezed", "overlaps the previous one", "last item leaves the bar" };
+            return kinds[Mathf.Clamp(_ovKind, 0, 2)] + ": child " + _ovIdx + " «" + c.name + "» (" + c.GetType().Name + ") x " + c.worldBound.xMin.ToString("F1") + ".." + c.worldBound.xMax.ToString("F1") + " vs " + _ovA.ToString("F1") + " / " + _ovB.ToString("F1") + " (bar " + _top.worldBound.xMax.ToString("F1") + ")";
+        }
+
         /// <summary>True when two items of the top bar overlap or the last one leaves the bar (the layout of the previous frame).</summary>
         public bool TopBarOverflows()
         {
+            _ovKind = -1;
             if (_top == null || _top.resolvedStyle.display == DisplayStyle.None) return false;
             Rect bar = _top.worldBound;
             if (bar.width < 10f) return false;
@@ -866,9 +880,9 @@ namespace WebGL.UI.Desktop
                 Rect r = c.worldBound;
                 shown++; // counted by display, not by width: a squeezed item must not look like one that came or went
                 // the two spacers around the mode switch must keep some air: with none left the bar is cramped even if nothing overlaps
-                if (c.resolvedStyle.flexGrow > 0f && r.width < MinSpacer) over = true;
+                if (c.resolvedStyle.flexGrow > 0f && r.width < MinSpacer) { if (_ovKind < 0) { _ovKind = 0; _ovIdx = ci; _ovA = r.width; _ovB = MinSpacer; } over = true; }
                 if (r.width < 1f) continue;
-                if (r.xMin < prevRight - 0.5f) over = true;
+                if (r.xMin < prevRight - 0.5f) { if (_ovKind < 0) { _ovKind = 1; _ovIdx = ci; _ovA = prevRight; _ovB = r.xMin; } over = true; }
                 // an item squeezed below its content (the mode switch) paints its children outside its own box: measure them too
                 float right = r.xMax;
                 for (int gi = 0; gi < c.childCount; gi++)
@@ -884,6 +898,7 @@ namespace WebGL.UI.Desktop
             }
 
             _barShown = shown;
+            if (_ovKind < 0 && prevRight > bar.xMax + 0.5f) { _ovKind = 2; _ovIdx = _top.childCount - 1; _ovA = prevRight; _ovB = bar.xMax; }
             return over || prevRight > bar.xMax + 0.5f;
         }
 

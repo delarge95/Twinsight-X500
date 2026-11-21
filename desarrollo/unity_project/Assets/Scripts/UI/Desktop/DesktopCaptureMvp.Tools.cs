@@ -64,8 +64,9 @@ namespace WebGL.UI.Desktop
             Check("piloting has its chip", ChipLive("DkChipPilot") && B("DkChipPilot").tooltip == Tip("Stop piloting", "Dejar de pilotar"));
             Cam.SetDistance(300f, true);
             yield return new WaitForSecondsRealtime(0.6f);
-            Check("seven tool chips + the session chip: the top bar does not overflow", !Chrome.TopBarOverflows());
-            Log("top bar level " + Chrome.BarLevel + ", effects on " + fx.ActiveCount);
+            bool barOver = Chrome.TopBarOverflows();
+            Check("seven tool chips + the session chip: the top bar does not overflow", !barOver);
+            Log("top bar level " + Chrome.BarLevel + ", effects on " + fx.ActiveCount + (barOver ? " | " + Chrome.TopBarWhy() : ""));
             yield return Shot("40_p1_chips_activos", 0.4f);
 
             // the chips switch their tools off, one click each
