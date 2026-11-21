@@ -124,6 +124,9 @@ namespace WebGL.UI.Desktop
             {
                 Tel.StartRecording();
                 yield return new WaitForSecondsRealtime(3.5f);
+                // a slow player (background window) samples fewer frames: wait for 2 s of samples, at most 20 s more
+                float until = Time.realtimeSinceStartup + 20f;
+                while (Tel.Recording && Tel.RecordedFrames < 2 * TwfWriter.RateHz && Time.realtimeSinceStartup < until) yield return null;
                 Log("recording: on " + Tel.Recording + ", frames " + Tel.RecordedFrames);
                 path = Tel.StopRecording();
                 Log("recording stopped: " + (path ?? "null") + " msg " + Tel.RecordMessage);

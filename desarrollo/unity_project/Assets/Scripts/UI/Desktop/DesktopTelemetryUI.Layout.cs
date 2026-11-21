@@ -27,7 +27,7 @@ namespace WebGL.UI.Desktop
         private readonly Dictionary<SourcePill, string> _srcPillTips = new Dictionary<SourcePill, string>();
         private Button _srcGear, _moreBtn;
         private Label _moreLabel;
-        private VisualElement _winLayer, _sepData;
+        private VisualElement _winLayer, _sepData, _sepSrc;
         private TSection? _openSection;
         private bool _moreOpen;
         private MenuSurface? _lastSurface;
@@ -59,7 +59,8 @@ namespace WebGL.UI.Desktop
             _srcGear = _chrome.IconButtonPublic("gear", "DkSrcGear", () => TogglePopover("source"), 14);
             _srcGear.AddToClassList("dk-strip-gear");
             _strip.Add(_srcGear);
-            _strip.Add(MakeSep());
+            _sepSrc = MakeSep();
+            _strip.Add(_sepSrc);
             AddSection(TSection.Cmd, "DkSecCmd", "gamepad");
             AddSection(TSection.Scene, "DkSecScene", "env_studio");
             AddSection(TSection.Tools, "DkSecTools", "pins");

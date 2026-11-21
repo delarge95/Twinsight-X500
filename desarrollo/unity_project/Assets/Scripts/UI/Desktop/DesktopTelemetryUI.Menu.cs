@@ -186,6 +186,7 @@ namespace WebGL.UI.Desktop
             _moreBtn.EnableInClassList("dk-strip-btn--on", _moreOpen);
             _moreBtn.EnableInClassList("dk-secbtn--open", _moreOpen);
             SetShown(_sepData, s != MenuSurface.Inspector);
+            SetShown(_sepSrc, s != MenuSurface.Inspector);
             if (s == MenuSurface.Inspector || _pilotOn) SetShown(_availRow, false); else RefreshAvailRow(s);
             SetShown(_camFold, shown.Contains(ToolId.Follow) || shown.Contains(ToolId.Game)); // the «Avanzado» fold of the commands (camera, game mode)
         }

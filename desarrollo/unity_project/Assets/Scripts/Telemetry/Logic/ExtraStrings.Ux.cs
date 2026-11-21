@@ -23,7 +23,6 @@ namespace WebGL.Telemetry
             d["ux.more"] = new[] { "Más", "More" };
             d["ux.more.tip"] = new[] { "Resto del menú (pilotando se muestra solo lo esencial)", "Rest of the menu (only the essentials while piloting)" };
             d["ux.src.on.tip"] = new[] { "Pulsa otra vez para apagar la telemetría", "Press again to turn the telemetry off" };
-            d["ux.gear.tip"] = new[] { "Ajustes", "Settings" };
             d["ux.win.tip"] = new[] { "Arrastra para mover · doble clic: a su sitio", "Drag to move · double-click: back to place" };
             d["ux.win.reset"] = new[] { "Restablecer ventanas", "Reset windows" };
         }
