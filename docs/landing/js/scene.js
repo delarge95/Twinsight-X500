@@ -117,8 +117,8 @@ const GRID_FRAG = /* glsl */ `
     vec2 p = vW.xz + uOff;
     float fade = smoothstep(7.5, 0.6, length(vW.xz));
     float g = gridLine(p * 2.0) * 0.35 + gridLine(p * 0.5) * 0.65;
-    float pool = smoothstep(2.6, 0.0, length(vW.xz)); // charco de luz bajo el dron
-    gl_FragColor = vec4(mix(uColor, vec3(0.30, 0.70, 1.0), pool * 0.6), (g * fade + pool * pool * 0.16) * uAlpha);
+    // v3 Instrumento: rejilla gris plana sobre el lienzo Grafito; sin charco de luz azul bajo el dron
+    gl_FragColor = vec4(uColor, g * fade * uAlpha);
   }`;
 
 const SHEET_FRAG = /* glsl */ `
@@ -313,7 +313,7 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     new ShaderMaterial({
       vertexShader: 'varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
       fragmentShader: GRID_FRAG,
-      uniforms: { uOff: { value: { x: 0, y: 0 } }, uAlpha: { value: 0 }, uColor: { value: new Color('#7fa6c8') } },
+      uniforms: { uOff: { value: { x: 0, y: 0 } }, uAlpha: { value: 0 }, uColor: { value: new Color('#858C94') } }, // token --ts-color-text-tertiary: rejilla neutra (v3)
       transparent: true, depthWrite: false,
     }),
   );

@@ -6,7 +6,7 @@
   <title>TwinSight X500 — Gemelo digital del Holybro X500 V2</title>
   <meta name="description" content="Gemelo digital interactivo del dron Holybro X500 V2: inspección pieza a pieza, vista explosionada, rayos X, térmico de base física y telemetría PX4. Web app en Three.js y app de escritorio en Unity 6.">
   <meta name="author" content="Alexander Woodcock Salomón">
-  <meta name="theme-color" content="#06080b">
+  <meta name="theme-color" content="#0C0D0E">
   <meta name="color-scheme" content="dark">
   <link rel="canonical" href="https://twinsight.alexwoodcock.me/">
 
@@ -32,7 +32,10 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
 
-  <link rel="preload" href="landing/fonts/SpaceGrotesk-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="landing/fonts/IBMPlexSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="landing/fonts/IBMPlexSans-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="landing/fonts/SpaceGrotesk-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="landing/css/tokens.css">
   <link rel="stylesheet" href="landing/css/landing.css">
   <link rel="modulepreload" href="landing/js/main.js">
   <script>document.documentElement.classList.add('js', 'is-intro');</script>
@@ -178,7 +181,7 @@
           <h2 class="title"><span class="ln"><span data-i18n="c4a">Calor estimado</span></span><span class="ln"><span data-i18n="c4b">con base física.</span></span></h2>
           <p class="body" data-reveal data-i18n="c4p">Motores y batería se calientan con la carga, y el calor fluye a las piezas vecinas. Un modelo simplificado, rotulado como tal.</p>
           <div class="legend" data-reveal>
-            <span data-i18n="c4l1">Frío</span><i></i><span data-i18n="c4l2">Caliente</span>
+            <span data-i18n="c4l1">Frío</span><i class="thermal-legend"></i><span data-i18n="c4l2">Caliente</span>
           </div>
           <p class="fine" data-reveal data-i18n="c4n">Vista ilustrativa. El modelo completo corre en la app.</p>
         </div>

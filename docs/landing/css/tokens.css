@@ -1,0 +1,83 @@
+/* TwinSight · tokens v2 «Instrumento» (paleta Grafito, oscuro) para la landing.
+   Procedencia: subconjunto copiado a mano el 2026-11-24 de E:\twinsight-web-twin\src\web\design\generated\tokens.css
+   (sección «v2 tokens --ts-*», fuente design/tokens.ts.json; rama design/v2-lote4). Valores idénticos, sin añadir ni cambiar ninguno.
+   Solo se incluyen las variables que usa la landing. Si cambia tokens.ts.json, volver a copiar a mano (la landing no tiene generador).
+   Referencia de diseño: docs/diseno/SISTEMA_DISENO_V2.md (§D.1 paleta, §E.5 reglas anti-slop) del repo twinsight-web-twin. */
+:root {
+  /* color */
+  --ts-color-surface-0: #111315;
+  --ts-color-surface-1: #171A1D;
+  --ts-color-surface-2: #1F2327;
+  --ts-color-surface-3: #2A2F34;
+  --ts-color-surface-canvas: #0C0D0E;
+  --ts-color-line-subtle: #33393F;
+  --ts-color-line-strong: #4A5158;
+  --ts-color-text-primary: #E6E8EA;
+  --ts-color-text-secondary: #A9AFB6;
+  --ts-color-text-tertiary: #858C94;
+  --ts-color-text-disabled: #565C63;
+  --ts-color-accent-interact: #46AFFF;
+  --ts-color-accent-on: #06121C;
+  --ts-color-accent-highlight: #BFEAFF;
+  --ts-color-brand: #FF8A2A;
+  --ts-color-state-ok: #3FBF8A;
+  --ts-color-state-warn: #F2B33D;
+  --ts-color-state-crit: #FF5A4F;
+  --ts-color-state-info: var(--ts-color-text-secondary);
+  --ts-color-data-1: #4C9BE0;
+  --ts-color-provenance-measured: solid;
+  --ts-color-provenance-estimated: dashed;
+  --ts-color-provenance-simulated: dotted;
+  /* font */
+  --ts-font-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --ts-font-data: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --ts-font-logo: "Space Grotesk";
+  --ts-font-weight-regular: 400;
+  --ts-font-weight-medium: 500;
+  --ts-font-weight-semibold: 600;
+  --ts-font-size-label: 11px;
+  --ts-font-size-body: 13px;
+  --ts-font-size-title: 16px;
+  --ts-font-size-value-sm: 19px;
+  --ts-font-size-value: 23px;
+  --ts-font-size-display: 28px;
+  --ts-font-line-height-label: 16px;
+  --ts-font-line-height-body: 20px;
+  --ts-font-line-height-title: 24px;
+  --ts-font-line-height-value: 28px;
+  --ts-font-tracking-label: 0.08em;
+  --ts-font-tracking-value: -0.01em;
+  /* space */
+  --ts-space-1: 4px;
+  --ts-space-2: 8px;
+  --ts-space-3: 12px;
+  --ts-space-4: 16px;
+  --ts-space-5: 24px;
+  --ts-space-6: 32px;
+  --ts-space-7: 48px;
+  --ts-space-8: 64px;
+  /* radius */
+  --ts-radius-none: 0px;
+  --ts-radius-control: 2px;
+  --ts-radius-touch: 4px;
+  /* border */
+  --ts-border-width: 1px;
+  --ts-border-selected: 2px;
+  --ts-border-focus-ring: 2px;
+  /* size */
+  --ts-size-control-pointer: 28px;
+  --ts-size-control-pointer-large: 32px;
+  --ts-size-control-touch: 44px;
+  --ts-size-bar-top: 40px;
+  --ts-size-indicator: 6px;
+  --ts-size-corner-tick: 6px;
+  --ts-size-meter-segment: 4px;
+  --ts-size-icon-sm: 16px;
+  --ts-size-icon-md: 20px;
+  --ts-size-icon-lg: 24px;
+  --ts-size-icon-stroke: 1.5;
+  /* motion */
+  --ts-motion-duration-instant: 100ms;
+  --ts-motion-duration-panel: 200ms;
+  --ts-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}
