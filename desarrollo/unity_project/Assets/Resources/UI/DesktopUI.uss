@@ -5,6 +5,11 @@
    Same tokens as Theme.uss: celeste rgb(70,175,255), white 0.65 muted text, pills.
    ════════════════════════════════════════════════════════════════ */
 
+/* DV2-U2 (design system v2 "Instrumento"): v2 tokens as USS custom properties (--ts-*), generated from design/tokens.ts.json by the web repo
+   (npm run design:unity). Same mechanism as Theme.uss (@import "Hotspots.uss"). A copy of this file lives next to DesktopUI.uss; never edit it by hand.
+   Pending in the Editor (not done by text): create the IBM Plex FontAsset (TextCore) from Resources/Fonts/IBMPlex*, check that @import and var() compile. */
+@import "TwinSightTokens.uss";
+
 /* ── Minimum pointer target: 44 px (agreed with the web) ── */
 .desktop-ui .hero-info-btn {
     width: 44px;

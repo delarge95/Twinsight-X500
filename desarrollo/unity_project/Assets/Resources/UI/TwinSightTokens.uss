@@ -1,0 +1,79 @@
+/* GENERATED from design/tokens.ts.json (sha256 cc3ea8a24627dfd4f685b27a9369a7d3b51deb8ba1d3e54f16040cbf67b92ec2) by tools/design/gen_unity.mjs (npm run design:unity). Do not edit. */
+/* Same --ts-* names as the web (tokens.css). Dark mode only: USS has no media queries. */
+/* Not emitted (no USS equivalent): font families and weights (-unity-font-definition / -unity-font-style), em lengths, cubic-bezier. See TwinSightTokens.cs. */
+/* Not verified in the Editor yet: var() inside transition-duration, border-radius and font-size (DV2-U2). */
+:root {
+    /* color */
+    --ts-color-surface-0: #111315;
+    --ts-color-surface-1: #171A1D;
+    --ts-color-surface-2: #1F2327;
+    --ts-color-surface-3: #2A2F34;
+    --ts-color-surface-canvas: #0C0D0E;
+    --ts-color-line-subtle: #33393F;
+    --ts-color-line-strong: #4A5158;
+    --ts-color-text-primary: #E6E8EA;
+    --ts-color-text-secondary: #A9AFB6;
+    --ts-color-text-tertiary: #858C94;
+    --ts-color-text-disabled: #565C63;
+    --ts-color-accent-interact: #46AFFF;
+    --ts-color-accent-on: #06121C;
+    --ts-color-accent-highlight: #BFEAFF;
+    --ts-color-brand: #FF8A2A;
+    --ts-color-state-ok: #3FBF8A;
+    --ts-color-state-warn: #F2B33D;
+    --ts-color-state-crit: #FF5A4F;
+    --ts-color-state-info: var(--ts-color-text-secondary);
+    --ts-color-data-1: #4C9BE0;
+    --ts-color-data-2: #EBD38F;
+    --ts-color-data-3: #C77AB8;
+    --ts-color-data-4: #DADDE0;
+    /* font */
+    --ts-font-size-label: 11px;
+    --ts-font-size-body: 13px;
+    --ts-font-size-title: 16px;
+    --ts-font-size-value-sm: 19px;
+    --ts-font-size-value: 23px;
+    --ts-font-size-display: 28px;
+    --ts-font-line-height-label: 16px;
+    --ts-font-line-height-body: 20px;
+    --ts-font-line-height-title: 24px;
+    --ts-font-line-height-value: 28px;
+    /* --ts-font-tracking-label: 0.08em (font.tracking.label): no em in USS; see TwinSightTokens.cs */
+    /* --ts-font-tracking-value: -0.01em (font.tracking.value): no em in USS; see TwinSightTokens.cs */
+    /* space */
+    --ts-space-1: 4px;
+    --ts-space-2: 8px;
+    --ts-space-3: 12px;
+    --ts-space-4: 16px;
+    --ts-space-5: 24px;
+    --ts-space-6: 32px;
+    --ts-space-7: 48px;
+    --ts-space-8: 64px;
+    /* radius */
+    --ts-radius-none: 0px;
+    --ts-radius-control: 2px;
+    --ts-radius-touch: 4px;
+    /* border */
+    --ts-border-width: 1px;
+    --ts-border-selected: 2px;
+    --ts-border-focus-ring: 2px;
+    /* size */
+    --ts-size-control-pointer: 28px;
+    --ts-size-control-pointer-large: 32px;
+    --ts-size-control-touch: 44px;
+    --ts-size-bar-top: 40px;
+    --ts-size-bar-status: 24px;
+    --ts-size-rail-left: 280px;
+    --ts-size-rail-right: 340px;
+    --ts-size-indicator: 6px;
+    --ts-size-corner-tick: 6px;
+    --ts-size-meter-segment: 4px;
+    --ts-size-icon-sm: 16px;
+    --ts-size-icon-md: 20px;
+    --ts-size-icon-lg: 24px;
+    --ts-size-icon-stroke: 1.5;
+    /* motion */
+    --ts-motion-duration-instant: 100ms;
+    --ts-motion-duration-panel: 200ms;
+    --ts-motion-alarm-blink: 1000ms;
+}
