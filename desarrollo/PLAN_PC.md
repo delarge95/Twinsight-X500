@@ -1511,3 +1511,8 @@ Sistema «Instrumento v2» (paleta Grafito, IBM Plex, radios <= 4 px) ya en `Des
 
 ### 45.3 NO verificado
 Mando real (XInput), PX4 SITL real, otra GPU (RTX 5060 Ti), Windows limpio, revisión a ojo de las capturas (solo se miró `fix2_fuente_sitl`), `-desk-*`, `-tools`, `-lote1*`, `-env`, `-tel-ui` (no pedidas).
+
+### 45.4 Corrección DV2-U5 (contraste de pistas de sliders, cc8bb05)
+- Causa: el barrido 7499d9b dejó la pista (`.glass-slider .unity-base-slider__tracker`, una sola regla para todos los deslizadores) con borde `line-strong` (2,17:1 sobre `surface-1` #171A1D, el fondo real del popover; la sonda mide con rgb 18,21,27 y da 2,27:1). Ratios sobre `surface-1` (sobre el fondo fijo de la sonda): `line-subtle` 1,50 (1,56), `line-strong` 2,17 (2,27), `text-disabled` 2,58 (2,70), **`text-tertiary` 5,14 (5,38)**, `text-secondary` 7,90, `accent-interact` 7,35 (el relleno, ya pasaba). Elegido: borde `text-tertiary`, cuerpo de la pista `line-strong`.
+- Mismo barrido, otra regresión de >= 3:1 a < 3:1 en un control (análisis del diff de 7499d9b, borde antiguo contra el nuevo, sobre `surface-1`): la casilla `.dk-pf-check` del filtro de Piezas (borde 0,35 blanco, 3,22:1, pasó a `line-strong`, 2,17:1) -> `text-tertiary`. No hay más pistas ni bordes de control en ese caso (los demás bordes translúcidos antiguos ya estaban bajo 3:1 o siguen siendo acento).
+- Medido en `pc_dv2` reconstruida (puerta OK, EditMode 370/370 Standalone): `-fix1` **156/156** a 1280 ES, 1904 ES, 1280 EN, 1904 EN y 150 % (la primera pasada de 150 % dio 150/156, interacciones de Filtro/Explotar bajo carga del equipo; repetida: 156/156); `-fix2` 67/67; `-mvp` 133/133; `-ux` 503/503 (la primera dio 502, «a submit on the ⓘ»; repetida: 503). Capturas y logs `capturas_dv2/u5_*`.
