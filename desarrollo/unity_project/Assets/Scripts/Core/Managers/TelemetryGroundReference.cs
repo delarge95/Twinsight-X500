@@ -23,6 +23,11 @@ namespace WebGL.Core.Managers
         static readonly Color Accent = new Color32(70, 175, 255, 255);
         static readonly Color Highlight = new Color32(191, 234, 255, 255);
         static readonly Color Panel = new Color32(23, 27, 34, 255);
+        // DV2-U6 tokens v2 (design/tokens.json, dark): line.subtle, line.strong, surface.canvas, surface.0
+        static readonly Color GridMinor = new Color32(0x33, 0x39, 0x3F, 255);
+        static readonly Color GridMajor = new Color32(0x4A, 0x51, 0x58, 255);
+        static readonly Color GridGround = new Color32(0x0C, 0x0D, 0x0E, 255);
+        static readonly Color GridHorizon = new Color32(0x11, 0x13, 0x15, 255);
 
         const int LegacyHalfCells = 14;
         const int LegacyMajorEvery = 5;
@@ -122,12 +127,12 @@ namespace WebGL.Core.Managers
             groundMaterial = new Material(src) { name = "TelemetryGround" };
             groundMaterial.SetFloat(MeterId, cell);
             groundMaterial.SetFloat(GroundYId, groundY);
-            groundMaterial.SetColor(LineColorId, Accent);
-            groundMaterial.SetColor(MajorColorId, Highlight);
-            Color ground = Color.Lerp(Panel, Accent, 0.17f);
-            Color horizon = Color.Lerp(Panel, Accent, 0.34f);
-            groundMaterial.SetColor(GroundColorId, ground);
-            groundMaterial.SetColor(HorizonColorId, horizon);
+            // DV2-U6 (design system v2, dark): grey grid, no neon. Minor (1 m and 10 m) = line.subtle, major (100 m, heading ticks, ring, horizon line) = line.strong,
+            // ground = surface.canvas fading to surface.0 at the horizon (no halo). The cue line, the fly-to marker and the legacy grid keep the accent.
+            groundMaterial.SetColor(LineColorId, GridMinor);
+            groundMaterial.SetColor(MajorColorId, GridMajor);
+            groundMaterial.SetColor(GroundColorId, GridGround);
+            groundMaterial.SetColor(HorizonColorId, GridHorizon);
             groundMaterial.SetFloat(FadeStartId, 60f);
             groundMaterial.SetFloat(FadeEndId, 1800f);
             groundMaterial.SetFloat("_ShadowStrength", 0.7f);

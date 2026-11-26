@@ -149,10 +149,10 @@ Shader "TwinSight/GroundGridPC"
                 if (_Quality > 0.5) cov1 = GridCoverage(p, fw, 1.0, 1.0);
                 cov10 = GridCoverage(p, fw, 10.0, 1.3);
                 cov100 = GridCoverage(p, fw, 100.0, 1.8);
-                // lines: fine < medium < major; the fine ones fade out sooner with the distance
-                rgb = lerp(rgb, _LineColor.rgb, cov1 * 0.20 * (1.0 - saturate(distM / 160.0)));
-                rgb = lerp(rgb, _LineColor.rgb, cov10 * 0.42);
-                rgb = lerp(rgb, _MajorColor.rgb, cov100 * 0.80);
+                // lines: fine < medium < major; the fine ones fade out sooner with the distance. DV2-U6: the colours are now the grey line tokens, so the weights no longer tame a neon
+                rgb = lerp(rgb, _LineColor.rgb, cov1 * 0.50 * (1.0 - saturate(distM / 160.0)));
+                rgb = lerp(rgb, _LineColor.rgb, cov10);
+                rgb = lerp(rgb, _MajorColor.rgb, cov100);
 
                 // the soft shadow of the drone (a blob that widens and fades with the altitude) and the ring of its ground point
                 float alt = max(_DroneShadow.y - _GroundY, 0.0) / m;                // metres
