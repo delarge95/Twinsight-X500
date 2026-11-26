@@ -1487,3 +1487,27 @@ Plataforma activa WebGL; `UniversalRenderPipelineGlobalSettings.asset`, `Dynamic
 
 ### 44.3 NO verificado
 - Windows limpio / otro equipo, SmartScreen y Mark of the Web reales (exe sin firmar); GPU distinta de la RTX 5060 Ti de esta maquina (Ultra exige una GPU potente, dicho en el LEEME); mando real (XInput); PX4 SITL real; sondas solo a 1280x720 ES sobre el paquete (1904 y EN, 150 %, `-desk-*`, `-tools`, `-lote1*`, `-env`, `-tel-ui` se pasaron en la build de desarrollo, §43.2); la causa de los fallos intermitentes de `-mvp-capture` (§43.3); ninguna captura revisada a ojo. Sin lector `.ulg` ni parametros/mision PX4 en escritorio (dicho en el LEEME). Release de GitHub y pagina de versiones: pendientes (los hace el usuario).
+
+## 45. Diseño v2 en escritorio (build de desarrollo pc_dv2) (2026-11-26, rama `pc-dv2-build` desde `pc-desktop` 8ab3a56, solo PC, sin push)
+
+Sistema «Instrumento v2» (paleta Grafito, IBM Plex, radios <= 4 px) ya en `DesktopUI.uss` (3963e58 tokens y fuentes, 7499d9b barrido, 8ab3a56 .meta). Esta ronda activa las fuentes (3428620, `feat(unity-ui): DV2-U4 activa IBM Plex en DesktopUI.uss`: Plex Sans Regular en la raíz `.desktop-ui`, `.ts-medium`/`.ts-semibold`, Plex Mono en lecturas numéricas; los 37 `-unity-font-style: bold` pasan a SemiBold; sin tocar Theme.uss, UXML ni C#) y construye `E:\TwinSight_builds\pc_dv2\TwinSightX500.exe` (desarrollo, receta §12.3; puerta `pc_postbuild_gate.ps1` **OK**).
+
+### 45.1 Verificado
+- Compilación 0 errores. EditMode **370/370** (Standalone) y **352/352** (WebGL).
+- Sondas sobre `pc_dv2` (capturas y logs en `twinsight-web-twin/docs/unity_pc/capturas_dv2`, sin commitear allí). `Player.log` sin Blitter / shader is null / NullReference / Exception en todos.
+
+| Sonda | Base (1280 ES) | 1280 ES | 1904 ES | 1280 EN | 1904 EN | 150 % |
+|---|---|---|---|---|---|---|
+| `-mvp-capture` | 133 | 132 | 132 | 132 | 133 | (fuerza 100 %) |
+| `-ux-capture` | 503 | 503 | 503 | 503 | 500 / 501 | (fuerza 100 %) |
+| `-fix1-capture` | 156 | **124** | **124** | **124** | **124** | **124** |
+| `-fix2-capture` | 67 | 67 | 67 | 67 | 67 | 67 |
+
+### 45.2 Fallos
+- **`-fix1-capture` (32 por ejecución, siempre los mismos)**: «the track of EnvLightRotation / EnvLightIntensity reads over the popover (2.27:1 >= 3)» en todas las vistas. Es contraste de la pista del deslizador (`surface-3` con borde `line-strong` sobre el popover): viene del barrido 7499d9b, no de las fuentes (con las fuentes revertidas, build `pc_dv2_nofont`: 124/156 igual). Propuesta: pista y borde con `text-tertiary` (#858C94) o más claro hasta >= 3:1.
+- `-mvp-capture`: 132/133 con «the hot motor is drawn warmer...» (intermitente de §37.4; 4 de 5 con fuentes, 0 de 3 sin ellas, muestra pequeña). Sin fuentes salió además el intermitente de §43.3 («top bar does not overflow» y dos de chips, 130/133).
+- `-ux-capture` 1904 EN: 500 y 501 (tooltip de un ⓘ de 0 x 0 px, un ⓘ distinto cada vez); sin fuentes salió 501 y 503: intermitente, no de las fuentes.
+- Desbordes de la barra superior a 150 % / 1080p: `-fix2` 67/67 y `-mvp` a 1904 sin fallo de desborde en las ejecuciones con fuentes.
+
+### 45.3 NO verificado
+Mando real (XInput), PX4 SITL real, otra GPU (RTX 5060 Ti), Windows limpio, revisión a ojo de las capturas (solo se miró `fix2_fuente_sitl`), `-desk-*`, `-tools`, `-lote1*`, `-env`, `-tel-ui` (no pedidas).
