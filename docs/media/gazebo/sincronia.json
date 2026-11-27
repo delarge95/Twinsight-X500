@@ -1,5 +1,55 @@
 {
-  "nota": "Prueba 04 (encuadre no definitivo, pose antigua de la cámara). desfase_s ajustado midiendo el solape en 60 fotogramas: error medio 4 px de 1280 (el evento «record» daba 1,33 s y 0,3 s de error). Sustituir por el sincronia.json de la captura final.",
-  "desfase_s": 1.65,
-  "camara": { "pose": [0, 14, 1.6, 0, -0.2, -1.5708], "hfov": 1.0472, "ancho": 1280, "alto": 720 }
+ "descripcion": "Sincronía vídeo (gazebo_demo.mp4/.webm) ↔ telemetría (telemetria.json). Ambos van en reloj de simulación de Gazebo/PX4 (sin deriva); solo hay un desfase constante.",
+ "formula": "t_telemetria_ms = (t_video_s + offset_video_a_telemetria_s) * 1000; telemetria.json: frames[i][0] = t_ms desde t0_lt (reloj de PX4 = simulación)",
+ "offset_video_a_telemetria_s": 1.7,
+ "incertidumbre_s": 0.1,
+ "metodo": "Correlación del movimiento del vídeo (diferencia de fotogramas) con la velocidad y la tasa angular de la telemetría (ventanas 15-27 s y 50-63 s: 1,7-1,8 s); toma de tierra: dron llega al suelo en vídeo 70,1 s y la altura EKF baja a ~6 cm en tele 71,8 s (1,7 s). El despegue por altura EKF sale ~0,3 s tarde (2,0-2,3 s) porque el EKF retrasa la subida; los vídeos de la 1.ª captura dieron 1,65 s.",
+ "anclas": {
+  "despegue_visible_video_s": 5.7,
+  "despegue_ekf_tele_s": 8.02,
+  "toma_tierra_video_s": 70.1,
+  "toma_tierra_tele_s": 71.8,
+  "landed_flag_tele_s": 73.38,
+  "fallo_motor_cmd_tele_s": 60.18
+ },
+ "video": {
+  "archivos": [
+   "gazebo_demo.mp4",
+   "gazebo_demo.webm"
+  ],
+  "duracion_s": 71.8,
+  "fps": 30,
+  "ancho": 1280,
+  "alto": 720,
+  "fotogramas": 2154,
+  "recorte": "el MP4 original de Gazebo duraba 73,93 s (2219 fotogramas); se recortó la cola estática a 71,8 s (el dron toca tierra en 70,1 s); el inicio no se recortó, por eso el offset es el del vídeo original"
+ },
+ "telemetria": {
+  "archivo": "telemetria.json",
+  "duracion_s": 76.18,
+  "rate_hz": 30.0,
+  "nota": "cubre todo el vuelo; el vídeo equivale a t_tele = 1,70 .. 73,50 s"
+ },
+ "camara_gazebo": {
+  "modelo": "demo_cam (camara_demo.sdf)",
+  "pose_enu_xyz_rpy": [
+   0,
+   14,
+   2.0,
+   0,
+   -0.06,
+   -1.5708
+  ],
+  "pose_nota": "Gazebo ENU: x=este, y=norte, z=arriba; mira al sur (yaw -90°) y 3,4° hacia arriba (pitch -0,06 rad en convención SDF)",
+  "hfov_rad": 1.0472,
+  "hfov_deg": 60.0,
+  "vfov_deg": 35.98,
+  "aspecto": "16:9",
+  "clip": [
+   0.1,
+   300
+  ]
+ },
+ "ejes_telemetria": "p = NED relativo al origen del EKF (≈ origen del mundo): n,e,d en cm; q = cuaternión w,x,y,z ×1e4 cuerpo FRD→NED; u = orden de motor ×1000 (no RPM medida); flags: bit0 armado, bit1 en tierra. NED→ENU: (x,y,z)=(e,n,−d)",
+ "rotulo": "Gemelo digital SITL · sesión grabada (dron simulado)"
 }
