@@ -11,7 +11,7 @@ mit = rd(glob.glob(pc + "com.lilytech-lab.wireframe-shader@*/LICENSE")[0])
 urp = rd(glob.glob(pc + "com.unity.render-pipelines.universal@*/Third Party Notices.md")[0])
 core = rd(glob.glob(pc + "com.unity.render-pipelines.core@*/THIRD PARTY NOTICES.md")[0])
 
-head = """TwinSight X500 para PC - version 0.0.3
+head = """TwinSight X500 para PC - version 0.0.4
 AVISOS DE LICENCIA DE TERCEROS (THIRD PARTY NOTICES)
 ======================================================================
 
@@ -34,13 +34,14 @@ RESUMEN
     Shader Graph library) ......................... Unity Companion License
  3. Space Grotesk (tipografia) ..................... SIL OFL 1.1
  4. Inter (tipografia) ............................. SIL OFL 1.1
- 5. HDRI "Studio Small 09" (Poly Haven) ............ CC0 1.0
- 6. DOTween (Demigiant) ............................ licencia de Demigiant: por confirmar
- 7. Wireframe Shader (Lilytech Lab) ................ MIT
- 8. Componentes Microsoft (D3D12, DirectStorage) ... terminos de Microsoft: por confirmar
- 9. Datos del vuelo de ejemplo (PX4 Flight Review) . licencia por confirmar
-10. Modelo 3D basado en el CAD de Holybro .......... propiedad de Holybro; sin afiliacion
-11. Iconos PNG heredados de la interfaz ............ origen y licencia por confirmar
+ 5. IBM Plex Sans e IBM Plex Mono (tipografia) ..... SIL OFL 1.1
+ 6. HDRI "Studio Small 09" (Poly Haven) ............ CC0 1.0
+ 7. DOTween (Demigiant) ............................ licencia de Demigiant: por confirmar
+ 8. Wireframe Shader (Lilytech Lab) ................ MIT
+ 9. Componentes Microsoft (D3D12, DirectStorage) ... terminos de Microsoft: por confirmar
+10. Datos del vuelo de ejemplo (PX4 Flight Review) . licencia por confirmar
+11. Modelo 3D basado en el CAD de Holybro .......... propiedad de Holybro; sin afiliacion
+12. Iconos PNG heredados de la interfaz ............ origen y licencia por confirmar
 
 
 1. UNITY 6 (6000.6.5f1) Y MONO
@@ -93,7 +94,16 @@ Licencia: SIL Open Font License 1.1 (texto completo en la seccion C).
 Se usa para el texto base de la interfaz.
 
 
-5. HDRI "STUDIO SMALL 09"
+5. IBM PLEX SANS E IBM PLEX MONO
+----------------------------------------------------------------------
+Copyright (c) 2017 IBM Corp., con el nombre de fuente reservado "Plex"
+(https://github.com/IBM/plex).
+Licencia: SIL Open Font License 1.1 (texto completo en la seccion C).
+Se usa para el texto de la interfaz (IBM Plex Sans: Regular, Medium y
+SemiBold) y para las lecturas numericas (IBM Plex Mono: Regular y Medium).
+
+
+6. HDRI "STUDIO SMALL 09"
 ----------------------------------------------------------------------
 Autor: Sergej Majboroda. Fuente: https://polyhaven.com/a/studio_small_09
 Licencia: CC0 1.0 (dominio publico); no exige atribucion, se cita por
@@ -101,7 +111,7 @@ cortesia. Se usa en la build de PC como entorno de reflejos y de luz
 ambiental (no se muestra de fondo). Poly Haven: https://polyhaven.com
 
 
-6. DOTWEEN
+7. DOTWEEN
 ----------------------------------------------------------------------
 DOTween is copyright (c) 2014-2018 Daniele Giardini - Demigiant
 (DOTween.dll, version gratuita, usada para animaciones de interfaz).
@@ -109,7 +119,7 @@ Licencia: la publica Demigiant en http://dotween.demigiant.com/license.php
 y no la he podido verificar desde aqui: licencia por confirmar.
 
 
-7. WIREFRAME SHADER (Lilytech Lab)
+8. WIREFRAME SHADER (Lilytech Lab)
 ----------------------------------------------------------------------
 Paquete com.lilytech-lab.wireframe-shader
 (https://github.com/lilytech-lab/WireframeShader). Su shader
@@ -117,7 +127,7 @@ Paquete com.lilytech-lab.wireframe-shader
 Licencia MIT (texto completo en la seccion D).
 
 
-8. COMPONENTES DE MICROSOFT
+9. COMPONENTES DE MICROSOFT
 ----------------------------------------------------------------------
 Las carpetas y archivos D3D12\\ (D3D12Core.dll), dstorage.dll y
 dstoragecore.dll los copia el reproductor de Unity (DirectX 12 /
@@ -126,7 +136,7 @@ sus derechos; sus terminos de redistribucion no estan en el proyecto:
 licencia por confirmar.
 
 
-9. DATOS DE VUELO DE EJEMPLO
+10. DATOS DE VUELO DE EJEMPLO
 ----------------------------------------------------------------------
 TwinSightX500_Data\\StreamingAssets\\Telemetry\\x500v2_flight.twf se
 deriva del registro publico de PX4 Flight Review
@@ -137,7 +147,7 @@ Gracias al piloto que lo hizo publico. Licencia del registro: por
 confirmar (Flight Review no declara aqui una licencia concreta).
 
 
-10. MODELO 3D
+11. MODELO 3D
 ----------------------------------------------------------------------
 Derivado del CAD publicado por Holybro para el kit de marco X500 V2,
 reorganizado y optimizado para visualizacion (solo muestra; no es un
@@ -146,7 +156,7 @@ es la duena del diseno y de sus marcas. Sin afiliacion con Holybro.
 Licencia de redistribucion del CAD: por confirmar.
 
 
-11. ICONOS PNG HEREDADOS
+12. ICONOS PNG HEREDADOS
 ----------------------------------------------------------------------
 Algunos iconos PNG de Assets\\UI\\Icons (heredados de la primera version
 de la interfaz) tienen origen y licencia sin documentar en el proyecto:
@@ -164,7 +174,7 @@ A. AVISOS DE TERCEROS DEL PAQUETE Universal Render Pipeline
 
 doc = (head + urp + "\n\n\nB. AVISOS DE TERCEROS DEL PAQUETE Core RP Library\n"
        "----------------------------------------------------------------------\n" + core +
-       "\n\n\nC. SIL OPEN FONT LICENSE 1.1 (Space Grotesk e Inter)\n"
+       "\n\n\nC. SIL OPEN FONT LICENSE 1.1 (Space Grotesk, Inter e IBM Plex)\n"
        "----------------------------------------------------------------------\n"
        "Copyright 2020 The Space Grotesk Project Authors (https://github.com/floriankarsten/space-grotesk)\n"
        "Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter)\n\n" + ofl_body +
