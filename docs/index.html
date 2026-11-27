@@ -71,6 +71,7 @@
     <nav class="nav__links" aria-label="Secciones">
       <a href="#producto" data-i18n="navProduct">Producto</a>
       <a href="#telemetria" data-i18n="navTelemetry">Telemetría</a>
+      <a href="#gazebo" data-i18n="navGazebo">Gazebo</a>
       <a href="#apps" data-i18n="navApps">Apps</a>
       <a href="#evidencia" data-i18n="navEvidence">Evidencia</a>
       <a href="#docs" data-i18n="navDocs">Docs</a>
@@ -303,8 +304,6 @@
         <p class="sitl__flow" data-reveal data-i18n="cxFlow">Gazebo simula el dron, PX4 SITL es el piloto automático real corriendo en un computador y un puente MAVLink alimenta la app.</p>
         <p class="fine" data-reveal data-i18n="cxNote">Gemelo digital SITL: un dron simulado que usa el piloto automático real PX4. Ningún dron físico está conectado.</p>
 
-        <!-- MULTIMEDIA PENDIENTE: video de la simulación de Gazebo en una ventana superpuesta y modelo 3D animado del dron como gemelo digital (o video de Unity), sin tapar la vista 3D -->
-
         <div class="sitl__cta" data-reveal>
           <div>
             <h3 data-i18n="cxCtaT">La conexión en vivo no es una demo pública</h3>
@@ -315,11 +314,37 @@
       </div>
     </section>
 
-    <!-- 07 · APPS -->
+    <!-- 07 · GAZEBO: el vídeo grabado es una ventana plana dentro de la escena 3D; el gemelo vuela delante con la telemetría
+         (landing/js/gazebo.js; constantes en gazebo-config.js). El <video> es la fuente de la textura: con 3D queda invisible
+         sobre el recuadro donde se dibuja el plano; sin 3D se ve tal cual. -->
+    <section class="block gz" id="gazebo" data-chapter="gazebo" aria-labelledby="gzTitle">
+      <div class="wrap">
+        <header class="block__head">
+          <p class="kicker" data-reveal><b>07</b><span data-i18n="gzK">Gazebo</span></p>
+          <h2 class="title" id="gzTitle"><span class="ln"><span data-i18n="gzA">Del simulador</span></span><span class="ln"><span data-i18n="gzB">a tu pantalla.</span></span></h2>
+        </header>
+        <figure class="gz__win">
+          <div class="gz__frame" id="gzFrame">
+            <video class="gz__video" id="gzVideo" muted playsinline loop preload="none" disablepictureinpicture aria-label="Vídeo de Gazebo con el gemelo 3D" data-i18n-aria="gzVideo" aria-describedby="gzAlt"></video>
+            <p class="gz__fail" id="gzFail" hidden data-i18n="gzFail">Vídeo no disponible: solo el gemelo.</p>
+          </div>
+          <figcaption class="gz__cap">
+            <span class="badge"><i class="dot dot--sim"></i><span data-i18n="gzChip">Gemelo digital SITL · sesión grabada</span></span>
+            <span class="tip">
+              <button class="tip__btn" type="button" aria-expanded="false" aria-describedby="gzInfo" aria-label="Más información" data-i18n-aria="tipMore">i</button>
+              <span class="tip__txt" id="gzInfo" role="tooltip" data-i18n="gzInfo">Vídeo de Gazebo y telemetría de PX4 SITL grabados a la vez. El dron es simulado.</span>
+            </span>
+          </figcaption>
+          <p class="sr" id="gzAlt" data-i18n="gzAlt">Un X500 simulado despega, avanza hacia la cámara, frena, pierde un motor un instante y aterriza. El gemelo 3D repite cada movimiento delante del vídeo.</p>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 08 · APPS -->
     <section class="block" id="apps" data-chapter="apps">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>07</b><span data-i18n="c6k">Apps</span></p>
+          <p class="kicker" data-reveal><b>08</b><span data-i18n="c6k">Apps</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c6a">Dos clientes,</span></span><span class="ln"><span data-i18n="c6b">un sistema.</span></span></h2>
         </header>
 
@@ -357,11 +382,11 @@
       </div>
     </section>
 
-    <!-- 08 · EVIDENCIA -->
+    <!-- 09 · EVIDENCIA -->
     <section class="block" id="evidencia" data-chapter="evidence">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>08</b><span data-i18n="c7k">Evidencia</span></p>
+          <p class="kicker" data-reveal><b>09</b><span data-i18n="c7k">Evidencia</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c7a">Validado con</span></span><span class="ln"><span data-i18n="c7b">usuarios reales.</span></span></h2>
         </header>
         <div class="evidence">
@@ -397,11 +422,11 @@
       </div>
     </section>
 
-    <!-- 09 · INGENIERÍA -->
+    <!-- 10 · INGENIERÍA -->
     <section class="block" data-chapter="engineering">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>09</b><span data-i18n="c8k">Ingeniería</span></p>
+          <p class="kicker" data-reveal><b>10</b><span data-i18n="c8k">Ingeniería</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c8a">Construido para</span></span><span class="ln"><span data-i18n="c8b">mantenerse.</span></span></h2>
         </header>
         <div class="bento">
@@ -438,11 +463,11 @@
       </div>
     </section>
 
-    <!-- 10 · DOCS -->
+    <!-- 11 · DOCS -->
     <section class="block" id="docs" data-chapter="docs">
       <div class="wrap">
         <header class="block__head">
-          <p class="kicker" data-reveal><b>10</b><span data-i18n="c9k">Documentación</span></p>
+          <p class="kicker" data-reveal><b>11</b><span data-i18n="c9k">Documentación</span></p>
           <h2 class="title"><span class="ln"><span data-i18n="c9a">Todo queda</span></span><span class="ln"><span data-i18n="c9b">por escrito.</span></span></h2>
         </header>
         <div class="docs" data-reveal>

@@ -5,6 +5,7 @@ export {
   Vector2, Vector3, Vector4, Quaternion, Euler, Matrix4, Box3, Sphere,
   MathUtils, PMREMGenerator, DirectionalLight, HemisphereLight,
   ShaderMaterial, MeshBasicMaterial, MeshStandardMaterial, PlaneGeometry,
+  Texture, VideoTexture, // sección Gazebo: vídeo (o póster) como textura de un plano dentro de la escena
   BufferGeometry, BufferAttribute, Float32BufferAttribute, Line, LineBasicMaterial,
   AdditiveBlending, NormalBlending, DoubleSide, FrontSide, SRGBColorSpace,
   ACESFilmicToneMapping, NeutralToneMapping, REVISION,

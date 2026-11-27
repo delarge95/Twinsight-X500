@@ -4,7 +4,7 @@
 import {
   WebGLRenderer, Scene, PerspectiveCamera, Group, Mesh, Color, Vector3, Vector4, Box3, MathUtils,
   PMREMGenerator, Quaternion, DirectionalLight, HemisphereLight, ShaderMaterial, PlaneGeometry, BufferGeometry,
-  BufferAttribute, MeshBasicMaterial, AdditiveBlending, DoubleSide, SRGBColorSpace, Vector2, Matrix4,
+  BufferAttribute, MeshBasicMaterial, AdditiveBlending, DoubleSide, SRGBColorSpace, Vector2, Matrix4, Line, LineBasicMaterial,
   ACESFilmicToneMapping, GLTFLoader, MeshoptDecoder, RoomEnvironment,
 } from '../vendor/three.bundle.js';
 
@@ -22,7 +22,10 @@ export const DEFAULT_STATE = {
   grid: 0.5, sway: 0.2, spin: 1, labels: 0,
   fov: 28, // campo de visión vertical, en grados; se anima para igualar la cámara de la web app al abrirla
   aim: 0,  // 0 = la cámara mira al centro del modelo; 1 = a su origen, como hace la web app
+  gz: 0,   // 0 = escena normal; 1 = sección Gazebo (cámara de Gazebo, vídeo en un plano y gemelo con la telemetría; ver gazebo.js)
 };
+// Origen de la cámara de Gazebo en la escena: mira hacia −z, con el plano del vídeo a D unidades (lejos del dron de los demás capítulos).
+const GZ_ORIGIN = new Vector3(0, 0, 12);
 
 // Piezas que la landing rotula en la vista explosionada. `match` es el prefijo del nodo en el GLB;
 // los nombres visibles salen de las fichas técnicas del proyecto (ver main.js).
@@ -430,6 +433,81 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     return hit;
   }
 
+  // ---- sección Gazebo: plano con el vídeo, marco y gemelo reubicado (la lógica de datos y vídeo vive en gazebo.js) ----
+  let gzLayer = null, gzOn = false, twinAlpha = 1, twinMats = null;
+  const gzPlane = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ toneMapped: false, transparent: true, depthWrite: true }));
+  gzPlane.visible = false; gzPlane.renderOrder = -2;
+  const gzFrame = new Line(new BufferGeometry(), new LineBasicMaterial({ color: new Color('#4A5158'), transparent: true })); // token --ts-color-line-strong
+  gzFrame.visible = false;
+  scene.add(gzPlane, gzFrame);
+  const gzCam = new Vector3(), gzP0 = new Matrix4(), gzP1 = new Matrix4(), gzPos = new Vector3();
+  function setTwinAlpha(a) {
+    if (Math.abs(a - twinAlpha) < 1e-3) return;
+    if (!twinMats) twinMats = [...new Set(meshes.map((m) => m.material))].map((m) => ({ m, tr: m.transparent, op: m.opacity, sp: m.forceSinglePass }));
+    const on = a < 0.999;
+    for (const o of twinMats) {
+      const tr = on || o.tr;
+      // forceSinglePass: un material transparente de doble cara se dibujaría en dos pasadas y three lo recompilaría en cada una
+      if (o.m.transparent !== tr) { o.m.transparent = tr; o.m.forceSinglePass = on || o.sp; o.m.needsUpdate = true; }
+      o.m.opacity = o.op * a;
+    }
+    twinAlpha = a;
+  }
+  function gazeboOff() {
+    if (!gzOn) return;
+    gzOn = false;
+    gzPlane.visible = gzFrame.visible = false;
+    rig.position.x = rig.position.z = 0;
+    rig.scale.setScalar(1);
+    setTwinAlpha(1);
+  }
+  function applyGazebo(g, dt) {
+    const s = gzLayer.sample(dt);
+    if (!s) { gazeboOff(); return; }
+    gzOn = true;
+    const L = gzLayer, p = L.params();
+    const r = L.rect();
+    const cx = r && r.width ? r.left + r.width / 2 : width / 2, cy = r && r.width ? r.top + r.height / 2 : height / 2;
+    const ppu = (r && r.width ? r.width : width) / (2 * L.halfW); // píxeles por unidad de escena a la distancia del plano
+    // «cabeza» del espectador: puntero + posición de la ventana en la pantalla + vaivén lento. El plano queda clavado al recuadro
+    // del DOM (proyección descentrada); lo que está delante de él se desplaza: así se ve que sobresale.
+    const sway = reducedMotion ? 0 : p.vaiven;
+    const hx = reducedMotion ? 0 : p.paralaje * pcur.x + sway * Math.sin(time * 0.31);
+    const hy = reducedMotion ? 0 : p.paralaje * (0.9 * (cy / height - 0.5) - 0.5 * pcur.y) + sway * 0.4 * Math.sin(time * 0.23);
+    gzCam.set(GZ_ORIGIN.x + hx, GZ_ORIGIN.y + hy, GZ_ORIGIN.z);
+    const n = camera.near, f = n / L.D;
+    gzP1.makePerspective((-hx - cx / ppu) * f, (-hx + (width - cx) / ppu) * f, (-hy + cy / ppu) * f, (-hy - (height - cy) / ppu) * f, n, camera.far);
+    gzP0.copy(camera.projectionMatrix);
+    const e0 = gzP0.elements, e1 = gzP1.elements, e = camera.projectionMatrix.elements;
+    for (let i = 0; i < 16; i++) e[i] = e0[i] + (e1[i] - e0[i]) * g;
+    camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+    camera.position.lerp(gzCam, g);
+    camera.quaternion.slerp(qId, g);
+
+    // plano del vídeo y marco
+    const tex = L.texture();
+    if (gzPlane.material.map !== tex) { gzPlane.material.map = tex; gzPlane.material.needsUpdate = true; }
+    gzPlane.visible = !!tex;
+    gzPlane.material.opacity = g;
+    gzPlane.material.transparent = g < 0.999;
+    gzPlane.position.set(GZ_ORIGIN.x, GZ_ORIGIN.y, GZ_ORIGIN.z - L.D);
+    gzPlane.scale.set(2 * L.halfW, 2 * L.halfH, 1);
+    if (!gzFrame.geometry.attributes.position) {
+      const w = L.halfW, h = L.halfH, z = GZ_ORIGIN.z - L.D + 0.002;
+      gzFrame.geometry.setAttribute('position', new BufferAttribute(new Float32Array([-w, -h, z, w, -h, z, w, h, z, -w, h, z, -w, -h, z]), 3));
+    }
+    gzFrame.visible = true;
+    gzFrame.material.opacity = g;
+
+    // gemelo: de su sitio en los demás capítulos a la pose del vuelo en el espacio de la cámara de Gazebo
+    rig.position.x = 0; rig.position.z = 0;
+    rig.position.lerp(gzPos.copy(GZ_ORIGIN).add(s.pos), g);
+    rig.quaternion.slerp(s.quat, g);
+    rig.scale.setScalar(1 + (s.scale - 1) * g);
+    setTwinAlpha(1 + (s.alpha - 1) * g);
+    return s;
+  }
+
   const v = new Vector3();
   const v2 = new Vector3();
   const originN = center.clone().multiplyScalar(-1 / radius); // origen del GLB en la escena normalizada
@@ -596,6 +674,9 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     camera.fov = cur.fov; // setViewOffset recalcula la proyección a continuación
     camera.setViewOffset(width, height, -cur.sx * width, -cur.sy * height, width, height);
 
+    const gzs = gzLayer && cur.gz > 0.002 ? applyGazebo(Math.min(1, cur.gz), dt) : (gazeboOff(), null);
+    if (gzs) { propAngle += gzs.u * gzLayer.spin * cur.gz * dt; for (const p of props) p.pivot.rotation.y = propAngle * p.dir; }
+
     renderer.render(scene, camera);
 
     if (onAnchors && cur.labels > 0.02) {
@@ -626,6 +707,10 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     setFlight(frames) { flight = { frames, index: 0 }; },
     setFlightIndex(i) { if (flight) flight.index = i; },
     setVisible(vis) { visible = vis; },
+    /** Capa de la sección Gazebo (gazebo.js): { D, halfW, halfH, sample(dt), texture(), rect(), params(), spin }. */
+    setGazebo(layer) { gzLayer = layer; },
+    /** Morro del modelo en la escena (vector unitario): lo necesita el mapeo de actitud de la sección Gazebo. */
+    noseDir: nose.toArray(),
     /** Resalta un grupo de piezas (id de landing/data/parts.json) y atenúa el resto; null lo quita. */
     select(id) { selId = id && groupMats.has(id) ? id : null; },
     /** Vista previa suave de un grupo (ratón encima). */

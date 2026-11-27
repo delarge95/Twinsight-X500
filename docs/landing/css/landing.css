@@ -520,3 +520,31 @@ main, .foot, .rail, .labels { transition: opacity 0.55s var(--ts-motion-easing-s
 @media (prefers-reduced-motion: reduce) {
   .tag, .labels line, .labels circle, .pchip { transition: none; }
 }
+
+/* ---------- 07 · Gazebo: el vídeo es una ventana plana dentro de la escena 3D (lo dibuja el lienzo; ver landing/js/gazebo.js) ---------- */
+.gz { min-height: 125vh; display: flex; flex-direction: column; justify-content: center; }
+.gz .block__head { margin-bottom: clamp(24px, 4vh, 44px); }
+.gz__win { position: relative; width: min(100%, calc((100vh - 260px) * 16 / 9)); }
+@media (min-width: 1181px) { /* título a la izquierda, ventana a la derecha; libre el índice lateral */
+  .gz .wrap { display: grid; grid-template-columns: minmax(260px, 1fr) 2.4fr; gap: var(--ts-space-7); align-items: center; padding-right: calc(var(--gutter) + 96px); }
+  .gz .block__head { margin-bottom: 0; }
+  .gz .title { font-size: clamp(36px, 3.6vw, 56px); }
+  .gz__win { width: min(100%, calc((100vh - 200px) * 16 / 9)); justify-self: end; }
+}
+/* recuadro 16:9 donde la escena clava el plano del vídeo; el <video> es solo la fuente de la textura */
+.gz__frame { position: relative; width: 100%; aspect-ratio: 16 / 9; }
+.gz__video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: contain; opacity: 0; pointer-events: none; }
+.no-3d .gz__video { opacity: 1; background: var(--ts-color-surface-0); outline: 1px solid var(--ts-color-line-strong); } /* sin WebGL: el vídeo tal cual */
+.gz__fail { position: absolute; left: var(--ts-space-3); bottom: var(--ts-space-3); padding: 4px 8px; border: 1px solid var(--ts-color-line-subtle); border-radius: var(--ts-radius-control); background: var(--ts-color-surface-canvas); font-size: 12px; color: var(--ts-color-text-secondary); }
+.gz__cap { display: flex; align-items: center; gap: var(--ts-space-2); margin-top: var(--ts-space-3); }
+/* ⓘ: lo largo va aquí, al pasar el cursor, con el foco o al tocar */
+.tip { position: relative; display: inline-flex; }
+.tip__btn { position: relative; display: inline-grid; place-items: center; width: var(--ts-size-control-pointer); height: var(--ts-size-control-pointer); border: 1px solid var(--ts-color-line-strong); border-radius: var(--ts-radius-control); font: var(--ts-font-weight-medium) 13px/1 var(--ts-font-data); color: var(--ts-color-text-secondary); transition: color var(--t), border-color var(--t); }
+.tip__btn::before { content: ""; position: absolute; inset: -8px; } /* área táctil de 44 px */
+.tip__btn:hover, .tip__btn[aria-expanded="true"] { color: var(--ts-color-text-primary); border-color: var(--ts-color-accent-interact); }
+.tip__txt { position: absolute; left: 0; bottom: calc(100% + 8px); z-index: 5; width: max-content; max-width: min(300px, 80vw); padding: 8px 10px; border: 1px solid var(--ts-color-line-strong); border-radius: var(--ts-radius-control); background: var(--ts-color-surface-1); font-size: 12.5px; line-height: 1.5; color: var(--ts-color-text-primary); visibility: hidden; opacity: 0; transition: opacity var(--ts-motion-duration-instant), visibility 0s linear var(--ts-motion-duration-instant); }
+.tip:hover .tip__txt, .tip__btn:focus-visible + .tip__txt, .tip__btn[aria-expanded="true"] + .tip__txt { visibility: visible; opacity: 1; transition-delay: 0s; }
+@media (max-width: 860px) {
+  .gz { min-height: 100vh; }
+  .tip__txt { left: auto; right: -40px; }
+}

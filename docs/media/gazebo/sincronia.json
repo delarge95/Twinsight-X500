@@ -1,0 +1,5 @@
+{
+  "nota": "Prueba 04 (encuadre no definitivo, pose antigua de la cámara). desfase_s ajustado midiendo el solape en 60 fotogramas: error medio 4 px de 1280 (el evento «record» daba 1,33 s y 0,3 s de error). Sustituir por el sincronia.json de la captura final.",
+  "desfase_s": 1.65,
+  "camara": { "pose": [0, 14, 1.6, 0, -0.2, -1.5708], "hfov": 1.0472, "ancho": 1280, "alto": 720 }
+}

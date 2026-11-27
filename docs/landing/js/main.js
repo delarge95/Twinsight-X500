@@ -55,6 +55,7 @@ function setLang(next, persist = true) {
   lang = next === 'en' ? 'en' : 'es';
   root.lang = lang;
   for (const el of $$('[data-i18n]')) el.textContent = el.dataset.i18n ? t(el.dataset.i18n) : '';
+  for (const el of $$('[data-i18n-aria]')) el.setAttribute('aria-label', t(el.dataset.i18nAria));
   for (const el of $$('[data-num]')) if (!el.dataset.counting) el.textContent = fmt(+el.dataset.num, +el.dataset.dec || 0);
   for (const b of $$('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
   document.title = t('docTitle');
@@ -72,7 +73,7 @@ function setLang(next, persist = true) {
 
 // ───────────── capítulos ─────────────
 const sections = $$('[data-chapter]');
-const BASE = { az: 2.27, el: 0.3, dist: 1.12, sx: 0, sy: 0.26, explode: 0, sweep: 0, thermal: 0, flight: 0, grid: 0.55, sway: 0.22, spin: 1, labels: 0, o: 1, fov: 28, aim: 0 };
+const BASE = { az: 2.27, el: 0.3, dist: 1.12, sx: 0, sy: 0.26, explode: 0, sweep: 0, thermal: 0, flight: 0, grid: 0.55, sway: 0.22, spin: 1, labels: 0, o: 1, fov: 28, aim: 0, gz: 0 };
 const KEYS = {
   hero: {},
   pipeline: { az: 2.05, el: 0.52, dist: 0.98, sx: 0.2, sy: 0, sweep: 1, kind: 'wire', sway: 0.12, grid: 0.7 },
@@ -81,6 +82,7 @@ const KEYS = {
   thermal: { az: -0.95, el: 0.78, dist: 1.02, sx: -0.2, sy: 0, thermal: 1, sway: 0.1 },
   flight: { az: 2.6, el: 0.2, dist: 1.34, sx: 0.1, sy: -0.1, flight: 1, grid: 1, sway: 0.05 },
   connect: { az: 1.3, el: 0.3, dist: 1.7, sx: 0, sy: -0.04, o: 0.12, sway: 0.1 },
+  gazebo: { az: 1.3, el: 0.3, dist: 1.7, gz: 1, o: 1, grid: 0, sway: 0, spin: 0 }, // con gz = 1 la cámara y el dron los pone gazebo.js
   apps: { az: 0.9, el: 0.3, dist: 1.7, sx: 0, sy: -0.08, o: 0.14, sway: 0.1 },
   evidence: { az: 0.4, el: 0.3, dist: 1.7, sx: 0, sy: 0, o: 0 },
   engineering: { az: 0.4, el: 0.3, dist: 1.7, sx: 0, sy: 0, o: 0 },
@@ -185,7 +187,7 @@ function compute() {
   nav.classList.toggle('is-stuck', scrollY > 24);
 }
 
-const NAV_ORDER = ['producto', 'telemetria', 'apps', 'evidencia', 'docs'];
+const NAV_ORDER = ['producto', 'telemetria', 'gazebo', 'apps', 'evidencia', 'docs'];
 function navTarget(index) {
   let id = '';
   for (let i = 0; i <= index; i++) if (NAV_ORDER.includes(sections[i].id)) id = sections[i].id;
@@ -592,6 +594,24 @@ addEventListener('pointermove', (e) => {
 }, { passive: true });
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && !portal.open && pz.id) selectPart(null); });
 
+// ───────────── sección Gazebo: vídeo grabado + gemelo que sale de la pantalla (gazebo.js, constantes en gazebo-config.js) ─────────────
+let gazebo = null;
+const gzSection = $('#gazebo');
+if (gzSection) {
+  import('./gazebo.js').then(({ createGazebo }) => {
+    gazebo = createGazebo({ section: gzSection, video: $('#gzVideo'), frame: $('#gzFrame'), fail: $('#gzFail'), reduced });
+    if (twin) gazebo.attach(twin);
+    if (new URLSearchParams(location.search).has('gzdebug')) window.twinsightGazebo = gazebo; // para afinar el efecto desde la consola
+  }).catch((err) => console.warn('TwinSight: sin sección Gazebo', err));
+}
+// ⓘ: el texto largo aparece al pasar el cursor o con el foco; en táctil, al tocar. Escape o un toque fuera lo cierran.
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest?.('.tip__btn');
+  for (const b of $$('.tip__btn[aria-expanded="true"]')) if (b !== btn) b.setAttribute('aria-expanded', 'false');
+  if (btn) btn.setAttribute('aria-expanded', String(btn.getAttribute('aria-expanded') !== 'true'));
+});
+addEventListener('keydown', (e) => { if (e.key === 'Escape') for (const b of $$('.tip__btn[aria-expanded="true"]')) b.setAttribute('aria-expanded', 'false'); });
+
 // ───────────── arranque ─────────────
 const query = new URLSearchParams(location.search).get('lang');
 applyLinks();
@@ -616,6 +636,7 @@ async function boot3d() {
       onAnchors: placeTags,
     });
     if (flight) twin.setFlight(flight.frames);
+    gazebo?.attach(twin);
     compute();
     twin.snap();
     stage.classList.add('is-ready');
