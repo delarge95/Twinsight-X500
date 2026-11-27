@@ -58,7 +58,7 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
   }
 
   // ───── muestra de la telemetría en el instante del vídeo ─────
-  const out = { pos: new Vector3(), quat: new Quaternion(), scale: 1, alpha: 1, u: 0, rho: 1, t: 0 };
+  const out = { pos: new Vector3(), quat: new Quaternion(), scale: 1, alpha: 1, near: 0, u: 0, rho: 1, t: 0 };
   const qa = new Quaternion(), qb = new Quaternion(), v = new Vector3();
   function index(t) {
     const T = st.data.T;
@@ -96,8 +96,11 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
     const zp = C.Z_ref * (rho >= 1 ? C.planoMax : Math.min(C.planoMax, Math.max(prof.rhoMin, Math.pow(rho, prof.gamma))));
     out.pos.copy(v).multiplyScalar((zp / z) * k); // mismo rayo, más cerca: mismo píxel que el dron del vídeo
     const near = smoothstep(C.opacidad.rhoLejos, C.opacidad.rhoCerca, rho);
-    out.scale = (C.radioDron ?? radiusM) * k * (zp / z) * (1 + (prof.exageracion - 1) * near);
+    // tamaño: proyección exacta (zp/z) por una exageración que crece con la cercanía (rampa de rhoExag a rhoMin)
+    const ex = smoothstep(prof.rhoExag, prof.rhoMin, rho);
+    out.scale = (C.radioDron ?? radiusM) * k * (zp / z) * (1 + (prof.exageracion - 1) * ex);
     out.alpha = C.opacidad.lejos + (C.opacidad.cerca - C.opacidad.lejos) * near;
+    out.near = near;
     out.rho = rho;
     return out;
   }
@@ -155,11 +158,13 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
     const [tel, sync] = await Promise.all([getJson(C.telemetria), getJson(C.sincronia)]);
     st.data = decode(tel);
     if (!st.data) { section.classList.add('gz--nodata'); return; }
-    const off = num(sync?.desfase_s, sync?.desfase, sync?.offset_s, sync?.offset);
+    const off = num(sync?.desfase_s, sync?.offset_video_a_telemetria_s, sync?.desfase, sync?.offset_s, sync?.offset);
     if (off !== undefined) { st.desfase = off; st.desfaseFuente = 'sincronia'; }
     else if (st.data.recStart !== undefined) { st.desfase = st.data.recStart; st.desfaseFuente = 'eventos'; }
-    const cam = sync?.camara ?? sync?.camera;
-    if (Array.isArray(cam?.pose) && cam.pose.length === 6) st.cam = { ...st.cam, ...cam };
+    // cámara: { camara: { pose, hfov, ancho, alto } } o el formato de la grabación { camara_gazebo: { pose_enu_xyz_rpy, hfov_rad }, video: { ancho, alto } }
+    const cg = sync?.camara_gazebo;
+    const cam = sync?.camara ?? sync?.camera ?? (cg && { pose: cg.pose_enu_xyz_rpy, hfov: cg.hfov_rad, ancho: sync.video?.ancho, alto: sync.video?.alto });
+    if (Array.isArray(cam?.pose) && cam.pose.length === 6) for (const key of ['pose', 'hfov', 'ancho', 'alto']) if (cam[key] != null) st.cam[key] = cam[key];
     loadVideo();
     if (twinRef) attach(twinRef);
   }
@@ -198,7 +203,7 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
     if (!st.data) return;
     setupCamera(new Vector3().fromArray(twin.noseDir));
     radiusM = twin.radiusM;
-    twin.setGazebo({
+    twin.setGazebo(st.layer = {
       D: C.D, halfW, halfH,
       sample, texture,
       rect: () => frame.getBoundingClientRect(),
@@ -228,6 +233,6 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
     attach,
     project,
     /** Estado para pruebas y para afinar: tiempo, ρ, desfase y de dónde salió. */
-    debug: () => ({ px: pixel(), poster: st.posterReady, tex: st.videoTex ? 'video' : st.posterTex ? 'póster' : 'ninguna', mediaTime: st.mediaTime, t: out.t, rho: out.rho, alpha: out.alpha, scale: out.scale, desfase: st.desfase, fuente: st.desfaseFuente, failed: st.failed, playing: st.playing, rvfc: hasRvfc, cam: st.cam.pose }),
+    debug: () => ({ ultimo: st.layer?.ultimo, px: pixel(), poster: st.posterReady, tex: st.videoTex ? 'video' : st.posterTex ? 'póster' : 'ninguna', mediaTime: st.mediaTime, t: out.t, rho: out.rho, alpha: out.alpha, scale: out.scale, desfase: st.desfase, fuente: st.desfaseFuente, failed: st.failed, playing: st.playing, rvfc: hasRvfc, cam: st.cam.pose }),
   };
 }

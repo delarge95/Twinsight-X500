@@ -4,7 +4,7 @@
 import {
   WebGLRenderer, Scene, PerspectiveCamera, Group, Mesh, Color, Vector3, Vector4, Box3, MathUtils,
   PMREMGenerator, Quaternion, DirectionalLight, HemisphereLight, ShaderMaterial, PlaneGeometry, BufferGeometry,
-  BufferAttribute, MeshBasicMaterial, AdditiveBlending, DoubleSide, SRGBColorSpace, Vector2, Matrix4, Line, LineBasicMaterial,
+  BufferAttribute, MeshBasicMaterial, AdditiveBlending, DoubleSide, SRGBColorSpace, Vector2, Matrix4, Line, LineBasicMaterial, Euler,
   ACESFilmicToneMapping, GLTFLoader, MeshoptDecoder, RoomEnvironment,
 } from '../vendor/three.bundle.js';
 
@@ -433,14 +433,29 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     return hit;
   }
 
-  // ---- sección Gazebo: plano con el vídeo, marco y gemelo reubicado (la lógica de datos y vídeo vive en gazebo.js) ----
+  // ---- sección Gazebo: «ventana» con el vídeo en un escenario y el gemelo delante (datos y vídeo en gazebo.js) ----
+  // gzRoot = la ventana: plano del vídeo, marco, sombra dura desplazada, línea de suelo y sombra de contacto del gemelo. Se inclina
+  // unos grados con el puntero y el scroll; el gemelo no gira con ella (está lejos del eje y se desplazaría del dron del vídeo).
   let gzLayer = null, gzOn = false, twinAlpha = 1, twinMats = null;
+  const gzRoot = new Group();
+  gzRoot.visible = false;
+  scene.add(gzRoot);
   const gzPlane = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ toneMapped: false, transparent: true, depthWrite: true }));
-  gzPlane.visible = false; gzPlane.renderOrder = -2;
-  const gzFrame = new Line(new BufferGeometry(), new LineBasicMaterial({ color: new Color('#4A5158'), transparent: true })); // token --ts-color-line-strong
-  gzFrame.visible = false;
-  scene.add(gzPlane, gzFrame);
-  const gzCam = new Vector3(), gzP0 = new Matrix4(), gzP1 = new Matrix4(), gzPos = new Vector3();
+  gzPlane.renderOrder = -2;
+  const gzFrame = new Line(new BufferGeometry(), new LineBasicMaterial({ color: new Color('#4A5158'), transparent: true })); // --ts-color-line-strong
+  const gzBack = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ color: new Color('#000000'), transparent: true, depthWrite: false, toneMapped: false }));
+  gzBack.renderOrder = -3; // sombra dura (sin desenfoque) desplazada abajo a la derecha: la ventana flota delante del fondo
+  const gzGround = new Line(new BufferGeometry(), new LineBasicMaterial({ color: new Color('#33393F'), transparent: true })); // --ts-color-line-subtle
+  const gzContact = new Mesh(new PlaneGeometry(1, 1), new ShaderMaterial({
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+    fragmentShader: 'uniform float uA; varying vec2 vUv; void main(){ float r = length(vUv - 0.5) * 2.0; gl_FragColor = vec4(0.0, 0.0, 0.0, uA * (1.0 - smoothstep(0.25, 1.0, r))); }',
+    uniforms: { uA: { value: 0 } }, transparent: true, depthWrite: false,
+  }));
+  gzContact.renderOrder = -1; // sombra de contacto del gemelo sobre el vídeo: grafito, sin brillo
+  gzRoot.add(gzBack, gzPlane, gzFrame, gzGround, gzContact);
+  const gzCam = new Vector3(), gzP0 = new Matrix4(), gzP1 = new Matrix4(), gzPos = new Vector3(), gzRel = new Vector3();
+  const gzTilt = new Quaternion(), gzEuler = new Euler(), gzQ = new Quaternion();
+  let gzBuilt = false;
   function setTwinAlpha(a) {
     if (Math.abs(a - twinAlpha) < 1e-3) return;
     if (!twinMats) twinMats = [...new Set(meshes.map((m) => m.material))].map((m) => ({ m, tr: m.transparent, op: m.opacity, sp: m.forceSinglePass }));
@@ -456,24 +471,37 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
   function gazeboOff() {
     if (!gzOn) return;
     gzOn = false;
-    gzPlane.visible = gzFrame.visible = false;
+    gzRoot.visible = false;
+    rig.visible = true;
     rig.position.x = rig.position.z = 0;
     rig.scale.setScalar(1);
     setTwinAlpha(1);
+  }
+  function buildGazebo(L) {
+    const w = L.halfW, h = L.halfH;
+    gzPlane.scale.set(2 * w, 2 * h, 1);
+    gzFrame.geometry.setAttribute('position', new BufferAttribute(new Float32Array([-w, -h, 0.002, w, -h, 0.002, w, h, 0.002, -w, h, 0.002, -w, -h, 0.002]), 3));
+    gzBack.scale.set(2 * w, 2 * h, 1);
+    gzBack.position.set(w * 0.035, -h * 0.06, -0.12);
+    const gy = -h * 1.16; // línea de suelo bajo la ventana, más ancha que ella
+    gzGround.geometry.setAttribute('position', new BufferAttribute(new Float32Array([-w * 1.15, gy, 0.4, w * 1.15, gy, 0.4]), 3));
+    gzBuilt = true;
   }
   function applyGazebo(g, dt) {
     const s = gzLayer.sample(dt);
     if (!s) { gazeboOff(); return; }
     gzOn = true;
     const L = gzLayer, p = L.params();
+    if (!gzBuilt) buildGazebo(L);
     const r = L.rect();
     const cx = r && r.width ? r.left + r.width / 2 : width / 2, cy = r && r.width ? r.top + r.height / 2 : height / 2;
     const ppu = (r && r.width ? r.width : width) / (2 * L.halfW); // píxeles por unidad de escena a la distancia del plano
-    // «cabeza» del espectador: puntero + posición de la ventana en la pantalla + vaivén lento. El plano queda clavado al recuadro
-    // del DOM (proyección descentrada); lo que está delante de él se desplaza: así se ve que sobresale.
+    // «cabeza» del espectador: puntero + posición de la ventana en la pantalla + vaivén lento. El centro de la ventana queda clavado
+    // al recuadro del DOM (proyección descentrada); lo que está delante se desplaza: así se ve que sobresale.
+    const scrollN = cy / height - 0.5;
     const sway = reducedMotion ? 0 : p.vaiven;
     const hx = reducedMotion ? 0 : p.paralaje * pcur.x + sway * Math.sin(time * 0.31);
-    const hy = reducedMotion ? 0 : p.paralaje * (0.9 * (cy / height - 0.5) - 0.5 * pcur.y) + sway * 0.4 * Math.sin(time * 0.23);
+    const hy = reducedMotion ? 0 : p.paralaje * (0.9 * scrollN - 0.5 * pcur.y) + sway * 0.4 * Math.sin(time * 0.23);
     gzCam.set(GZ_ORIGIN.x + hx, GZ_ORIGIN.y + hy, GZ_ORIGIN.z);
     const n = camera.near, f = n / L.D;
     gzP1.makePerspective((-hx - cx / ppu) * f, (-hx + (width - cx) / ppu) * f, (-hy + cy / ppu) * f, (-hy - (height - cy) / ppu) * f, n, camera.far);
@@ -484,27 +512,60 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     camera.position.lerp(gzCam, g);
     camera.quaternion.slerp(qId, g);
 
-    // plano del vídeo y marco
+    // inclinación de la ventana: mira un poco hacia el puntero; con el scroll se ve desde arriba o desde abajo. Tope en grados.
+    const tmax = reducedMotion ? 0 : MathUtils.degToRad(p.inclinacion);
+    gzEuler.set(MathUtils.clamp(tmax * (0.6 * pcur.y - 0.8 * scrollN), -tmax, tmax), MathUtils.clamp(tmax * pcur.x, -tmax, tmax), 0);
+    gzTilt.setFromEuler(gzEuler);
+    gzRoot.visible = true;
+    gzRoot.position.set(GZ_ORIGIN.x, GZ_ORIGIN.y, GZ_ORIGIN.z - L.D);
+    gzRoot.quaternion.copy(gzTilt);
+
     const tex = L.texture();
     if (gzPlane.material.map !== tex) { gzPlane.material.map = tex; gzPlane.material.needsUpdate = true; }
     gzPlane.visible = !!tex;
     gzPlane.material.opacity = g;
     gzPlane.material.transparent = g < 0.999;
-    gzPlane.position.set(GZ_ORIGIN.x, GZ_ORIGIN.y, GZ_ORIGIN.z - L.D);
-    gzPlane.scale.set(2 * L.halfW, 2 * L.halfH, 1);
-    if (!gzFrame.geometry.attributes.position) {
-      const w = L.halfW, h = L.halfH, z = GZ_ORIGIN.z - L.D + 0.002;
-      gzFrame.geometry.setAttribute('position', new BufferAttribute(new Float32Array([-w, -h, z, w, -h, z, w, h, z, -w, h, z, -w, -h, z]), 3));
-    }
-    gzFrame.visible = true;
     gzFrame.material.opacity = g;
+    gzBack.material.opacity = 0.55 * g;
+    gzGround.material.opacity = g;
 
-    // gemelo: de su sitio en los demás capítulos a la pose del vuelo en el espacio de la cámara de Gazebo
+    // ROMPER EL MARCO: el gemelo no se recorta a la ventana (el lienzo ocupa toda la pantalla). Topes: tamaño en pantalla y margen
+    // con los bordes, para que nunca se salga de cuadro (en móvil sobre todo). Se calcula en píxeles con la focal de la cámara.
+    const fpx = ppu * L.D;
+    gzRel.copy(s.pos);
+    let z = Math.max(0.05, -gzRel.z);
+    let scale = s.scale;
+    const rMax = p.radioMax * Math.min(width, height);
+    const rPx = (scale * fpx) / z;
+    if (rPx > rMax) scale *= rMax / rPx;
+    const rr = Math.min(rPx, rMax) * 1.05 + 8;
+    const sx = MathUtils.clamp(cx + (gzRel.x / z) * fpx, rr, width - rr);
+    const sy = MathUtils.clamp(cy - (gzRel.y / z) * fpx, Math.min(height / 2, rr + 56), height - rr); // 56 px: barra de navegación
+    gzRel.x = ((sx - cx) * z) / fpx; gzRel.y = (-(sy - cy) * z) / fpx;
+    const u = (L.ultimo ??= {}); // para afinar (?gzdebug); sin crear objetos por cuadro
+    u.g = g; u.z = z; u.scale = scale; u.rPx = rPx; u.rMax = rMax; u.sx = sx; u.sy = sy;
+
+    // sombra de contacto sobre el vídeo: aparece al acercarse, debajo del gemelo y algo desplazada (luz delante y arriba)
+    gzContact.visible = s.near > 0.02;
+    gzContact.position.set(gzRel.x, gzRel.y - scale * 0.5, 0.01);
+    gzContact.scale.set(scale * 2.6, scale * 1.3, 1);
+    gzContact.material.uniforms.uA.value = 0.42 * s.near * g;
+
+    // gemelo: en el espacio de la cámara de Gazebo, delante del plano (sin la inclinación de la ventana). En la transición no viaja
+    // entre las dos poses (la cámara lo atravesaría y llenaría la pantalla): se desvanece en la de los capítulos y aparece en la de Gazebo.
     rig.position.x = 0; rig.position.z = 0;
-    rig.position.lerp(gzPos.copy(GZ_ORIGIN).add(s.pos), g);
-    rig.quaternion.slerp(s.quat, g);
-    rig.scale.setScalar(1 + (s.scale - 1) * g);
-    setTwinAlpha(1 + (s.alpha - 1) * g);
+    const gIn = MathUtils.smoothstep(g, 0.85, 1), gOut = 1 - MathUtils.smoothstep(g, 0, 0.4);
+    rig.visible = gIn > 0.001 || gOut > 0.001;
+    if (gIn > 0.001) {
+      rig.position.copy(gzPos.copy(GZ_ORIGIN).add(gzRel));
+      rig.quaternion.copy(s.quat);
+      rig.scale.setScalar(scale);
+      setTwinAlpha(s.alpha * gIn);
+    } else {
+      rig.scale.setScalar(1);
+      setTwinAlpha(gOut);
+    }
+    gzContact.material.uniforms.uA.value *= gIn;
     return s;
   }
 
