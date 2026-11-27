@@ -20,22 +20,24 @@ export const GAZEBO = {
   // Orden: sincronia.json → «record» de los eventos de la telemetría (corregido por la duración real del vídeo) → este valor.
   desfase: 0,
   // Instante del póster (s de vídeo): con movimiento reducido el gemelo se queda quieto en este fotograma.
-  tPoster: 22.0, // captura v1: punto más cercano. El póster se saca de este fotograma para que el gemelo quieto coincida
+  tPoster: 48.2, // captura v2: punto más cercano (4,1 m). El póster es este fotograma, para que el gemelo quieto coincida con él
 
   // ── cámara de Gazebo (camara_demo.sdf) ──
-  // pose = x y z (ENU, m) roll pitch yaw (rad), como en el SDF. Esta es la de la captura final; las pruebas 02–04 se grabaron con
-  // «0 14 1.6 0 -0.2 -1.5708», que va en el sincronia.json de prueba. Si sincronia.json trae camara.pose, manda sobre esta.
+  // pose = x y z (ENU, m) roll pitch yaw (rad), como en el SDF. Es la de la captura v2 (8,5 m al norte del despegue de referencia,
+  // 1,6 m, mira al sur 3,5° hacia abajo). Manda la de sincronia.json (camara_gazebo.pose_enu_xyz_rpy) si la trae.
   camara: {
-    pose: [0, 14, 2.0, 0, -0.06, -1.5708],
-    hfov: 1.0472,          // rad (60°) → vFOV ≈ 35,98° a 16:9
+    pose: [0, 8.5, 1.6, 0, 0.0611, -1.5708],
+    hfov: 0.5585,          // rad (32°) → vFOV ≈ 18,32° a 16:9
     ancho: 1280, alto: 720, // resolución del vídeo: fija la proporción del plano
   },
 
   // ── mapeo cámara de Gazebo → escena ──
   D: 10,        // distancia del plano del vídeo a la cámara three, en unidades de escena (la escala es k = D / Z_ref)
-  Z_ref: 14,    // m: profundidad (en la cámara de Gazebo) que cae exactamente sobre el plano; ≈ distancia del despegue
+  Z_ref: 11.7,  // m: profundidad (en la cámara de Gazebo) que cae exactamente sobre el plano: la del despegue (N = −3,2 m)
   radioDron: null, // m: radio del X500 en Gazebo. null = el del GLB de la landing (son el mismo dron)
-  alturaCuerpo: 0.24, // m: el EKF marca 0 con el dron posado; el centro del cuerpo (y del GLB) queda esto más arriba
+  // m que se suman a la altura del EKF: centro del cuerpo sobre el punto del EKF (~0,2) + deriva del barómetro en esta sesión
+  // (el EKF da ~0,15 m menos que la pose real de Gazebo). Medido contra verdad_j.jsonl: con 0,35 el error mediano es 6 px de 1280.
+  alturaCuerpo: 0.35,
 
   // ── «salir de la pantalla» ──
   // ρ = z / Z_ref. Si ρ < 1 el gemelo se adelanta al plano: z′ = Z_ref·max(ρ_min, ρ^γ) y (x′, y′) = (x, y)·z′/z
@@ -46,7 +48,7 @@ export const GAZEBO = {
     gamma: 1.6,       // >1 exagera el acercamiento
     rhoMin: 0.25,     // tope de profundidad: el gemelo nunca pasa de 0,25·Z_ref (muy delante de la ventana)
     rhoExag: 0.9,     // la exageración de tamaño empieza en este ρ y es máxima en rhoMin
-    exageracion: 2.6, // tamaño del gemelo en el punto más cercano respecto a la proyección exacta (1 = exacta). ROMPE EL MARCO
+    exageracion: 3.4, // tamaño del gemelo en el punto más cercano respecto a la proyección exacta (1 = exacta). ROMPE EL MARCO
     radioMax: 0.6,    // tope del radio del gemelo en pantalla, en fracción del lado corto del viewport (no se sale de cuadro)
     paralaje: 0.6,    // unidades de escena que se mueve la «cabeza» (cámara three) con el puntero y el scroll; delata la profundidad
     vaiven: 0.1,      // vaivén lento automático de la cámara (0 = nada); se suma al paralaje
@@ -56,7 +58,7 @@ export const GAZEBO = {
     gamma: 1.3,
     rhoMin: 0.4,
     rhoExag: 0.9,
-    exageracion: 1.8,
+    exageracion: 3.0,
     radioMax: 0.5,
     paralaje: 0.3,
     vaiven: 0.06,

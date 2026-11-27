@@ -539,8 +539,10 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     const rPx = (scale * fpx) / z;
     if (rPx > rMax) scale *= rMax / rPx;
     const rr = Math.min(rPx, rMax) * 1.05 + 8;
-    const sx = MathUtils.clamp(cx + (gzRel.x / z) * fpx, rr, width - rr);
-    const sy = MathUtils.clamp(cy - (gzRel.y / z) * fpx, Math.min(height / 2, rr + 56), height - rr); // 56 px: barra de navegación
+    // márgenes con la silueta real: rr es media diagonal de la caja (hélices y patas); el dron es ancho y bajo
+    const mx = rr * 0.85, my = rr * 0.5;
+    const sx = MathUtils.clamp(cx + (gzRel.x / z) * fpx, mx, width - mx);
+    const sy = MathUtils.clamp(cy - (gzRel.y / z) * fpx, Math.min(height / 2, my + 56), height - my); // 56 px: barra de navegación
     gzRel.x = ((sx - cx) * z) / fpx; gzRel.y = (-(sy - cy) * z) / fpx;
     const u = (L.ultimo ??= {}); // para afinar (?gzdebug); sin crear objetos por cuadro
     u.g = g; u.z = z; u.scale = scale; u.rPx = rPx; u.rMax = rMax; u.sx = sx; u.sy = sy;
