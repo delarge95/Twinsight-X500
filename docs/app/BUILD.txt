@@ -1,2 +1,2 @@
-twinsight-web-twin 8a220cd
-compilado 2026-11-27T09:17:30.810Z
+twinsight-web-twin 7b9a754
+compilado 2026-11-27T14:43:38.180Z
