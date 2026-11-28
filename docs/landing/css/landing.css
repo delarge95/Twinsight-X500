@@ -522,21 +522,20 @@ main, .foot, .rail, .labels { transition: opacity 0.55s var(--ts-motion-easing-s
 }
 
 /* ---------- 07 · Gazebo: el vídeo es una ventana plana dentro de la escena 3D (lo dibuja el lienzo; ver landing/js/gazebo.js) ---------- */
-.gz { min-height: 125vh; display: flex; flex-direction: column; justify-content: center; }
-.gz .block__head { margin-bottom: clamp(20px, 3.5vh, 36px); }
-/* vídeo recortado (5:4, el recorte de gazebo-config.js) y, al lado, el escenario vacío del gemelo, del mismo tamaño.
-   El hueco entre ambos fija el desplazamiento del gemelo respecto al dron del vídeo (gazebo-config.js: desplazamiento null). */
-.gz__win { position: relative; width: min(100%, 1120px, calc((100vh - 300px) * 2.5 + 48px)); }
-.gz__pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4%, 48px); }
+.gz { min-height: 120vh; display: flex; flex-direction: column; justify-content: center; }
+.gz .block__head { margin-bottom: clamp(12px, 2vh, 24px); }
+/* la ventana del simulador, pequeña y abajo; encima, un «cielo» vacío donde vuela el gemelo (lo dibuja el lienzo) */
+.gz__win { position: relative; width: min(100%, 360px); margin-inline: auto; }
+.gz__sky { height: clamp(200px, 40vh, 400px); }
 @media (min-width: 1181px) {
-  .gz .wrap { padding-right: calc(var(--gutter) + 96px); } /* libre el índice lateral */
+  .gz .wrap { display: grid; grid-template-columns: minmax(280px, 1fr) 1.6fr; align-items: end; gap: var(--ts-space-7); padding-right: calc(var(--gutter) + 96px); }
+  .gz .block__head { align-self: start; margin-top: 6vh; }
   .gz .title { font-size: clamp(36px, 3.6vw, 56px); }
 }
-/* recuadro donde la escena clava el plano del vídeo; el <video> es solo la fuente de la textura */
-.gz__frame, .gz__lane { position: relative; width: 100%; aspect-ratio: 5 / 4; }
-.gz__video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; object-position: 48.8% 50%; opacity: 0; pointer-events: none; }
-.no-3d .gz__video { opacity: 1; background: var(--ts-color-surface-0); outline: 1px solid var(--ts-color-line-strong); } /* sin WebGL: el vídeo tal cual (mismo recorte) */
-.no-3d .gz__lane { display: none; }
+/* recuadro donde la escena clava la ventana; la proporción la pone gazebo.js (vídeo recortado + barras + panel) */
+.gz__frame { position: relative; width: 100%; aspect-ratio: 1.6; }
+.gz__video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; opacity: 0; pointer-events: none; }
+.no-3d .gz__video { opacity: 1; background: var(--ts-color-surface-0); outline: 1px solid var(--ts-color-line-strong); } /* sin WebGL: el vídeo tal cual */
 .gz__fail { position: absolute; left: var(--ts-space-3); bottom: var(--ts-space-3); padding: 4px 8px; border: 1px solid var(--ts-color-line-subtle); border-radius: var(--ts-radius-control); background: var(--ts-color-surface-canvas); font-size: 12px; color: var(--ts-color-text-secondary); }
 .gz__cap { display: flex; align-items: center; gap: var(--ts-space-2); margin-top: var(--ts-space-3); }
 /* ⓘ: lo largo va aquí, al pasar el cursor, con el foco o al tocar */
@@ -548,7 +547,7 @@ main, .foot, .rail, .labels { transition: opacity 0.55s var(--ts-motion-easing-s
 .tip:hover .tip__txt, .tip__btn:focus-visible + .tip__txt, .tip__btn[aria-expanded="true"] + .tip__txt { visibility: visible; opacity: 1; transition-delay: 0s; }
 @media (max-width: 860px) {
   .gz { min-height: 100vh; }
-  .gz__win { width: min(100%, 340px); margin-inline: auto; }
-  .gz__pair { grid-template-columns: 1fr; gap: 14px; }
+  .gz__win { width: min(80%, 270px); }
+  .gz__sky { height: clamp(180px, 34vh, 320px); }
   .tip__txt { left: auto; right: -40px; }
 }

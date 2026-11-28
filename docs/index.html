@@ -324,19 +324,17 @@
           <h2 class="title" id="gzTitle"><span class="ln"><span data-i18n="gzA">Del simulador</span></span><span class="ln"><span data-i18n="gzB">a tu pantalla.</span></span></h2>
         </header>
         <figure class="gz__win">
-          <div class="gz__pair">
-            <div class="gz__frame" id="gzFrame">
-              <video class="gz__video" id="gzVideo" muted playsinline loop preload="none" disablepictureinpicture aria-label="Vídeo de Gazebo con el gemelo 3D" data-i18n-aria="gzVideo" aria-describedby="gzAlt"></video>
-              <p class="gz__fail" id="gzFail" hidden data-i18n="gzFail">Vídeo no disponible: solo el gemelo.</p>
-            </div>
-            <!-- escenario del gemelo: lo dibuja el lienzo; este hueco solo reserva su sitio (y marca el desplazamiento del gemelo) -->
-            <div class="gz__lane" id="gzLane" aria-hidden="true"></div>
+          <!-- cielo: hueco donde vuela el gemelo (lo dibuja el lienzo); debajo, la ventana del simulador -->
+          <div class="gz__sky" aria-hidden="true"></div>
+          <div class="gz__frame" id="gzFrame">
+            <video class="gz__video" id="gzVideo" muted playsinline loop preload="none" disablepictureinpicture aria-label="Vídeo de Gazebo con el gemelo 3D" data-i18n-aria="gzVideo" aria-describedby="gzAlt"></video>
+            <p class="gz__fail" id="gzFail" hidden data-i18n="gzFail">Vídeo no disponible: solo el gemelo.</p>
           </div>
           <figcaption class="gz__cap">
             <span class="badge"><i class="dot dot--sim"></i><span data-i18n="gzChip">Gemelo digital SITL · sesión grabada</span></span>
             <span class="tip">
               <button class="tip__btn" type="button" aria-expanded="false" aria-describedby="gzInfo" aria-label="Más información" data-i18n-aria="tipMore">i</button>
-              <span class="tip__txt" id="gzInfo" role="tooltip" data-i18n="gzInfo">Vídeo de Gazebo y telemetría de PX4 SITL grabados a la vez. El dron es simulado.</span>
+              <span class="tip__txt" id="gzInfo" role="tooltip" data-i18n="gzInfo">Vídeo de Gazebo y telemetría de PX4 SITL grabados a la vez. El dron es simulado. Interfaz estilizada; el vídeo es una grabación real de Gazebo.</span>
             </span>
           </figcaption>
           <p class="sr" id="gzAlt" data-i18n="gzAlt">Un X500 simulado despega, avanza hacia la cámara, frena, pierde un motor un instante y aterriza. El gemelo 3D repite cada movimiento delante del vídeo.</p>

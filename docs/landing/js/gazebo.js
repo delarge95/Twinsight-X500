@@ -1,19 +1,21 @@
-// Sección «Gazebo»: el vídeo grabado de la cámara fija de Gazebo se dibuja como un plano dentro de la escena 3D de la landing
-// (mismo renderer, mismo GLB) y el gemelo imita el vuelo con la telemetría de PX4 grabada a la vez.
-// Mapeo (GAZEBO_VIDEO_LANDING_PLAN.md §4): la cámara three ES la cámara de Gazebo; un punto a profundidad Z_ref cae sobre el plano
-// y uno más cercano se adelanta por su mismo rayo (z′ = Z_ref·max(ρ_min, ρ^γ)), así que se proyecta sobre el dron del vídeo pero
-// sobresale hacia el espectador. El vídeo manda: el tiempo sale de requestVideoFrameCallback (o currentTime) + desfase.
+// Sección «Gazebo»: una ventana pequeña de simulador (interfaz estilizada alrededor del vídeo real de Gazebo, recortado) es un plano
+// dentro de la escena 3D de la landing (mismo renderer, mismo GLB), y el gemelo vuela alrededor y por delante de ella, grande, con la
+// telemetría de PX4 grabada a la vez. Cómo se transforma la posición del dron del vídeo en la del gemelo: gazebo-config.js (gemelo).
+// El vídeo manda: el tiempo sale de requestVideoFrameCallback (o currentTime) → mapa de tiempo (o desfase) → telemetría.
 import { GAZEBO as C } from './gazebo-config.js';
 import { Vector3, Quaternion, Matrix4, Euler, VideoTexture, Texture, SRGBColorSpace } from '../vendor/three.bundle.js';
+import { drawChrome, ventanaLayout } from './gazebo-ventana.js';
 
 const smoothstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const getJson = (url) => (url ? fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null) : Promise.resolve(null));
 const num = (...xs) => xs.find((x) => typeof x === 'number' && Number.isFinite(x));
 
-export function createGazebo({ section, video, frame, lane, fail, reduced, onState }) {
+export function createGazebo({ section, video, frame, fail, reduced, onState }) {
   const hasRvfc = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
+  // el recuadro del DOM toma la proporción de la ventana completa (vídeo recortado + barras + panel): la escena la clava ahí
+  { const r = C.recorte; const L0 = ventanaLayout(C.ventana, (r.x1 - r.x0) / (r.y1 - r.y0)); frame.style.aspectRatio = `${L0.W} / ${L0.H}`; }
   const st = {
-    data: null, cam: { ...C.camara }, desfase: C.desfase, desfaseFuente: 'config',
+    data: null, cam: { ...C.camara }, desfase: C.desfase, desfaseFuente: 'config', mapa: null,
     mediaTime: 0, clock: 0, failed: false, playing: false, inView: false, started: false,
     tex: null, posterTex: null, videoTex: null, hasFrame: false,
   };
@@ -69,14 +71,27 @@ export function createGazebo({ section, video, frame, lane, fail, reduced, onSta
     const span = T[hi] - T[lo];
     return [lo, span > 1e-6 ? (t - T[lo]) / span : 0];
   }
+  // Tiempo de vídeo → tiempo de telemetría: con mapaTiempo (nudos [t_vídeo, t_telemetría], lineal a tramos y pendiente 1 fuera de
+  // ellos) para el vídeo recortado y acelerado; si no hay mapa, t_vídeo + desfase.
+  function telTime(tv) {
+    const m = st.mapa;
+    if (!m) return tv + st.desfase;
+    if (tv <= m[0][0]) return m[0][1] + (tv - m[0][0]);
+    const last = m[m.length - 1];
+    if (tv >= last[0]) return last[1] + (tv - last[0]);
+    let lo = 0, hi = m.length - 1;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (m[mid][0] <= tv) lo = mid; else hi = mid; }
+    const a = m[lo], b = m[hi];
+    return a[1] + ((tv - a[0]) / (b[0] - a[0])) * (b[1] - a[1]);
+  }
   function sample(dt, tVideo) {
     const d = st.data;
     if (!d) return null;
     if (tVideo !== undefined) { /* instante dado (afinado): no toca el reloj */ }
     else if (reduced) st.mediaTime = C.tPoster;
-    else if (st.failed || !st.started) { if (st.inView && st.failed) st.clock = (st.clock + dt) % (d.duration - st.desfase); st.mediaTime = st.clock; }
+    else if (st.failed || !st.started) { if (st.inView && st.failed) st.clock = (st.clock + dt) % Math.max(1, st.videoDur || d.duration - st.desfase); st.mediaTime = st.clock; }
     else if (!hasRvfc) st.mediaTime = video.currentTime;
-    const t = (tVideo ?? st.mediaTime) + st.desfase;
+    const t = telTime(tVideo ?? st.mediaTime);
     out.t = t;
     const [i, f] = index(t);
     const j = Math.min(d.n - 1, i + 1);
@@ -96,13 +111,18 @@ export function createGazebo({ section, video, frame, lane, fail, reduced, onSta
     const zp = C.Z_ref * (rho >= 1 ? C.planoMax : Math.min(C.planoMax, Math.max(prof.rhoMin, Math.pow(rho, prof.gamma))));
     out.pos.copy(v).multiplyScalar((zp / z) * k); // mismo rayo, más cerca: mismo píxel que el dron del vídeo
     const near = smoothstep(C.opacidad.rhoLejos, C.opacidad.rhoCerca, rho);
-    // tamaño: proyección exacta (zp/z) por una exageración que crece con la cercanía (rampa de rhoExag a rhoMin)
-    const ex = smoothstep(prof.rhoExag, prof.rhoMin, rho);
     out.scaleExact = (C.radioDron ?? radiusM) * k * (zp / z); // tamaño de la proyección exacta (el del dron del vídeo)
-    out.scale = out.scaleExact * (1 + (prof.exageracion - 1) * ex);
+    out.scale = out.scaleExact;
     out.alpha = C.opacidad.lejos + (C.opacidad.cerca - C.opacidad.lejos) * near;
     out.near = near;
     out.rho = rho;
+    out.zReal = z;
+    // posición y tamaño del dron en el vídeo, normalizados al recorte (−1…1; y hacia abajo): lo que usa el gemelo para volar alrededor
+    const b = cropBox(), fv = (b.w / 2) / Math.tan((st.cam.hfov ?? C.camara.hfov) / 2);
+    const pxv = b.w / 2 + (v.x / z) * fv, pyv = b.h / 2 - (v.y / z) * fv;
+    out.nx = (pxv - (b.x0 + b.x1) / 2) / ((b.x1 - b.x0) / 2);
+    out.ny = (pyv - (b.y0 + b.y1) / 2) / ((b.y1 - b.y0) / 2);
+    out.rVid = ((C.radioDron ?? radiusM) * fv) / z; // radio del dron del vídeo, en px del vídeo
     return out;
   }
 
@@ -166,6 +186,10 @@ export function createGazebo({ section, video, frame, lane, fail, reduced, onSta
     const cg = sync?.camara_gazebo;
     const cam = sync?.camara ?? sync?.camera ?? (cg && { pose: cg.pose_enu_xyz_rpy, hfov: cg.hfov_rad, ancho: sync.video?.ancho, alto: sync.video?.alto });
     if (Array.isArray(cam?.pose) && cam.pose.length === 6) for (const key of ['pose', 'hfov', 'ancho', 'alto']) if (cam[key] != null) st.cam[key] = cam[key];
+    // vídeo recortado y acelerado: mapaTiempo = [[t_vídeo_nuevo, t_telemetría], …]
+    const mapa = sync?.mapaTiempo ?? sync?.mapa_tiempo;
+    if (Array.isArray(mapa) && mapa.length >= 2 && mapa.every((p) => Array.isArray(p) && p.length >= 2)) { st.mapa = mapa.map((p) => [+p[0], +p[1]]).sort((a, b) => a[0] - b[0]); st.desfaseFuente = 'mapaTiempo'; }
+    st.videoDur = num(sync?.video?.duracion_s);
     loadVideo();
     if (twinRef) attach(twinRef);
   }
@@ -211,6 +235,21 @@ export function createGazebo({ section, video, frame, lane, fail, reduced, onSta
     return st.posterReady ? p : null;
   }
 
+  // marco de la ventana del simulador (barra de título, herramientas, panel y estado) dibujado una vez en un lienzo 2D
+  let chromeTex = null;
+  function chromeTexture() {
+    if (chromeTex) return chromeTex;
+    const b = cropBox();
+    const canvas = drawChrome(C.ventana, (b.x1 - b.x0) / (b.y1 - b.y0));
+    chromeTex = new Texture(canvas);
+    chromeTex.colorSpace = SRGBColorSpace;
+    chromeTex.anisotropy = 4;
+    chromeTex.needsUpdate = true;
+    // las fuentes IBM Plex pueden llegar después: se repinta una vez cuando estén
+    document.fonts?.ready?.then(() => { drawChrome(C.ventana, (b.x1 - b.x0) / (b.y1 - b.y0), canvas); chromeTex.needsUpdate = true; });
+    return chromeTex;
+  }
+
   function attach(twin) {
     twinRef = twin;
     if (!st.data) return;
@@ -223,9 +262,9 @@ export function createGazebo({ section, video, frame, lane, fail, reduced, onSta
       D: C.D, halfW, halfH, crop,
       sample, texture,
       rect: () => frame.getBoundingClientRect(),
-      laneRect: () => lane?.getBoundingClientRect() ?? null,
       params: () => (innerWidth <= 860 ? C.movil : C.escritorio),
-      hilo: C.hilo,
+      ventana: ventanaLayout(C.ventana, (b.x1 - b.x0) / (b.y1 - b.y0)), chrome: chromeTexture,
+      cropPx: b,
       spin: C.giroHelices,
     });
   }
@@ -251,6 +290,6 @@ export function createGazebo({ section, video, frame, lane, fail, reduced, onSta
     attach,
     project,
     /** Estado para pruebas y para afinar: tiempo, ρ, desfase y de dónde salió. */
-    debug: () => ({ ultimo: st.layer?.ultimo, px: pixel(), poster: st.posterReady, tex: st.videoTex ? 'video' : st.posterTex ? 'póster' : 'ninguna', mediaTime: st.mediaTime, t: out.t, rho: out.rho, alpha: out.alpha, scale: out.scale, desfase: st.desfase, fuente: st.desfaseFuente, failed: st.failed, playing: st.playing, rvfc: hasRvfc, cam: st.cam.pose }),
+    debug: () => ({ ultimo: st.layer?.ultimo, nx: out.nx, ny: out.ny, mapa: !!st.mapa, px: pixel(), poster: st.posterReady, tex: st.videoTex ? 'video' : st.posterTex ? 'póster' : 'ninguna', mediaTime: st.mediaTime, t: out.t, rho: out.rho, alpha: out.alpha, scale: out.scale, desfase: st.desfase, fuente: st.desfaseFuente, failed: st.failed, playing: st.playing, rvfc: hasRvfc, cam: st.cam.pose }),
   };
 }

@@ -92,7 +92,7 @@ export const EN = {
   pzSrc: 'Data from the project’s technical sheets. Mass is a model estimate, not a measurement.',
   gzK: 'Gazebo', gzA: 'From the simulator', gzB: 'to your screen.',
   gzChip: 'SITL digital twin · recorded session', tipMore: 'More information',
-  gzInfo: 'Gazebo video and PX4 SITL telemetry recorded together. The drone is simulated.',
+  gzInfo: 'Gazebo video and PX4 SITL telemetry recorded together. The drone is simulated. Stylized interface; the video is a real Gazebo recording.',
   gzVideo: 'Gazebo video with the 3D twin', gzFail: 'Video unavailable: twin only.',
   gzAlt: 'A simulated X500 takes off, flies toward the camera, brakes, briefly loses a motor and lands. The 3D twin repeats every move in front of the video.',
   c10k: 'Connection', c10a: 'Connection with the', c10b: 'SITL digital twin.',
