@@ -10,7 +10,7 @@ const smoothstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b
 const getJson = (url) => (url ? fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null) : Promise.resolve(null));
 const num = (...xs) => xs.find((x) => typeof x === 'number' && Number.isFinite(x));
 
-export function createGazebo({ section, video, frame, fail, reduced, onState }) {
+export function createGazebo({ section, video, frame, lane, fail, reduced, onState }) {
   const hasRvfc = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
   const st = {
     data: null, cam: { ...C.camara }, desfase: C.desfase, desfaseFuente: 'config',
@@ -98,7 +98,8 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
     const near = smoothstep(C.opacidad.rhoLejos, C.opacidad.rhoCerca, rho);
     // tamaño: proyección exacta (zp/z) por una exageración que crece con la cercanía (rampa de rhoExag a rhoMin)
     const ex = smoothstep(prof.rhoExag, prof.rhoMin, rho);
-    out.scale = (C.radioDron ?? radiusM) * k * (zp / z) * (1 + (prof.exageracion - 1) * ex);
+    out.scaleExact = (C.radioDron ?? radiusM) * k * (zp / z); // tamaño de la proyección exacta (el del dron del vídeo)
+    out.scale = out.scaleExact * (1 + (prof.exageracion - 1) * ex);
     out.alpha = C.opacidad.lejos + (C.opacidad.cerca - C.opacidad.lejos) * near;
     out.near = near;
     out.rho = rho;
@@ -182,16 +183,28 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
     const img = new Image();
     const tex = new Texture(img);
     tex.colorSpace = SRGBColorSpace;
+    cropTexture(tex);
     img.onload = () => { tex.needsUpdate = true; st.posterReady = true; };
     img.onerror = () => { st.posterReady = false; };
     img.src = C.poster;
     st.posterTex = tex;
     return tex;
   }
+  // Recorte por UV (sin recodificar): el plano muestra solo la caja C.recorte del vídeo; el póster se recorta igual.
+  function cropBox() {
+    const w = st.cam.ancho ?? C.camara.ancho, h = st.cam.alto ?? C.camara.alto;
+    const r = C.recorte ?? { x0: 0, y0: 0, x1: w, y1: h };
+    return { w, h, x0: Math.max(0, r.x0), y0: Math.max(0, r.y0), x1: Math.min(w, r.x1), y1: Math.min(h, r.y1) };
+  }
+  function cropTexture(tex) {
+    const b = cropBox();
+    tex.repeat.set((b.x1 - b.x0) / b.w, (b.y1 - b.y0) / b.h);
+    tex.offset.set(b.x0 / b.w, 1 - b.y1 / b.h);
+  }
   function texture() {
     if (st.failed) return null;               // sin vídeo: solo el gemelo (y el marco)
     if (!reduced && st.hasFrame || (!reduced && !hasRvfc && st.started)) {
-      if (!st.videoTex) { st.videoTex = new VideoTexture(video); st.videoTex.colorSpace = SRGBColorSpace; }
+      if (!st.videoTex) { st.videoTex = new VideoTexture(video); st.videoTex.colorSpace = SRGBColorSpace; cropTexture(st.videoTex); }
       return st.videoTex;
     }
     const p = posterTexture();
@@ -203,11 +216,16 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
     if (!st.data) return;
     setupCamera(new Vector3().fromArray(twin.noseDir));
     radiusM = twin.radiusM;
+    // recorte en unidades de escena a la distancia del plano (centro relativo al eje óptico y medio ancho/alto)
+    const b = cropBox(), upp = (2 * halfW) / b.w;
+    const crop = { cx: ((b.x0 + b.x1) / 2 - b.w / 2) * upp, cy: -((b.y0 + b.y1) / 2 - b.h / 2) * upp, hw: ((b.x1 - b.x0) / 2) * upp, hh: ((b.y1 - b.y0) / 2) * upp };
     twin.setGazebo(st.layer = {
-      D: C.D, halfW, halfH,
+      D: C.D, halfW, halfH, crop,
       sample, texture,
       rect: () => frame.getBoundingClientRect(),
+      laneRect: () => lane?.getBoundingClientRect() ?? null,
       params: () => (innerWidth <= 860 ? C.movil : C.escritorio),
+      hilo: C.hilo,
       spin: C.giroHelices,
     });
   }

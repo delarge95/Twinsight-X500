@@ -6,7 +6,7 @@
 export const GAZEBO = {
   // ── archivos (rutas relativas a docs/) ──
   // Fuentes del <video>, por orden de preferencia. Solo se listan las que existen (una fuente ausente deja un 404 en la consola).
-  // Con la captura final: añadir delante { src: 'media/gazebo/gazebo_demo.webm', type: 'video/webm' }.
+  // Para la edición de color: sustituir gazebo_demo.webm / .mp4 y poster.png por archivos del mismo tamaño y duración, sin tocar código.
   video: [
     { src: 'media/gazebo/gazebo_demo.webm', type: 'video/webm' },
     { src: 'media/gazebo/gazebo_demo.mp4', type: 'video/mp4' },
@@ -39,6 +39,20 @@ export const GAZEBO = {
   // (el EKF da ~0,15 m menos que la pose real de Gazebo). Medido contra verdad_j.jsonl: con 0,35 el error mediano es 6 px de 1280.
   alturaCuerpo: 0.35,
 
+  // ── recorte del vídeo (px del vídeo original, por UV: no se recodifica) ──
+  // Caja de la trayectoria proyectada de todo el vuelo (telemetria.json + pose y FOV de sincronia.json) con el dron entero
+  // (±0,42 m a los lados, +0,15/−0,32 m arriba/abajo) y su sombra en el suelo, más ~25 px de margen: x 194–1055, y 0–720.
+  // Se amplía a 5:4. El póster y el fotograma de movimiento reducido se recortan igual.
+  recorte: { x0: 175, y0: 0, x1: 1075, y1: 720 },
+
+  // ── el gemelo AL LADO del vídeo, no encima ──
+  // Se dibuja en su propio «escenario» (un recuadro gris grafito vacío, #gzLane en el HTML) en la misma posición relativa que el dron
+  // ocupa en el vídeo: misma pose, desplazada un recuadro. Así se ven a la vez Gazebo y el gemelo sin taparse, y el gemelo puede
+  // salir de su recuadro hacia el espectador. desplazamiento: null = el que marca el maquetado (centro de #gzLane − centro del vídeo);
+  // [dx, dy] = fracciones del ancho/alto del recuadro del vídeo (p. ej. [1.08, 0] a la derecha, [0, 1.1] debajo).
+  // sinSolape: px mínimos entre la silueta del gemelo y la del dron del vídeo; el tamaño del gemelo se limita para respetarlos.
+  hilo: 0.55, // opacidad de la línea grafito que une el dron del vídeo con el gemelo (0 = sin línea)
+
   // ── «salir de la pantalla» ──
   // ρ = z / Z_ref. Si ρ < 1 el gemelo se adelanta al plano: z′ = Z_ref·max(ρ_min, ρ^γ) y (x′, y′) = (x, y)·z′/z
   // (mismo rayo → mismo píxel que el dron del vídeo, pero más cerca del espectador; se nota con el paralaje).
@@ -53,6 +67,8 @@ export const GAZEBO = {
     paralaje: 0.6,    // unidades de escena que se mueve la «cabeza» (cámara three) con el puntero y el scroll; delata la profundidad
     vaiven: 0.1,      // vaivén lento automático de la cámara (0 = nada); se suma al paralaje
     inclinacion: 4,   // grados máximos que se inclina la ventana con el puntero y el scroll (0 con movimiento reducido)
+    desplazamiento: null, // escritorio: el gemelo a la derecha del vídeo (lo marca #gzLane)
+    sinSolape: 16,
   },
   movil: { // pantallas ≤ 860 px: menos profundidad y ventana casi plana, mismo vídeo
     gamma: 1.3,
@@ -63,13 +79,15 @@ export const GAZEBO = {
     paralaje: 0.3,
     vaiven: 0.06,
     inclinacion: 1,
+    desplazamiento: null, // móvil: debajo del vídeo (lo marca #gzLane)
+    sinSolape: 10,
   },
   planoMax: 0.97,
 
-  // ── opacidad del gemelo ── smoothstep(rhoLejos, rhoCerca, ρ): lejos se ve sobre todo el dron del vídeo; cerca, el gemelo macizo.
-  // La misma rampa enciende la sombra de contacto del gemelo sobre el vídeo.
+  // ── opacidad del gemelo ── smoothstep(rhoLejos, rhoCerca, ρ): algo traslúcido lejos, macizo cerca.
+  // La misma rampa enciende la sombra de contacto del gemelo sobre su recuadro.
   opacidad: {
-    lejos: 0.35,    // opacidad con ρ ≥ rhoLejos (0 = invisible: solo el vídeo)
+    lejos: 1,       // opacidad con ρ ≥ rhoLejos (ya no tapa al dron del vídeo: macizo siempre; bajar si se quiere un gemelo «fantasma»)
     cerca: 1,       // opacidad con ρ ≤ rhoCerca
     rhoLejos: 1.0,
     rhoCerca: 0.6,

@@ -599,7 +599,7 @@ let gazebo = null;
 const gzSection = $('#gazebo');
 if (gzSection) {
   import('./gazebo.js').then(({ createGazebo }) => {
-    gazebo = createGazebo({ section: gzSection, video: $('#gzVideo'), frame: $('#gzFrame'), fail: $('#gzFail'), reduced });
+    gazebo = createGazebo({ section: gzSection, video: $('#gzVideo'), frame: $('#gzFrame'), lane: $('#gzLane'), fail: $('#gzFail'), reduced });
     if (twin) gazebo.attach(twin);
     if (new URLSearchParams(location.search).has('gzdebug')) window.twinsightGazebo = gazebo; // para afinar el efecto desde la consola
   }).catch((err) => console.warn('TwinSight: sin sección Gazebo', err));

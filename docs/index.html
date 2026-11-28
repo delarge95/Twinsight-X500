@@ -324,9 +324,13 @@
           <h2 class="title" id="gzTitle"><span class="ln"><span data-i18n="gzA">Del simulador</span></span><span class="ln"><span data-i18n="gzB">a tu pantalla.</span></span></h2>
         </header>
         <figure class="gz__win">
-          <div class="gz__frame" id="gzFrame">
-            <video class="gz__video" id="gzVideo" muted playsinline loop preload="none" disablepictureinpicture aria-label="Vídeo de Gazebo con el gemelo 3D" data-i18n-aria="gzVideo" aria-describedby="gzAlt"></video>
-            <p class="gz__fail" id="gzFail" hidden data-i18n="gzFail">Vídeo no disponible: solo el gemelo.</p>
+          <div class="gz__pair">
+            <div class="gz__frame" id="gzFrame">
+              <video class="gz__video" id="gzVideo" muted playsinline loop preload="none" disablepictureinpicture aria-label="Vídeo de Gazebo con el gemelo 3D" data-i18n-aria="gzVideo" aria-describedby="gzAlt"></video>
+              <p class="gz__fail" id="gzFail" hidden data-i18n="gzFail">Vídeo no disponible: solo el gemelo.</p>
+            </div>
+            <!-- escenario del gemelo: lo dibuja el lienzo; este hueco solo reserva su sitio (y marca el desplazamiento del gemelo) -->
+            <div class="gz__lane" id="gzLane" aria-hidden="true"></div>
           </div>
           <figcaption class="gz__cap">
             <span class="badge"><i class="dot dot--sim"></i><span data-i18n="gzChip">Gemelo digital SITL · sesión grabada</span></span>
