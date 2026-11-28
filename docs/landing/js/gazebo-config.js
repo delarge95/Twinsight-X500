@@ -16,11 +16,12 @@ export const GAZEBO = {
   sincronia: 'media/gazebo/sincronia.json',   // opcional: { desfase_s, camara: { pose, hfov } }. null = no se pide.
 
   // ── sincronía ──
-  // tiempo de telemetría (s desde t0_lt) = mediaTime del vídeo + desfase.
-  // Orden: sincronia.json → «record» de los eventos de la telemetría (corregido por la duración real del vídeo) → este valor.
+  // tiempo de telemetría (s desde t0_lt) = mapaTiempo de sincronia.json (vídeo recortado y acelerado, lineal a tramos) o, si no
+  // lo trae, mediaTime del vídeo + desfase (sincronia.json → «record» de los eventos → este valor).
   desfase: 0,
-  // Instante del póster (s de vídeo): con movimiento reducido el gemelo se queda quieto en este fotograma.
-  tPoster: 48.2, // captura v2: punto más cercano (4,1 m). El póster es este fotograma, para que el gemelo quieto coincida con él
+  // Instante del póster (s del vídeo ACTUAL): con movimiento reducido el gemelo se queda quieto en este fotograma.
+  // Vídeo corto: el póster de la grabación es el fotograma 22,53 s (dron grande, cerca de la cámara).
+  tPoster: 22.53,
 
   // ── cámara de Gazebo (camara_demo.sdf) ──
   // pose = x y z (ENU, m) roll pitch yaw (rad), como en el SDF. Es la de la captura v2 (8,5 m al norte del despegue de referencia,
