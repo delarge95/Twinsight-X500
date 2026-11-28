@@ -59,12 +59,12 @@ export const GAZEBO = {
   // Topes: nunca fuera de la pantalla (margen 8 px, barra de navegación arriba) y nunca encima del dron del vídeo (sinSolape px):
   // si lo taparía, sube; si arriba no cabe, se encoge. La actitud copia la telemetría.
   escritorio: {
-    ampX: 2.4, ampY: 1.0,   // amplificación del movimiento del dron (en medias ventanas)
-    elevacion: 1.05,        // el gemelo vuela por encima de la ventana (en altos de ventana)
+    ampX: 1.8, ampY: 0.8,   // amplificación del movimiento del dron (en medias ventanas)
+    elevacion: 0.62,        // el gemelo vuela por encima de la ventana (en altos de ventana)
     desvioX: 0,             // desplazamiento lateral fijo (en anchos de ventana)
-    tamBase: 0.135,         // radio con el dron a Z_ref (en fracción del lado corto de la pantalla): ≈ 4× el dron del vídeo
+    tamBase: 0.19,         // radio con el dron a Z_ref (en fracción del lado corto de la pantalla): ≈ 4× el dron del vídeo
     crecimiento: 1.1,       // cuánto crece al acercarse a la cámara de Gazebo
-    radioMax: 0.4,
+    radioMax: 0.5,
     vistaDesdeArriba: 9,    // grados extra para ver el gemelo algo desde arriba (además de los 3,5° de la cámara de Gazebo)
     sinSolape: 14,
     margenEKF: 0.7,         // margen extra con el dron del vídeo, en radios suyos (error de altura del EKF; medido contra la pose real)
@@ -74,12 +74,12 @@ export const GAZEBO = {
     inclinacion: 4,   // grados máximos que se inclina la ventana con el puntero y el scroll (0 con movimiento reducido)
   },
   movil: { // pantallas ≤ 860 px: ventana pequeña abajo, el gemelo encima, menos profundidad y ventana casi plana
-    ampX: 1.5, ampY: 0.8,
-    elevacion: 1.15,
+    ampX: 1.2, ampY: 0.7,
+    elevacion: 0.7,
     desvioX: 0,
-    tamBase: 0.19,
+    tamBase: 0.27,
     crecimiento: 0.9,
-    radioMax: 0.48,
+    radioMax: 0.56,
     vistaDesdeArriba: 9,
     sinSolape: 10,
     margenEKF: 0.7,
