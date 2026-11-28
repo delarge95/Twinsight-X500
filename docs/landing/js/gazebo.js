@@ -262,6 +262,7 @@ export function createGazebo({ section, video, frame, fail, reduced, onState }) 
       D: C.D, halfW, halfH, crop,
       sample, texture,
       rect: () => frame.getBoundingClientRect(),
+      headRect: () => section.querySelector('.block__head')?.getBoundingClientRect() ?? null,
       params: () => (innerWidth <= 860 ? C.movil : C.escritorio),
       ventana: ventanaLayout(C.ventana, (b.x1 - b.x0) / (b.y1 - b.y0)), chrome: chromeTexture,
       cropPx: b,

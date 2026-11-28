@@ -447,16 +447,10 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
   gzPlane.renderOrder = -2;
   const gzBack = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ color: new Color('#000000'), transparent: true, depthWrite: false, toneMapped: false }));
   gzBack.renderOrder = -4; // sombra dura (sin desenfoque) desplazada: la ventana flota delante del fondo
-  const gzGround = new Line(new BufferGeometry(), new LineBasicMaterial({ color: new Color('#33393F'), transparent: true })); // --ts-color-line-subtle
-  const gzContact = new Mesh(new PlaneGeometry(1, 1), new ShaderMaterial({
-    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'uniform float uA; varying vec2 vUv; void main(){ float r = length(vUv - 0.5) * 2.0; gl_FragColor = vec4(0.0, 0.0, 0.0, uA * (1.0 - smoothstep(0.25, 1.0, r))); }',
-    uniforms: { uA: { value: 0 } }, transparent: true, depthWrite: false,
-  }));
-  gzContact.renderOrder = -1; // sombra del gemelo sobre la ventana cuando pasa por delante: negra, sin brillo
-  gzRoot.add(gzBack, gzChrome, gzPlane, gzGround, gzContact);
+  gzRoot.add(gzBack, gzChrome, gzPlane);
   const gzCam = new Vector3(), gzP0 = new Matrix4(), gzP1 = new Matrix4(), gzPos = new Vector3(), gzRel = new Vector3();
   const gzTilt = new Quaternion(), gzEuler = new Euler();
+  const gzRay = new Vector3(), gzAxis = new Vector3(0, 0, -1), gzQRay = new Quaternion(), gzQAbove = new Quaternion(), gzXAxis = new Vector3(1, 0, 0);
   let gzBuilt = false;
   function setTwinAlpha(a) {
     if (Math.abs(a - twinAlpha) < 1e-3) return;
@@ -492,8 +486,6 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     gzPlane.position.set(gzWin.vx, gzWin.vy, 0);
     gzBack.scale.set(gzWin.W, gzWin.H, 1);
     gzBack.position.set(gzWin.W * 0.03, -gzWin.H * 0.045, -0.12);
-    const gy = -gzWin.H * 0.6; // línea de suelo bajo la ventana: referencia sobria de dónde está el «suelo» de la escena
-    gzGround.geometry.setAttribute('position', new BufferAttribute(new Float32Array([-gzWin.W * 1.6, gy, 0.3, gzWin.W * 1.6, gy, 0.3]), 3));
     gzBuilt = true;
   }
   function applyGazebo(g, dt) {
@@ -540,7 +532,6 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     gzChrome.material.opacity = g;
     gzChrome.material.transparent = g < 0.999;
     gzBack.material.opacity = 0.55 * g;
-    gzGround.material.opacity = g;
 
     // ── gemelo ── posición en pantalla a partir de la del dron en el vídeo (gazebo-config.js → gemelo), tamaño según la cercanía.
     const KX = 0.9, KY = 0.55; // silueta aproximada: media anchura 0,9·r, media altura 0,55·r (el dron es ancho y bajo)
@@ -554,15 +545,19 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     let rPx = Math.min(p.radioMax * short, p.tamBase * short * Math.pow(1 / Math.max(s.rho, p.rhoMin), p.crecimiento));
     let sx = cx + p.desvioX * winW + p.ampX * s.nx * winW / 2;
     let sy = cy - p.elevacion * winH + p.ampY * s.ny * winH / 2;
-    const top = 56 + 8, m = 8;
+    // arriba: la barra de navegación y, en móvil, el título de la sección (el gemelo no se mete debajo del texto)
+    const hr = width <= 860 ? L.headRect?.() : null;
+    const top = Math.max(56 + 8, hr && hr.bottom > 0 && hr.bottom < cy ? hr.bottom + 8 : 0), m = 8;
     // dentro de la pantalla: primero en tamaño (que quepa), luego en posición
     rPx = Math.min(rPx, (width - 2 * m) / (2 * KX), (height - top - m) / (2 * KY));
     sx = MathUtils.clamp(sx, m + KX * rPx, width - m - KX * rPx);
     sy = MathUtils.clamp(sy, top + KY * rPx, height - m - KY * rPx);
     // sin tapar al dron del vídeo (si se ve en el recorte): si las cajas se cruzan, el gemelo sube; si arriba no cabe, se encoge
     const dVis = xe + KX * rE > vidL && xe - KX * rE < vidL + vidW && ye + KY * rE > vidT && ye - KY * rE < vidT + vidH;
-    const dTop = Math.max(vidT, ye - KY * rE) - p.sinSolape;
-    const crosses = () => dVis && sx + KX * rPx > xe - KX * rE - p.sinSolape && sx - KX * rPx < xe + KX * rE + p.sinSolape && sy + KY * rPx > dTop;
+    // margen: fijo + proporcional al tamaño del dron del vídeo (la altura del EKF difiere de la real hasta ~0,5 m: de cerca son px)
+    const gap = p.sinSolape + (p.margenEKF ?? 0) * rE;
+    const dTop = Math.max(vidT, ye - KY * rE) - gap;
+    const crosses = () => dVis && sx + KX * rPx > xe - KX * rE - gap && sx - KX * rPx < xe + KX * rE + gap && sy + KY * rPx > dTop;
     if (crosses()) {
       sy = dTop - KY * rPx;
       if (sy - KY * rPx < top) { rPx = Math.max(6, (dTop - top) / (2 * KY)); sy = top + KY * rPx; }
@@ -577,13 +572,6 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
 
     const gIn = MathUtils.smoothstep(g, 0.85, 1), gOut = 1 - MathUtils.smoothstep(g, 0, 0.4);
 
-    // sombra del gemelo sobre la ventana cuando pasa por delante (luz de frente y algo arriba): solo si cae dentro
-    const lx = (sx - cx) / ppu, ly = -(sy - cy) / ppu - (KY * rPx * 1.1) / ppu;
-    const inside = Math.abs(lx) < gzWin.W / 2 && Math.abs(ly) < gzWin.H / 2;
-    gzContact.visible = inside;
-    gzContact.position.set(lx, ly, 0.012);
-    gzContact.scale.set((2 * KX * rPx) / ppu, (0.7 * KY * rPx) / ppu, 1);
-    gzContact.material.uniforms.uA.value = 0.5 * g * gIn;
 
     // gemelo en el espacio de la cámara de Gazebo, delante de la ventana. En la transición no viaja entre las dos poses (la cámara
     // lo atravesaría y llenaría la pantalla): se desvanece en la de los capítulos y aparece en la de Gazebo.
@@ -591,7 +579,12 @@ export async function createTwin(canvas, { modelUrl, onProgress, onAnchors, grou
     rig.visible = gIn > 0.001 || gOut > 0.001;
     if (gIn > 0.001) {
       rig.position.copy(gzPos.copy(GZ_ORIGIN).add(gzRel));
-      rig.quaternion.copy(s.quat);
+      // El gemelo vuela lejos del eje óptico (encima de la ventana) y muy cerca: con la perspectiva se vería desde abajo y de lado.
+      // Se gira para que la cámara lo vea como lo vería si estuviera en el eje (de frente) y un poco desde arriba (vistaDesdeArriba).
+      gzRay.copy(rig.position).sub(gzCam).normalize();
+      gzQRay.setFromUnitVectors(gzAxis, gzRay);
+      gzQAbove.setFromAxisAngle(gzXAxis, MathUtils.degToRad(p.vistaDesdeArriba ?? 0));
+      rig.quaternion.copy(gzQRay).multiply(gzQAbove).multiply(s.quat);
       rig.scale.setScalar(scale);
       setTwinAlpha(s.alpha * gIn);
     } else {

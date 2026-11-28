@@ -69,14 +69,15 @@ export function drawChrome(v, aspect, canvas = document.createElement('canvas'))
   if (pW > 0) {
     g.fillStyle = COL.panel; g.fillRect(b, py, pW, ph);
     g.fillStyle = COL.linea; g.fillRect(b + pW - 1, py, 1, ph);
-    const rh = Math.min(hH * 0.9, ph / 7), fs = Math.round(Math.min(rh * 0.46, pW / 13));
+    // panel sencillo: pocas filas y letra legible (≥ 11 px con la ventana a ~500 px)
+    const rh = Math.min(hH * 1.15, ph / 5), fs = Math.round(Math.min(rh * 0.5, pW / 9.5));
     g.font = font(fs, 500, true); g.textBaseline = 'middle';
-    const rows = [['default', 0], ['ground_plane', 1], ['sun', 1], ['demo_cam', 1], ['x500_0', 1], ['base_link', 2], ['rotor_0…3', 2]];
+    const rows = [['default', 0], ['x500_0', 1], ['demo_cam', 1], ['sun', 1]];
     rows.forEach(([name, lvl], i) => {
       const ry = py + rh * (i + 0.6);
       if (name === 'x500_0') { g.fillStyle = COL.sel; g.fillRect(b + 1, ry - rh / 2, pW - 2, rh); }
       g.fillStyle = lvl === 0 ? COL.texto : COL.tenue;
-      g.fillText((lvl ? '  '.repeat(lvl) + '▸ ' : '') + name, b + rh * 0.4, ry);
+      g.fillText((lvl ? '▸ ' : '') + name, b + rh * (0.3 + 0.35 * lvl), ry);
     });
   }
   // zona del vídeo (el plano del vídeo va encima) y barra de estado

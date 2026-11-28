@@ -41,13 +41,14 @@ export const GAZEBO = {
   alturaCuerpo: 0.35,
 
   // ── recorte del vídeo (px del vídeo original, por UV: no se recodifica) ──
-  // Ventana pequeña: recorte ceñido a donde vuela el dron (centro del dron entre x 590–726 y y 80–508 el 90 % del vuelo). En el punto
-  // más cercano (4 m) el dron se sale del recorte por arriba: aceptado. 16:10. El póster y el fotograma estático se recortan igual.
-  recorte: { x0: 340, y0: 150, x1: 940, y1: 525 },
+  // El dron entero (hélices ±0,45 m, +0,18/−0,35 m) y su sombra en el suelo quedan DENTRO en todo el vídeo corto (telemetría
+  // 6,05–73,75 s, con la pose y el FOV de sincronia.json): caja x 194–1055, y 0–715 (en el punto más cercano el dron llega a y ≈ 130;
+  // un pico del EKF en el fallo de motor toca el borde superior). Se amplía a 5:4. El póster y el fotograma estático se recortan igual.
+  recorte: { x0: 175, y0: 0, x1: 1075, y1: 720 },
 
   // ── ventana del simulador alrededor del vídeo (interfaz estilizada; ver gazebo-ventana.js) ──
   // Medidas en fracciones del ancho del vídeo recortado. panel: 0 = sin panel lateral.
-  ventana: { titulo: 0.09, herramientas: 0.075, estado: 0.06, panel: 0.3, borde: 0.006 },
+  ventana: { titulo: 0.085, herramientas: 0.07, estado: 0.055, panel: 0.27, borde: 0.005 },
 
   // ── el gemelo: vuela ALREDEDOR de la ventana, grande, sin tapar al dron del vídeo ──
   // Posición en pantalla (px), a partir de la del dron en el recorte del vídeo (nx, ny ∈ −1…1, y hacia abajo):
@@ -61,10 +62,12 @@ export const GAZEBO = {
     ampX: 2.4, ampY: 1.0,   // amplificación del movimiento del dron (en medias ventanas)
     elevacion: 1.05,        // el gemelo vuela por encima de la ventana (en altos de ventana)
     desvioX: 0,             // desplazamiento lateral fijo (en anchos de ventana)
-    tamBase: 0.1,           // radio con el dron a Z_ref (en fracción del lado corto de la pantalla): ≈ 3–4× el dron del vídeo
+    tamBase: 0.135,         // radio con el dron a Z_ref (en fracción del lado corto de la pantalla): ≈ 4× el dron del vídeo
     crecimiento: 1.1,       // cuánto crece al acercarse a la cámara de Gazebo
-    radioMax: 0.3,
+    radioMax: 0.4,
+    vistaDesdeArriba: 9,    // grados extra para ver el gemelo algo desde arriba (además de los 3,5° de la cámara de Gazebo)
     sinSolape: 14,
+    margenEKF: 0.7,         // margen extra con el dron del vídeo, en radios suyos (error de altura del EKF; medido contra la pose real)
     gamma: 1.6, rhoMin: 0.3, // profundidad del gemelo delante de la ventana
     paralaje: 0.6,    // unidades de escena que se mueve la «cabeza» (cámara three) con el puntero y el scroll; delata la profundidad
     vaiven: 0.1,      // vaivén lento automático de la cámara (0 = nada); se suma al paralaje
@@ -74,10 +77,12 @@ export const GAZEBO = {
     ampX: 1.5, ampY: 0.8,
     elevacion: 1.15,
     desvioX: 0,
-    tamBase: 0.14,
+    tamBase: 0.19,
     crecimiento: 0.9,
-    radioMax: 0.36,
+    radioMax: 0.48,
+    vistaDesdeArriba: 9,
     sinSolape: 10,
+    margenEKF: 0.7,
     gamma: 1.3, rhoMin: 0.45,
     paralaje: 0.3,
     vaiven: 0.06,
@@ -85,7 +90,7 @@ export const GAZEBO = {
   },
   planoMax: 0.97,
 
-  // ── opacidad del gemelo y sombra de contacto ── smoothstep(rhoLejos, rhoCerca, ρ) enciende la sombra al acercarse.
+  // ── opacidad del gemelo ── smoothstep(rhoLejos, rhoCerca, ρ) entre lejos y cerca (hoy macizo siempre: no tapa al dron del vídeo).
   opacidad: {
     lejos: 1,       // el gemelo no tapa al dron del vídeo: macizo siempre
     cerca: 1,
